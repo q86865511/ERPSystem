@@ -1,0 +1,73 @@
+# Manufacturing ERP
+
+[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+
+A from-scratch **manufacturing ERP** built as a portfolio project. Its soul is a hand-written
+**double-entry General Ledger**: every business action — goods receipt, production, shipment,
+payment — posts a balanced journal entry **in the same database transaction** as the document and
+inventory change. Nothing is ever half-posted; an unbalanced entry cannot be committed.
+
+> **Why build from scratch instead of extending Odoo/ERPNext?** Because the deliverable is evidence
+> of *architecture and ERP-domain literacy* — a posting engine with a hard debit=credit invariant, an
+> immutable inventory subledger that reconciles to a GL control account, and a
+> document → inventory → ledger pipeline defensible line by line. Extending a packaged ERP would
+> mostly demonstrate framework configuration. (Extending would be the right call for shipping real
+> business value fast, or when targeting an explicit Odoo/Frappe role — neither applies here.)
+
+## The headline demo — buy → make → sell
+
+One vertical slice exercises the document → inventory → ledger loop three times and lands the
+manufacturing differentiator (single-level BOM + Work Order with correct WIP accounting):
+
+1. **Buy** a raw material — Purchase Order → Goods Receipt → Vendor Bill → Payment
+2. **Make** a finished good — single-level BOM → Work Order (consume raw into WIP, produce finished good)
+3. **Sell** it — Sales Order → Delivery (COGS) → Invoice (revenue) → Receipt
+
+Then **prove it**: the *reconciliation health-check* asserts the books are correct —
+global `SUM(debit) = SUM(credit)`, inventory subledger value == GL Inventory control balance,
+AR/AP subledgers == their control accounts, and every clearing account (GR-IR, WIP) nets to zero
+after a complete cycle. This one report is the project's hero artifact.
+
+## Architecture
+
+A **modular monolith**: single deployable, single PostgreSQL database, in-process modules whose
+boundaries are *enforced* (no module imports another's internals or touches its tables — checked in
+CI with ArchUnit). The `ledger` module is a shared kernel; every other module posts through the
+single `LedgerPostingService`. See [docs/adr/](docs/adr/) for the architecture decision records.
+
+| Layer | Choice |
+|---|---|
+| Backend | Java 21 + Spring Boot 4 |
+| Database | PostgreSQL 16 |
+| Persistence | Spring Data JPA / Hibernate + Flyway migrations |
+| Boundary enforcement | ArchUnit (CI-enforced) |
+| Money | `BigDecimal` + Money value object (`NUMERIC(19,4)`), never `float` |
+| Auth | Spring Security + stateless JWT, role-based |
+| Testing | JUnit + Testcontainers (real Postgres) |
+| Frontend | React 18 + TypeScript + Mantine *(later phase)* |
+
+## Running it
+
+Prerequisites: **JDK 21**, **Docker** (for the database / Testcontainers).
+
+```bash
+# run the test suite (spins a throwaway Postgres via Testcontainers)
+./mvnw test
+
+# run the app locally (Spring Boot Docker Compose auto-starts the postgres service)
+./mvnw spring-boot:run
+```
+
+> On Windows the Maven Wrapper needs `powershell` on PATH and `JAVA_HOME` set; see
+> [PROGRESS.md](PROGRESS.md) for the exact environment notes used during development.
+
+## Roadmap
+
+Phase 0 walking skeleton (ledger spine) → 1 products & inventory → 2 procure-to-pay →
+3 order-to-cash → **4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close →
+6 polish & packaging. Full plan and consciously-deferred scope are tracked in [PROGRESS.md](PROGRESS.md).
+
+### Consciously deferred (deliberate scoping, not gaps)
+Multi-currency/FX, multi-tenancy (never), FIFO/standard-cost variances, tax engine beyond one VAT
+line, approval workflows, full time-phased MRP, lot/serial tracking, routings/work-centers/labor,
+multi-warehouse transfers, multi-level BOM.
