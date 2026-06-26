@@ -2,6 +2,8 @@ package com.erp.sales.web;
 
 import com.erp.sales.application.DeliveryService;
 import com.erp.sales.application.DeliveryService.DeliveryLineInput;
+import com.erp.sales.application.SalesInvoiceService;
+import com.erp.sales.application.SalesInvoiceService.InvoiceLineInput;
 import com.erp.sales.application.SalesOrderService;
 import com.erp.sales.application.SalesOrderService.SoLineInput;
 import org.springframework.http.HttpStatus;
@@ -25,10 +27,13 @@ public class SalesController {
 
     private final SalesOrderService salesOrderService;
     private final DeliveryService deliveryService;
+    private final SalesInvoiceService salesInvoiceService;
 
-    public SalesController(SalesOrderService salesOrderService, DeliveryService deliveryService) {
+    public SalesController(SalesOrderService salesOrderService, DeliveryService deliveryService,
+                           SalesInvoiceService salesInvoiceService) {
         this.salesOrderService = salesOrderService;
         this.deliveryService = deliveryService;
+        this.salesInvoiceService = salesInvoiceService;
     }
 
     public record CreateSoLine(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice) {
@@ -42,6 +47,13 @@ public class SalesController {
 
     public record CreateDeliveryRequest(Long salesOrderId, Long stockLocationId, LocalDate postingDate,
                                         List<DeliveryLine> lines) {
+    }
+
+    public record InvoiceLine(Long soLineId, BigDecimal qty, BigDecimal unitPrice) {
+    }
+
+    public record CreateInvoiceRequest(Long salesOrderId, String taxRateCode, LocalDate postingDate,
+                                       List<InvoiceLine> lines) {
     }
 
     @PostMapping("/sales-orders")
@@ -80,6 +92,23 @@ public class SalesController {
     @GetMapping("/deliveries/{id}")
     public DeliveryResponse getDelivery(@PathVariable Long id) {
         return DeliveryResponse.from(deliveryService.getDelivery(id));
+    }
+
+    @PostMapping("/sales-invoices")
+    public ResponseEntity<SalesInvoiceResponse> postInvoice(@RequestBody CreateInvoiceRequest request,
+                                                            Principal principal) {
+        LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
+        String taxRateCode = request.taxRateCode() != null ? request.taxRateCode() : "STANDARD";
+        List<InvoiceLineInput> lines = request.lines().stream()
+                .map(l -> new InvoiceLineInput(l.soLineId(), l.qty(), l.unitPrice())).toList();
+        SalesInvoiceResponse body = SalesInvoiceResponse.from(salesInvoiceService.postInvoice(
+                request.salesOrderId(), lines, taxRateCode, postingDate, actor(principal)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(body);
+    }
+
+    @GetMapping("/sales-invoices/{id}")
+    public SalesInvoiceResponse getInvoice(@PathVariable Long id) {
+        return SalesInvoiceResponse.from(salesInvoiceService.getInvoice(id));
     }
 
     private static String actor(Principal principal) {

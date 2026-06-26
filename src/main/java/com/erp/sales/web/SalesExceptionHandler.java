@@ -2,6 +2,7 @@ package com.erp.sales.web;
 
 import com.erp.sales.application.DeliveryNotFoundException;
 import com.erp.sales.application.SalesException;
+import com.erp.sales.application.SalesInvoiceNotFoundException;
 import com.erp.sales.application.SalesOrderNotFoundException;
 import com.erp.sales.application.SalesValidationException;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class SalesExceptionHandler {
 
-    @ExceptionHandler({SalesOrderNotFoundException.class, DeliveryNotFoundException.class})
+    @ExceptionHandler({SalesOrderNotFoundException.class, DeliveryNotFoundException.class,
+            SalesInvoiceNotFoundException.class})
     public ProblemDetail onNotFound(SalesException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }

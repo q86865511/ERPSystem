@@ -1,11 +1,17 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
-**Phase 3(訂單到收款)進行中** — 採「延後 COGS(deferred COGS)」設計鏡像採購側 GR-IR:出貨先把成本停在新過渡科目 1340,開票時才認 COGS,使「出貨↔開票」對稱清零。計畫 7 段 PR(Phase 3 四段 + Phase 4 三段),計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`。**S1 完成**:新 `sales` 模組 SO→Delivery(SHIPMENT 移動,`Dr 1340 / Cr 1330` 以移動平均成本),新增延後 COGS 科目 1340、movement type `SHIPMENT`/`SALES_RETURN` + COUNTER 規則→1340、銷售文件序號;`mvn verify` 全綠(Surefire 45、IT 36)。
+**Phase 3(訂單到收款)進行中** — 採「延後 COGS(deferred COGS)」設計鏡像採購側 GR-IR:出貨先把成本停在新過渡科目 1340,開票時才認 COGS,使「出貨↔開票」對稱清零。計畫 7 段 PR(Phase 3 四段 + Phase 4 三段),計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`。**S1+S2 完成**:`sales` 模組 SO→Delivery→CustomerInvoice;出貨 `Dr 1340 / Cr 1330`(移動平均),開票 `Dr 1200 / Cr 4100、Cr 2400` + `Dr 5100 / Cr 1340`(FIFO 配對 delivery 成本清 1340,延後 COGS 完整清零),AR 子帳==1200。`mvn verify` 全綠(Surefire 45、IT 39)。
 **Phase 2(採購到付款)完成** — 分 4 段 PR 交付(Partner/種子、purchasing PO→GR、VendorBill、payments)。**Phase 2 驗收達成(`ApReconciliationIT`)**:PO→GR→VendorBill→Payment 全鏈跑完後 **GR-IR→0、AP→0、AP 子帳==GL 2100、試算表平衡、庫存上升**;採購價差走庫存重估、GL 帶 partner 維度。
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-26] 🧾 P3-S2 CustomerInvoice(收入 + Output VAT + 認 COGS + AR 子帳)(Phase 3 Stage 2)
+  - `sales` 加 domain `SalesInvoice`/`InvoiceLine`(狀態機 DRAFT→POSTED→PARTIALLY_PAID→PAID,line 記 line_cogs);`SalesInvoiceService.postInvoice`(逐行算 net/vat 走售價,FIFO 配對 open `delivery_line` 算 COGS=配對 qty×delivery 成本 → bump qty_invoiced → 組 JE → 存 POSTED),鏡像 `VendorBillService`(無 revalue/無變異)。
+  - **開票分錄**:收入側 `Dr 1200(gross,標 partner)/ Cr 4100(net)、Cr 2400(vat)`;COGS 側 `Dr 5100 / Cr 1340`(清延後 COGS)。兩側各自天然平衡,無需 9990。`ArSubledgerService.arSubledgerBalance()`=Σ 未結發票餘額,對帳到 GL 1200。
+  - **published port**:`sales.api.ReceivableDocuments`/`ReceivableInvoiceView`(供 S3 payments IN 沖銷,由 `SalesInvoiceService` 實作);`DeliveryLineRepository` FIFO。REST `/api/sales/sales-invoices`。V11(sales_invoice/invoice_line)。
+  - **inventory.api 增益(additive)**:`StockMovementResult` 加 `unitCost`/`value`(該次移動實際成本/金額)。修正:出貨記成本須用「出貨當下移動平均」而非 issue 後的 `newAvgUnitCost`(全數出清會歸零);Phase 4 工單成本滾算同樣需要。`DeliveryService` 改用 `result.unitCost()`。
+  - `SalesInvoicePostingIT`(乾淨:`Dr1200/Cr4100/Cr2400`+`Dr5100/Cr1340`、1340 該訂單淨額→0、AR 子帳==1200;部分開票 FIFO;擋超出已出貨)。`verify` 全綠(Surefire 45、IT 39)。
 - [2026-06-26] 🚚 P3-S1 sales SO→Delivery(延後 COGS 出貨)(Phase 3 Stage 1)
   - 新 `sales` 模組:domain `SalesOrder`/`SoLine`(qty_ordered/shipped/invoiced、狀態機 DRAFT→CONFIRMED→PARTIALLY_SHIPPED→SHIPPED→CLOSED)、`Delivery`/`DeliveryLine`(POSTED 不可變);`SalesOrderService`(建單/確認,驗 partner 為 customer)、`DeliveryService.deliver`(每行經 `inventory.api.StockPosting` SHIPMENT 移動 STOCK→CUSTOMER,unitCost=null 走移動平均,過 `Dr 1340 / Cr 1330`,sourceDocId 加 `#lineNo` 保 idempotency 唯一),bump qty_shipped + SO 狀態;`delivery_line.unit_cost` 記出貨成本(取 `StockMovementResult.newAvgUnitCost`);REST `/api/sales`。
   - **延後 COGS 設計**:新增資產過渡科目 `1340 Deferred COGS(已出貨未開票)`(鏡像採購側 2150 GR-IR);新 movement type `SHIPMENT`/`SALES_RETURN` + COUNTER 規則→1340;出貨只認成本到 1340,COGS 留待開票(S2)認列。V9(1340、movement type CHECK 擴充 ×2 表、COUNTER 規則、SO/DLV/INV/REC/CRN 序號)、V10(sales_order/so_line/delivery/delivery_line)。
@@ -47,7 +53,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
-- **Phase 3 訂單到收款**(計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`,延後 COGS 設計)。S1(SO→Delivery)完成;下一棒 S2 CustomerInvoice(收入 + Output VAT + 認 COGS 清 1340 + AR 子帳)、S3 收款(payments IN)+ AR 帳齡 + O2C 全鏈對帳、S4 客戶退貨/credit note。之後 Phase 4 製造(S5 BOM+WO release+領料、S6 完工成本滾算+再訂點+對帳、S7 工單取消)。
+- **Phase 3 訂單到收款**(計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`,延後 COGS 設計)。S1(SO→Delivery)、S2(CustomerInvoice)完成;下一棒 S3 收款(payments IN)+ AR 帳齡 + O2C 全鏈對帳、S4 客戶退貨/credit note。之後 Phase 4 製造(S5 BOM+WO release+領料、S6 完工成本滾算+再訂點+對帳、S7 工單取消)。
 
 ## 待辦
 - **Phase 1 商品與庫存(下一棒)**:Item / Warehouse / Location 主檔、append-only `StockLedgerEntry`、移動加權平均(`ItemCostState`,`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳,並建立 `ledger` 的 published `api`(供 inventory 跨模組同步過帳)。驗收:庫存帳值 == GL Inventory 控制科目餘額(對帳測試)。
