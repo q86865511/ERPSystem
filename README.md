@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml/badge.svg)](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml)
 
+<p align="center"><img src="docs/cover.png" alt="Manufacturing ERP — cover" width="100%"></p>
+
 A from-scratch **manufacturing ERP** built as a portfolio project. Its soul is a hand-written
 **double-entry General Ledger**: every business action — goods receipt, production, shipment,
 payment — posts a balanced journal entry **in the same database transaction** as the document and
