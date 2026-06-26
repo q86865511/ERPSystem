@@ -12,4 +12,6 @@ public interface FiscalPeriodRepository extends JpaRepository<FiscalPeriod, Long
 
     @Query("select p from FiscalPeriod p where :date between p.startDate and p.endDate")
     Optional<FiscalPeriod> findByDate(@Param("date") LocalDate date);
+
+    Optional<FiscalPeriod> findByFiscalYearIdAndPeriodNo(Long fiscalYearId, int periodNo);
 }

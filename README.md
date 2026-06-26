@@ -92,14 +92,18 @@ lists items at or below their reorder point.
 **🎉 Minimum show-worthy milestone reached** (end of Phase 4): the full *buy → make → sell* slice runs
 end-to-end with the books reconciling at every step.
 
-**🚧 In progress:** Phase 5 reporting & period close. A read-side `reporting` module composes the ledger's
+**✅ Also done:** Phase 5 reporting & period close. A read-side `reporting` module composes the ledger's
 published balances into financial statements — a trial balance (as of a date), an income statement, and a
 balance sheet whose equity carries current-period earnings (retained earnings computed dynamically, no
 year-end close) — plus general-ledger drill-down. It also exposes the **reconciliation health-check** at
 `GET /api/reporting/reconciliation` — the project's hero artifact — which composes each module's published
 subledger balance with the GL to assert the books are correct: the trial balance balances and the
 inventory, AP and AR subledgers each equal their GL control account (with the GR-IR / Deferred-COGS / WIP
-clearing accounts reported alongside). *Remaining:* period soft-close.
+clearing accounts reported alongside). Fiscal periods can be **soft-closed** (and reopened) — the posting
+service refuses any entry dated in a non-open period.
+
+**Next:** Phase 6 polish & packaging — fuller RBAC, a one-key real-posting demo seed, and the final
+README (architecture diagram, ERD, ADRs).
 
 Full arc: Phase 0 (ledger spine) → 1 products & inventory → 2 procure-to-pay → 3 order-to-cash →
 **4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close → 6 polish & packaging.
