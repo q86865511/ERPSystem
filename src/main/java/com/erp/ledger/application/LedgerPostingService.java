@@ -1,5 +1,6 @@
 package com.erp.ledger.application;
 
+import com.erp.ledger.api.JournalEntryRequest;
 import com.erp.ledger.domain.Account;
 import com.erp.ledger.domain.FiscalPeriod;
 import com.erp.ledger.domain.Journal;
