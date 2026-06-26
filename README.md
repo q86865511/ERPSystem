@@ -92,8 +92,11 @@ lists items at or below their reorder point.
 **🎉 Minimum show-worthy milestone reached** (end of Phase 4): the full *buy → make → sell* slice runs
 end-to-end with the books reconciling at every step.
 
-**Next:** Phase 5 reporting & period close (balance sheet, P&L, trial-balance date filter, soft-close,
-a one-page reconciliation health-check).
+**🚧 In progress:** Phase 5 reporting & period close. A read-side `reporting` module composes the ledger's
+published balances into financial statements — a trial balance (as of a date), an income statement, and a
+balance sheet whose equity carries current-period earnings (retained earnings computed dynamically, no
+year-end close) — plus general-ledger drill-down. *Remaining:* a one-page reconciliation health-check and
+period soft-close.
 
 Full arc: Phase 0 (ledger spine) → 1 products & inventory → 2 procure-to-pay → 3 order-to-cash →
 **4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close → 6 polish & packaging.
