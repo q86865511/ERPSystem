@@ -43,4 +43,20 @@ class ArchitectureTest {
             noClasses().that().resideInAPackage("..ledger.api..")
                     .should().dependOnClassesThat()
                     .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..");
+
+    @ArchTest
+    static final ArchRule masterdata_api_is_self_contained =
+            noClasses().that().resideInAPackage("..masterdata.api..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..masterdata.domain..", "..masterdata.application..",
+                            "..masterdata.web..");
+
+    // ---- Cross-module isolation ---------------------------------------------------------------
+    // masterdata is a leaf: it must not reach into any other module.
+
+    @ArchTest
+    static final ArchRule masterdata_does_not_depend_on_other_modules =
+            noClasses().that().resideInAPackage("..masterdata..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..ledger..", "..inventory..");
 }
