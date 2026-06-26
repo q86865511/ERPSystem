@@ -1,9 +1,11 @@
 package com.erp.masterdata.web;
 
+import com.erp.masterdata.application.DuplicatePartnerCodeException;
 import com.erp.masterdata.application.DuplicateSkuException;
 import com.erp.masterdata.application.ItemNotFoundException;
 import com.erp.masterdata.application.LocationNotFoundException;
 import com.erp.masterdata.application.MasterDataException;
+import com.erp.masterdata.application.PartnerNotFoundException;
 import com.erp.masterdata.application.WarehouseNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -15,12 +17,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class MasterDataExceptionHandler {
 
     @ExceptionHandler({ItemNotFoundException.class, LocationNotFoundException.class,
-            WarehouseNotFoundException.class})
+            WarehouseNotFoundException.class, PartnerNotFoundException.class})
     public ProblemDetail onNotFound(MasterDataException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(DuplicateSkuException.class)
+    @ExceptionHandler({DuplicateSkuException.class, DuplicatePartnerCodeException.class})
     public ProblemDetail onConflict(MasterDataException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }

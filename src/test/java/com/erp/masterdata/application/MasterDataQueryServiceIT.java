@@ -7,6 +7,7 @@ import com.erp.masterdata.api.ItemView;
 import com.erp.masterdata.api.LocationType;
 import com.erp.masterdata.api.LocationView;
 import com.erp.masterdata.api.MasterDataQuery;
+import com.erp.masterdata.api.PartnerView;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,7 +58,7 @@ class MasterDataQueryServiceIT {
 
     @Test
     void rejectsMovementTypeWithNoCounterRule() {
-        assertThatThrownBy(() -> masterDataQuery.resolveCounterAccountCode(InventoryMovementType.RECEIPT))
+        assertThatThrownBy(() -> masterDataQuery.resolveCounterAccountCode(InventoryMovementType.TRANSFER))
                 .isInstanceOf(PostingRuleNotFoundException.class);
     }
 
@@ -98,5 +99,40 @@ class MasterDataQueryServiceIT {
         assertThatThrownBy(() -> masterDataService.createItem("RM-IT-DUP", "Dup again", ItemType.RAW,
                 "EA", true, BigDecimal.ZERO, null, null))
                 .isInstanceOf(DuplicateSkuException.class);
+    }
+
+    @Test
+    void resolvesReceiptCounterToGrIrClearing() {
+        assertThat(masterDataQuery.resolveCounterAccountCode(InventoryMovementType.RECEIPT))
+                .isEqualTo("2150");
+    }
+
+    @Test
+    void findsSeededVendorLocation() {
+        Long warehouseId = warehouseRepository.findByCode("WH1").orElseThrow().getId();
+
+        LocationView vendor = masterDataQuery.findLocationByType(warehouseId, LocationType.VENDOR)
+                .orElseThrow();
+        assertThat(vendor.type()).isEqualTo(LocationType.VENDOR);
+    }
+
+    @Test
+    void findsStandardTaxRate() {
+        assertThat(masterDataQuery.findTaxRate("STANDARD").orElseThrow()).isEqualByComparingTo("0.05");
+        assertThat(masterDataQuery.findTaxRate("NOPE")).isEmpty();
+    }
+
+    @Test
+    void createsAndReadsBackPartner() {
+        var created = masterDataService.createPartner("V-IT-1", "Acme Supplies", true, false,
+                "TAX-9", 45, null, null);
+
+        PartnerView byId = masterDataQuery.findPartner(created.getId()).orElseThrow();
+        assertThat(byId.code()).isEqualTo("V-IT-1");
+        assertThat(byId.vendor()).isTrue();
+        assertThat(byId.paymentTermsDays()).isEqualTo(45);
+
+        PartnerView byCode = masterDataQuery.findPartnerByCode("V-IT-1").orElseThrow();
+        assertThat(byCode.id()).isEqualTo(created.getId());
     }
 }

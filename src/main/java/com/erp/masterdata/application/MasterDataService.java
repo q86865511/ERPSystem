@@ -4,6 +4,7 @@ import com.erp.masterdata.api.ItemType;
 import com.erp.masterdata.api.LocationType;
 import com.erp.masterdata.domain.Item;
 import com.erp.masterdata.domain.Location;
+import com.erp.masterdata.domain.Partner;
 import com.erp.masterdata.domain.Warehouse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +18,16 @@ public class MasterDataService {
     private final ItemRepository itemRepository;
     private final WarehouseRepository warehouseRepository;
     private final LocationRepository locationRepository;
+    private final PartnerRepository partnerRepository;
 
     public MasterDataService(ItemRepository itemRepository,
                              WarehouseRepository warehouseRepository,
-                             LocationRepository locationRepository) {
+                             LocationRepository locationRepository,
+                             PartnerRepository partnerRepository) {
         this.itemRepository = itemRepository;
         this.warehouseRepository = warehouseRepository;
         this.locationRepository = locationRepository;
+        this.partnerRepository = partnerRepository;
     }
 
     @Transactional
@@ -65,5 +69,23 @@ public class MasterDataService {
     public Location getLocation(Long id) {
         return locationRepository.findById(id)
                 .orElseThrow(() -> new LocationNotFoundException(id));
+    }
+
+    @Transactional
+    public Partner createPartner(String code, String name, boolean vendor, boolean customer,
+                                 String taxId, int paymentTermsDays, String apAccountCode,
+                                 String arAccountCode) {
+        if (partnerRepository.existsByCode(code)) {
+            throw new DuplicatePartnerCodeException(code);
+        }
+        Partner partner = new Partner(code, name, vendor, customer, taxId, paymentTermsDays,
+                apAccountCode, arAccountCode);
+        return partnerRepository.saveAndFlush(partner);
+    }
+
+    @Transactional(readOnly = true)
+    public Partner getPartner(Long id) {
+        return partnerRepository.findById(id)
+                .orElseThrow(() -> new PartnerNotFoundException("with id " + id));
     }
 }
