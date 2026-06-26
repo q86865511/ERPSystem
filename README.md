@@ -64,7 +64,14 @@ Prerequisites: **JDK 21**, **Docker** (for the database / Testcontainers).
 
 # run the app locally (Spring Boot Docker Compose auto-starts the postgres service)
 ./mvnw spring-boot:run
+
+# run with the one-key demo seed — posts a full buy -> make -> sell slice through the real
+# services on startup, so the books land balanced and the reconciliation health-check is green
+./mvnw spring-boot:run -Dspring-boot.run.profiles=seed
 ```
+
+Seeded users (HTTP Basic): `admin/admin` (all roles), `accountant/accountant`, `warehouse/warehouse`,
+`sales/sales`. After seeding, `GET /api/reporting/reconciliation` (as any user) shows the books reconcile.
 
 > On Windows the Maven Wrapper needs `powershell` on PATH and `JAVA_HOME` set; see
 > [PROGRESS.md](PROGRESS.md) for the exact environment notes used during development.
@@ -105,8 +112,9 @@ service refuses any entry dated in a non-open period.
 **🚧 In progress:** Phase 6 polish & packaging. **Role-based access control** is in: four roles —
 `ACCOUNTANT` (financial postings), `WAREHOUSE` (physical movements & production), `SALES` (sales orders),
 `ADMIN` (master data, superuser) — enforced as request authorization over HTTP Basic; reads need only
-authentication. *Remaining:* a one-key real-posting demo seed and the final README (architecture diagram,
-ERD, ADR pass).
+authentication. A **one-key demo seed** (profile `seed`) posts the entire buy → make → sell slice through
+the real services on startup, so a fresh database lands with balanced books. *Remaining:* the final README
+pass (architecture diagram, ERD).
 
 Full arc: Phase 0 (ledger spine) → 1 products & inventory → 2 procure-to-pay → 3 order-to-cash →
 **4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close → 6 polish & packaging.
