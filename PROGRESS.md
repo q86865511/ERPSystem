@@ -1,9 +1,11 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
-**Phase 1(商品與庫存)進行中** — 分 3 段 PR 交付。**Stage 1(ledger published api port)完成**:`ledger` 對外暴露 `LedgerPosting` 介面 + `PostingResult`,供 inventory 跨模組同步過帳;`mvn verify` 全綠、Phase 0 零迴歸。下一段:Stage 2 masterdata 模組。完整路線圖見計畫檔 `~/.claude/plans/pm-erp-enchanted-aurora.md`,Phase 1 細部計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`。
+**Phase 1(商品與庫存)進行中** — 分 3 段 PR 交付。**Stage 1(ledger published api port)+ Stage 2(masterdata 模組)完成**:`ledger.api.LedgerPosting` port 就緒;`masterdata` 模組(Item/Warehouse/Location/InventoryPostingRule + `masterdata.api.MasterDataQuery` port + REST + V3 seed)`mvn verify` 全綠(IT 13)。下一段:Stage 3 inventory 模組(StockLedgerEntry / 移動平均 / 雙腿過帳 / 對帳 / 並行測試)。完整路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`,Phase 1 細部計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`。
 
 ## 已完成
+- [2026-06-26] 📦 P1-S2 masterdata 模組 + V3(Stage 2)
+  - `masterdata` 模組:domain `Item`/`Warehouse`/`Location`/`InventoryPostingRule`;`masterdata.api`(enums `ItemType`/`LocationType`/`InventoryMovementType`/`PostingRuleRole`/`ValuationMethod`、`ItemView`/`LocationView`、`MasterDataQuery` port);`MasterDataQueryService`(讀)/`MasterDataService`(寫)+ 例外;`/api/masterdata` REST。V3:item/warehouse/location/inventory_posting_rule 表(cost NUMERIC(19,6)、enum CHECK、過帳規則用兩個 partial unique index 守 INVENTORY/COUNTER 角色)、seed WH1 倉 + 6 型別化儲位 + 過帳規則(RAW→1310/WIP→1320/FINISHED→1330、ADJUSTMENT→6000)+ STOCK_ADJUSTMENT 序號。`MasterDataQueryServiceIT` 7 綠;`verify` 全綠(IT 13)。
 - [2026-06-26] 🔌 P1-S1 ledger published api port(Stage 1)
   - 把 `JournalEntryRequest` 搬到 `com.erp.ledger.api`;新增 `LedgerPosting` 介面(`post→PostingResult`)與 `PostingResult(entryId, entryNo, status)` record;`LedgerPostingAdapter` 委派既有 `LedgerPostingService.post`(回傳 `JournalEntry` 維持原樣,controller / Phase 0 IT 呼叫點不動)。ArchUnit 加 `DoNotIncludeTests`、把 domain/application/web 規則泛化到全模組、加 `ledger.api` 自我內聚規則。`verify` 全綠(Phase 0 既有 15 測試零迴歸)。
 - [2026-06-26] 📄 R0 GitHub repo 上線與 CI 綠
@@ -22,7 +24,7 @@
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
-- **Phase 1 / Stage 2 — masterdata 模組 + V3**:Item / Warehouse / Location / InventoryPostingRule 主檔、`masterdata.api`(enums + ItemView/LocationView + MasterDataQuery)、REST 與 V3 遷移(seed 倉/型別化儲位/過帳規則 + STOCK_ADJUSTMENT 序號)。
+- **Phase 1 / Stage 3 — inventory 模組 + V4 + 測試**:`shared.Quantity` VO;append-only `StockLedgerEntry`、`ItemCostState` 移動加權平均(`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳(STOCK↔INVENTORY_LOSS);`StockPostingService` 跨模組同步呼叫 `LedgerPosting`;對帳(庫存帳值==GL 控制科目)與並行測試。
 
 ## 待辦
 - **Phase 1 商品與庫存(下一棒)**:Item / Warehouse / Location 主檔、append-only `StockLedgerEntry`、移動加權平均(`ItemCostState`,`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳,並建立 `ledger` 的 published `api`(供 inventory 跨模組同步過帳)。驗收:庫存帳值 == GL Inventory 控制科目餘額(對帳測試)。
