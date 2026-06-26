@@ -1,10 +1,13 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
-**Phase 2(採購到付款)進行中** — 分 4 段 PR 交付。**Stage 1–3 完成**:Partner/種子(S1)、purchasing PO→GR(S2)、**VendorBill(S3)** 配對收貨清 GR-IR、Input VAT、AP,價差走庫存重估(revalue,移動平均 10→11),GL 行帶 partner 維度,AP 子帳對帳到 2100。`mvn verify` 全綠(IT 28)。下一段:Stage 4 payments + 配款 + AP 帳齡 + 全鏈對帳。
+**Phase 2(採購到付款)完成** — 分 4 段 PR 交付(Partner/種子、purchasing PO→GR、VendorBill、payments)。**Phase 2 驗收達成(`ApReconciliationIT`)**:PO→GR→VendorBill→Payment 全鏈跑完後 **GR-IR→0、AP→0、AP 子帳==GL 2100、試算表平衡、庫存上升**;採購價差走庫存重估、GL 帶 partner 維度。`mvn verify` 全綠(IT 32)。下一棒:Phase 3 訂單到收款(SO→Delivery→Invoice→Receipt、出貨認 COGS、開票認收入、AR 帳齡)。
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-26] 💸 P2-S4 payments + 配款 + AP 帳齡 + 全鏈對帳(Phase 2 Stage 4,收尾)
+  - 新 `payments` 模組:`Payment`(direction IN|OUT,供 Phase 3 客戶收款重用)/`PaymentAllocation`(`document_id` 泛型,無硬 FK);`PaymentService.payOut` 過 `Dr 2100(partner)/ Cr 1010`,經 `purchasing.api.PayableDocuments.applyPayment` 配款翻帳單 PARTIALLY_PAID/PAID;單一交易只取 JE 序號鎖;REST `/api/payments`。`ApAgingService`(依 partner 付款條件分桶)+ `/api/purchasing/ap-aging`。V8(payment/payment_allocation)。ArchUnit:payments 只用 `ledger.api`+`purchasing.api`,各模組不依賴 payments。
+  - `PaymentPostingIT`(Dr2100/Cr1010 + partner、配款翻狀態、配款不符擋下);**`ApReconciliationIT`(全鏈驗收)**:PO→GR→Bill→Payment 後 GR-IR→0、AP→0、AP 子帳==2100、TB 平、庫存上升。`verify` 全綠(IT 32)。
 - [2026-06-26] 🧾 P2-S3 VendorBill + partnerId + revalue(Phase 2 Stage 3)
   - **ledger.api(additive)**:`JournalEntryRequest.Line` 加可選 `partnerId`(4 參數相容建構子);`JournalEntry.addLine` overload + `JournalLine` 7 參數建構子寫入既有 `partner_id` 欄;`LedgerPostingService` 傳 partnerId。Phase 0/1 零迴歸。
   - **inventory**:`StockPosting.revalue`(鎖 ItemCostState→`applyRevaluation`→append 一條 qty=0 STOCK 腿、不另過 JE;**在 bill 過 JE 前呼叫**,鎖序 ItemCostState→JE 序號一致、無死鎖;STOCK location 由 inventory 自身從現有 SLE 腿解析)。
@@ -38,7 +41,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
-- **Phase 2 / Stage 4 — payments + 配款 + AP 帳齡 + 全鏈對帳**:`payments` 模組(Payment direction IN|OUT + PaymentAllocation,Dr 2100/Cr 1010 + 經 `purchasing.api.PayableDocuments` 配款翻帳單狀態)、`ApAgingService`、V8;`PaymentPostingIT` + 全鏈 `ApReconciliationIT`(GR-IR→0、AP→0、AP 子帳==2100、TB 平)。
+- (待指示)Phase 2 完成;下一棒 Phase 3 訂單到收款(客戶、SO→Delivery→Invoice→Receipt、出貨認 COGS、開票認收入 + Output VAT、AR 帳齡;payments 的 direction IN 重用)。
 
 ## 待辦
 - **Phase 1 商品與庫存(下一棒)**:Item / Warehouse / Location 主檔、append-only `StockLedgerEntry`、移動加權平均(`ItemCostState`,`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳,並建立 `ledger` 的 published `api`(供 inventory 跨模組同步過帳)。驗收:庫存帳值 == GL Inventory 控制科目餘額(對帳測試)。
@@ -59,6 +62,10 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - **[P1] 鎖序=ItemCostState 先、JE 序號最內層**:必須先鎖讀 `ItemCostState`(`SELECT…FOR UPDATE`)算出平均才能組分錄,JE 序號在 `LedgerPosting.post` 內最後取得(單一全域列、永遠最內層)→ 全域一致取得順序、無死鎖。計畫原寫「Sequence 先於 ItemCostState」物理上不可能,以「序號最內層」滿足其防死鎖意圖。首次建列用 `INSERT…ON CONFLICT DO NOTHING` 避免競態例外。
 - **[P1] 負庫存阻擋**:service 層(`StockPostingService`)讀鎖定的在庫先擋,丟 `NegativeInventoryException`;domain `applyIssue` 另有防禦性 `IllegalStateException`(分層鏡像 ledger)。
 - **[P1] 業務文件編號走共享 kernel port**:`StockAdjustment` 編號用 `ledger.api.SequenceAllocator`(把 `number_sequence` 表視為 ledger=module zero 的共享基建),沿用 inventory 對 `ledger.api` 的既有依賴,不另起第二套編號機制。
+- **[P2] GR-IR 清算 + 輕量三方比對**:收貨過 `Dr 1310 / Cr 2150`(經 inventory `StockPosting` RECEIPT);發票 FIFO 配對已收未請 `grn_line` 清 `Dr 2150`(= Σ 配對 qty × 收貨成本 = 原始貸方),使 2150 對完整循環歸零。三方比對只記 `match_status` 不擋過帳;唯一硬不變量 = GR-IR 借方 == 配對收貨貸方。`qty_billed` 在 grn_line/po_line 當水位。
+- **[P2] 採購價差→庫存(無 PPV)**:帳單價≠收貨成本時,差額入該 item 庫存控制科目(發票 JE 出 `Dr 1310`),並經 `StockPosting.revalue`(qty=0 STOCK 腿 + `applyRevaluation`)同步移動平均,維持「子帳==GL」與「快取==STOCK 腿」不變量。revalue **在發票過 JE 之前**呼叫,鎖序 `ItemCostState→JE 序號` 與收貨一致、無死鎖。`Item.valuation_method` 保留,standard-cost+PPV 為 v2 additive。
+- **[P2] partner 維度走既有 hook**:`journal_line.partner_id`(Phase 0 預留)由 AP/GR-IR 行寫入;權威 AP 子帳=未結帳單 open balance(purchasing),對帳到 GL 2100。`JournalEntryRequest.Line` additive 加 partnerId(4 參數相容建構子),Phase 0/1 零改動。
+- **[P2] payments 獨立模組、direction IN|OUT**:Payment+PaymentAllocation 供採購付款與 Phase 3 客戶收款共用;`PaymentAllocation.document_id` 泛型(無硬 FK)。payments 經 `purchasing.api.PayableDocuments` 沖銷帳單,不碰 purchasing internals。
 - **庫存估值=移動加權平均**(MVP 不做 PPV);standard-cost + 變異列為 v2(`Item.valuation_method` 保留欄)。
 - **並行=READ COMMITTED + 固定順序的悲觀鎖**(Sequence 先於 ItemCostState),不使用全域 SERIALIZABLE。
 - **編號**:只有 `JournalEntry.entry_no` 連號;業務文件用 unique-monotonic + prefix。

@@ -94,5 +94,14 @@ class ArchitectureTest {
                     .should().dependOnClassesThat()
                     .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
                             "..inventory.domain..", "..inventory.application..", "..inventory.web..",
-                            "..masterdata.domain..", "..masterdata.application..", "..masterdata.web..");
+                            "..masterdata.domain..", "..masterdata.application..", "..masterdata.web..",
+                            "..payments..");
+
+    @ArchTest
+    static final ArchRule payments_uses_only_published_ports =
+            noClasses().that().resideInAPackage("..payments..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
+                            "..purchasing.domain..", "..purchasing.application..", "..purchasing.web..",
+                            "..inventory..", "..masterdata..");
 }
