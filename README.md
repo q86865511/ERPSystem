@@ -74,7 +74,12 @@ Prerequisites: **JDK 21**, **Docker** (for the database / Testcontainers).
 **✅ Done:** Phase 0 walking skeleton (ledger spine) · Phase 1 products & inventory (moving weighted-average
 valuation, append-only subledger reconciling to the GL Inventory control account) · Phase 2 procure-to-pay
 (PO → goods receipt → vendor bill → payment, with GR-IR clearing, Input VAT, a purchase-price variance that
-revalues inventory, and an AP subledger that reconciles to its control account). **Next:** Phase 3 order-to-cash.
+revalues inventory, and an AP subledger that reconciles to its control account).
+
+**🚧 In progress:** Phase 3 order-to-cash. Costs follow a **deferred-COGS** model mirroring GR-IR: a delivery
+parks the shipped cost in a Deferred-COGS clearing account (`Dr 1340 / Cr Finished Goods`); the customer
+invoice recognises COGS against it (`Dr COGS / Cr 1340`) alongside revenue + Output VAT, so a fully
+shipped-and-invoiced order leaves the clearing account at zero. *Landed:* Sales Order → Delivery.
 
 Full arc: Phase 0 (ledger spine) → 1 products & inventory → 2 procure-to-pay → 3 order-to-cash →
 **4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close → 6 polish & packaging.

@@ -1,10 +1,16 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
-**Phase 2(採購到付款)完成** — 分 4 段 PR 交付(Partner/種子、purchasing PO→GR、VendorBill、payments)。**Phase 2 驗收達成(`ApReconciliationIT`)**:PO→GR→VendorBill→Payment 全鏈跑完後 **GR-IR→0、AP→0、AP 子帳==GL 2100、試算表平衡、庫存上升**;採購價差走庫存重估、GL 帶 partner 維度。`mvn verify` 全綠(IT 32)。下一棒:Phase 3 訂單到收款(SO→Delivery→Invoice→Receipt、出貨認 COGS、開票認收入、AR 帳齡)。
+**Phase 3(訂單到收款)進行中** — 採「延後 COGS(deferred COGS)」設計鏡像採購側 GR-IR:出貨先把成本停在新過渡科目 1340,開票時才認 COGS,使「出貨↔開票」對稱清零。計畫 7 段 PR(Phase 3 四段 + Phase 4 三段),計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`。**S1 完成**:新 `sales` 模組 SO→Delivery(SHIPMENT 移動,`Dr 1340 / Cr 1330` 以移動平均成本),新增延後 COGS 科目 1340、movement type `SHIPMENT`/`SALES_RETURN` + COUNTER 規則→1340、銷售文件序號;`mvn verify` 全綠(Surefire 45、IT 36)。
+**Phase 2(採購到付款)完成** — 分 4 段 PR 交付(Partner/種子、purchasing PO→GR、VendorBill、payments)。**Phase 2 驗收達成(`ApReconciliationIT`)**:PO→GR→VendorBill→Payment 全鏈跑完後 **GR-IR→0、AP→0、AP 子帳==GL 2100、試算表平衡、庫存上升**;採購價差走庫存重估、GL 帶 partner 維度。
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-26] 🚚 P3-S1 sales SO→Delivery(延後 COGS 出貨)(Phase 3 Stage 1)
+  - 新 `sales` 模組:domain `SalesOrder`/`SoLine`(qty_ordered/shipped/invoiced、狀態機 DRAFT→CONFIRMED→PARTIALLY_SHIPPED→SHIPPED→CLOSED)、`Delivery`/`DeliveryLine`(POSTED 不可變);`SalesOrderService`(建單/確認,驗 partner 為 customer)、`DeliveryService.deliver`(每行經 `inventory.api.StockPosting` SHIPMENT 移動 STOCK→CUSTOMER,unitCost=null 走移動平均,過 `Dr 1340 / Cr 1330`,sourceDocId 加 `#lineNo` 保 idempotency 唯一),bump qty_shipped + SO 狀態;`delivery_line.unit_cost` 記出貨成本(取 `StockMovementResult.newAvgUnitCost`);REST `/api/sales`。
+  - **延後 COGS 設計**:新增資產過渡科目 `1340 Deferred COGS(已出貨未開票)`(鏡像採購側 2150 GR-IR);新 movement type `SHIPMENT`/`SALES_RETURN` + COUNTER 規則→1340;出貨只認成本到 1340,COGS 留待開票(S2)認列。V9(1340、movement type CHECK 擴充 ×2 表、COUNTER 規則、SO/DLV/INV/REC/CRN 序號)、V10(sales_order/so_line/delivery/delivery_line)。
+  - ArchUnit:加 `sales.api` 自我內聚(`allowEmptyShould`,api 待 S2)+ `sales` 只用 published ports;既有跨模組規則擴含 `..sales..`。
+  - `SalesOrderTest`(單元:qty rollup/狀態)、`DeliveryPostingIT`(`Dr1340/Cr1330`、FG cost state↓、qty_shipped bump、部分出貨、擋超量/超在庫)。`verify` 全綠(Surefire 45、IT 36)。
 - [2026-06-26] 💸 P2-S4 payments + 配款 + AP 帳齡 + 全鏈對帳(Phase 2 Stage 4,收尾)
   - 新 `payments` 模組:`Payment`(direction IN|OUT,供 Phase 3 客戶收款重用)/`PaymentAllocation`(`document_id` 泛型,無硬 FK);`PaymentService.payOut` 過 `Dr 2100(partner)/ Cr 1010`,經 `purchasing.api.PayableDocuments.applyPayment` 配款翻帳單 PARTIALLY_PAID/PAID;單一交易只取 JE 序號鎖;REST `/api/payments`。`ApAgingService`(依 partner 付款條件分桶)+ `/api/purchasing/ap-aging`。V8(payment/payment_allocation)。ArchUnit:payments 只用 `ledger.api`+`purchasing.api`,各模組不依賴 payments。
   - `PaymentPostingIT`(Dr2100/Cr1010 + partner、配款翻狀態、配款不符擋下);**`ApReconciliationIT`(全鏈驗收)**:PO→GR→Bill→Payment 後 GR-IR→0、AP→0、AP 子帳==2100、TB 平、庫存上升。`verify` 全綠(IT 32)。
@@ -41,7 +47,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
-- (待指示)Phase 2 完成;下一棒 Phase 3 訂單到收款(客戶、SO→Delivery→Invoice→Receipt、出貨認 COGS、開票認收入 + Output VAT、AR 帳齡;payments 的 direction IN 重用)。
+- **Phase 3 訂單到收款**(計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`,延後 COGS 設計)。S1(SO→Delivery)完成;下一棒 S2 CustomerInvoice(收入 + Output VAT + 認 COGS 清 1340 + AR 子帳)、S3 收款(payments IN)+ AR 帳齡 + O2C 全鏈對帳、S4 客戶退貨/credit note。之後 Phase 4 製造(S5 BOM+WO release+領料、S6 完工成本滾算+再訂點+對帳、S7 工單取消)。
 
 ## 待辦
 - **Phase 1 商品與庫存(下一棒)**:Item / Warehouse / Location 主檔、append-only `StockLedgerEntry`、移動加權平均(`ItemCostState`,`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳,並建立 `ledger` 的 published `api`(供 inventory 跨模組同步過帳)。驗收:庫存帳值 == GL Inventory 控制科目餘額(對帳測試)。
@@ -66,6 +72,8 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - **[P2] 採購價差→庫存(無 PPV)**:帳單價≠收貨成本時,差額入該 item 庫存控制科目(發票 JE 出 `Dr 1310`),並經 `StockPosting.revalue`(qty=0 STOCK 腿 + `applyRevaluation`)同步移動平均,維持「子帳==GL」與「快取==STOCK 腿」不變量。revalue **在發票過 JE 之前**呼叫,鎖序 `ItemCostState→JE 序號` 與收貨一致、無死鎖。`Item.valuation_method` 保留,standard-cost+PPV 為 v2 additive。
 - **[P2] partner 維度走既有 hook**:`journal_line.partner_id`(Phase 0 預留)由 AP/GR-IR 行寫入;權威 AP 子帳=未結帳單 open balance(purchasing),對帳到 GL 2100。`JournalEntryRequest.Line` additive 加 partnerId(4 參數相容建構子),Phase 0/1 零改動。
 - **[P2] payments 獨立模組、direction IN|OUT**:Payment+PaymentAllocation 供採購付款與 Phase 3 客戶收款共用;`PaymentAllocation.document_id` 泛型(無硬 FK)。payments 經 `purchasing.api.PayableDocuments` 沖銷帳單,不碰 purchasing internals。
+- **[P3] 出貨成本走延後 COGS(deferred COGS),鏡像 GR-IR**:新增資產過渡科目 `1340`。出貨(SHIPMENT)只過 `Dr 1340 / Cr 1330`(移動平均成本),COGS 留到開票時 FIFO 配對 delivery 成本以 `Dr 5100 / Cr 1340` 認列,使「出貨↔開票」對稱清零(完整循環後 1340→0),與採購側「收貨↔請款」清 GR-IR 對稱。出貨即認 COGS 為較簡方案,但延後 COGS 展示收入/成本配比與過渡科目對稱性(使用者選定)。
+- **[P3] 每業務移動一個 movement type + 一條 COUNTER 規則**:`StockPostingService` 的 counter 科目由 movement type 解析(每型唯一一條規則),方向由「哪腿是 STOCK」決定。故出貨用新 `SHIPMENT`(counter 1340)、退貨用 `SALES_RETURN`(counter 1340),不重用 `RECEIPT`/`ISSUE`(counter 會錯)。新 movement type 需同時擴充 `stock_ledger_entry` 與 `inventory_posting_rule` 兩個 `movement_type` CHECK。
 - **庫存估值=移動加權平均**(MVP 不做 PPV);standard-cost + 變異列為 v2(`Item.valuation_method` 保留欄)。
 - **並行=READ COMMITTED + 固定順序的悲觀鎖**(Sequence 先於 ItemCostState),不使用全域 SERIALIZABLE。
 - **編號**:只有 `JournalEntry.entry_no` 連號;業務文件用 unique-monotonic + prefix。
