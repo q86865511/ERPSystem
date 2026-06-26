@@ -1,7 +1,7 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
-**Phase 3(訂單到收款)完成** — 分 4 段 PR 交付(SO→Delivery、CustomerInvoice、Receipt+AR 帳齡、CustomerReturn)。採「延後 COGS(deferred COGS)」鏡像 GR-IR:出貨成本停在過渡科目 1340,開票才認 COGS,「出貨↔開票」對稱清零。**O2C 驗收達成(`ArReconciliationIT`)**:全鏈跑完庫存↓、COGS+收入+Output VAT 入帳、1340→0、AR→0、AR 子帳==1200、試算表平衡;客戶退貨(credit note)全鏈沖回零。`mvn verify` 全綠(Surefire 45、IT 43)。**Phase 6(打磨與打包)進行中** — **S1+S2 完成**:RBAC 4 角色(URL 授權 + 4 in-memory 使用者,ADR-0008);**一鍵 demo seed**(`DataSeeder`,profile `seed`,composition root)經真實過帳 service 灌入完整 買→做→賣,落地後對帳健康檢查 healthy。`mvn verify` 全綠(Surefire 55、IT 58)。下一棒 S3 README/架構/文件收尾。
+**Phase 3(訂單到收款)完成** — 分 4 段 PR 交付(SO→Delivery、CustomerInvoice、Receipt+AR 帳齡、CustomerReturn)。採「延後 COGS(deferred COGS)」鏡像 GR-IR:出貨成本停在過渡科目 1340,開票才認 COGS,「出貨↔開票」對稱清零。**O2C 驗收達成(`ArReconciliationIT`)**:全鏈跑完庫存↓、COGS+收入+Output VAT 入帳、1340→0、AR→0、AR 子帳==1200、試算表平衡;客戶退貨(credit note)全鏈沖回零。`mvn verify` 全綠(Surefire 45、IT 43)。**Phase 6(打磨與打包)完成** — 分 3 段 PR(RBAC、demo seed、README 收尾)。RBAC 4 角色(URL 授權 + 4 in-memory 使用者,ADR-0008);一鍵 demo seed(`DataSeeder`,profile `seed`)經真實過帳 service 灌完整 買→做→賣;README 收尾(模組對照表 + 各 published port、Mermaid ERD、ADR 索引、角色/seed 用法、roadmap 全標完成)。`mvn verify` 全綠(Surefire 55、IT 58)。**🎉 Phase 0–6 全數完成**(完整路線圖落地;19→24 個 PR、IT 58、CI 綠)。
 
 **Phase 5(報表與期間結)完成** — 分 3 段 PR(財務報表、對帳健康檢查、soft-close)。`reporting` read-side 模組:財務報表(試算表 as-of、資產負債表保留盈餘動態、損益表、總帳 drill-down)+ **對帳健康檢查(hero,`/api/reporting/reconciliation`)**:全域 TB 平 + 庫存/AP/AR 子帳==GL 控制科目(跨模組經各 `*.api`),過渡科目餘額一併呈現。**soft-close**:`/api/ledger/fiscal-years/{year}/periods/{n}/close|reopen`,關閉後該期間過帳被擋。`mvn verify` 全綠(Surefire 55、IT 52)。下一棒(待指示):Phase 6 打磨與打包(RBAC 補 4 角色、一鍵 demo seed、README/架構圖收尾)。
 
@@ -10,6 +10,8 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-27] 📘 P6-S3 README/文件收尾(Phase 6 Stage 3,Phase 6 收尾)
+  - README:架構段補齊全模組(sales/manufacturing/reporting/iam)+ 「模組 × 責任 × published port」對照表;`auth` 列改 HTTP Basic 4 角色;**Data model** 段加 Mermaid ERD(會計脊椎 + 各文件/庫存子帳);**ADR 索引**(0001–0008);Running 段補 seed profile 指令與角色帳號;roadmap 全段標完成。純文件變更,build 不受影響。
 - [2026-06-27] 🌱 P6-S2 一鍵 demo seed(Phase 6 Stage 2)
   - `com.erp.bootstrap.DataSeeder`(`@Profile("seed")`,ApplicationRunner):啟動時經**真實過帳 service**(非繞過不變量的原生 SQL)灌入完整 買→做→賣 —— PO→GR→Bill→付款、BOM→WO→領料→完工、SO→出貨→開票→收款;落地後 GR-IR/AP/Deferred-COGS/AR/WIP 全歸零、庫存/COGS/收入入帳。放 composition root(非業務模組,不受模組邊界規則限制),做 idempotency 防呆(VEND-DEMO 已存在則跳過)。
   - `SeedDataIT`(`@ActiveProfiles("seed")`:RM-DEMO 在庫 50、FG-DEMO 在庫 20、`reconcile().healthy()` true)。`verify` 全綠(Surefire 55、IT 58)。
@@ -97,7 +99,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
-- **Phase 6 打磨與打包**。S1(RBAC)、S2(demo seed)完成。下一棒 S3 README/文件收尾(角色與 demo seed 用法、reconciliation 端點、Phase 5/6 段落、ADR 索引)。計畫見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
+- (待指示)**Phase 0–6 全數完成** —— 總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / 打磨與打包,完整路線圖落地。`mvn verify` 全綠(Surefire 55、IT 58),CI 綠。可選後續:前端(React)、JWT/持久化使用者庫、上線 demo 部署、多階 BOM / FIFO 等延後範圍。
 
 ## 待辦
 - **Phase 1 商品與庫存(下一棒)**:Item / Warehouse / Location 主檔、append-only `StockLedgerEntry`、移動加權平均(`ItemCostState`,`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳,並建立 `ledger` 的 published `api`(供 inventory 跨模組同步過帳)。驗收:庫存帳值 == GL Inventory 控制科目餘額(對帳測試)。
