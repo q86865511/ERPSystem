@@ -2,6 +2,8 @@ package com.erp.manufacturing.web;
 
 import com.erp.manufacturing.application.BomService;
 import com.erp.manufacturing.application.BomService.ComponentInput;
+import com.erp.manufacturing.application.ReorderReport;
+import com.erp.manufacturing.application.ReorderReportService;
 import com.erp.manufacturing.application.WorkOrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +26,13 @@ public class ManufacturingController {
 
     private final BomService bomService;
     private final WorkOrderService workOrderService;
+    private final ReorderReportService reorderReportService;
 
-    public ManufacturingController(BomService bomService, WorkOrderService workOrderService) {
+    public ManufacturingController(BomService bomService, WorkOrderService workOrderService,
+                                   ReorderReportService reorderReportService) {
         this.bomService = bomService;
         this.workOrderService = workOrderService;
+        this.reorderReportService = reorderReportService;
     }
 
     public record CreateBomComponent(Long componentItemId, BigDecimal qtyPer, BigDecimal scrapPct) {
@@ -41,6 +46,9 @@ public class ManufacturingController {
     }
 
     public record IssueRequest(Long stockLocationId, LocalDate postingDate) {
+    }
+
+    public record CompleteRequest(BigDecimal qtyProduced, Long stockLocationId, LocalDate postingDate) {
     }
 
     @PostMapping("/boms")
@@ -79,9 +87,22 @@ public class ManufacturingController {
                 actor(principal)));
     }
 
+    @PostMapping("/work-orders/{id}/complete")
+    public WorkOrderResponse complete(@PathVariable Long id, @RequestBody CompleteRequest request,
+                                      Principal principal) {
+        LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
+        return WorkOrderResponse.from(workOrderService.complete(id, request.qtyProduced(),
+                request.stockLocationId(), postingDate, actor(principal)));
+    }
+
     @GetMapping("/work-orders/{id}")
     public WorkOrderResponse getWorkOrder(@PathVariable Long id) {
         return WorkOrderResponse.from(workOrderService.getWorkOrder(id));
+    }
+
+    @GetMapping("/reorder-report")
+    public ReorderReport reorderReport() {
+        return reorderReportService.reorderReport();
     }
 
     private static String actor(Principal principal) {
