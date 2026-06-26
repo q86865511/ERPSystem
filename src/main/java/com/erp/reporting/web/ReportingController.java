@@ -3,6 +3,8 @@ package com.erp.reporting.web;
 import com.erp.ledger.api.LedgerLineView;
 import com.erp.reporting.application.BalanceSheet;
 import com.erp.reporting.application.IncomeStatement;
+import com.erp.reporting.application.ReconciliationReport;
+import com.erp.reporting.application.ReconciliationService;
 import com.erp.reporting.application.ReportingService;
 import com.erp.reporting.application.TrialBalance;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,9 +23,12 @@ import java.util.List;
 public class ReportingController {
 
     private final ReportingService reportingService;
+    private final ReconciliationService reconciliationService;
 
-    public ReportingController(ReportingService reportingService) {
+    public ReportingController(ReportingService reportingService,
+                              ReconciliationService reconciliationService) {
         this.reportingService = reportingService;
+        this.reconciliationService = reconciliationService;
     }
 
     @GetMapping("/trial-balance")
@@ -42,6 +47,14 @@ public class ReportingController {
     public BalanceSheet balanceSheet(@RequestParam(required = false)
                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate asOf) {
         return reportingService.balanceSheet(asOfOrToday(asOf));
+    }
+
+    /** The reconciliation health-check: trial balance balanced + subledgers == GL control accounts. */
+    @GetMapping("/reconciliation")
+    public ReconciliationReport reconciliation(@RequestParam(required = false)
+                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                               LocalDate asOf) {
+        return reconciliationService.reconcile(asOfOrToday(asOf));
     }
 
     @GetMapping("/general-ledger/{accountCode}")

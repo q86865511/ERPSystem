@@ -95,8 +95,11 @@ end-to-end with the books reconciling at every step.
 **🚧 In progress:** Phase 5 reporting & period close. A read-side `reporting` module composes the ledger's
 published balances into financial statements — a trial balance (as of a date), an income statement, and a
 balance sheet whose equity carries current-period earnings (retained earnings computed dynamically, no
-year-end close) — plus general-ledger drill-down. *Remaining:* a one-page reconciliation health-check and
-period soft-close.
+year-end close) — plus general-ledger drill-down. It also exposes the **reconciliation health-check** at
+`GET /api/reporting/reconciliation` — the project's hero artifact — which composes each module's published
+subledger balance with the GL to assert the books are correct: the trial balance balances and the
+inventory, AP and AR subledgers each equal their GL control account (with the GR-IR / Deferred-COGS / WIP
+clearing accounts reported alongside). *Remaining:* period soft-close.
 
 Full arc: Phase 0 (ledger spine) → 1 products & inventory → 2 procure-to-pay → 3 order-to-cash →
 **4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close → 6 polish & packaging.
