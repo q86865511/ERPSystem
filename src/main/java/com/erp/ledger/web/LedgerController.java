@@ -1,6 +1,6 @@
 package com.erp.ledger.web;
 
-import com.erp.ledger.application.JournalEntryRequest;
+import com.erp.ledger.api.JournalEntryRequest;
 import com.erp.ledger.application.LedgerPostingService;
 import com.erp.ledger.application.LedgerReportService;
 import com.erp.ledger.application.TrialBalanceReport;
