@@ -1,13 +1,16 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
-**Phase 3(訂單到收款)完成** — 分 4 段 PR 交付(SO→Delivery、CustomerInvoice、Receipt+AR 帳齡、CustomerReturn)。採「延後 COGS(deferred COGS)」鏡像 GR-IR:出貨成本停在過渡科目 1340,開票才認 COGS,「出貨↔開票」對稱清零。**O2C 驗收達成(`ArReconciliationIT`)**:全鏈跑完庫存↓、COGS+收入+Output VAT 入帳、1340→0、AR→0、AR 子帳==1200、試算表平衡;客戶退貨(credit note)全鏈沖回零。`mvn verify` 全綠(Surefire 45、IT 43)。**Phase 5(報表與期間結)進行中** — **S1+S2 完成**:`reporting` read-side 模組 —— 財務報表(試算表 as-of、資產負債表保留盈餘動態、損益表、總帳 drill-down)+ **對帳健康檢查(hero,`/api/reporting/reconciliation`)**:全域 TB 平 + 庫存/AP/AR 子帳==GL 控制科目(跨模組經各 `*.api`:`ledger.api.GeneralLedgerQuery`、`inventory.api.InventoryQuery.subledgerByAccount`、`purchasing.api.PayablesQuery`、`sales.api.ReceivablesQuery`),過渡科目(GR-IR/Deferred-COGS/WIP)餘額一併呈現。`mvn verify` 全綠(Surefire 55、IT 51)。下一棒 S3 soft-close(期間關閉/重開)。
+**Phase 3(訂單到收款)完成** — 分 4 段 PR 交付(SO→Delivery、CustomerInvoice、Receipt+AR 帳齡、CustomerReturn)。採「延後 COGS(deferred COGS)」鏡像 GR-IR:出貨成本停在過渡科目 1340,開票才認 COGS,「出貨↔開票」對稱清零。**O2C 驗收達成(`ArReconciliationIT`)**:全鏈跑完庫存↓、COGS+收入+Output VAT 入帳、1340→0、AR→0、AR 子帳==1200、試算表平衡;客戶退貨(credit note)全鏈沖回零。`mvn verify` 全綠(Surefire 45、IT 43)。**Phase 5(報表與期間結)完成** — 分 3 段 PR(財務報表、對帳健康檢查、soft-close)。`reporting` read-side 模組:財務報表(試算表 as-of、資產負債表保留盈餘動態、損益表、總帳 drill-down)+ **對帳健康檢查(hero,`/api/reporting/reconciliation`)**:全域 TB 平 + 庫存/AP/AR 子帳==GL 控制科目(跨模組經各 `*.api`),過渡科目餘額一併呈現。**soft-close**:`/api/ledger/fiscal-years/{year}/periods/{n}/close|reopen`,關閉後該期間過帳被擋。`mvn verify` 全綠(Surefire 55、IT 52)。下一棒(待指示):Phase 6 打磨與打包(RBAC 補 4 角色、一鍵 demo seed、README/架構圖收尾)。
 
 **Phase 4 製造完成** —— 分 3 段 PR(BOM+release+領料、完工成本滾算+再訂點+對帳、工單取消)。`manufacturing` 模組 BOM→WorkOrder(release 快照)→領料(`Dr 1320 / Cr 1310`)→完工(成本滾算 `Dr 1330 / Cr 1320`,餘差掃 5930)→可取消(反向領料 `Dr 1310 / Cr 1320`)。**製造驗收達成(`MfgReconciliationIT`)**:原料↓、成品依滾算成本↑、**WIP(1320)→0**、庫存子帳==GL、試算表平衡。再訂點報表上線(經新 `inventory.api.InventoryQuery`)。**🎉 路線圖「買→做→賣」最低可展示里程碑(Phase 4 結束)達成。** `mvn verify` 全綠(Surefire 54、IT 49)。下一棒(待指示):Phase 5 報表與期間結。
 **Phase 2(採購到付款)完成** — 分 4 段 PR 交付(Partner/種子、purchasing PO→GR、VendorBill、payments)。**Phase 2 驗收達成(`ApReconciliationIT`)**:PO→GR→VendorBill→Payment 全鏈跑完後 **GR-IR→0、AP→0、AP 子帳==GL 2100、試算表平衡、庫存上升**;採購價差走庫存重估、GL 帶 partner 維度。
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-27] 🔒 P5-S3 soft-close 期間關閉/重開(Phase 5 Stage 3,Phase 5 收尾)
+  - `FiscalPeriodService.close/reopen(yearCode, periodNo)`(`FiscalPeriod` 既有 `close()/reopen()`、`FiscalPeriodStatus OPEN/CLOSED/LOCKED`;過帳路徑既有 `isOpen()` 檢查 → `PeriodNotOpenException`);新 `FiscalYearRepository.findByCode`、`FiscalPeriodRepository.findByFiscalYearIdAndPeriodNo`。REST `/api/ledger/fiscal-years/{yearCode}/periods/{periodNo}/{close|reopen}`。hard-close(LOCKED)+ 保留盈餘結轉仍延後。
+  - `FiscalPeriodSoftCloseIT`(關閉 3 月 → 該期過帳 `PeriodNotOpenException` → 重開 → 過帳成功;用 3 月避免汙染他測試的 6 月)。`verify` 全綠(Surefire 55、IT 52)。
 - [2026-06-27] ✅ P5-S2 對帳健康檢查(hero artifact)(Phase 5 Stage 2)
   - `reporting.ReconciliationService` + `ReconciliationReport`:`/api/reporting/reconciliation` 彙整全域 TB 平 + 子帳==GL 控制(庫存 1310/1320/1330、AP 2100、AR 1200),`healthy` = TB 平 ∧ 所有子帳對齊;過渡科目 GR-IR(2150)/Deferred-COGS(1340)/WIP(1320)餘額一併列出(完整循環後為 0)。
   - **跨模組經 published ports**:新 `inventory.api.InventoryQuery.subledgerByAccount()`/`InventoryAccountBalance`、`purchasing.api.PayablesQuery`(由 `ApSubledgerService` 實作)、`sales.api.ReceivablesQuery`(由 `ArSubledgerService` 實作);reporting 只依賴各 `*.api`。
@@ -85,7 +88,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
-- **Phase 5 報表與期間結**。S1(財務報表)、S2(對帳健康檢查 hero)完成。下一棒 S3 soft-close(期間 OPEN→CLOSED 關閉/重開,過帳到非 OPEN 期間擋下 —— 過帳路徑既有期間檢查,本段補關閉/重開入口 + 測試)。計畫見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
+- (待指示)Phase 0–5 完成(總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結),共 19 個 PR merge,`mvn verify` 全綠(Surefire 55、IT 52),CI 綠。剩 Phase 6 打磨與打包(RBAC 補到 4 角色、一鍵真過帳 demo seed、README 架構圖/ERD/ADR 收尾、上線 demo)。計畫見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 待辦
 - **Phase 1 商品與庫存(下一棒)**:Item / Warehouse / Location 主檔、append-only `StockLedgerEntry`、移動加權平均(`ItemCostState`,`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳,並建立 `ledger` 的 published `api`(供 inventory 跨模組同步過帳)。驗收:庫存帳值 == GL Inventory 控制科目餘額(對帳測試)。
