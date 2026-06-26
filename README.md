@@ -38,8 +38,9 @@ A **modular monolith**: single deployable, single PostgreSQL database, in-proces
 boundaries are *enforced* (no module imports another's internals or touches its tables — checked in
 CI with ArchUnit). The `ledger` module is a shared kernel exposing a published `LedgerPosting` port;
 every other module posts through it **in the same transaction** as its own writes, never reaching into
-ledger internals. The `inventory` module is the first consumer — a moving weighted-average subledger
-whose value reconciles exactly to the GL Inventory control account. See [docs/adr/](docs/adr/) for the
+ledger internals. `inventory` keeps a moving weighted-average subledger that reconciles to the GL Inventory
+control account; `purchasing` and `payments` drive the procure-to-pay chain (receipt → bill → payment) with
+GR-IR clearing and an AP subledger that reconciles to its control account. See [docs/adr/](docs/adr/) for the
 architecture decision records.
 
 | Layer | Choice |
@@ -71,7 +72,9 @@ Prerequisites: **JDK 21**, **Docker** (for the database / Testcontainers).
 ## Roadmap
 
 **✅ Done:** Phase 0 walking skeleton (ledger spine) · Phase 1 products & inventory (moving weighted-average
-valuation, append-only subledger reconciling to the GL Inventory control account). **Next:** Phase 2 procure-to-pay.
+valuation, append-only subledger reconciling to the GL Inventory control account) · Phase 2 procure-to-pay
+(PO → goods receipt → vendor bill → payment, with GR-IR clearing, Input VAT, a purchase-price variance that
+revalues inventory, and an AP subledger that reconciles to its control account). **Next:** Phase 3 order-to-cash.
 
 Full arc: Phase 0 (ledger spine) → 1 products & inventory → 2 procure-to-pay → 3 order-to-cash →
 **4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close → 6 polish & packaging.

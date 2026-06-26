@@ -1,11 +1,14 @@
 package com.erp.purchasing.web;
 
+import com.erp.purchasing.application.ApAgingReport;
+import com.erp.purchasing.application.ApAgingService;
 import com.erp.purchasing.application.GoodsReceiptService;
 import com.erp.purchasing.application.GoodsReceiptService.ReceiptLineInput;
 import com.erp.purchasing.application.PurchaseOrderService;
 import com.erp.purchasing.application.PurchaseOrderService.PoLineInput;
 import com.erp.purchasing.application.VendorBillService;
 import com.erp.purchasing.application.VendorBillService.BillLineInput;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,13 +31,16 @@ public class PurchasingController {
     private final PurchaseOrderService purchaseOrderService;
     private final GoodsReceiptService goodsReceiptService;
     private final VendorBillService vendorBillService;
+    private final ApAgingService apAgingService;
 
     public PurchasingController(PurchaseOrderService purchaseOrderService,
                                 GoodsReceiptService goodsReceiptService,
-                                VendorBillService vendorBillService) {
+                                VendorBillService vendorBillService,
+                                ApAgingService apAgingService) {
         this.purchaseOrderService = purchaseOrderService;
         this.goodsReceiptService = goodsReceiptService;
         this.vendorBillService = vendorBillService;
+        this.apAgingService = apAgingService;
     }
 
     public record CreatePoLine(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice) {
@@ -110,6 +116,15 @@ public class PurchasingController {
     @GetMapping("/vendor-bills/{id}")
     public VendorBillResponse getBill(@PathVariable Long id) {
         return VendorBillResponse.from(vendorBillService.getBill(id));
+    }
+
+    /** Accounts-payable aging as of a date (defaults to today). */
+    @GetMapping("/ap-aging")
+    public ApAgingReport apAging(@RequestParam(required = false)
+                                 @org.springframework.format.annotation.DateTimeFormat(iso =
+                                         org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
+                                 LocalDate asOf) {
+        return apAgingService.apAging(asOf != null ? asOf : LocalDate.now());
     }
 
     private static String actor(Principal principal) {
