@@ -13,4 +13,7 @@ public interface InventoryQuery {
     Optional<ItemOnHand> onHand(Long itemId);
 
     List<ItemOnHand> allOnHand();
+
+    /** The moving-average subledger value rolled up per GL inventory control account, for reconciliation. */
+    List<InventoryAccountBalance> subledgerByAccount();
 }
