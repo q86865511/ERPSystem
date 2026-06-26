@@ -36,8 +36,11 @@ after a complete cycle. This one report is the project's hero artifact.
 
 A **modular monolith**: single deployable, single PostgreSQL database, in-process modules whose
 boundaries are *enforced* (no module imports another's internals or touches its tables — checked in
-CI with ArchUnit). The `ledger` module is a shared kernel; every other module posts through the
-single `LedgerPostingService`. See [docs/adr/](docs/adr/) for the architecture decision records.
+CI with ArchUnit). The `ledger` module is a shared kernel exposing a published `LedgerPosting` port;
+every other module posts through it **in the same transaction** as its own writes, never reaching into
+ledger internals. The `inventory` module is the first consumer — a moving weighted-average subledger
+whose value reconciles exactly to the GL Inventory control account. See [docs/adr/](docs/adr/) for the
+architecture decision records.
 
 | Layer | Choice |
 |---|---|
@@ -45,7 +48,7 @@ single `LedgerPostingService`. See [docs/adr/](docs/adr/) for the architecture d
 | Database | PostgreSQL 16 |
 | Persistence | Spring Data JPA / Hibernate + Flyway migrations |
 | Boundary enforcement | ArchUnit (CI-enforced) |
-| Money | `BigDecimal` + Money value object (`NUMERIC(19,4)`), never `float` |
+| Money & quantity | `BigDecimal` value objects — `Money` (`NUMERIC(19,4)`) and `Quantity`/cost (`NUMERIC(19,6)`), never `float` |
 | Auth | Spring Security + stateless JWT, role-based |
 | Testing | JUnit + Testcontainers (real Postgres) |
 | Frontend | React 18 + TypeScript + Mantine *(later phase)* |
@@ -67,9 +70,12 @@ Prerequisites: **JDK 21**, **Docker** (for the database / Testcontainers).
 
 ## Roadmap
 
-Phase 0 walking skeleton (ledger spine) → 1 products & inventory → 2 procure-to-pay →
-3 order-to-cash → **4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close →
-6 polish & packaging. Full plan and consciously-deferred scope are tracked in [PROGRESS.md](PROGRESS.md).
+**✅ Done:** Phase 0 walking skeleton (ledger spine) · Phase 1 products & inventory (moving weighted-average
+valuation, append-only subledger reconciling to the GL Inventory control account). **Next:** Phase 2 procure-to-pay.
+
+Full arc: Phase 0 (ledger spine) → 1 products & inventory → 2 procure-to-pay → 3 order-to-cash →
+**4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close → 6 polish & packaging.
+Full plan and consciously-deferred scope are tracked in [PROGRESS.md](PROGRESS.md).
 
 ### Consciously deferred (deliberate scoping, not gaps)
 Multi-currency/FX, multi-tenancy (never), FIFO/standard-cost variances, tax engine beyond one VAT
