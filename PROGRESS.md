@@ -102,8 +102,12 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - (待指示)**Phase 0–6 全數完成** —— 總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / 打磨與打包,完整路線圖落地。`mvn verify` 全綠(Surefire 55、IT 58),CI 綠。可選後續:前端(React)、JWT/持久化使用者庫、上線 demo 部署、多階 BOM / FIFO 等延後範圍。
 
 ## 待辦
-- **Phase 1 商品與庫存(下一棒)**:Item / Warehouse / Location 主檔、append-only `StockLedgerEntry`、移動加權平均(`ItemCostState`,`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳,並建立 `ledger` 的 published `api`(供 inventory 跨模組同步過帳)。驗收:庫存帳值 == GL Inventory 控制科目餘額(對帳測試)。
-- Phase 2 採購到付款 → Phase 3 訂單到收款 → Phase 4 製造(最低可展示里程碑)→ Phase 5 報表與期間結 → Phase 6 打磨與打包。詳見計畫檔。
+> 核心路線圖 Phase 0–6 已全部完成。以下為可選後續與刻意延後範圍(非缺漏)。
+- **對外可展示性**:一鍵部署 demo(docker-compose 把 postgres + api(+前端)拉起、雲端 demo)、前端 GUI(React 18 + TS + Mantine)。目前純後端 + REST API,無 GUI。
+- **安全**:JWT + 持久化使用者/角色庫(取代目前 HTTP Basic + 4 in-memory 使用者)。
+- **財會加值**:PDF/列印報表(發票/PO/出貨單/試算表)、獨立 append-only `audit_log` + 敏感動作事件監聽、hard-close + 保留盈餘年結轉。
+- **品質**:並行測試擴到 sales/manufacturing(目前僅 inventory 有 concurrency IT)、Swagger/OpenAPI(互動式 API 文件)。
+- **刻意切割(YAGNI)**:多幣別/FX、多公司/多租戶、FIFO/標準成本+PPV、多稅率稅引擎、簽核流程、時間相位 MRP、批號/序號、工序/工作中心/人工製費、多倉調撥、多階 BOM、購買↔庫存單位換算(UoM)。
 
 ## 已知問題
 - 本機 `java`/`mvn` 不在沙箱 shell 的 PATH;建置需顯式設定 `JAVA_HOME=E:\JDK21` 並把 System32/PowerShell 路徑補進 PATH(否則 mvnw.cmd 找不到 powershell 無法 bootstrap)。
@@ -126,6 +130,12 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - **[P2] payments 獨立模組、direction IN|OUT**:Payment+PaymentAllocation 供採購付款與 Phase 3 客戶收款共用;`PaymentAllocation.document_id` 泛型(無硬 FK)。payments 經 `purchasing.api.PayableDocuments` 沖銷帳單,不碰 purchasing internals。
 - **[P3] 出貨成本走延後 COGS(deferred COGS),鏡像 GR-IR**:新增資產過渡科目 `1340`。出貨(SHIPMENT)只過 `Dr 1340 / Cr 1330`(移動平均成本),COGS 留到開票時 FIFO 配對 delivery 成本以 `Dr 5100 / Cr 1340` 認列,使「出貨↔開票」對稱清零(完整循環後 1340→0),與採購側「收貨↔請款」清 GR-IR 對稱。出貨即認 COGS 為較簡方案,但延後 COGS 展示收入/成本配比與過渡科目對稱性(使用者選定)。
 - **[P3] 每業務移動一個 movement type + 一條 COUNTER 規則**:`StockPostingService` 的 counter 科目由 movement type 解析(每型唯一一條規則),方向由「哪腿是 STOCK」決定。故出貨用新 `SHIPMENT`(counter 1340)、退貨用 `SALES_RETURN`(counter 1340),不重用 `RECEIPT`/`ISSUE`(counter 會錯)。新 movement type 需同時擴充 `stock_ledger_entry` 與 `inventory_posting_rule` 兩個 `movement_type` CHECK。
+- **[P4] 製造 WIP=清算控制科目、成品走實際成本滾算**:領料 `Dr 1320 / Cr 1310`(原料移動平均)累計 consumed_value;完工 `rolledCost = Σconsumed / qtyProduced`(6dp)、`Dr 1330 / Cr 1320`,殘差掃 `5930 製造變異` 使 WIP 在完整循環後歸零(整數情境餘差天然為 0)。每業務移動專屬 movement type:`MANUFACTURING_ISSUE`/`MANUFACTURING_RECEIPT`/`MANUFACTURING_RETURN`(counter 皆 1320,借方科目由 item type 區分)。標準成本+變異會計、工時/製費為延後 v2。ADR-0007。
+- **[P4] 工單 release 快照 BOM、取消走 append-only 反向領料**:release 時把 BOM 展開量(`qtyPer×qty/outputQty`)凍結到 `work_order_component`(不可變原則);取消未完工工單以 `MANUFACTURING_RETURN`(WIP→STOCK,原領料成本)反向領料、WIP 歸零,不改既有腿/分錄。
+- **[P5] reporting=read-side leaf、跨模組對帳只走 published ports**:財務報表(試算表/資產負債表/損益表,保留盈餘動態算)與**對帳健康檢查**(`/api/reporting/reconciliation`)由新 `reporting` 模組組合各模組 `*.api`——`ledger.api.GeneralLedgerQuery`、`inventory.api.InventoryQuery.subledgerByAccount`、`purchasing.api.PayablesQuery`、`sales.api.ReceivablesQuery`;`reporting` 不被任何模組依賴(ArchUnit 擴含 `..reporting..`)。`AccountBalance.naturalBalance()` 依 normal balance 帶號。
+- **[P5] 期間只做 soft-close**:`FiscalPeriod.close/reopen`(OPEN↔CLOSED),過帳路徑既有 `isOpen()` 檢查擋下非 OPEN 期間(`PeriodNotOpenException`);hard-close(`LOCKED`,連沖銷都擋)與保留盈餘年結轉延後(資產負債表保留盈餘=Σ收入−費用 動態計算,規避 year-end close)。
+- **[P6] RBAC 放 web 邊界(URL 授權),非 service `@PreAuthorize`**:`SecurityConfig` 以 `authorizeHttpRequests`(URL+HTTP method)管控 4 角色(ADMIN/ACCOUNTANT/WAREHOUSE/SALES);單一 REST 入口下與 service 層守衛等價,且可避免 ~50 個 service 直呼的 IT 全要塞安全 context。4 個 in-memory 使用者(admin 持全角色為超級使用者,免角色階層),延續 HTTP Basic;JWT/持久化使用者庫延後。ADR-0008。
+- **[P6] 一鍵 demo seed 放 composition root**:`com.erp.bootstrap.DataSeeder`(`@Profile("seed")`)經**真實過帳 service**(非繞過不變量的原生 SQL)灌入完整 買→做→賣;因跨模組編排而置於 root(非業務模組,不受模組邊界規則限制),`VEND-DEMO` 已存在則跳過(idempotent)。
 - **庫存估值=移動加權平均**(MVP 不做 PPV);standard-cost + 變異列為 v2(`Item.valuation_method` 保留欄)。
 - **並行=READ COMMITTED + 固定順序的悲觀鎖**(Sequence 先於 ItemCostState),不使用全域 SERIALIZABLE。
 - **編號**:只有 `JournalEntry.entry_no` 連號;業務文件用 unique-monotonic + prefix。
