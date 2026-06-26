@@ -102,8 +102,11 @@ inventory, AP and AR subledgers each equal their GL control account (with the GR
 clearing accounts reported alongside). Fiscal periods can be **soft-closed** (and reopened) — the posting
 service refuses any entry dated in a non-open period.
 
-**Next:** Phase 6 polish & packaging — fuller RBAC, a one-key real-posting demo seed, and the final
-README (architecture diagram, ERD, ADRs).
+**🚧 In progress:** Phase 6 polish & packaging. **Role-based access control** is in: four roles —
+`ACCOUNTANT` (financial postings), `WAREHOUSE` (physical movements & production), `SALES` (sales orders),
+`ADMIN` (master data, superuser) — enforced as request authorization over HTTP Basic; reads need only
+authentication. *Remaining:* a one-key real-posting demo seed and the final README (architecture diagram,
+ERD, ADR pass).
 
 Full arc: Phase 0 (ledger spine) → 1 products & inventory → 2 procure-to-pay → 3 order-to-cash →
 **4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close → 6 polish & packaging.
