@@ -96,7 +96,8 @@ public class MasterDataQueryService implements MasterDataQuery {
 
     private static ItemView toView(Item item) {
         return new ItemView(item.getId(), item.getSku(), item.getName(), item.getItemType(),
-                item.getUom(), item.isStocked(), item.getStandardCost());
+                item.getUom(), item.isStocked(), item.getStandardCost(), item.getReorderPoint(),
+                item.getReorderQty());
     }
 
     private static LocationView toView(Location location) {

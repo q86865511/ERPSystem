@@ -69,8 +69,15 @@ class ArchitectureTest {
     static final ArchRule sales_api_is_self_contained =
             noClasses().that().resideInAPackage("..sales.api..")
                     .should().dependOnClassesThat()
-                    .resideInAnyPackage("..sales.domain..", "..sales.application..", "..sales.web..")
-                    // sales.api arrives in a later stage; tolerate it being empty until then.
+                    .resideInAnyPackage("..sales.domain..", "..sales.application..", "..sales.web..");
+
+    @ArchTest
+    static final ArchRule manufacturing_api_is_self_contained =
+            noClasses().that().resideInAPackage("..manufacturing.api..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..manufacturing.domain..", "..manufacturing.application..",
+                            "..manufacturing.web..")
+                    // manufacturing has no published api yet; tolerate it being empty.
                     .allowEmptyShould(true);
 
     // ---- Cross-module isolation ---------------------------------------------------------------
@@ -81,14 +88,14 @@ class ArchitectureTest {
             noClasses().that().resideInAPackage("..masterdata..")
                     .should().dependOnClassesThat()
                     .resideInAnyPackage("..ledger..", "..inventory..", "..purchasing..", "..payments..",
-                            "..sales..");
+                            "..sales..", "..manufacturing..");
 
     @ArchTest
     static final ArchRule ledger_does_not_depend_on_other_modules =
             noClasses().that().resideInAPackage("..ledger..")
                     .should().dependOnClassesThat()
                     .resideInAnyPackage("..masterdata..", "..inventory..", "..purchasing..", "..payments..",
-                            "..sales..");
+                            "..sales..", "..manufacturing..");
 
     @ArchTest
     static final ArchRule inventory_uses_only_published_ports =
@@ -96,7 +103,7 @@ class ArchitectureTest {
                     .should().dependOnClassesThat()
                     .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
                             "..masterdata.domain..", "..masterdata.application..", "..masterdata.web..",
-                            "..purchasing..", "..payments..", "..sales..");
+                            "..purchasing..", "..payments..", "..sales..", "..manufacturing..");
 
     @ArchTest
     static final ArchRule purchasing_uses_only_published_ports =
@@ -105,7 +112,7 @@ class ArchitectureTest {
                     .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
                             "..inventory.domain..", "..inventory.application..", "..inventory.web..",
                             "..masterdata.domain..", "..masterdata.application..", "..masterdata.web..",
-                            "..payments..", "..sales..");
+                            "..payments..", "..sales..", "..manufacturing..");
 
     @ArchTest
     static final ArchRule sales_uses_only_published_ports =
@@ -114,7 +121,16 @@ class ArchitectureTest {
                     .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
                             "..inventory.domain..", "..inventory.application..", "..inventory.web..",
                             "..masterdata.domain..", "..masterdata.application..", "..masterdata.web..",
-                            "..purchasing..", "..payments..");
+                            "..purchasing..", "..payments..", "..manufacturing..");
+
+    @ArchTest
+    static final ArchRule manufacturing_uses_only_published_ports =
+            noClasses().that().resideInAPackage("..manufacturing..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
+                            "..inventory.domain..", "..inventory.application..", "..inventory.web..",
+                            "..masterdata.domain..", "..masterdata.application..", "..masterdata.web..",
+                            "..purchasing..", "..payments..", "..sales..");
 
     @ArchTest
     static final ArchRule payments_uses_only_published_ports =
@@ -123,5 +139,5 @@ class ArchitectureTest {
                     .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
                             "..purchasing.domain..", "..purchasing.application..", "..purchasing.web..",
                             "..sales.domain..", "..sales.application..", "..sales.web..",
-                            "..inventory..", "..masterdata..");
+                            "..inventory..", "..masterdata..", "..manufacturing..");
 }
