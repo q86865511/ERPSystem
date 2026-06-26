@@ -37,6 +37,11 @@ public class MasterDataController {
     public record CreateLocationRequest(Long warehouseId, String code, LocationType locationType) {
     }
 
+    public record CreatePartnerRequest(String code, String name, Boolean vendor, Boolean customer,
+                                       String taxId, Integer paymentTermsDays, String apAccountCode,
+                                       String arAccountCode) {
+    }
+
     @PostMapping("/items")
     public ResponseEntity<ItemResponse> createItem(@RequestBody CreateItemRequest request) {
         boolean stocked = request.stocked() == null || request.stocked();
@@ -73,5 +78,21 @@ public class MasterDataController {
     @GetMapping("/locations/{id}")
     public LocationResponse getLocation(@PathVariable Long id) {
         return LocationResponse.from(masterDataService.getLocation(id));
+    }
+
+    @PostMapping("/partners")
+    public ResponseEntity<PartnerResponse> createPartner(@RequestBody CreatePartnerRequest request) {
+        boolean vendor = request.vendor() != null && request.vendor();
+        boolean customer = request.customer() != null && request.customer();
+        int terms = request.paymentTermsDays() != null ? request.paymentTermsDays() : 30;
+        PartnerResponse body = PartnerResponse.from(masterDataService.createPartner(
+                request.code(), request.name(), vendor, customer, request.taxId(), terms,
+                request.apAccountCode(), request.arAccountCode()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(body);
+    }
+
+    @GetMapping("/partners/{id}")
+    public PartnerResponse getPartner(@PathVariable Long id) {
+        return PartnerResponse.from(masterDataService.getPartner(id));
     }
 }

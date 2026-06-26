@@ -1,5 +1,6 @@
 package com.erp.masterdata.api;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 /**
@@ -18,6 +19,13 @@ public interface MasterDataQuery {
 
     /** Finds the (single) location of a given type within a warehouse, e.g. its INVENTORY_LOSS sink. */
     Optional<LocationView> findLocationByType(Long warehouseId, LocationType type);
+
+    Optional<PartnerView> findPartner(Long id);
+
+    Optional<PartnerView> findPartnerByCode(String code);
+
+    /** The VAT rate for a tax-rate code (e.g. {@code STANDARD}), if configured. */
+    Optional<BigDecimal> findTaxRate(String code);
 
     /**
      * The inventory control account code for an item type (RAW→1310, WIP→1320, FINISHED→1330).
