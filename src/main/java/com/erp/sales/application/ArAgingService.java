@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 /** Read-side accounts-receivable aging: open invoices bucketed by days past their due date. */
 @Service
@@ -33,7 +34,8 @@ public class ArAgingService {
         BigDecimal d61to90 = BigDecimal.ZERO;
         BigDecimal d90plus = BigDecimal.ZERO;
 
-        for (SalesInvoice invoice : salesInvoiceRepository.findByStatusNot(SalesInvoiceStatus.PAID)) {
+        for (SalesInvoice invoice : salesInvoiceRepository.findByStatusIn(
+                List.of(SalesInvoiceStatus.POSTED, SalesInvoiceStatus.PARTIALLY_PAID))) {
             BigDecimal open = invoice.openBalance();
             if (open.signum() <= 0) {
                 continue;

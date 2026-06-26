@@ -2,6 +2,7 @@ package com.erp.sales.web;
 
 import com.erp.sales.application.ArAgingReport;
 import com.erp.sales.application.ArAgingService;
+import com.erp.sales.application.CustomerReturnService;
 import com.erp.sales.application.DeliveryService;
 import com.erp.sales.application.DeliveryService.DeliveryLineInput;
 import com.erp.sales.application.SalesInvoiceService;
@@ -32,13 +33,16 @@ public class SalesController {
     private final DeliveryService deliveryService;
     private final SalesInvoiceService salesInvoiceService;
     private final ArAgingService arAgingService;
+    private final CustomerReturnService customerReturnService;
 
     public SalesController(SalesOrderService salesOrderService, DeliveryService deliveryService,
-                           SalesInvoiceService salesInvoiceService, ArAgingService arAgingService) {
+                           SalesInvoiceService salesInvoiceService, ArAgingService arAgingService,
+                           CustomerReturnService customerReturnService) {
         this.salesOrderService = salesOrderService;
         this.deliveryService = deliveryService;
         this.salesInvoiceService = salesInvoiceService;
         this.arAgingService = arAgingService;
+        this.customerReturnService = customerReturnService;
     }
 
     public record CreateSoLine(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice) {
@@ -59,6 +63,9 @@ public class SalesController {
 
     public record CreateInvoiceRequest(Long salesOrderId, String taxRateCode, LocalDate postingDate,
                                        List<InvoiceLine> lines) {
+    }
+
+    public record CreateReturnRequest(Long salesInvoiceId, Long stockLocationId, LocalDate postingDate) {
     }
 
     @PostMapping("/sales-orders")
@@ -114,6 +121,20 @@ public class SalesController {
     @GetMapping("/sales-invoices/{id}")
     public SalesInvoiceResponse getInvoice(@PathVariable Long id) {
         return SalesInvoiceResponse.from(salesInvoiceService.getInvoice(id));
+    }
+
+    @PostMapping("/customer-returns")
+    public ResponseEntity<CustomerReturnResponse> postReturn(@RequestBody CreateReturnRequest request,
+                                                             Principal principal) {
+        LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
+        CustomerReturnResponse body = CustomerReturnResponse.from(customerReturnService.postReturn(
+                request.salesInvoiceId(), request.stockLocationId(), postingDate, actor(principal)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(body);
+    }
+
+    @GetMapping("/customer-returns/{id}")
+    public CustomerReturnResponse getReturn(@PathVariable Long id) {
+        return CustomerReturnResponse.from(customerReturnService.getReturn(id));
     }
 
     /** Accounts-receivable aging as of a date (defaults to today). */

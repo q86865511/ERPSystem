@@ -132,6 +132,9 @@ public class SalesInvoice {
 
     /** Allocates a customer receipt to this invoice, advancing its status. */
     public void applyReceipt(BigDecimal amount) {
+        if (status != SalesInvoiceStatus.POSTED && status != SalesInvoiceStatus.PARTIALLY_PAID) {
+            throw new IllegalStateException("cannot receive against an invoice in status " + status);
+        }
         if (amount == null || amount.signum() <= 0) {
             throw new IllegalArgumentException("receipt amount must be positive");
         }
@@ -143,6 +146,18 @@ public class SalesInvoice {
         this.status = openBalance().signum() == 0
                 ? SalesInvoiceStatus.PAID
                 : SalesInvoiceStatus.PARTIALLY_PAID;
+    }
+
+    /** Fully reverses an unpaid posted invoice (credit note). */
+    public void markReturned() {
+        if (status != SalesInvoiceStatus.POSTED) {
+            throw new IllegalStateException("only a POSTED invoice can be returned, was " + status);
+        }
+        if (amountReceived.signum() != 0) {
+            throw new IllegalStateException("cannot return invoice " + invoiceNumber
+                    + " with a receipt already applied");
+        }
+        this.status = SalesInvoiceStatus.RETURNED;
     }
 
     public List<InvoiceLine> getLines() {

@@ -23,7 +23,7 @@ manufacturing differentiator (single-level BOM + Work Order with correct WIP acc
 
 1. **Buy** a raw material — Purchase Order → Goods Receipt → Vendor Bill → Payment
 2. **Make** a finished good — single-level BOM → Work Order (consume raw into WIP, produce finished good)
-3. **Sell** it — Sales Order → Delivery (COGS) → Invoice (revenue) → Receipt
+3. **Sell** it — Sales Order → Delivery (ship at cost) → Invoice (revenue + COGS) → Receipt
 
 Then **prove it**: the *reconciliation health-check* asserts the books are correct —
 global `SUM(debit) = SUM(credit)`, inventory subledger value == GL Inventory control balance,
@@ -74,15 +74,18 @@ Prerequisites: **JDK 21**, **Docker** (for the database / Testcontainers).
 **✅ Done:** Phase 0 walking skeleton (ledger spine) · Phase 1 products & inventory (moving weighted-average
 valuation, append-only subledger reconciling to the GL Inventory control account) · Phase 2 procure-to-pay
 (PO → goods receipt → vendor bill → payment, with GR-IR clearing, Input VAT, a purchase-price variance that
-revalues inventory, and an AP subledger that reconciles to its control account).
+revalues inventory, and an AP subledger that reconciles to its control account) · Phase 3 order-to-cash
+(Sales Order → Delivery → Invoice → Receipt, plus customer returns / credit notes). Costs follow a
+**deferred-COGS** model mirroring GR-IR: a delivery parks the shipped cost in a Deferred-COGS clearing
+account (`Dr 1340 / Cr Finished Goods`); the invoice recognises COGS against it (`Dr COGS / Cr 1340`)
+alongside revenue + Output VAT, so a fully shipped-and-invoiced order leaves the clearing account at zero.
+The chain reconciles end-to-end (inventory falls, COGS/revenue/Output VAT post, Deferred-COGS and AR net to
+zero, trial balance balances, AR subledger == its control account); customer receipts reuse the `payments`
+module (`direction IN`), an AR-aging report is exposed, and a customer return posts a credit note that
+reverses the whole cycle to zero.
 
-**🚧 In progress:** Phase 3 order-to-cash. Costs follow a **deferred-COGS** model mirroring GR-IR: a delivery
-parks the shipped cost in a Deferred-COGS clearing account (`Dr 1340 / Cr Finished Goods`); the customer
-invoice recognises COGS against it (`Dr COGS / Cr 1340`) alongside revenue + Output VAT, so a fully
-shipped-and-invoiced order leaves the clearing account at zero. The full chain Sales Order → Delivery →
-Invoice → Receipt now reconciles end-to-end (inventory falls, COGS/revenue/Output VAT post, Deferred-COGS
-and AR net to zero, trial balance balances, AR subledger == its control account); customer receipts reuse
-the `payments` module (`direction IN`) and an AR-aging report is exposed. *Remaining:* customer returns / credit notes.
+**🚧 In progress:** Phase 4 manufacturing — single-level BOM, work orders, WIP issue/completion with cost
+roll-up, and a reorder-point report.
 
 Full arc: Phase 0 (ledger spine) → 1 products & inventory → 2 procure-to-pay → 3 order-to-cash →
 **4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close → 6 polish & packaging.

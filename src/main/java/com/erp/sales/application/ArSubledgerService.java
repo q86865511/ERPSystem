@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Read-side accounts-receivable reporting. The AR subledger balance is the sum of every open customer
@@ -23,7 +24,8 @@ public class ArSubledgerService {
     }
 
     public BigDecimal arSubledgerBalance() {
-        return salesInvoiceRepository.findByStatusNot(SalesInvoiceStatus.PAID).stream()
+        return salesInvoiceRepository.findByStatusIn(
+                        List.of(SalesInvoiceStatus.POSTED, SalesInvoiceStatus.PARTIALLY_PAID)).stream()
                 .map(SalesInvoice::openBalance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
