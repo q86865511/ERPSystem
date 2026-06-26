@@ -65,18 +65,27 @@ class ArchitectureTest {
     static final ArchRule masterdata_does_not_depend_on_other_modules =
             noClasses().that().resideInAPackage("..masterdata..")
                     .should().dependOnClassesThat()
-                    .resideInAnyPackage("..ledger..", "..inventory..");
+                    .resideInAnyPackage("..ledger..", "..inventory..", "..purchasing..", "..payments..");
 
     @ArchTest
     static final ArchRule ledger_does_not_depend_on_other_modules =
             noClasses().that().resideInAPackage("..ledger..")
                     .should().dependOnClassesThat()
-                    .resideInAnyPackage("..masterdata..", "..inventory..");
+                    .resideInAnyPackage("..masterdata..", "..inventory..", "..purchasing..", "..payments..");
 
     @ArchTest
     static final ArchRule inventory_uses_only_published_ports =
             noClasses().that().resideInAPackage("..inventory..")
                     .should().dependOnClassesThat()
                     .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
+                            "..masterdata.domain..", "..masterdata.application..", "..masterdata.web..",
+                            "..purchasing..", "..payments..");
+
+    @ArchTest
+    static final ArchRule purchasing_uses_only_published_ports =
+            noClasses().that().resideInAPackage("..purchasing..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
+                            "..inventory.domain..", "..inventory.application..", "..inventory.web..",
                             "..masterdata.domain..", "..masterdata.application..", "..masterdata.web..");
 }
