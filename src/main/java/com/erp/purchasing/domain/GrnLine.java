@@ -73,7 +73,8 @@ public class GrnLine {
         return qtyReceived.subtract(qtyBilled);
     }
 
-    void bill(BigDecimal qty) {
+    /** Records billed quantity against this receipt line when a vendor bill clears its GR-IR. */
+    public void bill(BigDecimal qty) {
         this.qtyBilled = qtyBilled.add(qty);
     }
 }

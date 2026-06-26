@@ -77,7 +77,7 @@ public class LedgerPostingService {
             BigDecimal debit = line.debit() != null ? line.debit() : BigDecimal.ZERO;
             BigDecimal credit = line.credit() != null ? line.credit() : BigDecimal.ZERO;
             try {
-                entry.addLine(account.getId(), debit, credit, line.memo());
+                entry.addLine(account.getId(), debit, credit, line.memo(), line.partnerId());
             } catch (IllegalArgumentException ex) {
                 throw new InvalidLedgerRequestException(ex.getMessage());
             }

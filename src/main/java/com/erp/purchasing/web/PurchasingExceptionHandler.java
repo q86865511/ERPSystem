@@ -4,6 +4,7 @@ import com.erp.purchasing.application.GoodsReceiptNotFoundException;
 import com.erp.purchasing.application.PurchaseOrderNotFoundException;
 import com.erp.purchasing.application.PurchasingException;
 import com.erp.purchasing.application.PurchasingValidationException;
+import com.erp.purchasing.application.VendorBillNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,7 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class PurchasingExceptionHandler {
 
-    @ExceptionHandler({PurchaseOrderNotFoundException.class, GoodsReceiptNotFoundException.class})
+    @ExceptionHandler({PurchaseOrderNotFoundException.class, GoodsReceiptNotFoundException.class,
+            VendorBillNotFoundException.class})
     public ProblemDetail onNotFound(PurchasingException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }

@@ -21,6 +21,16 @@ public record JournalEntryRequest(
         String sourceEvent,
         List<Line> lines) {
 
-    public record Line(String accountCode, BigDecimal debit, BigDecimal credit, String memo) {
+    /**
+     * One leg. {@code partnerId} is an optional analytic dimension (the vendor/customer the line
+     * relates to, e.g. on an AP or GR-IR line); the four-argument form leaves it null so existing
+     * callers are unaffected.
+     */
+    public record Line(String accountCode, BigDecimal debit, BigDecimal credit, String memo,
+                       Long partnerId) {
+
+        public Line(String accountCode, BigDecimal debit, BigDecimal credit, String memo) {
+            this(accountCode, debit, credit, memo, null);
+        }
     }
 }

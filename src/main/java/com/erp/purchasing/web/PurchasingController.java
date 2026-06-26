@@ -4,6 +4,8 @@ import com.erp.purchasing.application.GoodsReceiptService;
 import com.erp.purchasing.application.GoodsReceiptService.ReceiptLineInput;
 import com.erp.purchasing.application.PurchaseOrderService;
 import com.erp.purchasing.application.PurchaseOrderService.PoLineInput;
+import com.erp.purchasing.application.VendorBillService;
+import com.erp.purchasing.application.VendorBillService.BillLineInput;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,11 +27,14 @@ public class PurchasingController {
 
     private final PurchaseOrderService purchaseOrderService;
     private final GoodsReceiptService goodsReceiptService;
+    private final VendorBillService vendorBillService;
 
     public PurchasingController(PurchaseOrderService purchaseOrderService,
-                                GoodsReceiptService goodsReceiptService) {
+                                GoodsReceiptService goodsReceiptService,
+                                VendorBillService vendorBillService) {
         this.purchaseOrderService = purchaseOrderService;
         this.goodsReceiptService = goodsReceiptService;
+        this.vendorBillService = vendorBillService;
     }
 
     public record CreatePoLine(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice) {
@@ -43,6 +48,13 @@ public class PurchasingController {
 
     public record CreateGrnRequest(Long purchaseOrderId, Long stockLocationId, LocalDate postingDate,
                                    List<ReceiptLine> lines) {
+    }
+
+    public record BillLine(Long poLineId, BigDecimal qty, BigDecimal unitPrice) {
+    }
+
+    public record CreateBillRequest(Long purchaseOrderId, String taxRateCode, LocalDate postingDate,
+                                    List<BillLine> lines) {
     }
 
     @PostMapping("/purchase-orders")
@@ -81,6 +93,23 @@ public class PurchasingController {
     @GetMapping("/goods-receipts/{id}")
     public GoodsReceiptResponse getReceipt(@PathVariable Long id) {
         return GoodsReceiptResponse.from(goodsReceiptService.getReceipt(id));
+    }
+
+    @PostMapping("/vendor-bills")
+    public ResponseEntity<VendorBillResponse> postBill(@RequestBody CreateBillRequest request,
+                                                       Principal principal) {
+        LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
+        String taxRateCode = request.taxRateCode() != null ? request.taxRateCode() : "STANDARD";
+        List<BillLineInput> lines = request.lines().stream()
+                .map(l -> new BillLineInput(l.poLineId(), l.qty(), l.unitPrice())).toList();
+        VendorBillResponse body = VendorBillResponse.from(vendorBillService.postBill(
+                request.purchaseOrderId(), lines, taxRateCode, postingDate, actor(principal)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(body);
+    }
+
+    @GetMapping("/vendor-bills/{id}")
+    public VendorBillResponse getBill(@PathVariable Long id) {
+        return VendorBillResponse.from(vendorBillService.getBill(id));
     }
 
     private static String actor(Principal principal) {

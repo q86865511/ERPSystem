@@ -60,12 +60,13 @@ public class JournalLine {
     private Long moId;
 
     JournalLine(JournalEntry journalEntry, int lineNo, Long accountId,
-                BigDecimal debit, BigDecimal credit, String memo) {
+                BigDecimal debit, BigDecimal credit, String memo, Long partnerId) {
         this.journalEntry = journalEntry;
         this.lineNo = lineNo;
         this.accountId = accountId;
         this.debit = debit;
         this.credit = credit;
         this.memo = memo;
+        this.partnerId = partnerId;
     }
 }
