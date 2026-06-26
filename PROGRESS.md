@@ -1,11 +1,16 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
-**Phase 3(訂單到收款)進行中** — 採「延後 COGS(deferred COGS)」設計鏡像採購側 GR-IR:出貨先把成本停在新過渡科目 1340,開票時才認 COGS,使「出貨↔開票」對稱清零。計畫 7 段 PR(Phase 3 四段 + Phase 4 三段),計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`。**S1+S2 完成**:`sales` 模組 SO→Delivery→CustomerInvoice;出貨 `Dr 1340 / Cr 1330`(移動平均),開票 `Dr 1200 / Cr 4100、Cr 2400` + `Dr 5100 / Cr 1340`(FIFO 配對 delivery 成本清 1340,延後 COGS 完整清零),AR 子帳==1200。`mvn verify` 全綠(Surefire 45、IT 39)。
+**Phase 3(訂單到收款)進行中** — 採「延後 COGS(deferred COGS)」設計鏡像採購側 GR-IR:出貨先把成本停在新過渡科目 1340,開票時才認 COGS,使「出貨↔開票」對稱清零。計畫 7 段 PR(Phase 3 四段 + Phase 4 三段),計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`。**S1+S2+S3 完成**:`sales` 模組 SO→Delivery→CustomerInvoice→Receipt 全鏈;**O2C 驗收達成(`ArReconciliationIT`)** —— 全鏈跑完後庫存↓、COGS+收入+Output VAT 入帳、**1340→0、AR→0、AR 子帳==1200、試算表平衡**;收款重用 payments `direction IN`、AR 帳齡上線。下一棒 S4 客戶退貨/credit note。`mvn verify` 全綠(Surefire 45、IT 42)。
 **Phase 2(採購到付款)完成** — 分 4 段 PR 交付(Partner/種子、purchasing PO→GR、VendorBill、payments)。**Phase 2 驗收達成(`ApReconciliationIT`)**:PO→GR→VendorBill→Payment 全鏈跑完後 **GR-IR→0、AP→0、AP 子帳==GL 2100、試算表平衡、庫存上升**;採購價差走庫存重估、GL 帶 partner 維度。
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-27] 💵 P3-S3 收款(payments IN)+ AR 帳齡 + O2C 全鏈對帳(Phase 3 Stage 3)
+  - `PaymentService.payIn`(鏡像 `payOut`):過 `Dr 1010 / Cr 1200`(1200 標 partner),逐筆經 `sales.api.ReceivableDocuments.applyReceipt` 翻發票 PARTIALLY_PAID/PAID;REST `POST /api/payments/in`。`payment.direction IN` 既有、無 schema 變更。`Allocation`(bill)/`ReceiptAllocation`(invoice)分開。
+  - `sales` 加 `ArAgingService`/`ArAgingReport`(依 partner 付款條件分桶,鏡像 `ApAging*`)+ `GET /api/sales/ar-aging`。
+  - ArchUnit:`payments_uses_only_published_ports` 由「禁 `..sales..`」改為「禁 `sales.domain/application/web`」(允許 `payments→sales.api`,鏡像 `purchasing.api`)。
+  - `ReceiptPostingIT`(`Dr1010/Cr1200`+partner、配款翻狀態);**`ArReconciliationIT`(全鏈 O2C)**:SO→Delivery→Invoice→Receipt 後庫存↓、4100/2400/5100 入帳、1340 該訂單→0、AR(customer)→0、TB 平、AR 子帳==1200。`verify` 全綠(Surefire 45、IT 42)。
 - [2026-06-26] 🧾 P3-S2 CustomerInvoice(收入 + Output VAT + 認 COGS + AR 子帳)(Phase 3 Stage 2)
   - `sales` 加 domain `SalesInvoice`/`InvoiceLine`(狀態機 DRAFT→POSTED→PARTIALLY_PAID→PAID,line 記 line_cogs);`SalesInvoiceService.postInvoice`(逐行算 net/vat 走售價,FIFO 配對 open `delivery_line` 算 COGS=配對 qty×delivery 成本 → bump qty_invoiced → 組 JE → 存 POSTED),鏡像 `VendorBillService`(無 revalue/無變異)。
   - **開票分錄**:收入側 `Dr 1200(gross,標 partner)/ Cr 4100(net)、Cr 2400(vat)`;COGS 側 `Dr 5100 / Cr 1340`(清延後 COGS)。兩側各自天然平衡,無需 9990。`ArSubledgerService.arSubledgerBalance()`=Σ 未結發票餘額,對帳到 GL 1200。
@@ -53,7 +58,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
-- **Phase 3 訂單到收款**(計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`,延後 COGS 設計)。S1(SO→Delivery)、S2(CustomerInvoice)完成;下一棒 S3 收款(payments IN)+ AR 帳齡 + O2C 全鏈對帳、S4 客戶退貨/credit note。之後 Phase 4 製造(S5 BOM+WO release+領料、S6 完工成本滾算+再訂點+對帳、S7 工單取消)。
+- **Phase 3 訂單到收款**(計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`,延後 COGS 設計)。S1~S3 完成(O2C 全鏈 + 對帳達成);下一棒 S4 客戶退貨/credit note。之後 Phase 4 製造(S5 BOM+WO release+領料、S6 完工成本滾算+再訂點+對帳、S7 工單取消)。
 
 ## 待辦
 - **Phase 1 商品與庫存(下一棒)**:Item / Warehouse / Location 主檔、append-only `StockLedgerEntry`、移動加權平均(`ItemCostState`,`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳,並建立 `ledger` 的 published `api`(供 inventory 跨模組同步過帳)。驗收:庫存帳值 == GL Inventory 控制科目餘額(對帳測試)。

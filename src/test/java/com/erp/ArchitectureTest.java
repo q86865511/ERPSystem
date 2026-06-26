@@ -122,5 +122,6 @@ class ArchitectureTest {
                     .should().dependOnClassesThat()
                     .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
                             "..purchasing.domain..", "..purchasing.application..", "..purchasing.web..",
-                            "..inventory..", "..masterdata..", "..sales..");
+                            "..sales.domain..", "..sales.application..", "..sales.web..",
+                            "..inventory..", "..masterdata..");
 }
