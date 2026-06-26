@@ -5,7 +5,8 @@ import java.math.BigDecimal;
 /**
  * Published read view of an item — what other modules (inventory, purchasing, ...) need without
  * importing the {@code Item} domain entity: its id, identity, type (for account resolution), whether
- * it is stocked, and its standard cost (the default unit cost for a stock gain).
+ * it is stocked, its standard cost (the default unit cost for a stock gain), and the optional
+ * reorder point / quantity used by the manufacturing reorder report.
  */
 public record ItemView(
         Long id,
@@ -14,5 +15,7 @@ public record ItemView(
         ItemType itemType,
         String uom,
         boolean stocked,
-        BigDecimal standardCost) {
+        BigDecimal standardCost,
+        BigDecimal reorderPoint,
+        BigDecimal reorderQty) {
 }

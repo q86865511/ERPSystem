@@ -1,11 +1,16 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
-**Phase 3(訂單到收款)完成** — 分 4 段 PR 交付(SO→Delivery、CustomerInvoice、Receipt+AR 帳齡、CustomerReturn)。採「延後 COGS(deferred COGS)」鏡像 GR-IR:出貨成本停在過渡科目 1340,開票才認 COGS,「出貨↔開票」對稱清零。**O2C 驗收達成(`ArReconciliationIT`)**:全鏈跑完庫存↓、COGS+收入+Output VAT 入帳、1340→0、AR→0、AR 子帳==1200、試算表平衡;客戶退貨(credit note)全鏈沖回零。`mvn verify` 全綠(Surefire 45、IT 43)。下一棒:**Phase 4 製造**(BOM、WorkOrder、WIP 領料/完工成本滾算、再訂點),計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`。
+**Phase 3(訂單到收款)完成** — 分 4 段 PR 交付(SO→Delivery、CustomerInvoice、Receipt+AR 帳齡、CustomerReturn)。採「延後 COGS(deferred COGS)」鏡像 GR-IR:出貨成本停在過渡科目 1340,開票才認 COGS,「出貨↔開票」對稱清零。**O2C 驗收達成(`ArReconciliationIT`)**:全鏈跑完庫存↓、COGS+收入+Output VAT 入帳、1340→0、AR→0、AR 子帳==1200、試算表平衡;客戶退貨(credit note)全鏈沖回零。`mvn verify` 全綠(Surefire 45、IT 43)。**Phase 4 製造進行中**:**S5 完成** —— 新 `manufacturing` 模組(BOM + WorkOrder),release 快照 BOM、領料(MANUFACTURING_ISSUE STOCK→WIP,`Dr 1320 / Cr 1310` 以移動平均);新增 3 個製造 movement type + COUNTER 規則→1320、WO 序號;`ItemView` 補 reorder 欄。下一棒 S6 完工成本滾算 + 再訂點 + 製造對帳、S7 工單取消。計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`。
 **Phase 2(採購到付款)完成** — 分 4 段 PR 交付(Partner/種子、purchasing PO→GR、VendorBill、payments)。**Phase 2 驗收達成(`ApReconciliationIT`)**:PO→GR→VendorBill→Payment 全鏈跑完後 **GR-IR→0、AP→0、AP 子帳==GL 2100、試算表平衡、庫存上升**;採購價差走庫存重估、GL 帶 partner 維度。
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-27] 🏭 P4-S5 BOM + WorkOrder release + 領料(WIP issue)(Phase 4 Stage 1)
+  - 新 `manufacturing` 模組:domain `BillOfMaterials`/`BomComponent`(單階,output_qty/qty_per/scrap_pct 保留)、`WorkOrder`/`WorkOrderComponent`(狀態機 DRAFT→RELEASED→IN_PROGRESS→DONE→CANCELLED);`BomService.createBom`(自動 version)、`WorkOrderService.create/release/issue`。`release` 展開 BOM × qtyToProduce/outputQty → 快照 planned_qty(凍結);`issue` 逐 component 經 `StockPosting` MANUFACTURING_ISSUE STOCK→WIP 過 `Dr 1320 / Cr 1310`(移動平均),累計 `consumed_value` 供完工滾算,WO→IN_PROGRESS。REST `/api/manufacturing`。
+  - 基礎:`InventoryMovementType` 加 `MANUFACTURING_ISSUE/RECEIPT/RETURN`,V13 擴充兩個 movement_type CHECK + COUNTER 規則(全 →1320)+ WO 序號;`ItemView` 加 `reorderPoint/reorderQty`(additive,供 S6 再訂點)。V14(bill_of_materials/bom_component/work_order/work_order_component)。WIP/SCRAP/PRODUCTION_WIP 儲位、科目 1320/5930 皆既有。
+  - ArchUnit:加 `manufacturing.api` 自我內聚(allowEmptyShould)+ `manufacturing` 只用 published ports;既有跨模組規則擴含 `..manufacturing..`。
+  - `BillOfMaterialsTest`/`WorkOrderTest`(單元:BOM、狀態機、release 快照守衛)、`WorkOrderIssueIT`(`Dr1320/Cr1310`、raw cost state↓、consumed_value、擋超在庫)。`verify` 全綠(Surefire 54、IT 45)。
 - [2026-06-27] ↩️ P3-S4 客戶退貨 / credit note(銷售沖銷)(Phase 3 Stage 4,收尾)
   - 新 `CustomerReturn`/`CustomerReturnLine`(POSTED 不可變);`CustomerReturnService.postReturn(invoiceId, stockLocationId,…)` 對「已開票未收款」發票整筆沖回:逐行 `StockPosting` SALES_RETURN CUSTOMER→STOCK(以 delivery 成本 `Dr 1330 / Cr 1340` 退庫)+ 單張 credit note JE(`Dr 4100/Dr 2400 / Cr 1200` 反收入/AR;`Dr 1340 / Cr 5100` 反 COGS);發票翻 RETURNED。REST `/api/sales/customer-returns`。V12(customer_return/line + sales_invoice 狀態 CHECK 加 RETURNED)。
   - **append-only 沖銷**:全程 INSERT 反向腿 + 反向分錄,不改既有腿/分錄。`ArSubledgerService`/`ArAgingService` 改取 live 應收(POSTED/PARTIALLY_PAID),RETURNED 不計;`SalesInvoice.applyReceipt` 加狀態守衛、`markReturned`(限未收款)。
@@ -62,7 +67,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
-- **Phase 4 製造**(計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`)。Phase 3 已完成。下一棒 S5 BOM + WorkOrder release(快照 BOM)+ 領料(WIP issue,`Dr 1320 / Cr 1310`)、S6 完工成本滾算(`Dr 1330 / Cr 1320`,餘差→5930)+ 再訂點報表 + 製造對帳、S7 工單取消(反向領料)。
+- **Phase 4 製造**(計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`)。S5(BOM+release+領料)完成。下一棒 S6 完工成本滾算(`Dr 1330 / Cr 1320`,餘差→5930)+ 再訂點報表 + 製造對帳(`MfgReconciliationIT`,WIP→0)、S7 工單取消(反向領料 `Dr 1310 / Cr 1320`)。
 
 ## 待辦
 - **Phase 1 商品與庫存(下一棒)**:Item / Warehouse / Location 主檔、append-only `StockLedgerEntry`、移動加權平均(`ItemCostState`,`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳,並建立 `ledger` 的 published `api`(供 inventory 跨模組同步過帳)。驗收:庫存帳值 == GL Inventory 控制科目餘額(對帳測試)。
