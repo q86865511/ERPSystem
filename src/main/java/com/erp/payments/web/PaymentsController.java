@@ -2,6 +2,7 @@ package com.erp.payments.web;
 
 import com.erp.payments.application.PaymentService;
 import com.erp.payments.application.PaymentService.Allocation;
+import com.erp.payments.application.PaymentService.ReceiptAllocation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 
-/** REST surface for payments. Phase 2 exposes outgoing (vendor) payments. */
+/** REST surface for payments: outgoing (vendor) payments and incoming (customer) receipts. */
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentsController {
@@ -34,6 +35,13 @@ public class PaymentsController {
                                 List<AllocationLine> allocations) {
     }
 
+    public record ReceiptAllocationLine(Long invoiceId, BigDecimal amount) {
+    }
+
+    public record PayInRequest(Long partnerId, BigDecimal amount, LocalDate postingDate,
+                               List<ReceiptAllocationLine> allocations) {
+    }
+
     @PostMapping("/out")
     public ResponseEntity<PaymentResponse> payOut(@RequestBody PayOutRequest request,
                                                   Principal principal) {
@@ -42,6 +50,18 @@ public class PaymentsController {
         List<Allocation> allocations = request.allocations().stream()
                 .map(a -> new Allocation(a.billId(), a.amount())).toList();
         PaymentResponse body = PaymentResponse.from(paymentService.payOut(
+                request.partnerId(), request.amount(), postingDate, allocations, actor));
+        return ResponseEntity.status(HttpStatus.CREATED).body(body);
+    }
+
+    @PostMapping("/in")
+    public ResponseEntity<PaymentResponse> payIn(@RequestBody PayInRequest request,
+                                                 Principal principal) {
+        String actor = principal != null ? principal.getName() : "system";
+        LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
+        List<ReceiptAllocation> allocations = request.allocations().stream()
+                .map(a -> new ReceiptAllocation(a.invoiceId(), a.amount())).toList();
+        PaymentResponse body = PaymentResponse.from(paymentService.payIn(
                 request.partnerId(), request.amount(), postingDate, allocations, actor));
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
     }

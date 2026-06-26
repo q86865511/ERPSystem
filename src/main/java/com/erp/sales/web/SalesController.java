@@ -1,11 +1,14 @@
 package com.erp.sales.web;
 
+import com.erp.sales.application.ArAgingReport;
+import com.erp.sales.application.ArAgingService;
 import com.erp.sales.application.DeliveryService;
 import com.erp.sales.application.DeliveryService.DeliveryLineInput;
 import com.erp.sales.application.SalesInvoiceService;
 import com.erp.sales.application.SalesInvoiceService.InvoiceLineInput;
 import com.erp.sales.application.SalesOrderService;
 import com.erp.sales.application.SalesOrderService.SoLineInput;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,12 +31,14 @@ public class SalesController {
     private final SalesOrderService salesOrderService;
     private final DeliveryService deliveryService;
     private final SalesInvoiceService salesInvoiceService;
+    private final ArAgingService arAgingService;
 
     public SalesController(SalesOrderService salesOrderService, DeliveryService deliveryService,
-                           SalesInvoiceService salesInvoiceService) {
+                           SalesInvoiceService salesInvoiceService, ArAgingService arAgingService) {
         this.salesOrderService = salesOrderService;
         this.deliveryService = deliveryService;
         this.salesInvoiceService = salesInvoiceService;
+        this.arAgingService = arAgingService;
     }
 
     public record CreateSoLine(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice) {
@@ -109,6 +114,15 @@ public class SalesController {
     @GetMapping("/sales-invoices/{id}")
     public SalesInvoiceResponse getInvoice(@PathVariable Long id) {
         return SalesInvoiceResponse.from(salesInvoiceService.getInvoice(id));
+    }
+
+    /** Accounts-receivable aging as of a date (defaults to today). */
+    @GetMapping("/ar-aging")
+    public ArAgingReport arAging(@RequestParam(required = false)
+                                 @org.springframework.format.annotation.DateTimeFormat(iso =
+                                         org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
+                                 LocalDate asOf) {
+        return arAgingService.arAging(asOf != null ? asOf : LocalDate.now());
     }
 
     private static String actor(Principal principal) {
