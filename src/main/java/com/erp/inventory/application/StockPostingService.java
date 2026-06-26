@@ -125,7 +125,7 @@ public class StockPostingService implements StockPosting {
         stockLedgerEntryRepository.flush();
 
         return new StockMovementResult(movementGroupId, posting.entryId(), posting.entryNo(),
-                costState.getOnHandQty(), costState.getAvgUnitCost());
+                costState.getOnHandQty(), costState.getAvgUnitCost(), unitCost, value);
     }
 
     @Override

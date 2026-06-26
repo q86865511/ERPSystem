@@ -96,7 +96,8 @@ public class DeliveryService {
                     postingDate, "delivery " + deliveryNumber);
             StockMovementResult result = stockPosting.post(command, actor);
 
-            delivery.addLine(input.soLineId(), soLine.getItemId(), qty, result.newAvgUnitCost(),
+            // unitCost is the moving average AT the issue (newAvgUnitCost is 0 after a full drain).
+            delivery.addLine(input.soLineId(), soLine.getItemId(), qty, result.unitCost(),
                     result.movementGroupId(), result.journalEntryId());
             order.applyDelivery(input.soLineId(), qty);
         }
