@@ -51,12 +51,32 @@ class ArchitectureTest {
                     .resideInAnyPackage("..masterdata.domain..", "..masterdata.application..",
                             "..masterdata.web..");
 
+    @ArchTest
+    static final ArchRule inventory_api_is_self_contained =
+            noClasses().that().resideInAPackage("..inventory.api..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..inventory.domain..", "..inventory.application..",
+                            "..inventory.web..");
+
     // ---- Cross-module isolation ---------------------------------------------------------------
-    // masterdata is a leaf: it must not reach into any other module.
+    // Each module reaches another only through its published api package, never its internals.
 
     @ArchTest
     static final ArchRule masterdata_does_not_depend_on_other_modules =
             noClasses().that().resideInAPackage("..masterdata..")
                     .should().dependOnClassesThat()
                     .resideInAnyPackage("..ledger..", "..inventory..");
+
+    @ArchTest
+    static final ArchRule ledger_does_not_depend_on_other_modules =
+            noClasses().that().resideInAPackage("..ledger..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..masterdata..", "..inventory..");
+
+    @ArchTest
+    static final ArchRule inventory_uses_only_published_ports =
+            noClasses().that().resideInAPackage("..inventory..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
+                            "..masterdata.domain..", "..masterdata.application..", "..masterdata.web..");
 }
