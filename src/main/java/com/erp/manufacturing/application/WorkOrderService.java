@@ -3,6 +3,9 @@ package com.erp.manufacturing.application;
 import com.erp.inventory.api.StockMovementCommand;
 import com.erp.inventory.api.StockMovementResult;
 import com.erp.inventory.api.StockPosting;
+import com.erp.ledger.api.JournalEntryRequest;
+import com.erp.ledger.api.JournalEntryRequest.Line;
+import com.erp.ledger.api.LedgerPosting;
 import com.erp.ledger.api.SequenceAllocator;
 import com.erp.manufacturing.domain.BillOfMaterials;
 import com.erp.manufacturing.domain.BomComponent;
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Creates, releases and issues work orders. Release snapshots the BOM into frozen planned components;
@@ -31,23 +35,29 @@ public class WorkOrderService {
 
     private static final String SEQUENCE_SCOPE = "WORK_ORDER";
     private static final String SOURCE_DOC_TYPE = "WORK_ORDER";
+    private static final String WIP_ACCOUNT = "1320";
+    private static final String VARIANCE_ACCOUNT = "5930";
     private static final int QTY_SCALE = 6;
+    private static final int COST_SCALE = 6;
 
     private final WorkOrderRepository workOrderRepository;
     private final BillOfMaterialsRepository bomRepository;
     private final SequenceAllocator sequenceAllocator;
     private final StockPosting stockPosting;
+    private final LedgerPosting ledgerPosting;
     private final MasterDataQuery masterDataQuery;
 
     public WorkOrderService(WorkOrderRepository workOrderRepository,
                             BillOfMaterialsRepository bomRepository,
                             SequenceAllocator sequenceAllocator,
                             StockPosting stockPosting,
+                            LedgerPosting ledgerPosting,
                             MasterDataQuery masterDataQuery) {
         this.workOrderRepository = workOrderRepository;
         this.bomRepository = bomRepository;
         this.sequenceAllocator = sequenceAllocator;
         this.stockPosting = stockPosting;
+        this.ledgerPosting = ledgerPosting;
         this.masterDataQuery = masterDataQuery;
     }
 
@@ -118,6 +128,59 @@ public class WorkOrderService {
                     result.journalEntryId());
             workOrder.addComponentCost(result.value());
         }
+        return workOrderRepository.saveAndFlush(workOrder);
+    }
+
+    /**
+     * Completes the work order: receives the finished goods into stock at rolled actual cost
+     * (total consumed WIP / qty produced) and sweeps any sub-unit rounding residual to Manufacturing
+     * Variance so WIP nets to zero.
+     */
+    @Transactional
+    public WorkOrder complete(Long woId, BigDecimal qtyProduced, Long fgStockLocationId,
+                              LocalDate postingDate, String actor) {
+        WorkOrder workOrder = getWorkOrder(woId);
+        if (qtyProduced == null || qtyProduced.signum() <= 0) {
+            throw new ManufacturingValidationException("qtyProduced must be positive");
+        }
+        LocationView stockLocation = masterDataQuery.findLocation(fgStockLocationId)
+                .orElseThrow(() -> new ManufacturingValidationException(
+                        "unknown location " + fgStockLocationId));
+        if (stockLocation.type() != LocationType.STOCK) {
+            throw new ManufacturingValidationException(
+                    "completion target must be a STOCK location, was " + stockLocation.type());
+        }
+        if (workOrder.getWipLocationId() == null) {
+            throw new ManufacturingValidationException(
+                    "work order " + woId + " has no issued components to complete");
+        }
+
+        BigDecimal consumed = workOrder.getTotalComponentCost();
+        BigDecimal rolledCost = consumed.divide(qtyProduced, COST_SCALE, RoundingMode.HALF_UP);
+
+        // Receive finished goods WIP → STOCK at rolled cost (Dr Finished Goods / Cr WIP).
+        StockMovementCommand command = new StockMovementCommand(
+                workOrder.getItemId(), workOrder.getWipLocationId(), fgStockLocationId, qtyProduced,
+                rolledCost, InventoryMovementType.MANUFACTURING_RECEIPT, SOURCE_DOC_TYPE,
+                workOrder.getWoNumber() + "#receipt", postingDate,
+                "work order completion " + workOrder.getWoNumber());
+        StockMovementResult result = stockPosting.post(command, actor);
+
+        // Sweep any residual (consumed − received) so the WIP control account nets to zero.
+        BigDecimal residual = consumed.subtract(result.value());
+        if (residual.signum() != 0) {
+            List<Line> lines = residual.signum() > 0
+                    ? List.of(new Line(VARIANCE_ACCOUNT, residual, null, "manufacturing variance"),
+                              new Line(WIP_ACCOUNT, null, residual, "WIP clearing"))
+                    : List.of(new Line(WIP_ACCOUNT, residual.negate(), null, "WIP clearing"),
+                              new Line(VARIANCE_ACCOUNT, null, residual.negate(), "manufacturing variance"));
+            JournalEntryRequest request = new JournalEntryRequest(null, postingDate,
+                    "work order variance " + workOrder.getWoNumber(), null, SOURCE_DOC_TYPE,
+                    workOrder.getWoNumber(), "VARIANCE", lines);
+            ledgerPosting.post(request, actor);
+        }
+
+        workOrder.markDone(qtyProduced);
         return workOrderRepository.saveAndFlush(workOrder);
     }
 
