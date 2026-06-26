@@ -1,6 +1,6 @@
 # Manufacturing ERP
 
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![CI](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml/badge.svg)](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml)
 
 A from-scratch **manufacturing ERP** built as a portfolio project. Its soul is a hand-written
 **double-entry General Ledger**: every business action — goods receipt, production, shipment,
