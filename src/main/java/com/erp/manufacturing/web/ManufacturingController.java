@@ -51,6 +51,9 @@ public class ManufacturingController {
     public record CompleteRequest(BigDecimal qtyProduced, Long stockLocationId, LocalDate postingDate) {
     }
 
+    public record CancelRequest(Long stockLocationId, LocalDate postingDate) {
+    }
+
     @PostMapping("/boms")
     public ResponseEntity<BomResponse> createBom(@RequestBody CreateBomRequest request,
                                                  Principal principal) {
@@ -93,6 +96,14 @@ public class ManufacturingController {
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
         return WorkOrderResponse.from(workOrderService.complete(id, request.qtyProduced(),
                 request.stockLocationId(), postingDate, actor(principal)));
+    }
+
+    @PostMapping("/work-orders/{id}/cancel")
+    public WorkOrderResponse cancel(@PathVariable Long id, @RequestBody CancelRequest request,
+                                    Principal principal) {
+        LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
+        return WorkOrderResponse.from(workOrderService.cancel(id, request.stockLocationId(), postingDate,
+                actor(principal)));
     }
 
     @GetMapping("/work-orders/{id}")

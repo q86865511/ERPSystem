@@ -12,6 +12,7 @@ import com.erp.manufacturing.domain.BomComponent;
 import com.erp.manufacturing.domain.BomStatus;
 import com.erp.manufacturing.domain.WorkOrder;
 import com.erp.manufacturing.domain.WorkOrderComponent;
+import com.erp.manufacturing.domain.WorkOrderStatus;
 import com.erp.masterdata.api.InventoryMovementType;
 import com.erp.masterdata.api.LocationType;
 import com.erp.masterdata.api.LocationView;
@@ -181,6 +182,44 @@ public class WorkOrderService {
         }
 
         workOrder.markDone(qtyProduced);
+        return workOrderRepository.saveAndFlush(workOrder);
+    }
+
+    /**
+     * Cancels a released/in-progress work order. Any components already issued are returned to stock
+     * (MANUFACTURING_RETURN, WIP → STOCK at the issue cost, Dr component inventory / Cr WIP), so WIP nets
+     * to zero. Nothing posted earlier is mutated (append-only reversal).
+     */
+    @Transactional
+    public WorkOrder cancel(Long woId, Long stockLocationId, LocalDate postingDate, String actor) {
+        WorkOrder workOrder = getWorkOrder(woId);
+
+        if (workOrder.getStatus() == WorkOrderStatus.IN_PROGRESS) {
+            LocationView stockLocation = masterDataQuery.findLocation(stockLocationId)
+                    .orElseThrow(() -> new ManufacturingValidationException(
+                            "unknown location " + stockLocationId));
+            if (stockLocation.type() != LocationType.STOCK) {
+                throw new ManufacturingValidationException(
+                        "return target must be a STOCK location, was " + stockLocation.type());
+            }
+            int lineNo = 0;
+            for (WorkOrderComponent component : workOrder.getComponents()) {
+                lineNo++;
+                if (component.getConsumedQty().signum() <= 0) {
+                    continue;
+                }
+                BigDecimal unitCost = component.getConsumedValue()
+                        .divide(component.getConsumedQty(), COST_SCALE, RoundingMode.HALF_UP);
+                StockMovementCommand command = new StockMovementCommand(
+                        component.getComponentItemId(), workOrder.getWipLocationId(), stockLocationId,
+                        component.getConsumedQty(), unitCost, InventoryMovementType.MANUFACTURING_RETURN,
+                        SOURCE_DOC_TYPE, workOrder.getWoNumber() + "#return#" + lineNo, postingDate,
+                        "work order cancel " + workOrder.getWoNumber());
+                stockPosting.post(command, actor);
+            }
+        }
+
+        workOrder.markCancelled();
         return workOrderRepository.saveAndFlush(workOrder);
     }
 
