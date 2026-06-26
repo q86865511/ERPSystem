@@ -82,10 +82,18 @@ alongside revenue + Output VAT, so a fully shipped-and-invoiced order leaves the
 The chain reconciles end-to-end (inventory falls, COGS/revenue/Output VAT post, Deferred-COGS and AR net to
 zero, trial balance balances, AR subledger == its control account); customer receipts reuse the `payments`
 module (`direction IN`), an AR-aging report is exposed, and a customer return posts a credit note that
-reverses the whole cycle to zero.
+reverses the whole cycle to zero. · Phase 4 manufacturing (single-level BOM → Work Order → WIP issue →
+completion at rolled actual cost, plus work-order cancellation). A work order snapshots its BOM at
+release, issues components into WIP (`Dr WIP / Cr component inventory` at moving-average cost), and
+completes by receiving finished goods at the rolled cost (`Dr Finished Goods / Cr WIP`, any sub-unit
+residual swept to Manufacturing Variance) — so WIP nets to zero over the cycle. A reorder-point report
+lists items at or below their reorder point.
 
-**🚧 In progress:** Phase 4 manufacturing — single-level BOM, work orders, WIP issue/completion with cost
-roll-up, and a reorder-point report.
+**🎉 Minimum show-worthy milestone reached** (end of Phase 4): the full *buy → make → sell* slice runs
+end-to-end with the books reconciling at every step.
+
+**Next:** Phase 5 reporting & period close (balance sheet, P&L, trial-balance date filter, soft-close,
+a one-page reconciliation health-check).
 
 Full arc: Phase 0 (ledger spine) → 1 products & inventory → 2 procure-to-pay → 3 order-to-cash →
 **4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close → 6 polish & packaging.

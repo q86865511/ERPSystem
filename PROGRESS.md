@@ -1,11 +1,14 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
-**Phase 3(訂單到收款)完成** — 分 4 段 PR 交付(SO→Delivery、CustomerInvoice、Receipt+AR 帳齡、CustomerReturn)。採「延後 COGS(deferred COGS)」鏡像 GR-IR:出貨成本停在過渡科目 1340,開票才認 COGS,「出貨↔開票」對稱清零。**O2C 驗收達成(`ArReconciliationIT`)**:全鏈跑完庫存↓、COGS+收入+Output VAT 入帳、1340→0、AR→0、AR 子帳==1200、試算表平衡;客戶退貨(credit note)全鏈沖回零。`mvn verify` 全綠(Surefire 45、IT 43)。**Phase 4 製造進行中**:**S5+S6 完成** —— `manufacturing` 模組 BOM→WorkOrder(release 快照)→領料(`Dr 1320 / Cr 1310`)→完工(成本滾算 `Dr 1330 / Cr 1320`,餘差掃 5930)。**製造驗收達成(`MfgReconciliationIT`)**:原料↓、成品依滾算成本↑、**WIP(1320)→0**、庫存子帳==GL、試算表平衡。再訂點報表上線(經新 `inventory.api.InventoryQuery` 讀在庫 + masterdata reorder)。下一棒 S7 工單取消(反向領料)。計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`。
+**Phase 3(訂單到收款)完成** — 分 4 段 PR 交付(SO→Delivery、CustomerInvoice、Receipt+AR 帳齡、CustomerReturn)。採「延後 COGS(deferred COGS)」鏡像 GR-IR:出貨成本停在過渡科目 1340,開票才認 COGS,「出貨↔開票」對稱清零。**O2C 驗收達成(`ArReconciliationIT`)**:全鏈跑完庫存↓、COGS+收入+Output VAT 入帳、1340→0、AR→0、AR 子帳==1200、試算表平衡;客戶退貨(credit note)全鏈沖回零。`mvn verify` 全綠(Surefire 45、IT 43)。**Phase 4 製造完成** —— 分 3 段 PR(BOM+release+領料、完工成本滾算+再訂點+對帳、工單取消)。`manufacturing` 模組 BOM→WorkOrder(release 快照)→領料(`Dr 1320 / Cr 1310`)→完工(成本滾算 `Dr 1330 / Cr 1320`,餘差掃 5930)→可取消(反向領料 `Dr 1310 / Cr 1320`)。**製造驗收達成(`MfgReconciliationIT`)**:原料↓、成品依滾算成本↑、**WIP(1320)→0**、庫存子帳==GL、試算表平衡。再訂點報表上線(經新 `inventory.api.InventoryQuery`)。**🎉 路線圖「買→做→賣」最低可展示里程碑(Phase 4 結束)達成。** `mvn verify` 全綠(Surefire 54、IT 49)。下一棒(待指示):Phase 5 報表與期間結。
 **Phase 2(採購到付款)完成** — 分 4 段 PR 交付(Partner/種子、purchasing PO→GR、VendorBill、payments)。**Phase 2 驗收達成(`ApReconciliationIT`)**:PO→GR→VendorBill→Payment 全鏈跑完後 **GR-IR→0、AP→0、AP 子帳==GL 2100、試算表平衡、庫存上升**;採購價差走庫存重估、GL 帶 partner 維度。
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-27] 🛑 P4-S7 工單取消 / 反向領料(製造沖銷)(Phase 4 Stage 3,Phase 4 收尾)
+  - `WorkOrderService.cancel(woId, stockLocationId,…)`:對 IN_PROGRESS 工單,逐已領 component 經 `StockPosting` MANUFACTURING_RETURN WIP→STOCK(以原領料成本 `Dr 1310 / Cr 1320`)退料回庫,使 WIP 歸零;WO→CANCELLED。RELEASED(未領料)直接取消、不過帳。append-only 沖銷,不改既有腿。REST `/api/manufacturing/work-orders/{id}/cancel`。
+  - `WorkOrderCancelIT`:領料後取消 → 退料 `Dr1310/Cr1320`、raw 回補 100、WIP 該工單淨額→0、WO CANCELLED、TB 平。`verify` 全綠(Surefire 54、IT 49)。
 - [2026-06-27] 🏭 P4-S6 WO 完工(成本滾算)+ 餘差 5930 + 再訂點 + 製造對帳(Phase 4 Stage 2)
   - `WorkOrderService.complete(woId, qtyProduced, fgStockLocationId,…)`:`rolledCost = totalComponentCost / qtyProduced`(6dp),經 `StockPosting` MANUFACTURING_RECEIPT WIP→STOCK 過 `Dr 1330 / Cr 1320`(成品進庫更新移動平均);殘差 `consumed − received` 掃 5930(`Dr/Cr 5930 vs 1320`)使 WIP 歸零;WO→DONE。整數情境餘差為 0(6dp 成本 × 整數量於 money scale 還原)。
   - **再訂點報表**:新 `inventory.api.InventoryQuery`/`ItemOnHand`(讀在庫,不外露 cost-state 實體)+ `InventoryQueryService`;`manufacturing.ReorderReportService`(join 在庫 + masterdata reorder_point,列出 ≤ 再訂點者)。REST `/api/manufacturing/work-orders/{id}/complete`、`/api/manufacturing/reorder-report`。
@@ -71,7 +74,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
-- **Phase 4 製造**(計畫檔 `~/.claude/plans/phase3-4-immutable-stream.md`)。S5(BOM+release+領料)、S6(完工+再訂點+對帳)完成。下一棒 S7 工單取消(反向領料 `Dr 1310 / Cr 1320`,WIP→0,WO→CANCELLED)—— Phase 4 收尾。
+- (待指示)Phase 3(訂單到收款)與 Phase 4(製造)皆完成,「買→做→賣」最低可展示里程碑達成。下一棒 Phase 5 報表與期間結(資產負債表/損益表、TB 日期篩選、soft-close、對帳健康檢查 UI 一頁),或 Phase 6 打磨。計畫見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 待辦
 - **Phase 1 商品與庫存(下一棒)**:Item / Warehouse / Location 主檔、append-only `StockLedgerEntry`、移動加權平均(`ItemCostState`,`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳,並建立 `ledger` 的 published `api`(供 inventory 跨模組同步過帳)。驗收:庫存帳值 == GL Inventory 控制科目餘額(對帳測試)。
