@@ -114,6 +114,12 @@ public class JournalEntry {
 
     /** Adds a debit/credit line; exactly one side must be strictly positive. */
     public JournalLine addLine(Long accountId, BigDecimal debit, BigDecimal credit, String memo) {
+        return addLine(accountId, debit, credit, memo, null);
+    }
+
+    /** Adds a debit/credit line tagged with an optional partner dimension. */
+    public JournalLine addLine(Long accountId, BigDecimal debit, BigDecimal credit, String memo,
+                               Long partnerId) {
         if (debit == null || credit == null) {
             throw new IllegalArgumentException("debit and credit must not be null");
         }
@@ -125,7 +131,8 @@ public class JournalEntry {
         if (debitSide == creditSide) {
             throw new IllegalArgumentException("exactly one of debit/credit must be non-zero");
         }
-        JournalLine line = new JournalLine(this, lines.size() + 1, accountId, debit, credit, memo);
+        JournalLine line = new JournalLine(this, lines.size() + 1, accountId, debit, credit, memo,
+                partnerId);
         lines.add(line);
         return line;
     }

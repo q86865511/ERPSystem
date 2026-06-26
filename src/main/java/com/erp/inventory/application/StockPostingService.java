@@ -8,6 +8,7 @@ import com.erp.inventory.domain.StockLedgerEntry;
 import com.erp.ledger.api.JournalEntryRequest;
 import com.erp.ledger.api.LedgerPosting;
 import com.erp.ledger.api.PostingResult;
+import com.erp.masterdata.api.InventoryMovementType;
 import com.erp.masterdata.api.ItemView;
 import com.erp.masterdata.api.LocationType;
 import com.erp.masterdata.api.LocationView;
@@ -125,6 +126,38 @@ public class StockPostingService implements StockPosting {
 
         return new StockMovementResult(movementGroupId, posting.entryId(), posting.entryNo(),
                 costState.getOnHandQty(), costState.getAvgUnitCost());
+    }
+
+    @Override
+    @Transactional
+    public void revalue(Long itemId, BigDecimal valueDelta, String sourceDocType, String sourceDocId) {
+        if (valueDelta == null || valueDelta.signum() == 0) {
+            return;
+        }
+        ItemCostState costState = itemCostStateRepository.lockByItemId(itemId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "cannot revalue item " + itemId + " with no cost state"));
+        costState.applyRevaluation(valueDelta);
+        itemCostStateRepository.save(costState);
+
+        Long stockLocationId = stockLocationForItem(itemId);
+        InventoryMovementType type = valueDelta.signum() > 0
+                ? InventoryMovementType.ADJUSTMENT_IN : InventoryMovementType.ADJUSTMENT_OUT;
+        StockLedgerEntry leg = new StockLedgerEntry(UUID.randomUUID(), itemId, stockLocationId,
+                BigDecimal.ZERO, BigDecimal.ZERO, valueDelta, type, sourceDocType, sourceDocId,
+                null, Instant.now());
+        stockLedgerEntryRepository.saveAndFlush(leg);
+    }
+
+    /** Finds a STOCK-type location that already holds the item (where its value can be revalued). */
+    private Long stockLocationForItem(Long itemId) {
+        return stockLedgerEntryRepository.findByItemId(itemId).stream()
+                .map(StockLedgerEntry::getLocationId).distinct()
+                .filter(locationId -> masterDataQuery.findLocation(locationId)
+                        .map(location -> location.type() == LocationType.STOCK).orElse(false))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "no STOCK location holding item " + itemId + " to revalue"));
     }
 
     private LocationView requireLocation(Long locationId) {

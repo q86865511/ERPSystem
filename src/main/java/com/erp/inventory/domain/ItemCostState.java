@@ -97,6 +97,19 @@ public class ItemCostState {
         return qtyOut.isGreaterThan(Quantity.of(onHandQty));
     }
 
+    /**
+     * Adjusts total value (and the derived average) without changing on-hand quantity — a purchase
+     * price-variance revaluation. The value delta is money (scale 4) and may be negative.
+     */
+    public void applyRevaluation(BigDecimal valueDelta) {
+        BigDecimal newValue = totalValue.add(valueDelta);
+        if (newValue.signum() < 0) {
+            throw new IllegalStateException("revaluation drives item " + itemId + " value negative");
+        }
+        this.totalValue = newValue;
+        recomputeAverage();
+    }
+
     private void recomputeAverage() {
         this.avgUnitCost = onHandQty.signum() == 0
                 ? BigDecimal.ZERO.setScale(Quantity.SCALE)

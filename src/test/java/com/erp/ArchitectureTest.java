@@ -58,6 +58,13 @@ class ArchitectureTest {
                     .resideInAnyPackage("..inventory.domain..", "..inventory.application..",
                             "..inventory.web..");
 
+    @ArchTest
+    static final ArchRule purchasing_api_is_self_contained =
+            noClasses().that().resideInAPackage("..purchasing.api..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..purchasing.domain..", "..purchasing.application..",
+                            "..purchasing.web..");
+
     // ---- Cross-module isolation ---------------------------------------------------------------
     // Each module reaches another only through its published api package, never its internals.
 
