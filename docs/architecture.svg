@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 510" role="img" aria-labelledby="t d" font-family="'Segoe UI',system-ui,-apple-system,'Noto Sans TC','Microsoft JhengHei',sans-serif">
+<title id="t">Manufacturing ERP · Architecture</title><desc id="d">Double-entry ledger · modular monolith · ArchUnit-enforced boundaries</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#7c8aa5"/></marker></defs>
+<rect x="0" y="0" width="920" height="510" rx="14" fill="#0f1623"/>
+<rect x="0" y="0" width="920" height="510" rx="14" fill="none" stroke="#283449" stroke-width="1.5"/>
+<text x="40" y="50" fill="#c0904f" font-size="24" font-weight="600">Manufacturing ERP · Architecture</text>
+<text x="40" y="76" fill="#8a96ab" font-size="14.5">Double-entry ledger · modular monolith · ArchUnit-enforced boundaries</text>
+<rect x="40" y="95" width="840" height="66" rx="10" fill="#121d2e" stroke="#3a5a8c" stroke-width="1.3"/><text x="60" y="119" fill="#9ec1f0" font-size="13.5" font-weight="500">Spring Boot (Web MVC · Actuator)</text>
+<rect x="300" y="118" width="320" height="38" rx="8" fill="#16243a" stroke="#3a5a8c" stroke-width="1.3"/><text x="460" y="135" fill="#dbe4f0" font-size="13.5" font-weight="500" text-anchor="middle">REST API</text><text x="460" y="152" fill="#8a96ab" font-size="11" text-anchor="middle">manual entries · trial balance</text>
+<rect x="40" y="185" width="840" height="175" rx="10" fill="#141a12" stroke="#5a6b3a" stroke-width="1.3"/><text x="60" y="209" fill="#b6c98a" font-size="13.5" font-weight="500">Modules · modular monolith  (ArchUnit-enforced boundaries)</text>
+<rect x="60" y="225" width="150" height="62" rx="8" fill="#1a2030" stroke="#2d3548" stroke-width="1.3"/><text x="135" y="254" fill="#dbe4f0" font-size="13.5" font-weight="500" text-anchor="middle">Business document</text><text x="135" y="271" fill="#8a96ab" font-size="11" text-anchor="middle">receipt/ship/payment</text>
+<rect x="245" y="225" width="150" height="62" rx="8" fill="#10261f" stroke="#2f7d63" stroke-width="1.3"/><text x="320" y="254" fill="#dbe4f0" font-size="13.5" font-weight="500" text-anchor="middle">Inventory subledger</text><text x="320" y="271" fill="#8a96ab" font-size="11" text-anchor="middle">immutable</text>
+<rect x="430" y="221" width="185" height="70" rx="8" fill="#241a2e" stroke="#7a5cc0" stroke-width="1.3"/><text x="522.5" y="254" fill="#dbe4f0" font-size="13.5" font-weight="500" text-anchor="middle">Double-entry posting</text><text x="522.5" y="271" fill="#8a96ab" font-size="11" text-anchor="middle">LedgerPostingService · debit=credit</text>
+<rect x="650" y="225" width="110" height="62" rx="8" fill="#2a1e10" stroke="#9a7b3f" stroke-width="1.3"/><text x="705" y="254" fill="#dbe4f0" font-size="13.5" font-weight="500" text-anchor="middle">Journal entries</text><text x="705" y="271" fill="#8a96ab" font-size="11" text-anchor="middle">immutable</text>
+<rect x="430" y="305" width="185" height="40" rx="8" fill="#10261f" stroke="#2f7d63" stroke-width="1.3"/><text x="522.5" y="329" fill="#dbe4f0" font-size="13.5" font-weight="500" text-anchor="middle">Trial balance / reconciliation</text>
+<text x="60" y="348" fill="#9aa8b8" font-size="11.5"  >modules: ledger · iam · 〔future: inventory · purchasing · sales · manufacturing〕</text>
+<rect x="40" y="382" width="840" height="78" rx="10" fill="#1d1810" stroke="#9a7b3f" stroke-width="1.3"/><text x="60" y="406" fill="#d6b478" font-size="13.5" font-weight="500">Persistence</text>
+<rect x="280" y="410" width="360" height="44" rx="8" fill="#2a1e10" stroke="#9a7b3f" stroke-width="1.3"/><text x="460" y="430" fill="#dbe4f0" font-size="13.5" font-weight="500" text-anchor="middle">PostgreSQL 16</text><text x="460" y="447" fill="#8a96ab" font-size="11" text-anchor="middle">DB constraints: balanced · immutable · Flyway</text>
+<line x1="460" y1="161" x2="510" y2="221" stroke="#7c8aa5" stroke-width="1.6" marker-end="url(#a)"/>
+<line x1="210" y1="256" x2="245" y2="256" stroke="#7c8aa5" stroke-width="1.6" marker-end="url(#a)"/>
+<line x1="395" y1="256" x2="430" y2="256" stroke="#7c8aa5" stroke-width="1.6" marker-end="url(#a)"/>
+<line x1="615" y1="256" x2="650" y2="256" stroke="#7c8aa5" stroke-width="1.6" marker-end="url(#a)"/>
+<line x1="522" y1="291" x2="522" y2="305" stroke="#7c8aa5" stroke-width="1.6" marker-end="url(#a)"/>
+<line x1="705" y1="287" x2="600" y2="410" stroke="#7c8aa5" stroke-width="1.6" marker-end="url(#a)"/><text x="690" y="360" fill="#7c8aa5" font-size="11" text-anchor="middle">persist</text>
+<text x="540" y="214" fill="#7c8aa5" font-size="10.5" text-anchor="middle" >same DB transaction</text>
+</svg>

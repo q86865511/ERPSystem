@@ -32,6 +32,8 @@ after a complete cycle. This one report is the project's hero artifact.
 
 ## Architecture
 
+<p align="center"><img src="docs/architecture.svg" alt="Manufacturing ERP architecture" width="900"></p>
+
 A **modular monolith**: single deployable, single PostgreSQL database, in-process modules whose
 boundaries are *enforced* (no module imports another's internals or touches its tables — checked in
 CI with ArchUnit). The `ledger` module is a shared kernel; every other module posts through the
