@@ -1,10 +1,12 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
-**Phase 2(採購到付款)進行中** — 分 4 段 PR 交付。**Stage 1(Partner + 種子 + 稅率)完成**:masterdata 加 `Partner`(供應商/客戶)與 `TaxRate`,`masterdata.api` 加 `PartnerView` + `findPartner/findPartnerByCode/findTaxRate`;V5 seed VENDOR/CUSTOMER 儲位、RECEIPT→2150 GR-IR 規則、tax_rate STANDARD 0.05、PO/GRN/BILL/PAY 序號。`mvn verify` 全綠(IT 23)。下一段:Stage 2 purchasing PO→GR。
+**Phase 2(採購到付款)進行中** — 分 4 段 PR 交付。**Stage 1 + Stage 2 完成**:Stage 1 加 Partner/TaxRate 與採購種子;Stage 2 `purchasing` 模組(PurchaseOrder/PoLine、GoodsReceipt/GrnLine)收貨經 `inventory.api.StockPosting`(RECEIPT,VENDOR→STOCK)過 **Dr 1310 / Cr 2150**、PO 狀態機與部分收貨追蹤。`mvn verify` 全綠(IT 26)。下一段:Stage 3 VendorBill(清 GR-IR + Input VAT + AP + 價差 revalue)。
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-26] 📥 P2-S2 purchasing PO→GR(Phase 2 Stage 2)
+  - 新 `purchasing` 模組:domain `PurchaseOrder`/`PoLine`(qty_ordered/received/billed 追蹤、狀態機 DRAFT→CONFIRMED→PARTIALLY_RECEIVED→RECEIVED)、`GoodsReceipt`/`GrnLine`;`PurchaseOrderService`(建單/確認)、`GoodsReceiptService.receive`(每行經 `inventory.api.StockPosting` RECEIPT 移動 VENDOR→STOCK,過 Dr 1310/Cr 2150,sourceDocId 加 `#lineNo` 保 idempotency 唯一),bump qty_received + PO 狀態;REST `/api/purchasing`;V6(purchase_order/po_line/goods_receipt/grn_line)。ArchUnit:purchasing 只用 published ports + 既有 3 規則擴含 purchasing/payments。子行集合採 EAGER(GET/confirm 端點在交易外映射)。`GoodsReceiptPostingIT` 3 綠;`verify` 全綠(IT 26)。
 - [2026-06-26] 🤝 P2-S1 Partner + 種子 + 稅率(Phase 2 Stage 1)
   - masterdata 加 `Partner`(code uniq、is_vendor/is_customer、payment_terms_days、ap/ar_account_code 覆寫)與 `TaxRate`(code PK、rate 19,6);`masterdata.api` 加 `PartnerView` + `MasterDataQuery.findPartner/findPartnerByCode/findTaxRate`;`MasterDataService.createPartner` + `/api/masterdata/partners` REST + `DuplicatePartnerCodeException`(409)。V5:partner/tax_rate 表、seed VENDOR+CUSTOMER 儲位於 WH1、`InventoryPostingRule` COUNTER `RECEIPT→2150`、tax_rate STANDARD 0.05、PO/GRN/BILL/PAY 序號。`verify` 全綠(IT 23;舊測試 `rejectsMovementTypeWithNoCounterRule` 改用 TRANSFER,因 RECEIPT 已有規則)。
 - [2026-06-26] 📊 P1-S3 inventory 模組 + V4 + 對帳/並行測試(Stage 3,Phase 1 收尾)
@@ -31,7 +33,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
-- **Phase 2 / Stage 2 — purchasing PO→GR**:PurchaseOrder/PoLine、GoodsReceipt/GrnLine;收貨經 `inventory.api.StockPosting`(RECEIPT,VENDOR→STOCK)過 Dr 1310 / Cr 2150;`po_line.qty_received` 追蹤、PO 狀態機;V6 + `GoodsReceiptPostingIT`。
+- **Phase 2 / Stage 3 — VendorBill + partnerId + revalue**:`ledger.api.Line` 加 partnerId(additive);`inventory` 加 `StockPosting.revalue` + `ItemCostState.applyRevaluation`;VendorBill 配對收貨清 GR-IR、Input VAT(1450)、AP(2100)、價差走 revalue;`ApSubledgerService`、`purchasing.api.PayableDocuments`、V7 + `VendorBillPostingIT`。
 
 ## 待辦
 - **Phase 1 商品與庫存(下一棒)**:Item / Warehouse / Location 主檔、append-only `StockLedgerEntry`、移動加權平均(`ItemCostState`,`SELECT…FOR UPDATE`)、`StockAdjustment` 雙腿過帳,並建立 `ledger` 的 published `api`(供 inventory 跨模組同步過帳)。驗收:庫存帳值 == GL Inventory 控制科目餘額(對帳測試)。
