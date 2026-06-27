@@ -228,4 +228,10 @@ public class WorkOrderService {
         return workOrderRepository.findById(id)
                 .orElseThrow(() -> new WorkOrderNotFoundException(id));
     }
+
+    @Transactional(readOnly = true)
+    public List<WorkOrder> listWorkOrders() {
+        return workOrderRepository.findAll(org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "id"));
+    }
 }

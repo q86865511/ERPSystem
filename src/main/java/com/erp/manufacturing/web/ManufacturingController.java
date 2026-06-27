@@ -69,6 +69,11 @@ public class ManufacturingController {
         return BomResponse.from(bomService.getBom(id));
     }
 
+    @GetMapping("/boms")
+    public List<BomResponse> listBoms() {
+        return bomService.listBoms().stream().map(BomResponse::from).toList();
+    }
+
     @PostMapping("/work-orders")
     public ResponseEntity<WorkOrderResponse> createWorkOrder(@RequestBody CreateWorkOrderRequest request,
                                                              Principal principal) {
@@ -109,6 +114,11 @@ public class ManufacturingController {
     @GetMapping("/work-orders/{id}")
     public WorkOrderResponse getWorkOrder(@PathVariable Long id) {
         return WorkOrderResponse.from(workOrderService.getWorkOrder(id));
+    }
+
+    @GetMapping("/work-orders")
+    public List<WorkOrderResponse> listWorkOrders() {
+        return workOrderService.listWorkOrders().stream().map(WorkOrderResponse::from).toList();
     }
 
     @GetMapping("/reorder-report")
