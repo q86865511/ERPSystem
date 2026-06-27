@@ -3,7 +3,8 @@ package com.erp.iam;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -27,11 +29,16 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        AuthenticationEntryPoint entryPoint = restAuthenticationEntryPoint();
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
+                        // Interactive API docs and the OpenAPI spec are open for dev/demo; a fronting
+                        // nginx withholds these paths in production.
+                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/v3/api-docs.yaml",
+                                "/swagger-ui.html", "/swagger-ui/**", "/webjars/**").permitAll()
                         // Master data setup is administrative.
                         .requestMatchers(HttpMethod.POST, "/api/masterdata/**").hasRole("ADMIN")
                         // Financial postings (most specific purchasing/sales paths first).
@@ -49,8 +56,22 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/manufacturing/**").hasRole("WAREHOUSE")
                         // Everything else (reads, reports) just needs an authenticated user.
                         .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(basic -> basic.authenticationEntryPoint(entryPoint))
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint));
         return http.build();
+    }
+
+    /**
+     * Returns 401 on a missing/invalid credential <em>without</em> a {@code WWW-Authenticate: Basic}
+     * header. That header would make browsers pop their native login dialog over an XHR/fetch call;
+     * suppressing it lets the SPA render its own login page and handle 401 itself.
+     */
+    private static AuthenticationEntryPoint restAuthenticationEntryPoint() {
+        return (request, response, authException) -> {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\"}");
+        };
     }
 
     @Bean
