@@ -1,4 +1,5 @@
 HELP.md
+CLAUDE_REVIEW_NOTES.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
