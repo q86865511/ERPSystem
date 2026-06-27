@@ -21,6 +21,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    restart: unless-stopped
     networks: [erpnet]
 
   app:
@@ -46,6 +47,7 @@ services:
       timeout: 5s
       retries: 12
       start_period: 60s
+    restart: unless-stopped
     networks: [erpnet]
 
   frontend:
@@ -57,6 +59,7 @@ services:
         condition: service_healthy
     ports:
       - "8081:80"
+    restart: unless-stopped
     networks: [erpnet]
 
 volumes:
