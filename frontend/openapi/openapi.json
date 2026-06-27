@@ -489,21 +489,16 @@
     },
     "/api/masterdata/items" : {
       "get" : {
-        "operationId" : "getItemBySku",
-        "parameters" : [ {
-          "in" : "query",
-          "name" : "sku",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
+        "operationId" : "listItems",
         "responses" : {
           "200" : {
             "content" : {
               "*/*" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ItemResponse"
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ItemResponse"
+                  }
                 }
               }
             },
@@ -524,6 +519,32 @@
           },
           "required" : true
         },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ItemResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      }
+    },
+    "/api/masterdata/items/by-sku" : {
+      "get" : {
+        "operationId" : "getItemBySku",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "sku",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
         "responses" : {
           "200" : {
             "content" : {
@@ -567,6 +588,34 @@
       }
     },
     "/api/masterdata/locations" : {
+      "get" : {
+        "operationId" : "listLocations",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "warehouseId",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/LocationResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      },
       "post" : {
         "operationId" : "createLocation",
         "requestBody" : {
@@ -622,6 +671,40 @@
       }
     },
     "/api/masterdata/partners" : {
+      "get" : {
+        "operationId" : "listPartners",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "vendor",
+          "required" : false,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "in" : "query",
+          "name" : "customer",
+          "required" : false,
+          "schema" : {
+            "type" : "boolean"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PartnerResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      },
       "post" : {
         "operationId" : "createPartner",
         "requestBody" : {
@@ -677,6 +760,25 @@
       }
     },
     "/api/masterdata/warehouses" : {
+      "get" : {
+        "operationId" : "listWarehouses",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/WarehouseResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      },
       "post" : {
         "operationId" : "createWarehouse",
         "requestBody" : {

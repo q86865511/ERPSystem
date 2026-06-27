@@ -57,6 +57,10 @@ class OpenApiSpecIT {
         // BigDecimal documented as string (no JSON number anywhere), matching runtime serialization.
         assertThat(body.replaceAll("\\s", "")).doesNotContain("\"type\":\"number\"");
 
+        // No merged operations: two handler methods on one path+method make springdoc emit a `oneOf`
+        // response, which the typed client can't use cleanly. Give each operation a distinct path.
+        assertThat(body).as("merged path operations — give each its own path").doesNotContain("oneOf");
+
         // Export for `npm run gen:api` (the running-server route is unavailable in this sandbox).
         Path out = Path.of("target", "openapi.json");
         Files.writeString(out, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root));

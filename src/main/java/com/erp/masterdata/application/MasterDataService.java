@@ -6,10 +6,12 @@ import com.erp.masterdata.domain.Item;
 import com.erp.masterdata.domain.Location;
 import com.erp.masterdata.domain.Partner;
 import com.erp.masterdata.domain.Warehouse;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /** Write-side master-data operations: create items, warehouses and locations. */
 @Service
@@ -51,6 +53,37 @@ public class MasterDataService {
             throw new WarehouseNotFoundException(warehouseId);
         }
         return locationRepository.saveAndFlush(new Location(warehouseId, code, locationType));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Item> listItems() {
+        return itemRepository.findAll(Sort.by("sku"));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Warehouse> listWarehouses() {
+        return warehouseRepository.findAll(Sort.by("code"));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Location> listLocations(Long warehouseId) {
+        return warehouseId != null
+                ? locationRepository.findByWarehouseIdOrderByCode(warehouseId)
+                : locationRepository.findAll(Sort.by("code"));
+    }
+
+    /** Partners, optionally narrowed to vendors or customers (both/neither flag → all partners). */
+    @Transactional(readOnly = true)
+    public List<Partner> listPartners(Boolean vendor, Boolean customer) {
+        boolean v = Boolean.TRUE.equals(vendor);
+        boolean c = Boolean.TRUE.equals(customer);
+        if (v && !c) {
+            return partnerRepository.findByVendorTrueOrderByCode();
+        }
+        if (c && !v) {
+            return partnerRepository.findByCustomerTrueOrderByCode();
+        }
+        return partnerRepository.findAll(Sort.by("code"));
     }
 
     @Transactional(readOnly = true)
