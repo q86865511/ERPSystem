@@ -1,84 +1,148 @@
-# Manufacturing ERP
+# 製造業 ERP · Manufacturing ERP
+
+**繁體中文** · [English](README.en.md)
+
+> 從零自建的**製造業 ERP**(作品集專案)——靈魂是一具手寫的**複式記帳總帳**:收貨、生產、出貨、收付款,每個業務動作都與文件、庫存變動**在同一個資料庫交易**裡過出一張借貸平衡的分錄。沒有任何半過帳;不平衡的分錄根本無法 commit。如今再戴上**全端外衣**:React 前端 + 一行 `docker compose` 起整套。
+
+<p align="center"><img src="docs/cover.png" alt="Manufacturing ERP — 封面" width="100%"></p>
 
 [![CI](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml/badge.svg)](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml)
+[![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)](pom.xml)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-6db33f?logo=springboot&logoColor=white)](pom.xml)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169e1?logo=postgresql&logoColor=white)](compose.yaml)
+[![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=black)](frontend/package.json)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white)](frontend/package.json)
+[![Mantine](https://img.shields.io/badge/Mantine-9-339af0?logo=mantine&logoColor=white)](frontend/package.json)
+[![Docker](https://img.shields.io/badge/Docker-compose%20demo-2496ed?logo=docker&logoColor=white)](compose.demo.yaml)
 
-<p align="center"><img src="docs/cover.png" alt="Manufacturing ERP — cover" width="100%"></p>
+<p align="center"><img src="docs/architecture.svg" alt="Manufacturing ERP 架構" width="900"></p>
 
-A from-scratch **manufacturing ERP** built as a portfolio project. Its soul is a hand-written
-**double-entry General Ledger**: every business action — goods receipt, production, shipment,
-payment — posts a balanced journal entry **in the same database transaction** as the document and
-inventory change. Nothing is ever half-posted; an unbalanced entry cannot be committed.
+> **為什麼從零自建,而不是擴充 Odoo/ERPNext?** 因為這份作品集要展示的是 *架構與 ERP 領域素養* ——
+> 一具帶硬性 `借=貸` 不變量的過帳引擎、一本對帳到 GL 控制科目的不可變庫存子帳,以及一條
+> 可逐行辯護的「文件 → 庫存 → 分錄」管線。擴充套裝 ERP 多半只能展示框架設定。
 
-> **Why build from scratch instead of extending Odoo/ERPNext?** Because the deliverable is evidence
-> of *architecture and ERP-domain literacy* — a posting engine with a hard debit=credit invariant, an
-> immutable inventory subledger that reconciles to a GL control account, and a
-> document → inventory → ledger pipeline defensible line by line. Extending a packaged ERP would
-> mostly demonstrate framework configuration. (Extending would be the right call for shipping real
-> business value fast, or when targeting an explicit Odoo/Frappe role — neither applies here.)
+**目前進度**:**Phase 0–7 全數完成 + 全端化**。後端模組化單體(複式總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / RBAC)`mvn verify` 全綠(單元 56 + 整合 69);React 前端覆蓋全部 8 個模組;一行 `docker compose -f compose.demo.yaml up --build` 即可把 **postgres + 自動 seed 的後端 + 前端**整套拉起。逐階段交付見 [PROGRESS.md](PROGRESS.md)。
 
-## The headline demo — buy → make → sell
+## 目錄
 
-One vertical slice exercises the document → inventory → ledger loop three times and lands the
-manufacturing differentiator (single-level BOM + Work Order with correct WIP accounting):
+- [旗艦 demo:買 → 做 → 賣](#旗艦-demo買--做--賣)
+- [✨ 技術亮點](#-技術亮點)
+- [🚀 快速開始](#-快速開始)
+- [🏗️ 架構](#️-架構)
+- [🖥️ 前端](#️-前端)
+- [📊 資料模型](#-資料模型)
+- [🧪 測試](#-測試)
+- [🗺️ 路線圖](#️-路線圖)
+- [⚠️ 刻意切割(非缺漏)](#️-刻意切割非缺漏)
+- [📐 架構決策紀錄(ADR)](#-架構決策紀錄adr)
+- [文件索引](#文件索引)
 
-1. **Buy** a raw material — Purchase Order → Goods Receipt → Vendor Bill → Payment
-2. **Make** a finished good — single-level BOM → Work Order (consume raw into WIP, produce finished good)
-3. **Sell** it — Sales Order → Delivery (ship at cost) → Invoice (revenue + COGS) → Receipt
+## 旗艦 demo:買 → 做 → 賣
 
-Then **prove it**: the *reconciliation health-check* asserts the books are correct —
-global `SUM(debit) = SUM(credit)`, inventory subledger value == GL Inventory control balance,
-AR/AP subledgers == their control accounts, and every clearing account (GR-IR, WIP) nets to zero
-after a complete cycle. This one report is the project's hero artifact.
+一條垂直切片把「文件 → 庫存 → 分錄」迴圈跑三次,並落地製造差異化亮點(單階 BOM + 工單與正確的 WIP 會計):
 
-## Architecture
+1. **買**一個原料 —— 採購單 → 收貨 → 廠商帳單 → 付款
+2. **做**一個成品 —— 單階 BOM → 工單(領料進 WIP、完工產出成品)
+3. **賣**出去 —— 銷售單 → 出貨(以成本出) → 開票(收入 + COGS) → 收款
 
-<p align="center"><img src="docs/architecture.svg" alt="Manufacturing ERP architecture" width="900"></p>
+然後**證明它是對的**:*對帳健康檢查* 斷言帳是平的 —— 全域 `SUM(借) = SUM(貸)`、庫存子帳值 == GL 庫存控制科目餘額、AP/AR 子帳 == 各自控制科目,且每個過渡科目(GR-IR、Deferred-COGS、WIP)在完整循環後都歸零。這張報表是本專案的招牌。
 
-A **modular monolith**: single deployable, single PostgreSQL database, in-process modules whose
-boundaries are *enforced* (no module imports another's internals or touches its tables — checked in
-CI with ArchUnit). The `ledger` module is a shared kernel exposing a published `LedgerPosting` port;
-every other module posts through it **in the same transaction** as its own writes, never reaching into
-ledger internals. `inventory` keeps a moving weighted-average subledger that reconciles to the GL Inventory
-control account; `purchasing` and `payments` drive procure-to-pay (receipt → bill → payment) with GR-IR
-clearing and an AP subledger; `sales` mirrors it for order-to-cash (delivery → invoice → receipt) with a
-Deferred-COGS clearing account and an AR subledger; `manufacturing` runs single-level BOM → work order →
-WIP issue/completion at rolled actual cost. The `reporting` module is a read-side leaf that composes the
-others' published ports into the financial statements and the **reconciliation health-check**, and `iam`
-enforces role-based access control.
+> 啟動 demo 後,以任一帳號開 **儀表板** 即可看到對帳 hero 亮綠燈;`GET /api/reporting/reconciliation` 是它的資料來源。
 
-The modules and their published ports:
+## ✨ 技術亮點
 
-| Module | Responsibility | Published port(s) |
+- **手寫複式總帳,硬不變量**:`ledger` 是共享核心,暴露 published `LedgerPosting` port;每個模組都在**與自身寫入同一個交易**裡過帳,借貸不平就無法 commit(DB deferred constraint trigger 把關),POSTED 分錄不可改/刪。
+- **模組化單體 + CI 強制邊界**:單一部署、單一 PostgreSQL、行程內模組;模組邊界=套件邊界,用 **ArchUnit** 在 CI 強制(模組只能透過他模組的 `*.api` published port 互動,絕不碰 domain/application/web 內部)。
+- **移動加權平均庫存子帳**:append-only `StockLedgerEntry`(DB trigger 擋改/刪)對帳到 GL 控制科目;固定鎖序(ItemCostState 先、JE 序號最內層)無死鎖;採購價差走庫存重估而非 PPV 科目。
+- **過渡科目對稱清零**:GR-IR(收貨↔請款)、Deferred-COGS(出貨↔開票)、WIP(領料↔完工)三組過渡科目在完整循環後歸零,由**對帳 hero** 一張報表全程驗證。
+- **全端型別安全,金額永不碰 float**:後端加 **springdoc-openapi**,前端用 `openapi-typescript` + `openapi-fetch` 從 OpenAPI spec **產生型別安全的 TS client**;`BigDecimal` 全域序列化為 **JSON 字串**(並以 `SpringDocUtils` 讓 spec 同步標 string),前後端都不對金額做浮點運算。
+- **現代前端**:React 19 + TypeScript + Mantine 9 + Vite 8 + TanStack Query + React Router;feature 導向結構,RBAC 鏡像後端授權矩陣(僅作 UI 提示,真正強制仍在後端)。
+- **一行容器化 demo**:獨立 nginx 容器以**單一 origin 反向代理** `/api` 到後端(免 CORS),`compose.demo.yaml` 一鍵起 postgres + 自動 seed 的後端 + 前端。
+- **以多代理工作流設計**:系統設計採「6 維度設計 → 整合 → 對抗式審查」的多代理流程定案;前端 8 階段亦以多代理設計後逐階交付。
+- **互動式 API 文件**:Swagger UI(`/swagger-ui.html`)+ OpenAPI 3.1 spec(`/v3/api-docs`),demo 內可直接 Authorize 試打。
+
+## 🚀 快速開始
+
+前置:**Docker**(demo 全程在容器內,不需要本機裝 JDK/Node)。
+
+```bash
+# 一鍵 demo:postgres + 自動 seed 的後端 + nginx 前端
+docker compose -f compose.demo.yaml up --build
+```
+
+- 前端入口:<http://localhost:8081>
+- 互動式 API 文件(Swagger UI):<http://localhost:8081/swagger-ui.html>(按 **Authorize**,用 `admin`/`admin`)
+- 內建 4 個帳號(HTTP Basic):`admin/admin`(全角色)、`accountant/accountant`、`warehouse/warehouse`、`sales/sales`
+- 啟動時會經**真實過帳 service** 灌入完整 買→做→賣(`DataSeeder` 為冪等:demo 廠商已存在則跳過,故保留 volume 重跑 `up` 安全)
+
+> 想要全新一份資料時:`docker compose -f compose.demo.yaml down -v` 清掉 volume 再 `up`。
+
+### 本機開發
+
+```bash
+# 後端(Spring Boot Docker Compose 會自動起 postgres;見 compose.yaml)
+./mvnw spring-boot:run
+
+# 前端(另開一個終端機)
+cd frontend
+npm install
+npm run dev          # Vite dev server,proxy /api 到 :8080 → http://localhost:5173
+
+# 後端 API 有變動時,從執行中的後端重新產生型別安全的 TS client
+npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最新 spec
+```
+
+> Windows 上 Maven Wrapper 需要 `powershell` 在 PATH、且設好 `JAVA_HOME`;細節見 [PROGRESS.md](PROGRESS.md) 的環境備忘。
+
+## 🏗️ 架構
+
+**模組化單體**:單一部署、單一 PostgreSQL、行程內模組,邊界*被強制*(任何模組都不 import 他模組內部、也不碰他模組的表 —— 由 CI 的 ArchUnit 把關)。`ledger` 是共享核心,暴露 published `LedgerPosting` port;其餘模組都透過它**在同一交易**裡過帳。`inventory` 維護移動加權平均子帳並對帳到 GL 控制科目;`purchasing`+`payments` 跑 procure-to-pay(收貨→帳單→付款,含 GR-IR 清算與 AP 子帳);`sales` 鏡像 order-to-cash(出貨→開票→收款,含 Deferred-COGS 與 AR 子帳);`manufacturing` 跑單階 BOM → 工單 → WIP 領料/完工(實際成本滾算)。`reporting` 是 read-side leaf,組合各模組 published port 產出財務報表與**對帳健康檢查**;`iam` 管 RBAC。前端則在 nginx 容器中以單一 origin 反代到後端。
+
+| 模組 | 責任 | Published port(s) |
 |---|---|---|
-| `ledger` | Double-entry GL, posting engine, fiscal periods, trial balance | `LedgerPosting`, `SequenceAllocator`, `GeneralLedgerQuery` |
-| `masterdata` | Items, partners, warehouses/locations, posting rules, tax rates | `MasterDataQuery` |
-| `inventory` | Moving-average subledger, two-leg movements, revaluation | `StockPosting`, `InventoryQuery` |
-| `purchasing` | PO → goods receipt → vendor bill, GR-IR, AP subledger | `PayableDocuments`, `PayablesQuery` |
-| `sales` | SO → delivery → invoice → return, Deferred-COGS, AR subledger | `ReceivableDocuments`, `ReceivablesQuery` |
-| `manufacturing` | BOM, work orders, WIP issue/completion, reorder report | — |
-| `payments` | Customer/vendor payments + allocation (direction in/out) | — |
-| `reporting` | Read-side financial statements + reconciliation health-check | — |
-| `iam` | Authentication & role-based authorization | — |
+| `ledger` | 複式總帳、過帳引擎、會計期間、試算表 | `LedgerPosting`、`SequenceAllocator`、`GeneralLedgerQuery` |
+| `masterdata` | 商品、夥伴、倉庫/儲位、過帳規則、稅率 | `MasterDataQuery` |
+| `inventory` | 移動平均子帳、雙腿移動、重估 | `StockPosting`、`InventoryQuery` |
+| `purchasing` | PO → 收貨 → 廠商帳單、GR-IR、AP 子帳 | `PayableDocuments`、`PayablesQuery` |
+| `sales` | SO → 出貨 → 發票 → 退貨、Deferred-COGS、AR 子帳 | `ReceivableDocuments`、`ReceivablesQuery` |
+| `manufacturing` | BOM、工單、WIP 領料/完工、再訂點 | — |
+| `payments` | 客戶/廠商收付款 + 配款(in/out) | — |
+| `reporting` | read-side 財務報表 + 對帳健康檢查 | — |
+| `iam` | 認證與角色授權 | — |
 
-See [docs/adr/](docs/adr/) for the architecture decision records (indexed below).
-
-| Layer | Choice |
+| 層面 | 選型 |
 |---|---|
-| Backend | Java 21 + Spring Boot 4 |
-| Database | PostgreSQL 16 |
-| Persistence | Spring Data JPA / Hibernate + Flyway migrations |
-| Boundary enforcement | ArchUnit (CI-enforced) |
-| Money & quantity | `BigDecimal` value objects — `Money` (`NUMERIC(19,4)`) and `Quantity`/cost (`NUMERIC(19,6)`), never `float`; serialized as JSON **strings** so clients never apply float arithmetic to amounts |
-| API docs | OpenAPI 3.1 via springdoc; interactive Swagger UI at `/swagger-ui.html` |
-| Auth | Spring Security + HTTP Basic, role-based (ADMIN / ACCOUNTANT / WAREHOUSE / SALES); stateless JWT deferred |
-| Testing | JUnit + Testcontainers (real Postgres) |
-| Frontend | React 18 + TypeScript + Mantine *(later phase)* |
+| 後端 | Java 21 + Spring Boot 4.1 |
+| 資料庫 | PostgreSQL 16 |
+| 持久化 | Spring Data JPA / Hibernate + Flyway migrations |
+| 邊界強制 | ArchUnit(CI 強制) |
+| 金額與數量 | `BigDecimal` value object —— `Money`(`NUMERIC(19,4)`)、`Quantity`/cost(`NUMERIC(19,6)`),絕不用 `float`;JSON 序列化為**字串** |
+| 認證 | Spring Security + HTTP Basic,4 角色(ADMIN / ACCOUNTANT / WAREHOUSE / SALES);JWT 延後 |
+| API 文件 | springdoc-openapi(OpenAPI 3.1)+ Swagger UI(`/swagger-ui.html`) |
+| 測試 | JUnit + Testcontainers(真 Postgres) |
+| 前端 | React 19 + TypeScript + Mantine 9 + Vite 8 + TanStack Query + React Router |
+| 打包 | 後端/前端各自 multi-stage Dockerfile;nginx 反代;`compose.demo.yaml` 一鍵 demo |
 
-## Data model
+## 🖥️ 前端
 
-The accounting spine (accounts, balanced journal entries, fiscal periods) is the centre; every business
-document links its postings back to a journal entry, and inventory movements are an append-only subledger
-that reconciles to the GL.
+`frontend/` 是獨立的 Vite 專案(不掛進 Maven build)。資料層用 **`openapi-typescript`**(從 spec 產生型別)+ **`openapi-fetch`**(型別安全 client,middleware 注入 HTTP Basic、解析 RFC 9457 ProblemDetail)+ **TanStack Query**;路由用 React Router;UI 用 Mantine 9。RBAC 在前端鏡像後端的 POST 授權矩陣,僅作「隱藏/停用按鈕」的提示(真正強制在後端)。
+
+涵蓋全部 8 個模組:
+
+- **儀表板** —— 對帳健康檢查 hero(子帳 vs GL、過渡科目歸零)+ 總資產/負債/淨利摘要
+- **報表** —— 試算表(點科目開總帳鑽取 Drawer)、損益表、資產負債表(共用 as-of 日期)
+- **主檔** —— 商品 / 夥伴 / 倉庫 / 儲位 CRUD + 可複用選擇器
+- **採購** —— PO(多行 + 確認)→ 收貨(部分收)→ 廠商帳單(FIFO matchStatus)→ 付款 + AP 帳齡
+- **銷售** —— SO → 出貨 → 發票(顯示 COGS)→ 收款 → 客戶退貨(credit note 雙帳)+ AR 帳齡
+- **製造** —— BOM 建單、工單狀態機(release/issue/complete/cancel 條件啟用)、再訂點
+- **庫存** —— 在庫查詢、子帳對帳、庫存調整
+- **總帳** —— 手動分錄(即時借貸平衡檢核)、會計期間關閉/重開
+
+每張文件的詳情都把過帳結果攤開(關聯的 `journalEntryId`、`movementGroupId`、狀態流轉),呼應這個 ERP 的賣點:帳怎麼走,看得見。
+
+## 📊 資料模型
+
+會計脊椎(科目、平衡分錄、會計期間)是中心;每張業務文件把過帳連回分錄,庫存移動是 append-only 子帳並對帳到 GL。
 
 ```mermaid
 erDiagram
@@ -101,89 +165,48 @@ erDiagram
     PAYMENT ||--|{ PAYMENT_ALLOCATION : allocates
 ```
 
-## Running it
-
-Prerequisites: **JDK 21**, **Docker** (for the database / Testcontainers).
+## 🧪 測試
 
 ```bash
-# run the test suite (spins a throwaway Postgres via Testcontainers)
-./mvnw test
+# 後端:單元測試(Surefire)+ Testcontainers 整合測試(Failsafe,起真 Postgres)
+./mvnw verify       # 單元 56 + 整合 69;CI 用 `./mvnw -B -ntp verify`
 
-# run the app locally (Spring Boot Docker Compose auto-starts the postgres service)
-./mvnw spring-boot:run
-
-# run with the one-key demo seed — posts a full buy -> make -> sell slice through the real
-# services on startup, so the books land balanced and the reconciliation health-check is green
-./mvnw spring-boot:run -Dspring-boot.run.profiles=seed
+# 前端:型別檢查 + 打包
+cd frontend && npm run build      # tsc -b && vite build
 ```
 
-Seeded users (HTTP Basic): `admin/admin` (all roles), `accountant/accountant`, `warehouse/warehouse`,
-`sales/sales`. After seeding, `GET /api/reporting/reconciliation` (as any user) shows the books reconcile.
+整合測試命名為 `*IT`(Failsafe 在 `verify` 跑),`mvn test` 只跑 `*Test`/`*Tests`。請用 `mvn verify` 跑完整測試;GitHub Actions CI 已用 `verify`。`OpenApiSpecIT` 額外守 OpenAPI spec 不變量(無命名衝突、金額型別為字串、無合併 `oneOf` operation)。
 
-Interactive API docs are at `http://localhost:8080/swagger-ui.html` (use the **Authorize** button with
-`admin`/`admin`); the OpenAPI spec is served at `/v3/api-docs`.
+## 🗺️ 路線圖
 
-> On Windows the Maven Wrapper needs `powershell` on PATH and `JAVA_HOME` set; see
-> [PROGRESS.md](PROGRESS.md) for the exact environment notes used during development.
+**✅ Phase 0–6(後端)**:Phase 0 walking skeleton(總帳脊椎)→ 1 商品與庫存(移動加權平均、子帳對帳)→ 2 採購到付款(GR-IR、Input VAT、價差重估、AP 子帳)→ 3 訂單到收款(Deferred-COGS、退貨/credit note、AR 子帳)→ **4 製造(單階 BOM、工單、WIP 實際成本滾算 —— 最低可展示里程碑)** → 5 報表與期間結(財務報表、對帳 hero、soft-close)→ 6 打磨與打包(RBAC 4 角色、一鍵 seed、README/ADR)。
 
-## Roadmap
+**✅ Phase 7(全端化)**:後端 enablement(springdoc、`/api/auth/me`、BigDecimal-as-string、各模組唯讀列表端點)+ React 前端(8 階段:骨架 → 主檔 → 儀表板/財報 → 採購 → 銷售 → 製造 → 進階 → 容器化)+ 一鍵 `docker compose` demo。
 
-**✅ Done:** Phase 0 walking skeleton (ledger spine) · Phase 1 products & inventory (moving weighted-average
-valuation, append-only subledger reconciling to the GL Inventory control account) · Phase 2 procure-to-pay
-(PO → goods receipt → vendor bill → payment, with GR-IR clearing, Input VAT, a purchase-price variance that
-revalues inventory, and an AP subledger that reconciles to its control account) · Phase 3 order-to-cash
-(Sales Order → Delivery → Invoice → Receipt, plus customer returns / credit notes). Costs follow a
-**deferred-COGS** model mirroring GR-IR: a delivery parks the shipped cost in a Deferred-COGS clearing
-account (`Dr 1340 / Cr Finished Goods`); the invoice recognises COGS against it (`Dr COGS / Cr 1340`)
-alongside revenue + Output VAT, so a fully shipped-and-invoiced order leaves the clearing account at zero.
-The chain reconciles end-to-end (inventory falls, COGS/revenue/Output VAT post, Deferred-COGS and AR net to
-zero, trial balance balances, AR subledger == its control account); customer receipts reuse the `payments`
-module (`direction IN`), an AR-aging report is exposed, and a customer return posts a credit note that
-reverses the whole cycle to zero. · Phase 4 manufacturing (single-level BOM → Work Order → WIP issue →
-completion at rolled actual cost, plus work-order cancellation). A work order snapshots its BOM at
-release, issues components into WIP (`Dr WIP / Cr component inventory` at moving-average cost), and
-completes by receiving finished goods at the rolled cost (`Dr Finished Goods / Cr WIP`, any sub-unit
-residual swept to Manufacturing Variance) — so WIP nets to zero over the cycle. A reorder-point report
-lists items at or below their reorder point.
+## ⚠️ 刻意切割(非缺漏)
 
-**🎉 Minimum show-worthy milestone reached** (end of Phase 4): the full *buy → make → sell* slice runs
-end-to-end with the books reconciling at every step.
+多幣別/FX、多租戶(永不)、FIFO/標準成本+變異、單一 VAT 以外的稅引擎、簽核流程、完整時間相位 MRP、批號/序號、工序/工作中心/人工製費、多倉調撥、多階 BOM。
+**安全**:目前 HTTP Basic + in-memory 使用者;JWT + 持久化使用者/角色庫為刻意延後(前端 auth 層已抽象化以利日後抽換)。
 
-**✅ Also done:** Phase 5 reporting & period close. A read-side `reporting` module composes the ledger's
-published balances into financial statements — a trial balance (as of a date), an income statement, and a
-balance sheet whose equity carries current-period earnings (retained earnings computed dynamically, no
-year-end close) — plus general-ledger drill-down. It also exposes the **reconciliation health-check** at
-`GET /api/reporting/reconciliation` — the project's hero artifact — which composes each module's published
-subledger balance with the GL to assert the books are correct: the trial balance balances and the
-inventory, AP and AR subledgers each equal their GL control account (with the GR-IR / Deferred-COGS / WIP
-clearing accounts reported alongside). Fiscal periods can be **soft-closed** (and reopened) — the posting
-service refuses any entry dated in a non-open period.
+## 📐 架構決策紀錄(ADR)
 
-**✅ Done:** Phase 6 polish & packaging. **Role-based access control** with four roles —
-`ACCOUNTANT` (financial postings), `WAREHOUSE` (physical movements & production), `SALES` (sales orders),
-`ADMIN` (master data, superuser) — enforced as request authorization over HTTP Basic; reads need only
-authentication. A **one-key demo seed** (profile `seed`) posts the entire buy → make → sell slice through
-the real services on startup, so a fresh database lands with balanced books. Plus this README pass — the
-module map, the data-model ERD above, and the ADR index below.
+資深訊號的決策,逐則寫在 [docs/adr/](docs/adr/):
 
-Full arc: Phase 0 (ledger spine) → 1 products & inventory → 2 procure-to-pay → 3 order-to-cash →
-**4 manufacturing (minimum show-worthy milestone)** → 5 reporting & period close → 6 polish & packaging.
-Full plan and consciously-deferred scope are tracked in [PROGRESS.md](PROGRESS.md).
+1. [模組化單體](docs/adr/0001-modular-monolith.md) —— 邊界強制的模組化,非微服務。
+2. [移動平均估值](docs/adr/0002-moving-average-valuation.md) —— 永續加權平均,無 PPV。
+3. [跨模組過帳與鎖序](docs/adr/0003-cross-module-posting-and-locking.md) —— 同一交易同步過帳;固定鎖序。
+4. [GR-IR 清算與三方比對](docs/adr/0004-gr-ir-clearing-and-three-way-match.md) —— 已收未請款歸零。
+5. [採購價差→庫存](docs/adr/0005-purchase-price-variance-to-inventory.md) —— 差額重估庫存,無 PPV 科目。
+6. [Deferred COGS](docs/adr/0006-deferred-cogs.md) —— 開票才認 COGS,銷售側鏡像 GR-IR。
+7. [製造 WIP 與實際成本滾算](docs/adr/0007-manufacturing-wip-and-actual-cost-rollup.md) —— WIP 歸零;成品走滾算實際成本。
+8. [RBAC 走請求授權](docs/adr/0008-rbac-url-authorization.md) —— 4 角色在單一 REST 入口強制。
 
-### Consciously deferred (deliberate scoping, not gaps)
-Multi-currency/FX, multi-tenancy (never), FIFO/standard-cost variances, tax engine beyond one VAT
-line, approval workflows, full time-phased MRP, lot/serial tracking, routings/work-centers/labor,
-multi-warehouse transfers, multi-level BOM.
+## 文件索引
 
-## Architecture decision records
-
-The senior-signal decisions, each written up under [docs/adr/](docs/adr/):
-
-1. [Modular monolith](docs/adr/0001-modular-monolith.md) — enforced module boundaries over microservices.
-2. [Moving-average valuation](docs/adr/0002-moving-average-valuation.md) — perpetual weighted average, no PPV.
-3. [Cross-module posting & locking](docs/adr/0003-cross-module-posting-and-locking.md) — synchronous posting in one transaction; fixed lock order.
-4. [GR-IR clearing & three-way match](docs/adr/0004-gr-ir-clearing-and-three-way-match.md) — goods-received-not-invoiced nets to zero.
-5. [Purchase price variance → inventory](docs/adr/0005-purchase-price-variance-to-inventory.md) — variance revalues inventory, no PPV account.
-6. [Deferred COGS](docs/adr/0006-deferred-cogs.md) — recognise cost at invoicing, the sales-side mirror of GR-IR.
-7. [Manufacturing WIP & actual-cost roll-up](docs/adr/0007-manufacturing-wip-and-actual-cost-rollup.md) — WIP clears to zero; finished goods at rolled actual cost.
-8. [RBAC via request authorization](docs/adr/0008-rbac-url-authorization.md) — four roles enforced at the single REST entry point.
+| 文件 | 內容 |
+|---|---|
+| [PROGRESS.md](PROGRESS.md) | 逐階段進度、重要決策紀錄、環境備忘 |
+| [docs/adr/](docs/adr/) | 架構決策紀錄(ADR 0001–0008) |
+| [compose.demo.yaml](compose.demo.yaml) | 一鍵 demo(postgres + 後端 + 前端) |
+| [frontend/](frontend/) | React 前端(獨立 Vite 專案) |
+| [README.en.md](README.en.md) | English version |
