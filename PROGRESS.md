@@ -140,7 +140,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - **前端 bundle 瘦身**:`@tabler/icons` barrel 使 JS >800KB(build 警告);改 per-icon import 或 code-split。
 
 **B. 前端中/英 i18n 切換(使用者要求,新)**
-- 目前前端 UI 全英文。需加 **中文/英文 語言切換**(react-i18next 或輕量 context;抽出全部 UI 字串為 zh/en;AppShell header 放切換器;偏好存 localStorage)。與雙語 README 對齊。規模約一個 stage。
+- 目前前端 UI 全英文。需加 **中文/英文 語言切換**(react-i18next 或輕量 context;抽出全部 UI 字串為 zh/en;AppShell header 放切換器;偏好存 localStorage)。與雙語 README 對齊。規模約一個 stage。**決定**:預設語言**跟隨瀏覽器**(zh-* → 繁中,其餘 → 英文),使用者可手動覆寫。(使用者選定先實機點測再做 i18n。)
 
 **C. 安全**
 - JWT + 持久化使用者/角色庫(取代 HTTP Basic + 4 in-memory;前端 auth 層已抽象化好接)。
