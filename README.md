@@ -6,6 +6,7 @@
 
 <p align="center"><img src="docs/cover.png" alt="Manufacturing ERP — 封面" width="100%"></p>
 
+[![Live demo](https://img.shields.io/badge/live%20demo-erp.terrychou.com-success?logo=cloudflare&logoColor=white)](https://erp.terrychou.com)
 [![CI](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml/badge.svg)](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)](pom.xml)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-6db33f?logo=springboot&logoColor=white)](pom.xml)
@@ -63,7 +64,9 @@
 
 ## 🚀 快速開始
 
-前置:**Docker**(demo 全程在容器內,不需要本機裝 JDK/Node)。
+**線上 demo(免安裝)**:<https://erp.terrychou.com>(登入 `admin`/`admin`;Swagger 在 `/swagger-ui.html`)。部署架構見 [docs/DEPLOY.md](docs/DEPLOY.md)。
+
+或在本機跑(前置:**Docker**,全程在容器內,不需裝 JDK/Node):
 
 ```bash
 # 一鍵 demo:postgres + 自動 seed 的後端 + nginx 前端
@@ -207,6 +210,7 @@ cd frontend && npm run build      # tsc -b && vite build
 |---|---|
 | [PROGRESS.md](PROGRESS.md) | 逐階段進度、重要決策紀錄、環境備忘 |
 | [docs/adr/](docs/adr/) | 架構決策紀錄(ADR 0001–0008) |
+| [docs/DEPLOY.md](docs/DEPLOY.md) | 部署:本機一鍵 demo + 雲端子網域(Cloudflare Tunnel + Caddy) |
 | [compose.demo.yaml](compose.demo.yaml) | 一鍵 demo(postgres + 後端 + 前端) |
 | [frontend/](frontend/) | React 前端(獨立 Vite 專案) |
 | [README.en.md](README.en.md) | English version |
