@@ -10,6 +10,7 @@
 
 <p align="center"><img src="docs/cover.png" alt="Manufacturing ERP — cover" width="100%"></p>
 
+[![Live demo](https://img.shields.io/badge/live%20demo-erp.terrychou.com-success?logo=cloudflare&logoColor=white)](https://erp.terrychou.com)
 [![CI](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml/badge.svg)](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)](pom.xml)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-6db33f?logo=springboot&logoColor=white)](pom.xml)
@@ -98,7 +99,10 @@ zero after a complete cycle. This one report is the project's hero artifact.
 
 ## 🚀 Quick start
 
-Prerequisite: **Docker** (the demo runs entirely in containers — no local JDK/Node needed).
+**Live demo (nothing to install)**: <https://erp.terrychou.com> (sign in `admin`/`admin`; Swagger at
+`/swagger-ui.html`). Deployment architecture: [docs/DEPLOY.md](docs/DEPLOY.md).
+
+Or run it locally (prerequisite: **Docker** — everything runs in containers, no local JDK/Node):
 
 ```bash
 # One-command demo: postgres + an auto-seeded backend + the nginx-served frontend
@@ -275,6 +279,7 @@ The senior-signal decisions, each written up under [docs/adr/](docs/adr/):
 |---|---|
 | [PROGRESS.md](PROGRESS.md) | Stage-by-stage progress, key decisions, environment notes |
 | [docs/adr/](docs/adr/) | Architecture decision records (ADR 0001–0008) |
+| [docs/DEPLOY.md](docs/DEPLOY.md) | Deployment: local one-command demo + cloud subdomain (Cloudflare Tunnel + Caddy) |
 | [compose.demo.yaml](compose.demo.yaml) | One-command demo (postgres + backend + frontend) |
 | [frontend/](frontend/) | React frontend (standalone Vite project) |
 | [README.md](README.md) | 繁體中文版 |
