@@ -174,6 +174,12 @@ public class SalesInvoiceService implements ReceivableDocuments {
                 .orElseThrow(() -> new SalesInvoiceNotFoundException(id));
     }
 
+    @Transactional(readOnly = true)
+    public List<SalesInvoice> listInvoices() {
+        return salesInvoiceRepository.findAll(org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "id"));
+    }
+
     private static BigDecimal zero() {
         return BigDecimal.ZERO.setScale(MONEY_SCALE);
     }

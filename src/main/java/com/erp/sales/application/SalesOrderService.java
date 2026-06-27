@@ -63,4 +63,10 @@ public class SalesOrderService {
         return salesOrderRepository.findById(soId)
                 .orElseThrow(() -> new SalesOrderNotFoundException(soId));
     }
+
+    @Transactional(readOnly = true)
+    public List<SalesOrder> listOrders() {
+        return salesOrderRepository.findAll(org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "id"));
+    }
 }

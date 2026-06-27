@@ -89,6 +89,11 @@ public class SalesController {
         return SalesOrderResponse.from(salesOrderService.getOrder(id));
     }
 
+    @GetMapping("/sales-orders")
+    public List<SalesOrderResponse> listOrders() {
+        return salesOrderService.listOrders().stream().map(SalesOrderResponse::from).toList();
+    }
+
     @PostMapping("/deliveries")
     public ResponseEntity<DeliveryResponse> deliver(@RequestBody CreateDeliveryRequest request,
                                                     Principal principal) {
@@ -104,6 +109,11 @@ public class SalesController {
     @GetMapping("/deliveries/{id}")
     public DeliveryResponse getDelivery(@PathVariable Long id) {
         return DeliveryResponse.from(deliveryService.getDelivery(id));
+    }
+
+    @GetMapping("/deliveries")
+    public List<DeliveryResponse> listDeliveries() {
+        return deliveryService.listDeliveries().stream().map(DeliveryResponse::from).toList();
     }
 
     @PostMapping("/sales-invoices")
@@ -123,6 +133,11 @@ public class SalesController {
         return SalesInvoiceResponse.from(salesInvoiceService.getInvoice(id));
     }
 
+    @GetMapping("/sales-invoices")
+    public List<SalesInvoiceResponse> listInvoices() {
+        return salesInvoiceService.listInvoices().stream().map(SalesInvoiceResponse::from).toList();
+    }
+
     @PostMapping("/customer-returns")
     public ResponseEntity<CustomerReturnResponse> postReturn(@RequestBody CreateReturnRequest request,
                                                              Principal principal) {
@@ -135,6 +150,11 @@ public class SalesController {
     @GetMapping("/customer-returns/{id}")
     public CustomerReturnResponse getReturn(@PathVariable Long id) {
         return CustomerReturnResponse.from(customerReturnService.getReturn(id));
+    }
+
+    @GetMapping("/customer-returns")
+    public List<CustomerReturnResponse> listReturns() {
+        return customerReturnService.listReturns().stream().map(CustomerReturnResponse::from).toList();
     }
 
     /** Accounts-receivable aging as of a date (defaults to today). */

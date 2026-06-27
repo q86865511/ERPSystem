@@ -111,4 +111,10 @@ public class DeliveryService {
         return deliveryRepository.findById(id)
                 .orElseThrow(() -> new DeliveryNotFoundException(id));
     }
+
+    @Transactional(readOnly = true)
+    public List<Delivery> listDeliveries() {
+        return deliveryRepository.findAll(org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "id"));
+    }
 }

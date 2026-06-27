@@ -142,6 +142,12 @@ public class CustomerReturnService {
                 .orElseThrow(() -> new CustomerReturnNotFoundException(id));
     }
 
+    @Transactional(readOnly = true)
+    public List<CustomerReturn> listReturns() {
+        return customerReturnRepository.findAll(org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "id"));
+    }
+
     private static BigDecimal zero() {
         return BigDecimal.ZERO.setScale(MONEY_SCALE);
     }

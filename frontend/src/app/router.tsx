@@ -6,6 +6,7 @@ import { InventoryPage } from '../features/inventory/InventoryPage';
 import { MasterDataPage } from '../features/masterdata/MasterDataPage';
 import { PurchasingPage } from '../features/purchasing/PurchasingPage';
 import { ReportsPage } from '../features/reporting/ReportsPage';
+import { SalesPage } from '../features/sales/SalesPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { LoginPage } from '../pages/LoginPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
@@ -33,7 +34,7 @@ export const router = createBrowserRouter([
           { path: '/', element: <DashboardPage /> },
           { path: '/masterdata', element: <MasterDataPage /> },
           { path: '/purchasing', element: <PurchasingPage /> },
-          { path: '/sales', element: <PlaceholderPage title="Sales" /> },
+          { path: '/sales', element: <SalesPage /> },
           { path: '/manufacturing', element: <PlaceholderPage title="Manufacturing" /> },
           { path: '/inventory', element: <InventoryPage /> },
           { path: '/reporting', element: <ReportsPage /> },
