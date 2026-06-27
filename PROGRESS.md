@@ -132,18 +132,37 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - **基底 Phase 0–6 全數完成** —— 總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / 打磨與打包,完整路線圖落地,CI 綠。
 
 ## 待辦
-> 核心路線圖 Phase 0–6 已全部完成。以下為可選後續與刻意延後範圍(非缺漏)。
-- **對外可展示性**:一鍵部署 demo(docker-compose 把 postgres + api(+前端)拉起、雲端 demo)、前端 GUI(React 18 + TS + Mantine)。目前純後端 + REST API,無 GUI。
-- **安全**:JWT + 持久化使用者/角色庫(取代目前 HTTP Basic + 4 in-memory 使用者)。
-- **財會加值**:PDF/列印報表(發票/PO/出貨單/試算表)、獨立 append-only `audit_log` + 敏感動作事件監聽、hard-close + 保留盈餘年結轉。
-- **品質**:並行測試擴到 sales/manufacturing(目前僅 inventory 有 concurrency IT)、Swagger/OpenAPI(互動式 API 文件)。
-- **刻意切割(YAGNI)**:多幣別/FX、多公司/多租戶、FIFO/標準成本+PPV、多稅率稅引擎、簽核流程、時間相位 MRP、批號/序號、工序/工作中心/人工製費、多倉調撥、多階 BOM、購買↔庫存單位換算(UoM)。
+> Phase 0–7 已全部完成(後端 + 全端 React 前端 + 一鍵 demo + 雲端上線 https://erp.terrychou.com)。以下為尚未做的後續,依優先序。
+
+**A. 收尾 / 驗證(高優先)**
+- ✅ **前端實機點測(已做)**:用 **headless Playwright** 對 live demo(Oracle)自動點測 —— admin 登入 → 8 頁全部渲染(Dashboard/Master Data/Purchasing/Sales/Manufacturing/Inventory/Reports/Ledger)+ 開「New item」表單 Modal,**零 console / pageerror / 失敗 /api 請求**;對帳 hero 綠、PO-000001 列表帶 partner 名與 RECEIVED 狀態徽章。互動式逐流程(實際送 PO→GR→Bill…)仍可再深測,但渲染 + 主要互動已過。
+- ✅ **README 截圖(已做)**:Playwright 截 8 頁 + Modal 放 `docs/screenshots/`,README(繁/英)嵌入儀表板 hero + 採購/製造/財報。
+- **前端 bundle 瘦身**:`@tabler/icons` barrel 使 JS >800KB(build 警告);改 per-icon import 或 code-split。
+
+**B. 前端中/英 i18n 切換(使用者要求,新)**
+- 目前前端 UI 全英文。需加 **中文/英文 語言切換**(react-i18next 或輕量 context;抽出全部 UI 字串為 zh/en;AppShell header 放切換器;偏好存 localStorage)。與雙語 README 對齊。規模約一個 stage。**決定**:預設語言**跟隨瀏覽器**(zh-* → 繁中,其餘 → 英文),使用者可手動覆寫。(使用者選定先實機點測再做 i18n。)
+
+**C. 安全**
+- JWT + 持久化使用者/角色庫(取代 HTTP Basic + 4 in-memory;前端 auth 層已抽象化好接)。
+- live demo 為 `admin/admin` 公開可寫;可考慮唯讀帳號/唯讀模式(後端強制借貸平衡 + 子帳對帳,對帳 hero 恆綠,訪客動不壞不變量,但會累積測試資料)。
+
+**D. 財會加值**
+- PDF/列印報表(發票/PO/出貨單/試算表)、獨立 append-only `audit_log` + 敏感動作事件監聽、hard-close + 保留盈餘年結轉(目前只 soft-close,保留盈餘動態算)。
+
+**E. 品質 / 維運**
+- 並行測試擴到 sales/manufacturing(目前僅 inventory 有 concurrency IT);**前端無自動化測試**(只有 tsc + vite build,可加 Vitest/Playwright)。
+- 自動部署(merge 後 GitHub Actions 自動 pull + rebuild;目前 Oracle 上手動 clone + compose up);demo 定時重置(cron 每晚 `down -v && up` 還原乾淨 seed)。
+
+**F. 刻意切割(YAGNI,不打算做)**
+- 多幣別/FX、多公司/多租戶、FIFO/標準成本+PPV、多稅率稅引擎、簽核流程、時間相位 MRP、批號/序號、工序/工作中心/人工製費、多倉調撥、多階 BOM、購買↔庫存單位換算(UoM)。
 
 ## 已知問題
 - 本機 `java`/`mvn` 不在沙箱 shell 的 PATH;建置需顯式設定 `JAVA_HOME=E:\JDK21` 並把 System32/PowerShell 路徑補進 PATH(否則 mvnw.cmd 找不到 powershell 無法 bootstrap)。
 - Testcontainers 需 Docker daemon;若 `docker info` 連不上需先啟動 Docker Desktop(`C:\Program Files\Docker\Docker\Docker Desktop.exe`)。
 - **教訓**:整合測試命名為 `*IT` 由 Failsafe 在 `verify` 跑,`mvn test` 不會跑到(Surefire 只跑 `*Test`/`*Tests`)。請用 `mvn verify` 跑完整測試;CI 已用 `verify`。
 - ~~README CI badge 佔位~~(已解決:指向 `q86865511/ERPSystem`,main CI 綠)。
+- **沙箱限制**:本機沙箱/VM 擋 Tomcat loopback,無法在此跑真實 web server / Vite dev server;故 spec 以 MockMvc 匯出、前端以 `vite build` 驗證,實機驗證改在 **Oracle**(`ssh oracle`)上跑 Docker demo。
+- **前端小限制(可補可不補)**:庫存調整無歷史列表(後端無 adjustments list 端點);手動分錄科目選單取自試算表(空帳本無選項);期間關閉 `yearCode` 需手填;文件詳情點 `journalEntryId` 是導到該科目總帳鑽取的近似(無 by-entry 取整張分錄端點);主檔只有建立 + 列表,無編輯/刪除;列表端點無分頁(demo 規模夠用)。
 
 ## 重要決策紀錄
 - **建置策略=從零自建**:作品集價值在於展示自己的架構與 ERP 領域素養,而非 Odoo/Frappe 設定。
