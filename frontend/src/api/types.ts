@@ -40,6 +40,13 @@ export type CreateReturnRequest = Schemas['CreateReturnRequest'];
 export type ArAgingReport = Schemas['ArAgingReport'];
 export type PayInRequest = Schemas['PayInRequest'];
 
+// --- Advanced / ledger (Stage 7) ---
+export type CreateAdjustmentRequest = Schemas['CreateAdjustmentRequest'];
+export type AdjustmentResponse = Schemas['AdjustmentResponse'];
+export type JournalEntryRequest = Schemas['JournalEntryRequest'];
+export type JournalEntryResponse = Schemas['JournalEntryResponse'];
+export type FiscalPeriodResponse = Schemas['FiscalPeriodResponse'];
+
 // --- Manufacturing (Stage 6) ---
 export type BomResponse = Schemas['BomResponse'];
 export type CreateBomRequest = Schemas['CreateBomRequest'];

@@ -3,6 +3,7 @@ import { AuthProvider } from '../auth/AuthContext';
 import { RequireAuth } from '../auth/RequireAuth';
 import { AppLayout } from '../components/AppLayout';
 import { InventoryPage } from '../features/inventory/InventoryPage';
+import { LedgerPage } from '../features/ledger/LedgerPage';
 import { ManufacturingPage } from '../features/manufacturing/ManufacturingPage';
 import { MasterDataPage } from '../features/masterdata/MasterDataPage';
 import { PurchasingPage } from '../features/purchasing/PurchasingPage';
@@ -11,7 +12,6 @@ import { SalesPage } from '../features/sales/SalesPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { LoginPage } from '../pages/LoginPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
-import { PlaceholderPage } from '../pages/PlaceholderPage';
 
 // AuthProvider sits inside the router tree (it uses useNavigate). /login is public; everything else is
 // gated by RequireAuth and rendered inside the AppLayout shell. Module screens are placeholders until
@@ -39,7 +39,7 @@ export const router = createBrowserRouter([
           { path: '/manufacturing', element: <ManufacturingPage /> },
           { path: '/inventory', element: <InventoryPage /> },
           { path: '/reporting', element: <ReportsPage /> },
-          { path: '/ledger', element: <PlaceholderPage title="Ledger" /> },
+          { path: '/ledger', element: <LedgerPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

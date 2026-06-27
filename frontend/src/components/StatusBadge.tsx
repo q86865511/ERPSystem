@@ -20,6 +20,9 @@ const COLOR: Record<string, string> = {
   MATCHED: 'teal',
   PARTIAL: 'yellow',
   UNMATCHED: 'red',
+  // fiscal period status
+  OPEN: 'teal',
+  LOCKED: 'red',
 };
 
 export function StatusBadge({ status }: { status: string | undefined }) {
