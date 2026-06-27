@@ -28,6 +28,18 @@ export type PaymentResponse = Schemas['PaymentResponse'];
 export type PayOutRequest = Schemas['PayOutRequest'];
 export type ApAgingReport = Schemas['ApAgingReport'];
 
+// --- Sales / O2C (Stage 5) ---
+export type SalesOrderResponse = Schemas['SalesOrderResponse'];
+export type CreateSoRequest = Schemas['CreateSoRequest'];
+export type DeliveryResponse = Schemas['DeliveryResponse'];
+export type CreateDeliveryRequest = Schemas['CreateDeliveryRequest'];
+export type SalesInvoiceResponse = Schemas['SalesInvoiceResponse'];
+export type CreateInvoiceRequest = Schemas['CreateInvoiceRequest'];
+export type CustomerReturnResponse = Schemas['CustomerReturnResponse'];
+export type CreateReturnRequest = Schemas['CreateReturnRequest'];
+export type ArAgingReport = Schemas['ArAgingReport'];
+export type PayInRequest = Schemas['PayInRequest'];
+
 export const ITEM_TYPES: ItemType[] = ['RAW', 'WIP', 'FINISHED', 'SERVICE'];
 export const LOCATION_TYPES: LocationType[] = [
   'STOCK',

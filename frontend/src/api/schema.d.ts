@@ -523,7 +523,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["listOrders"];
+        get: operations["listOrders_1"];
         put?: never;
         post: operations["createOrder_1"];
         delete?: never;
@@ -699,7 +699,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listReturns"];
         put?: never;
         post: operations["postReturn"];
         delete?: never;
@@ -731,7 +731,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listDeliveries"];
         put?: never;
         post: operations["deliver"];
         delete?: never;
@@ -763,7 +763,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listInvoices"];
         put?: never;
         post: operations["postInvoice"];
         delete?: never;
@@ -795,7 +795,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listOrders"];
         put?: never;
         post: operations["createOrder"];
         delete?: never;
@@ -2407,7 +2407,7 @@ export interface operations {
             };
         };
     };
-    listOrders: {
+    listOrders_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2695,6 +2695,26 @@ export interface operations {
             };
         };
     };
+    listReturns: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CustomerReturnResponse"][];
+                };
+            };
+        };
+    };
     postReturn: {
         parameters: {
             query?: never;
@@ -2737,6 +2757,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CustomerReturnResponse"];
+                };
+            };
+        };
+    };
+    listDeliveries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DeliveryResponse"][];
                 };
             };
         };
@@ -2787,6 +2827,26 @@ export interface operations {
             };
         };
     };
+    listInvoices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SalesInvoiceResponse"][];
+                };
+            };
+        };
+    };
     postInvoice: {
         parameters: {
             query?: never;
@@ -2829,6 +2889,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["SalesInvoiceResponse"];
+                };
+            };
+        };
+    };
+    listOrders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SalesOrderResponse"][];
                 };
             };
         };

@@ -35,4 +35,12 @@ export const qk = {
     list: (direction?: string) => ['payments', 'list', direction ?? 'all'] as const,
     one: (id: number) => ['payments', 'one', id] as const,
   },
+  sales: {
+    orders: () => ['sales', 'orders'] as const,
+    order: (id: number) => ['sales', 'order', id] as const,
+    deliveries: () => ['sales', 'deliveries'] as const,
+    invoices: () => ['sales', 'invoices'] as const,
+    returns: () => ['sales', 'returns'] as const,
+    arAging: (asOf?: string) => ['sales', 'ar-aging', asOf ?? 'today'] as const,
+  },
 };

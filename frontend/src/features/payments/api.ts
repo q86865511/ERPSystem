@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import { qk } from '../../api/queryKeys';
-import type { PayOutRequest } from '../../api/types';
+import type { PayInRequest, PayOutRequest } from '../../api/types';
 
 export type PaymentDirection = 'IN' | 'OUT';
 
@@ -39,6 +39,22 @@ export function usePayOut() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['payments'] });
       qc.invalidateQueries({ queryKey: ['purchasing'] });
+      qc.invalidateQueries({ queryKey: ['reporting'] });
+    },
+  });
+}
+
+export function usePayIn() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: PayInRequest) => {
+      const { data, error } = await api.POST('/api/payments/in', { body });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['payments'] });
+      qc.invalidateQueries({ queryKey: ['sales'] });
       qc.invalidateQueries({ queryKey: ['reporting'] });
     },
   });

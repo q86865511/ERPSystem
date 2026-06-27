@@ -1022,7 +1022,7 @@
     },
     "/api/purchasing/purchase-orders" : {
       "get" : {
-        "operationId" : "listOrders",
+        "operationId" : "listOrders_1",
         "responses" : {
           "200" : {
             "content" : {
@@ -1368,6 +1368,25 @@
       }
     },
     "/api/sales/customer-returns" : {
+      "get" : {
+        "operationId" : "listReturns",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CustomerReturnResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      },
       "post" : {
         "operationId" : "postReturn",
         "requestBody" : {
@@ -1423,6 +1442,25 @@
       }
     },
     "/api/sales/deliveries" : {
+      "get" : {
+        "operationId" : "listDeliveries",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DeliveryResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      },
       "post" : {
         "operationId" : "deliver",
         "requestBody" : {
@@ -1478,6 +1516,25 @@
       }
     },
     "/api/sales/sales-invoices" : {
+      "get" : {
+        "operationId" : "listInvoices",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/SalesInvoiceResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      },
       "post" : {
         "operationId" : "postInvoice",
         "requestBody" : {
@@ -1533,6 +1590,25 @@
       }
     },
     "/api/sales/sales-orders" : {
+      "get" : {
+        "operationId" : "listOrders",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/SalesOrderResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      },
       "post" : {
         "operationId" : "createOrder",
         "requestBody" : {
