@@ -2,6 +2,7 @@ import { createBrowserRouter, Outlet } from 'react-router-dom';
 import { AuthProvider } from '../auth/AuthContext';
 import { RequireAuth } from '../auth/RequireAuth';
 import { AppLayout } from '../components/AppLayout';
+import { MasterDataPage } from '../features/masterdata/MasterDataPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { LoginPage } from '../pages/LoginPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
@@ -27,7 +28,7 @@ export const router = createBrowserRouter([
         ),
         children: [
           { path: '/', element: <DashboardPage /> },
-          { path: '/masterdata', element: <PlaceholderPage title="Master Data" /> },
+          { path: '/masterdata', element: <MasterDataPage /> },
           { path: '/purchasing', element: <PlaceholderPage title="Purchasing" /> },
           { path: '/sales', element: <PlaceholderPage title="Sales" /> },
           { path: '/manufacturing', element: <PlaceholderPage title="Manufacturing" /> },

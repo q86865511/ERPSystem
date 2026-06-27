@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /** REST surface for master data: items, warehouses and locations. */
 @RestController
@@ -56,9 +57,16 @@ public class MasterDataController {
         return ItemResponse.from(masterDataService.getItem(id));
     }
 
-    @GetMapping(value = "/items", params = "sku")
+    // Distinct sub-path (not /items?sku=) so /items has a single GET operation in the OpenAPI spec;
+    // Spring matches the literal "by-sku" before the /items/{id} numeric path variable.
+    @GetMapping("/items/by-sku")
     public ItemResponse getItemBySku(@RequestParam String sku) {
         return ItemResponse.from(masterDataService.getItemBySku(sku));
+    }
+
+    @GetMapping("/items")
+    public List<ItemResponse> listItems() {
+        return masterDataService.listItems().stream().map(ItemResponse::from).toList();
     }
 
     @PostMapping("/warehouses")
@@ -66,6 +74,11 @@ public class MasterDataController {
         WarehouseResponse body = WarehouseResponse.from(
                 masterDataService.createWarehouse(request.code(), request.name()));
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
+    }
+
+    @GetMapping("/warehouses")
+    public List<WarehouseResponse> listWarehouses() {
+        return masterDataService.listWarehouses().stream().map(WarehouseResponse::from).toList();
     }
 
     @PostMapping("/locations")
@@ -78,6 +91,11 @@ public class MasterDataController {
     @GetMapping("/locations/{id}")
     public LocationResponse getLocation(@PathVariable Long id) {
         return LocationResponse.from(masterDataService.getLocation(id));
+    }
+
+    @GetMapping("/locations")
+    public List<LocationResponse> listLocations(@RequestParam(required = false) Long warehouseId) {
+        return masterDataService.listLocations(warehouseId).stream().map(LocationResponse::from).toList();
     }
 
     @PostMapping("/partners")
@@ -94,5 +112,12 @@ public class MasterDataController {
     @GetMapping("/partners/{id}")
     public PartnerResponse getPartner(@PathVariable Long id) {
         return PartnerResponse.from(masterDataService.getPartner(id));
+    }
+
+    @GetMapping("/partners")
+    public List<PartnerResponse> listPartners(@RequestParam(required = false) Boolean vendor,
+                                              @RequestParam(required = false) Boolean customer) {
+        return masterDataService.listPartners(vendor, customer).stream()
+                .map(PartnerResponse::from).toList();
     }
 }

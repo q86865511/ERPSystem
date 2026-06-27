@@ -283,9 +283,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["getItemBySku"];
+        get: operations["listItems"];
         put?: never;
         post: operations["createItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/masterdata/items/by-sku": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getItemBySku"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -315,7 +331,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listLocations"];
         put?: never;
         post: operations["createLocation"];
         delete?: never;
@@ -347,7 +363,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listPartners"];
         put?: never;
         post: operations["createPartner"];
         delete?: never;
@@ -379,7 +395,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listWarehouses"];
         put?: never;
         post: operations["createWarehouse"];
         delete?: never;
@@ -1919,11 +1935,9 @@ export interface operations {
             };
         };
     };
-    getItemBySku: {
+    listItems: {
         parameters: {
-            query: {
-                sku: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -1936,7 +1950,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ItemResponse"];
+                    "*/*": components["schemas"]["ItemResponse"][];
                 };
             };
         };
@@ -1953,6 +1967,28 @@ export interface operations {
                 "application/json": components["schemas"]["CreateItemRequest"];
             };
         };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ItemResponse"];
+                };
+            };
+        };
+    };
+    getItemBySku: {
+        parameters: {
+            query: {
+                sku: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
@@ -1983,6 +2019,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ItemResponse"];
+                };
+            };
+        };
+    };
+    listLocations: {
+        parameters: {
+            query?: {
+                warehouseId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LocationResponse"][];
                 };
             };
         };
@@ -2033,6 +2091,29 @@ export interface operations {
             };
         };
     };
+    listPartners: {
+        parameters: {
+            query?: {
+                vendor?: boolean;
+                customer?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PartnerResponse"][];
+                };
+            };
+        };
+    };
     createPartner: {
         parameters: {
             query?: never;
@@ -2075,6 +2156,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PartnerResponse"];
+                };
+            };
+        };
+    };
+    listWarehouses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WarehouseResponse"][];
                 };
             };
         };
