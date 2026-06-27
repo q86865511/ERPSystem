@@ -3,6 +3,7 @@ package com.erp.purchasing.application;
 import com.erp.ledger.api.SequenceAllocator;
 import com.erp.masterdata.api.MasterDataQuery;
 import com.erp.purchasing.domain.PurchaseOrder;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,5 +63,10 @@ public class PurchaseOrderService {
     public PurchaseOrder getOrder(Long poId) {
         return purchaseOrderRepository.findById(poId)
                 .orElseThrow(() -> new PurchaseOrderNotFoundException(poId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<PurchaseOrder> listOrders() {
+        return purchaseOrderRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 }

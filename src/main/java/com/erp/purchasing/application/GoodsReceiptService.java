@@ -11,6 +11,7 @@ import com.erp.masterdata.api.MasterDataQuery;
 import com.erp.purchasing.domain.GoodsReceipt;
 import com.erp.purchasing.domain.PoLine;
 import com.erp.purchasing.domain.PurchaseOrder;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,5 +109,10 @@ public class GoodsReceiptService {
     public GoodsReceipt getReceipt(Long id) {
         return goodsReceiptRepository.findById(id)
                 .orElseThrow(() -> new GoodsReceiptNotFoundException(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<GoodsReceipt> listReceipts() {
+        return goodsReceiptRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 }

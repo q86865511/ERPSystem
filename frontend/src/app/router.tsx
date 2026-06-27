@@ -4,6 +4,7 @@ import { RequireAuth } from '../auth/RequireAuth';
 import { AppLayout } from '../components/AppLayout';
 import { InventoryPage } from '../features/inventory/InventoryPage';
 import { MasterDataPage } from '../features/masterdata/MasterDataPage';
+import { PurchasingPage } from '../features/purchasing/PurchasingPage';
 import { ReportsPage } from '../features/reporting/ReportsPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { LoginPage } from '../pages/LoginPage';
@@ -31,7 +32,7 @@ export const router = createBrowserRouter([
         children: [
           { path: '/', element: <DashboardPage /> },
           { path: '/masterdata', element: <MasterDataPage /> },
-          { path: '/purchasing', element: <PlaceholderPage title="Purchasing" /> },
+          { path: '/purchasing', element: <PurchasingPage /> },
           { path: '/sales', element: <PlaceholderPage title="Sales" /> },
           { path: '/manufacturing', element: <PlaceholderPage title="Manufacturing" /> },
           { path: '/inventory', element: <InventoryPage /> },

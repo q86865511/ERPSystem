@@ -11,6 +11,7 @@ import com.erp.purchasing.api.PayableBillView;
 import com.erp.purchasing.api.PayableDocuments;
 import com.erp.sales.api.ReceivableDocuments;
 import com.erp.sales.api.ReceivableInvoiceView;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -145,5 +146,14 @@ public class PaymentService {
     public Payment getPayment(Long id) {
         return paymentRepository.findById(id)
                 .orElseThrow(() -> new PaymentNotFoundException(id));
+    }
+
+    /** All payments, optionally filtered by direction (IN = receipts, OUT = vendor payments). */
+    @Transactional(readOnly = true)
+    public List<Payment> listPayments(PaymentDirection direction) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        return direction != null
+                ? paymentRepository.findByDirection(direction, sort)
+                : paymentRepository.findAll(sort);
     }
 }

@@ -806,6 +806,36 @@
         "tags" : [ "master-data-controller" ]
       }
     },
+    "/api/payments" : {
+      "get" : {
+        "operationId" : "listPayments",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "direction",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "IN", "OUT" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PaymentResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "payments-controller" ]
+      }
+    },
     "/api/payments/in" : {
       "post" : {
         "operationId" : "payIn",
@@ -917,6 +947,25 @@
       }
     },
     "/api/purchasing/goods-receipts" : {
+      "get" : {
+        "operationId" : "listReceipts",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/GoodsReceiptResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      },
       "post" : {
         "operationId" : "receive",
         "requestBody" : {
@@ -972,6 +1021,25 @@
       }
     },
     "/api/purchasing/purchase-orders" : {
+      "get" : {
+        "operationId" : "listOrders",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PurchaseOrderResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      },
       "post" : {
         "operationId" : "createOrder_1",
         "requestBody" : {
@@ -1054,6 +1122,25 @@
       }
     },
     "/api/purchasing/vendor-bills" : {
+      "get" : {
+        "operationId" : "listBills",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/VendorBillResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      },
       "post" : {
         "operationId" : "postBill",
         "requestBody" : {

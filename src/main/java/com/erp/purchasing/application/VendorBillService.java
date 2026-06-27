@@ -197,6 +197,12 @@ public class VendorBillService implements PayableDocuments {
                 .orElseThrow(() -> new VendorBillNotFoundException(id));
     }
 
+    @Transactional(readOnly = true)
+    public List<VendorBill> listBills() {
+        return vendorBillRepository.findAll(org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "id"));
+    }
+
     private static BigDecimal zero() {
         return BigDecimal.ZERO.setScale(MONEY_SCALE);
     }
