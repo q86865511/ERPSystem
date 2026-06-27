@@ -1,0 +1,280 @@
+# Manufacturing ERP · 製造業 ERP
+
+[繁體中文](README.md) · **English**
+
+> A from-scratch **manufacturing ERP** (portfolio project). Its soul is a hand-written **double-entry
+> General Ledger**: every business action — goods receipt, production, shipment, payment — posts a
+> balanced journal entry **in the same database transaction** as the document and inventory change.
+> Nothing is ever half-posted; an unbalanced entry cannot be committed. Now with a full-stack coat:
+> a React frontend and a one-command `docker compose` demo.
+
+<p align="center"><img src="docs/cover.png" alt="Manufacturing ERP — cover" width="100%"></p>
+
+[![CI](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml/badge.svg)](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml)
+[![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)](pom.xml)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-6db33f?logo=springboot&logoColor=white)](pom.xml)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169e1?logo=postgresql&logoColor=white)](compose.yaml)
+[![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=black)](frontend/package.json)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white)](frontend/package.json)
+[![Mantine](https://img.shields.io/badge/Mantine-9-339af0?logo=mantine&logoColor=white)](frontend/package.json)
+[![Docker](https://img.shields.io/badge/Docker-compose%20demo-2496ed?logo=docker&logoColor=white)](compose.demo.yaml)
+
+<p align="center"><img src="docs/architecture.svg" alt="Manufacturing ERP architecture" width="900"></p>
+
+> **Why build from scratch instead of extending Odoo/ERPNext?** Because the deliverable is evidence of
+> *architecture and ERP-domain literacy* — a posting engine with a hard debit=credit invariant, an
+> immutable inventory subledger that reconciles to a GL control account, and a
+> document → inventory → ledger pipeline defensible line by line. Extending a packaged ERP would mostly
+> demonstrate framework configuration.
+
+**Status**: **Phase 0–7 complete + full-stack**. The modular-monolith backend (double-entry GL,
+inventory, procure-to-pay, order-to-cash, manufacturing, reporting & period close, RBAC) is green on
+`mvn verify` (56 unit + 69 integration); the React frontend covers all 8 modules; and a single
+`docker compose -f compose.demo.yaml up --build` brings up **postgres + an auto-seeded backend +
+the frontend**. Stage-by-stage delivery is tracked in [PROGRESS.md](PROGRESS.md).
+
+## Table of contents
+
+- [The headline demo — buy → make → sell](#the-headline-demo--buy--make--sell)
+- [✨ Highlights](#-highlights)
+- [🚀 Quick start](#-quick-start)
+- [🏗️ Architecture](#️-architecture)
+- [🖥️ Frontend](#️-frontend)
+- [📊 Data model](#-data-model)
+- [🧪 Testing](#-testing)
+- [🗺️ Roadmap](#️-roadmap)
+- [⚠️ Consciously deferred (not gaps)](#️-consciously-deferred-not-gaps)
+- [📐 Architecture decision records](#-architecture-decision-records)
+- [Document index](#document-index)
+
+## The headline demo — buy → make → sell
+
+One vertical slice exercises the document → inventory → ledger loop three times and lands the
+manufacturing differentiator (single-level BOM + Work Order with correct WIP accounting):
+
+1. **Buy** a raw material — Purchase Order → Goods Receipt → Vendor Bill → Payment
+2. **Make** a finished good — single-level BOM → Work Order (consume raw into WIP, produce the good)
+3. **Sell** it — Sales Order → Delivery (ship at cost) → Invoice (revenue + COGS) → Receipt
+
+Then **prove it**: the *reconciliation health-check* asserts the books are correct — global
+`SUM(debit) = SUM(credit)`, inventory subledger value == GL Inventory control balance, AP/AR
+subledgers == their control accounts, and every clearing account (GR-IR, Deferred-COGS, WIP) nets to
+zero after a complete cycle. This one report is the project's hero artifact.
+
+> After starting the demo, open the **Dashboard** (as any user) to see the reconciliation hero go
+> green; `GET /api/reporting/reconciliation` is its data source.
+
+## ✨ Highlights
+
+- **Hand-written double-entry GL with a hard invariant**: `ledger` is the shared kernel exposing a
+  published `LedgerPosting` port; every module posts **in the same transaction** as its own writes, an
+  unbalanced entry can't commit (a DB deferred-constraint trigger enforces it), and POSTED entries are
+  immutable.
+- **Modular monolith with CI-enforced boundaries**: single deployable, single PostgreSQL, in-process
+  modules whose boundaries are *enforced* with **ArchUnit** — a module reaches another only through its
+  published `*.api` port, never its domain/application/web internals.
+- **Moving weighted-average inventory subledger**: an append-only `StockLedgerEntry` (DB triggers block
+  edits/deletes) reconciles to its GL control account; a fixed lock order (ItemCostState first, journal
+  sequence innermost) avoids deadlock; purchase price variance revalues inventory rather than hitting a
+  PPV account.
+- **Clearing accounts net to zero**: GR-IR (receipt↔bill), Deferred-COGS (delivery↔invoice) and WIP
+  (issue↔completion) all return to zero over a complete cycle — verified end-to-end by the
+  **reconciliation hero**.
+- **Full-stack type safety, money never touches a float**: the backend adds **springdoc-openapi**; the
+  frontend generates a **type-safe TS client** from the OpenAPI spec via `openapi-typescript` +
+  `openapi-fetch`; `BigDecimal` is serialized as a **JSON string** globally (and `SpringDocUtils` makes
+  the spec say `string` too), so neither side does floating-point arithmetic on amounts.
+- **Modern frontend**: React 19 + TypeScript + Mantine 9 + Vite 8 + TanStack Query + React Router; a
+  feature-oriented structure with RBAC mirroring the backend authorization matrix (UI hints only — the
+  backend still enforces).
+- **One-command containerized demo**: a standalone nginx container **reverse-proxies `/api`** to the
+  backend on a single origin (no CORS); `compose.demo.yaml` brings up postgres + an auto-seeded backend
+  + the frontend in one command.
+- **Designed with a multi-agent workflow**: the system design was settled via a "6-dimension design →
+  integrate → adversarial review" multi-agent process; the 8-stage frontend was likewise designed by
+  multiple agents and delivered stage by stage.
+- **Interactive API docs**: Swagger UI (`/swagger-ui.html`) + OpenAPI 3.1 spec (`/v3/api-docs`),
+  Authorize-and-try right inside the demo.
+
+## 🚀 Quick start
+
+Prerequisite: **Docker** (the demo runs entirely in containers — no local JDK/Node needed).
+
+```bash
+# One-command demo: postgres + an auto-seeded backend + the nginx-served frontend
+docker compose -f compose.demo.yaml up --build
+```
+
+- Frontend: <http://localhost:8081>
+- Interactive API docs (Swagger UI): <http://localhost:8081/swagger-ui.html> (click **Authorize**, use `admin`/`admin`)
+- Seeded users (HTTP Basic): `admin/admin` (all roles), `accountant/accountant`, `warehouse/warehouse`, `sales/sales`
+- On startup the app posts a full buy → make → sell slice through the **real services** (`DataSeeder`
+  is idempotent — it skips when the demo vendor already exists, so re-running `up` against the kept
+  volume is safe)
+
+> For a fresh dataset: `docker compose -f compose.demo.yaml down -v` to drop the volume, then `up`.
+
+### Local development
+
+```bash
+# Backend (Spring Boot Docker Compose auto-starts postgres; see compose.yaml)
+./mvnw spring-boot:run
+
+# Frontend (a second terminal)
+cd frontend
+npm install
+npm run dev          # Vite dev server, proxies /api to :8080 → http://localhost:5173
+
+# When the backend API changes, regenerate the type-safe TS client from the running backend
+npm run gen:api      # reads openapi/openapi.json; or `npm run spec:pull` to fetch the latest spec first
+```
+
+> On Windows the Maven Wrapper needs `powershell` on PATH and `JAVA_HOME` set; see
+> [PROGRESS.md](PROGRESS.md) for the exact environment notes.
+
+## 🏗️ Architecture
+
+A **modular monolith**: single deployable, single PostgreSQL, in-process modules whose boundaries are
+*enforced* (no module imports another's internals or touches its tables — checked in CI with ArchUnit).
+The `ledger` module is the shared kernel exposing a published `LedgerPosting` port; every other module
+posts through it **in the same transaction** as its own writes. `inventory` keeps a moving
+weighted-average subledger reconciling to a GL control account; `purchasing`+`payments` drive
+procure-to-pay (receipt → bill → payment) with GR-IR clearing and an AP subledger; `sales` mirrors it
+for order-to-cash (delivery → invoice → receipt) with a Deferred-COGS clearing account and an AR
+subledger; `manufacturing` runs single-level BOM → work order → WIP issue/completion at rolled actual
+cost. `reporting` is a read-side leaf that composes the others' published ports into the financial
+statements and the **reconciliation health-check**, and `iam` enforces RBAC. The frontend is served by
+an nginx container that reverse-proxies to the backend on a single origin.
+
+| Module | Responsibility | Published port(s) |
+|---|---|---|
+| `ledger` | Double-entry GL, posting engine, fiscal periods, trial balance | `LedgerPosting`, `SequenceAllocator`, `GeneralLedgerQuery` |
+| `masterdata` | Items, partners, warehouses/locations, posting rules, tax rates | `MasterDataQuery` |
+| `inventory` | Moving-average subledger, two-leg movements, revaluation | `StockPosting`, `InventoryQuery` |
+| `purchasing` | PO → goods receipt → vendor bill, GR-IR, AP subledger | `PayableDocuments`, `PayablesQuery` |
+| `sales` | SO → delivery → invoice → return, Deferred-COGS, AR subledger | `ReceivableDocuments`, `ReceivablesQuery` |
+| `manufacturing` | BOM, work orders, WIP issue/completion, reorder report | — |
+| `payments` | Customer/vendor payments + allocation (in/out) | — |
+| `reporting` | Read-side financial statements + reconciliation health-check | — |
+| `iam` | Authentication & role-based authorization | — |
+
+| Layer | Choice |
+|---|---|
+| Backend | Java 21 + Spring Boot 4.1 |
+| Database | PostgreSQL 16 |
+| Persistence | Spring Data JPA / Hibernate + Flyway migrations |
+| Boundary enforcement | ArchUnit (CI-enforced) |
+| Money & quantity | `BigDecimal` value objects — `Money` (`NUMERIC(19,4)`) and `Quantity`/cost (`NUMERIC(19,6)`), never `float`; serialized as JSON **strings** |
+| Auth | Spring Security + HTTP Basic, four roles (ADMIN / ACCOUNTANT / WAREHOUSE / SALES); JWT deferred |
+| API docs | springdoc-openapi (OpenAPI 3.1) + Swagger UI (`/swagger-ui.html`) |
+| Testing | JUnit + Testcontainers (real Postgres) |
+| Frontend | React 19 + TypeScript + Mantine 9 + Vite 8 + TanStack Query + React Router |
+| Packaging | Multi-stage Dockerfiles (backend & frontend); nginx reverse proxy; `compose.demo.yaml` one-command demo |
+
+## 🖥️ Frontend
+
+`frontend/` is a standalone Vite project (not part of the Maven build). Its data layer uses
+**`openapi-typescript`** (types generated from the spec) + **`openapi-fetch`** (a type-safe client whose
+middleware injects HTTP Basic and parses RFC 9457 ProblemDetail) + **TanStack Query**; routing is React
+Router; UI is Mantine 9. RBAC mirrors the backend's POST authorization matrix as UI hints only
+(hide/disable buttons) — the backend still enforces.
+
+It covers all 8 modules:
+
+- **Dashboard** — the reconciliation health-check hero (subledgers vs GL, clearing accounts at zero) + assets/liabilities/net-income summary
+- **Reports** — trial balance (click an account to drill into its ledger), income statement, balance sheet (shared as-of date)
+- **Master data** — items / partners / warehouses / locations CRUD + reusable selectors
+- **Purchasing** — PO (multi-line + confirm) → goods receipt (partial) → vendor bill (FIFO match status) → payment + AP aging
+- **Sales** — SO → delivery → invoice (shows COGS) → receipt → customer return (credit note, dual postings) + AR aging
+- **Manufacturing** — BOM authoring, work-order state machine (release/issue/complete/cancel, conditionally enabled), reorder report
+- **Inventory** — on-hand lookup, subledger reconciliation, stock adjustments
+- **Ledger** — manual journal entry (live debit=credit check), fiscal-period close/reopen
+
+Every document's detail surfaces its posting results (the linked `journalEntryId`, `movementGroupId`,
+status transitions) — making this ERP's selling point visible: you can see how the books move.
+
+## 📊 Data model
+
+The accounting spine (accounts, balanced journal entries, fiscal periods) is the centre; every business
+document links its postings back to a journal entry, and inventory movements are an append-only
+subledger that reconciles to the GL.
+
+```mermaid
+erDiagram
+    JOURNAL_ENTRY ||--|{ JOURNAL_LINE : contains
+    ACCOUNT ||--o{ JOURNAL_LINE : "posted to"
+    FISCAL_PERIOD ||--o{ JOURNAL_ENTRY : "in period"
+    ITEM ||--o{ STOCK_LEDGER_ENTRY : moves
+    ITEM ||--|| ITEM_COST_STATE : "avg cost cache"
+    STOCK_LEDGER_ENTRY }o--|| JOURNAL_ENTRY : links
+    PARTNER ||--o{ PURCHASE_ORDER : vendor
+    PARTNER ||--o{ SALES_ORDER : customer
+    PURCHASE_ORDER ||--|{ PO_LINE : has
+    GOODS_RECEIPT ||--|{ GRN_LINE : has
+    VENDOR_BILL ||--|{ BILL_LINE : has
+    SALES_ORDER ||--|{ SO_LINE : has
+    DELIVERY ||--|{ DELIVERY_LINE : has
+    SALES_INVOICE ||--|{ INVOICE_LINE : has
+    BILL_OF_MATERIALS ||--|{ BOM_COMPONENT : has
+    WORK_ORDER ||--|{ WORK_ORDER_COMPONENT : consumes
+    PAYMENT ||--|{ PAYMENT_ALLOCATION : allocates
+```
+
+## 🧪 Testing
+
+```bash
+# Backend: unit tests (Surefire) + Testcontainers integration tests (Failsafe, real Postgres)
+./mvnw verify       # 56 unit + 69 integration; CI runs `./mvnw -B -ntp verify`
+
+# Frontend: type-check + bundle
+cd frontend && npm run build      # tsc -b && vite build
+```
+
+Integration tests are named `*IT` (run by Failsafe in `verify`); `mvn test` only runs `*Test`/`*Tests`.
+Use `mvn verify` for the full suite; GitHub Actions CI already does. `OpenApiSpecIT` additionally guards
+OpenAPI-spec invariants (no schema-name collisions, money typed as string, no merged `oneOf` operations).
+
+## 🗺️ Roadmap
+
+**✅ Phase 0–6 (backend)**: Phase 0 walking skeleton (ledger spine) → 1 products & inventory
+(moving weighted-average, subledger reconciliation) → 2 procure-to-pay (GR-IR, Input VAT, variance
+revaluation, AP subledger) → 3 order-to-cash (Deferred-COGS, returns/credit notes, AR subledger) →
+**4 manufacturing (single-level BOM, work orders, WIP actual-cost roll-up — minimum show-worthy
+milestone)** → 5 reporting & period close (financial statements, reconciliation hero, soft-close) →
+6 polish & packaging (RBAC, one-key seed, README/ADRs).
+
+**✅ Phase 7 (full-stack)**: backend enablement (springdoc, `/api/auth/me`, BigDecimal-as-string,
+read-only list endpoints per module) + a React frontend (8 stages: skeleton → master data →
+dashboard/reports → purchasing → sales → manufacturing → advanced → containerization) + a one-command
+`docker compose` demo.
+
+## ⚠️ Consciously deferred (not gaps)
+
+Multi-currency/FX, multi-tenancy (never), FIFO/standard-cost variances, a tax engine beyond one VAT
+line, approval workflows, full time-phased MRP, lot/serial tracking, routings/work-centers/labor,
+multi-warehouse transfers, multi-level BOM.
+**Security**: currently HTTP Basic + in-memory users; JWT + a persisted user/role store is a deliberate
+deferral (the frontend auth layer is already abstracted to swap it in).
+
+## 📐 Architecture decision records
+
+The senior-signal decisions, each written up under [docs/adr/](docs/adr/):
+
+1. [Modular monolith](docs/adr/0001-modular-monolith.md) — enforced boundaries over microservices.
+2. [Moving-average valuation](docs/adr/0002-moving-average-valuation.md) — perpetual weighted average, no PPV.
+3. [Cross-module posting & locking](docs/adr/0003-cross-module-posting-and-locking.md) — synchronous posting in one transaction; fixed lock order.
+4. [GR-IR clearing & three-way match](docs/adr/0004-gr-ir-clearing-and-three-way-match.md) — goods-received-not-invoiced nets to zero.
+5. [Purchase price variance → inventory](docs/adr/0005-purchase-price-variance-to-inventory.md) — variance revalues inventory, no PPV account.
+6. [Deferred COGS](docs/adr/0006-deferred-cogs.md) — recognise cost at invoicing, the sales-side mirror of GR-IR.
+7. [Manufacturing WIP & actual-cost roll-up](docs/adr/0007-manufacturing-wip-and-actual-cost-rollup.md) — WIP clears to zero; finished goods at rolled actual cost.
+8. [RBAC via request authorization](docs/adr/0008-rbac-url-authorization.md) — four roles enforced at the single REST entry point.
+
+## Document index
+
+| Document | Contents |
+|---|---|
+| [PROGRESS.md](PROGRESS.md) | Stage-by-stage progress, key decisions, environment notes |
+| [docs/adr/](docs/adr/) | Architecture decision records (ADR 0001–0008) |
+| [compose.demo.yaml](compose.demo.yaml) | One-command demo (postgres + backend + frontend) |
+| [frontend/](frontend/) | React frontend (standalone Vite project) |
+| [README.md](README.md) | 繁體中文版 |

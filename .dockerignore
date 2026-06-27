@@ -1,0 +1,13 @@
+target/
+frontend/
+.git/
+.github/
+.idea/
+.vscode/
+docs/
+*.md
+HELP.md
+compose.yaml
+compose.demo.yaml
+# Keep .mvn/wrapper/maven-wrapper.properties — the wrapper needs it to bootstrap Maven.
+.mvn/wrapper/maven-wrapper.jar

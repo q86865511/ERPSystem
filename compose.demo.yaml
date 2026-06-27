@@ -1,0 +1,67 @@
+name: erp-demo
+
+# One-command demo: postgres + backend (auto-seeded buy -> make -> sell) + nginx-served React frontend.
+#   docker compose -f compose.demo.yaml up --build
+# Then open http://localhost:8081 (Swagger at http://localhost:8081/swagger-ui.html).
+#
+# This file is separate from compose.yaml on purpose: compose.yaml is the postgres-only file that
+# spring-boot-docker-compose auto-detects for local `./mvnw spring-boot:run` development.
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: erp
+      POSTGRES_USER: erp
+      POSTGRES_PASSWORD: erp
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U erp -d erp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [erpnet]
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/erp
+      SPRING_DATASOURCE_USERNAME: erp
+      SPRING_DATASOURCE_PASSWORD: erp
+      # Seed a full buy -> make -> sell slice on first start (DataSeeder is idempotent: it skips when
+      # the demo vendor already exists, so re-running `up` against the kept volume is safe).
+      SPRING_PROFILES_ACTIVE: seed
+      # The app does not manage its own postgres here; we wire the datasource explicitly. Without this
+      # spring-boot-docker-compose would try to start a compose file inside the container and fail.
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health | grep -q UP || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    networks: [erpnet]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "8081:80"
+    networks: [erpnet]
+
+volumes:
+  pgdata:
+
+networks:
+  erpnet:
+    driver: bridge
