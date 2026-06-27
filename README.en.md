@@ -37,6 +37,7 @@ the frontend**. Stage-by-stage delivery is tracked in [PROGRESS.md](PROGRESS.md)
 ## Table of contents
 
 - [The headline demo — buy → make → sell](#the-headline-demo--buy--make--sell)
+- [🖼️ Screenshots](#️-screenshots)
 - [✨ Highlights](#-highlights)
 - [🚀 Quick start](#-quick-start)
 - [🏗️ Architecture](#️-architecture)
@@ -64,6 +65,19 @@ zero after a complete cycle. This one report is the project's hero artifact.
 
 > After starting the demo, open the **Dashboard** (as any user) to see the reconciliation hero go
 > green; `GET /api/reporting/reconciliation` is its data source.
+
+## 🖼️ Screenshots
+
+**Reconciliation health-check dashboard** (books balanced after the seed — subledgers == GL, clearing accounts at zero):
+
+<p align="center"><img src="docs/screenshots/01-dashboard.png" alt="Dashboard — reconciliation hero" width="100%"></p>
+
+| Purchasing (P2P) | Manufacturing (WO state machine) | Financial statements |
+|---|---|---|
+| <img src="docs/screenshots/03-purchasing.png" alt="Purchasing"> | <img src="docs/screenshots/05-manufacturing.png" alt="Manufacturing"> | <img src="docs/screenshots/07-reporting.png" alt="Reports"> |
+
+> Captured by headless Playwright against the live demo; the same run verified login + all 8 pages
+> rendering + a form modal opening, with **zero console/runtime errors**.
 
 ## ✨ Highlights
 

@@ -27,6 +27,7 @@
 ## 目錄
 
 - [旗艦 demo:買 → 做 → 賣](#旗艦-demo買--做--賣)
+- [🖼️ 畫面](#️-畫面)
 - [✨ 技術亮點](#-技術亮點)
 - [🚀 快速開始](#-快速開始)
 - [🏗️ 架構](#️-架構)
@@ -49,6 +50,18 @@
 然後**證明它是對的**:*對帳健康檢查* 斷言帳是平的 —— 全域 `SUM(借) = SUM(貸)`、庫存子帳值 == GL 庫存控制科目餘額、AP/AR 子帳 == 各自控制科目,且每個過渡科目(GR-IR、Deferred-COGS、WIP)在完整循環後都歸零。這張報表是本專案的招牌。
 
 > 啟動 demo 後,以任一帳號開 **儀表板** 即可看到對帳 hero 亮綠燈;`GET /api/reporting/reconciliation` 是它的資料來源。
+
+## 🖼️ 畫面
+
+**對帳健康檢查儀表板**(seed 後帳對平 —— 子帳==GL、過渡科目歸零):
+
+<p align="center"><img src="docs/screenshots/01-dashboard.png" alt="儀表板 — 對帳 hero" width="100%"></p>
+
+| 採購 P2P | 製造(工單狀態機) | 財務報表 |
+|---|---|---|
+| <img src="docs/screenshots/03-purchasing.png" alt="採購"> | <img src="docs/screenshots/05-manufacturing.png" alt="製造"> | <img src="docs/screenshots/07-reporting.png" alt="財報"> |
+
+> 畫面由 headless Playwright 對 live demo 自動截圖;同一輪也驗證了登入 + 全部 8 頁渲染 + 表單開啟,**零 console/runtime 錯誤**。
 
 ## ✨ 技術亮點
 

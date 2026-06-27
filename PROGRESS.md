@@ -135,8 +135,8 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 > Phase 0–7 已全部完成(後端 + 全端 React 前端 + 一鍵 demo + 雲端上線 https://erp.terrychou.com)。以下為尚未做的後續,依優先序。
 
 **A. 收尾 / 驗證(高優先)**
-- **前端實機點測(最大未驗證缺口)**:目前只驗證 `mvn verify`、`npm run build`(型別檢查對真實 spec)、Docker build、live demo 的 **API 層**(login/對帳/Swagger)。**尚未用瀏覽器逐一點過每條 UI 流程** —— 型別過 ≠ 互動無 bug(Mantine prop / 表單 / Drawer 的 runtime 問題型別抓不到)。需在 live demo 點一輪 買→做→賣 + 手動分錄/期間結。
-- **README 截圖**:從 live demo 截圖(對帳 hero、買→做→賣、Swagger)放 `docs/` 並嵌入 README。
+- ✅ **前端實機點測(已做)**:用 **headless Playwright** 對 live demo(Oracle)自動點測 —— admin 登入 → 8 頁全部渲染(Dashboard/Master Data/Purchasing/Sales/Manufacturing/Inventory/Reports/Ledger)+ 開「New item」表單 Modal,**零 console / pageerror / 失敗 /api 請求**;對帳 hero 綠、PO-000001 列表帶 partner 名與 RECEIVED 狀態徽章。互動式逐流程(實際送 PO→GR→Bill…)仍可再深測,但渲染 + 主要互動已過。
+- ✅ **README 截圖(已做)**:Playwright 截 8 頁 + Modal 放 `docs/screenshots/`,README(繁/英)嵌入儀表板 hero + 採購/製造/財報。
 - **前端 bundle 瘦身**:`@tabler/icons` barrel 使 JS >800KB(build 警告);改 per-icon import 或 code-split。
 
 **B. 前端中/英 i18n 切換(使用者要求,新)**
