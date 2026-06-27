@@ -17,6 +17,17 @@ export type LocationResponse = Schemas['LocationResponse'];
 export type CreateLocationRequest = Schemas['CreateLocationRequest'];
 export type LocationType = NonNullable<LocationResponse['locationType']>;
 
+// --- Purchasing / payments (Stage 4) ---
+export type PurchaseOrderResponse = Schemas['PurchaseOrderResponse'];
+export type CreatePoRequest = Schemas['CreatePoRequest'];
+export type GoodsReceiptResponse = Schemas['GoodsReceiptResponse'];
+export type CreateGrnRequest = Schemas['CreateGrnRequest'];
+export type VendorBillResponse = Schemas['VendorBillResponse'];
+export type CreateBillRequest = Schemas['CreateBillRequest'];
+export type PaymentResponse = Schemas['PaymentResponse'];
+export type PayOutRequest = Schemas['PayOutRequest'];
+export type ApAgingReport = Schemas['ApAgingReport'];
+
 export const ITEM_TYPES: ItemType[] = ['RAW', 'WIP', 'FINISHED', 'SERVICE'];
 export const LOCATION_TYPES: LocationType[] = [
   'STOCK',

@@ -3,6 +3,7 @@ package com.erp.payments.web;
 import com.erp.payments.application.PaymentService;
 import com.erp.payments.application.PaymentService.Allocation;
 import com.erp.payments.application.PaymentService.ReceiptAllocation;
+import com.erp.payments.domain.PaymentDirection;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
@@ -69,5 +71,10 @@ public class PaymentsController {
     @GetMapping("/{id}")
     public PaymentResponse getPayment(@PathVariable Long id) {
         return PaymentResponse.from(paymentService.getPayment(id));
+    }
+
+    @GetMapping
+    public List<PaymentResponse> listPayments(@RequestParam(required = false) PaymentDirection direction) {
+        return paymentService.listPayments(direction).stream().map(PaymentResponse::from).toList();
     }
 }

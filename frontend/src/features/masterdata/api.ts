@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import { qk } from '../../api/queryKeys';
@@ -44,6 +45,26 @@ export function usePartners(filter?: { vendor?: boolean; customer?: boolean }) {
       return data;
     },
   });
+}
+
+/** Map of item id → "SKU — Name", for labelling item references in document lines. */
+export function useItemMap() {
+  const { data } = useItems();
+  return useMemo(() => {
+    const map = new Map<number, string>();
+    for (const i of data ?? []) if (i.id != null) map.set(i.id, `${i.sku} — ${i.name}`);
+    return map;
+  }, [data]);
+}
+
+/** Map of partner id → "CODE — Name", for labelling partner references in document tables. */
+export function usePartnerMap() {
+  const { data } = usePartners();
+  return useMemo(() => {
+    const map = new Map<number, string>();
+    for (const p of data ?? []) if (p.id != null) map.set(p.id, `${p.code} — ${p.name}`);
+    return map;
+  }, [data]);
 }
 
 export function useCreatePartner() {

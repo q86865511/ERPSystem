@@ -404,6 +404,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listPayments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/payments/in": {
         parameters: {
             query?: never;
@@ -475,7 +491,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listReceipts"];
         put?: never;
         post: operations["receive"];
         delete?: never;
@@ -507,7 +523,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listOrders"];
         put?: never;
         post: operations["createOrder_1"];
         delete?: never;
@@ -555,7 +571,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listBills"];
         put?: never;
         post: operations["postBill"];
         delete?: never;
@@ -2211,6 +2227,28 @@ export interface operations {
             };
         };
     };
+    listPayments: {
+        parameters: {
+            query?: {
+                direction?: "IN" | "OUT";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PaymentResponse"][];
+                };
+            };
+        };
+    };
     payIn: {
         parameters: {
             query?: never;
@@ -2303,6 +2341,26 @@ export interface operations {
             };
         };
     };
+    listReceipts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GoodsReceiptResponse"][];
+                };
+            };
+        };
+    };
     receive: {
         parameters: {
             query?: never;
@@ -2345,6 +2403,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["GoodsReceiptResponse"];
+                };
+            };
+        };
+    };
+    listOrders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PurchaseOrderResponse"][];
                 };
             };
         };
@@ -2413,6 +2491,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PurchaseOrderResponse"];
+                };
+            };
+        };
+    };
+    listBills: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["VendorBillResponse"][];
                 };
             };
         };

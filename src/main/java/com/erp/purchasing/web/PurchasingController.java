@@ -84,6 +84,11 @@ public class PurchasingController {
         return PurchaseOrderResponse.from(purchaseOrderService.getOrder(id));
     }
 
+    @GetMapping("/purchase-orders")
+    public List<PurchaseOrderResponse> listOrders() {
+        return purchaseOrderService.listOrders().stream().map(PurchaseOrderResponse::from).toList();
+    }
+
     @PostMapping("/goods-receipts")
     public ResponseEntity<GoodsReceiptResponse> receive(@RequestBody CreateGrnRequest request,
                                                         Principal principal) {
@@ -101,6 +106,11 @@ public class PurchasingController {
         return GoodsReceiptResponse.from(goodsReceiptService.getReceipt(id));
     }
 
+    @GetMapping("/goods-receipts")
+    public List<GoodsReceiptResponse> listReceipts() {
+        return goodsReceiptService.listReceipts().stream().map(GoodsReceiptResponse::from).toList();
+    }
+
     @PostMapping("/vendor-bills")
     public ResponseEntity<VendorBillResponse> postBill(@RequestBody CreateBillRequest request,
                                                        Principal principal) {
@@ -116,6 +126,11 @@ public class PurchasingController {
     @GetMapping("/vendor-bills/{id}")
     public VendorBillResponse getBill(@PathVariable Long id) {
         return VendorBillResponse.from(vendorBillService.getBill(id));
+    }
+
+    @GetMapping("/vendor-bills")
+    public List<VendorBillResponse> listBills() {
+        return vendorBillService.listBills().stream().map(VendorBillResponse::from).toList();
     }
 
     /** Accounts-payable aging as of a date (defaults to today). */

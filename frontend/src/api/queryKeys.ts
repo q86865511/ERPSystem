@@ -24,4 +24,15 @@ export const qk = {
     reconciliation: () => ['inventory', 'reconciliation'] as const,
     onHand: (itemId: number) => ['inventory', 'on-hand', itemId] as const,
   },
+  purchasing: {
+    orders: () => ['purchasing', 'orders'] as const,
+    order: (id: number) => ['purchasing', 'order', id] as const,
+    receipts: () => ['purchasing', 'receipts'] as const,
+    bills: () => ['purchasing', 'bills'] as const,
+    apAging: (asOf?: string) => ['purchasing', 'ap-aging', asOf ?? 'today'] as const,
+  },
+  payments: {
+    list: (direction?: string) => ['payments', 'list', direction ?? 'all'] as const,
+    one: (id: number) => ['payments', 'one', id] as const,
+  },
 };
