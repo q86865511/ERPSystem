@@ -1244,10 +1244,18 @@ export interface components {
             sku?: string;
             totalValue?: string;
         };
+        JournalEntryLine: {
+            accountCode?: string;
+            credit?: string;
+            debit?: string;
+            memo?: string;
+            /** Format: int64 */
+            partnerId?: number;
+        };
         JournalEntryRequest: {
             currencyCode?: string;
             journalCode?: string;
-            lines?: components["schemas"]["Line"][];
+            lines?: components["schemas"]["JournalEntryLine"][];
             memo?: string;
             /** Format: date */
             postingDate?: string;
@@ -1280,14 +1288,6 @@ export interface components {
             postingDate?: string;
             sourceDocId?: string;
             sourceDocType?: string;
-        };
-        Line: {
-            accountCode?: string;
-            credit?: string;
-            debit?: string;
-            memo?: string;
-            /** Format: int64 */
-            partnerId?: number;
         };
         LocationResponse: {
             active?: boolean;
@@ -1461,7 +1461,7 @@ export interface components {
             /** Format: date */
             asOf?: string;
             balanced?: boolean;
-            lines?: components["schemas"]["Line"][];
+            lines?: components["schemas"]["TrialBalanceRow"][];
             totalCredit?: string;
             totalDebit?: string;
         };
@@ -1477,6 +1477,13 @@ export interface components {
             lines?: components["schemas"]["TrialBalanceLine"][];
             totalCredit?: string;
             totalDebit?: string;
+        };
+        TrialBalanceRow: {
+            accountClass?: string;
+            code?: string;
+            credit?: string;
+            debit?: string;
+            name?: string;
         };
         VendorBillResponse: {
             amountPaid?: string;

@@ -61,6 +61,15 @@ class OpenApiSpecIT {
         // response, which the typed client can't use cleanly. Give each operation a distinct path.
         assertThat(body).as("merged path operations — give each its own path").doesNotContain("oneOf");
 
+        // Guard the nested-record name clash that the _1 check can't see: two distinct Java records with
+        // the same simple name (e.g. TrialBalance.Line vs JournalEntryRequest.Line) silently collapse to
+        // one schema, mistyping one of them. The trial-balance row must carry accounting columns.
+        String tbRef = schemas.path("TrialBalance").path("properties").path("lines").path("items")
+                .path("$ref").asString();
+        String tbRowSchema = tbRef.substring(tbRef.lastIndexOf('/') + 1);
+        assertThat(schemas.path(tbRowSchema).path("properties").propertyNames())
+                .as("trial-balance row columns").contains("code", "accountClass");
+
         // Export for `npm run gen:api` (the running-server route is unavailable in this sandbox).
         Path out = Path.of("target", "openapi.json");
         Files.writeString(out, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root));

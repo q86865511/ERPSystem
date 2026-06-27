@@ -1,5 +1,7 @@
 package com.erp.ledger.api;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -26,6 +28,7 @@ public record JournalEntryRequest(
      * relates to, e.g. on an AP or GR-IR line); the four-argument form leaves it null so existing
      * callers are unaffected.
      */
+    @Schema(name = "JournalEntryLine")
     public record Line(String accountCode, BigDecimal debit, BigDecimal credit, String memo,
                        Long partnerId) {
 
