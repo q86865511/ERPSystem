@@ -139,7 +139,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listBoms"];
         put?: never;
         post: operations["createBom"];
         delete?: never;
@@ -187,7 +187,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listWorkOrders"];
         put?: never;
         post: operations["createWorkOrder"];
         delete?: never;
@@ -1746,6 +1746,26 @@ export interface operations {
             };
         };
     };
+    listBoms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BomResponse"][];
+                };
+            };
+        };
+    };
     createBom: {
         parameters: {
             query?: never;
@@ -1808,6 +1828,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ReorderReport"];
+                };
+            };
+        };
+    };
+    listWorkOrders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WorkOrderResponse"][];
                 };
             };
         };

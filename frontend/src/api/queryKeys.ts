@@ -43,4 +43,10 @@ export const qk = {
     returns: () => ['sales', 'returns'] as const,
     arAging: (asOf?: string) => ['sales', 'ar-aging', asOf ?? 'today'] as const,
   },
+  manufacturing: {
+    boms: () => ['manufacturing', 'boms'] as const,
+    workOrders: () => ['manufacturing', 'work-orders'] as const,
+    workOrder: (id: number) => ['manufacturing', 'work-order', id] as const,
+    reorder: () => ['manufacturing', 'reorder'] as const,
+  },
 };

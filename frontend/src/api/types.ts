@@ -40,6 +40,13 @@ export type CreateReturnRequest = Schemas['CreateReturnRequest'];
 export type ArAgingReport = Schemas['ArAgingReport'];
 export type PayInRequest = Schemas['PayInRequest'];
 
+// --- Manufacturing (Stage 6) ---
+export type BomResponse = Schemas['BomResponse'];
+export type CreateBomRequest = Schemas['CreateBomRequest'];
+export type WorkOrderResponse = Schemas['WorkOrderResponse'];
+export type CreateWorkOrderRequest = Schemas['CreateWorkOrderRequest'];
+export type ReorderReport = Schemas['ReorderReport'];
+
 export const ITEM_TYPES: ItemType[] = ['RAW', 'WIP', 'FINISHED', 'SERVICE'];
 export const LOCATION_TYPES: LocationType[] = [
   'STOCK',

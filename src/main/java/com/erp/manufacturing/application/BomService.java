@@ -49,4 +49,10 @@ public class BomService {
     public BillOfMaterials getBom(Long id) {
         return bomRepository.findById(id).orElseThrow(() -> new BomNotFoundException(id));
     }
+
+    @Transactional(readOnly = true)
+    public List<BillOfMaterials> listBoms() {
+        return bomRepository.findAll(org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "id"));
+    }
 }

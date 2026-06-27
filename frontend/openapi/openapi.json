@@ -222,6 +222,25 @@
       }
     },
     "/api/manufacturing/boms" : {
+      "get" : {
+        "operationId" : "listBoms",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BomResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      },
       "post" : {
         "operationId" : "createBom",
         "requestBody" : {
@@ -295,6 +314,25 @@
       }
     },
     "/api/manufacturing/work-orders" : {
+      "get" : {
+        "operationId" : "listWorkOrders",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/WorkOrderResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      },
       "post" : {
         "operationId" : "createWorkOrder",
         "requestBody" : {
