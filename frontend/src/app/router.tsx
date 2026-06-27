@@ -2,7 +2,9 @@ import { createBrowserRouter, Outlet } from 'react-router-dom';
 import { AuthProvider } from '../auth/AuthContext';
 import { RequireAuth } from '../auth/RequireAuth';
 import { AppLayout } from '../components/AppLayout';
+import { InventoryPage } from '../features/inventory/InventoryPage';
 import { MasterDataPage } from '../features/masterdata/MasterDataPage';
+import { ReportsPage } from '../features/reporting/ReportsPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { LoginPage } from '../pages/LoginPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
@@ -32,8 +34,8 @@ export const router = createBrowserRouter([
           { path: '/purchasing', element: <PlaceholderPage title="Purchasing" /> },
           { path: '/sales', element: <PlaceholderPage title="Sales" /> },
           { path: '/manufacturing', element: <PlaceholderPage title="Manufacturing" /> },
-          { path: '/inventory', element: <PlaceholderPage title="Inventory" /> },
-          { path: '/reporting', element: <PlaceholderPage title="Reporting" /> },
+          { path: '/inventory', element: <InventoryPage /> },
+          { path: '/reporting', element: <ReportsPage /> },
           { path: '/ledger', element: <PlaceholderPage title="Ledger" /> },
           { path: '*', element: <NotFoundPage /> },
         ],

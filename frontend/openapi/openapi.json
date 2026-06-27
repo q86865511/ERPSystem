@@ -2599,6 +2599,27 @@
           }
         }
       },
+      "JournalEntryLine" : {
+        "type" : "object",
+        "properties" : {
+          "accountCode" : {
+            "type" : "string"
+          },
+          "credit" : {
+            "type" : "string"
+          },
+          "debit" : {
+            "type" : "string"
+          },
+          "memo" : {
+            "type" : "string"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
       "JournalEntryRequest" : {
         "type" : "object",
         "properties" : {
@@ -2611,7 +2632,7 @@
           "lines" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/Line"
+              "$ref" : "#/components/schemas/JournalEntryLine"
             }
           },
           "memo" : {
@@ -2693,27 +2714,6 @@
           },
           "sourceDocType" : {
             "type" : "string"
-          }
-        }
-      },
-      "Line" : {
-        "type" : "object",
-        "properties" : {
-          "accountCode" : {
-            "type" : "string"
-          },
-          "credit" : {
-            "type" : "string"
-          },
-          "debit" : {
-            "type" : "string"
-          },
-          "memo" : {
-            "type" : "string"
-          },
-          "partnerId" : {
-            "type" : "integer",
-            "format" : "int64"
           }
         }
       },
@@ -3172,7 +3172,7 @@
           "lines" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/Line"
+              "$ref" : "#/components/schemas/TrialBalanceRow"
             }
           },
           "totalCredit" : {
@@ -3219,6 +3219,26 @@
             "type" : "string"
           },
           "totalDebit" : {
+            "type" : "string"
+          }
+        }
+      },
+      "TrialBalanceRow" : {
+        "type" : "object",
+        "properties" : {
+          "accountClass" : {
+            "type" : "string"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "credit" : {
+            "type" : "string"
+          },
+          "debit" : {
+            "type" : "string"
+          },
+          "name" : {
             "type" : "string"
           }
         }

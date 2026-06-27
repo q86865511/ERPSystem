@@ -1,14 +1,27 @@
 import { Badge, Card, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { MoneyText } from '../components/Money';
 import { useAuth } from '../auth/useAuth';
+import { ReconciliationHero } from '../features/reporting/ReconciliationHero';
+import { useBalanceSheet, useIncomeStatement } from '../features/reporting/api';
 
-const FLOW = [
-  { title: 'Buy', desc: 'Purchase order → goods receipt → vendor bill → payment' },
-  { title: 'Make', desc: 'BOM → work order → issue to WIP → completion at rolled cost' },
-  { title: 'Sell', desc: 'Sales order → delivery → invoice → receipt' },
-];
+function Summary({ label, value }: { label: string; value?: string }) {
+  return (
+    <Card withBorder radius="md" padding="lg">
+      <Text size="sm" c="dimmed">
+        {label}
+      </Text>
+      <Text fw={700} fz="xl" ff="monospace">
+        <MoneyText value={value} />
+      </Text>
+    </Card>
+  );
+}
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const bs = useBalanceSheet();
+  const is = useIncomeStatement();
+
   return (
     <Stack gap="lg">
       <Stack gap={4}>
@@ -24,22 +37,13 @@ export function DashboardPage() {
         </Group>
       </Stack>
 
-      <SimpleGrid cols={{ base: 1, sm: 3 }}>
-        {FLOW.map((f) => (
-          <Card key={f.title} withBorder radius="md" padding="lg">
-            <Title order={4}>{f.title}</Title>
-            <Text size="sm" c="dimmed" mt="xs">
-              {f.desc}
-            </Text>
-          </Card>
-        ))}
-      </SimpleGrid>
+      <ReconciliationHero />
 
-      <Card withBorder radius="md" padding="lg">
-        <Text c="dimmed">
-          The reconciliation health-check and financial statements land in the reporting stage.
-        </Text>
-      </Card>
+      <SimpleGrid cols={{ base: 1, sm: 3 }}>
+        <Summary label="Total assets" value={bs.data?.totalAssets} />
+        <Summary label="Total liabilities" value={bs.data?.totalLiabilities} />
+        <Summary label="Net income" value={is.data?.netIncome} />
+      </SimpleGrid>
     </Stack>
   );
 }
