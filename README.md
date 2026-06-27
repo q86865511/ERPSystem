@@ -68,7 +68,8 @@ See [docs/adr/](docs/adr/) for the architecture decision records (indexed below)
 | Database | PostgreSQL 16 |
 | Persistence | Spring Data JPA / Hibernate + Flyway migrations |
 | Boundary enforcement | ArchUnit (CI-enforced) |
-| Money & quantity | `BigDecimal` value objects — `Money` (`NUMERIC(19,4)`) and `Quantity`/cost (`NUMERIC(19,6)`), never `float` |
+| Money & quantity | `BigDecimal` value objects — `Money` (`NUMERIC(19,4)`) and `Quantity`/cost (`NUMERIC(19,6)`), never `float`; serialized as JSON **strings** so clients never apply float arithmetic to amounts |
+| API docs | OpenAPI 3.1 via springdoc; interactive Swagger UI at `/swagger-ui.html` |
 | Auth | Spring Security + HTTP Basic, role-based (ADMIN / ACCOUNTANT / WAREHOUSE / SALES); stateless JWT deferred |
 | Testing | JUnit + Testcontainers (real Postgres) |
 | Frontend | React 18 + TypeScript + Mantine *(later phase)* |
@@ -118,6 +119,9 @@ Prerequisites: **JDK 21**, **Docker** (for the database / Testcontainers).
 
 Seeded users (HTTP Basic): `admin/admin` (all roles), `accountant/accountant`, `warehouse/warehouse`,
 `sales/sales`. After seeding, `GET /api/reporting/reconciliation` (as any user) shows the books reconcile.
+
+Interactive API docs are at `http://localhost:8080/swagger-ui.html` (use the **Authorize** button with
+`admin`/`admin`); the OpenAPI spec is served at `/v3/api-docs`.
 
 > On Windows the Maven Wrapper needs `powershell` on PATH and `JAVA_HOME` set; see
 > [PROGRESS.md](PROGRESS.md) for the exact environment notes used during development.

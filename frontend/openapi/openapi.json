@@ -1,0 +1,3282 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "description" : "Modular-monolith manufacturing ERP — double-entry ledger, inventory, procure-to-pay, order-to-cash, manufacturing and reporting.",
+    "title" : "Manufacturing ERP API",
+    "version" : "0.0.1"
+  },
+  "servers" : [ {
+    "url" : "http://localhost",
+    "description" : "Generated server url"
+  } ],
+  "security" : [ {
+    "basicAuth" : [ ]
+  } ],
+  "paths" : {
+    "/api/auth/me" : {
+      "get" : {
+        "operationId" : "me",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CurrentUserResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "auth-controller" ]
+      }
+    },
+    "/api/inventory/adjustments" : {
+      "post" : {
+        "operationId" : "postAdjustment",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateAdjustmentRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdjustmentResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "inventory-controller" ]
+      }
+    },
+    "/api/inventory/items/{itemId}/on-hand" : {
+      "get" : {
+        "operationId" : "onHand",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "itemId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ItemStock"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "inventory-controller" ]
+      }
+    },
+    "/api/inventory/reconciliation" : {
+      "get" : {
+        "operationId" : "reconciliation_1",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/AccountSubledgerValue"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "inventory-controller" ]
+      }
+    },
+    "/api/ledger/fiscal-years/{yearCode}/periods/{periodNo}/close" : {
+      "post" : {
+        "operationId" : "closePeriod",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "yearCode",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "periodNo",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FiscalPeriodResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "ledger-controller" ]
+      }
+    },
+    "/api/ledger/fiscal-years/{yearCode}/periods/{periodNo}/reopen" : {
+      "post" : {
+        "operationId" : "reopenPeriod",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "yearCode",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "periodNo",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FiscalPeriodResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "ledger-controller" ]
+      }
+    },
+    "/api/ledger/journal-entries" : {
+      "post" : {
+        "operationId" : "post",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/JournalEntryRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/JournalEntryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "ledger-controller" ]
+      }
+    },
+    "/api/ledger/trial-balance" : {
+      "get" : {
+        "operationId" : "trialBalance_1",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TrialBalanceReport"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "ledger-controller" ]
+      }
+    },
+    "/api/manufacturing/boms" : {
+      "post" : {
+        "operationId" : "createBom",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateBomRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BomResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      }
+    },
+    "/api/manufacturing/boms/{id}" : {
+      "get" : {
+        "operationId" : "getBom",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BomResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      }
+    },
+    "/api/manufacturing/reorder-report" : {
+      "get" : {
+        "operationId" : "reorderReport",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ReorderReport"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      }
+    },
+    "/api/manufacturing/work-orders" : {
+      "post" : {
+        "operationId" : "createWorkOrder",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateWorkOrderRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WorkOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      }
+    },
+    "/api/manufacturing/work-orders/{id}" : {
+      "get" : {
+        "operationId" : "getWorkOrder",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WorkOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      }
+    },
+    "/api/manufacturing/work-orders/{id}/cancel" : {
+      "post" : {
+        "operationId" : "cancel",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CancelRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WorkOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      }
+    },
+    "/api/manufacturing/work-orders/{id}/complete" : {
+      "post" : {
+        "operationId" : "complete",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CompleteRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WorkOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      }
+    },
+    "/api/manufacturing/work-orders/{id}/issue" : {
+      "post" : {
+        "operationId" : "issue",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/IssueRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WorkOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      }
+    },
+    "/api/manufacturing/work-orders/{id}/release" : {
+      "post" : {
+        "operationId" : "release",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WorkOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      }
+    },
+    "/api/masterdata/items" : {
+      "get" : {
+        "operationId" : "getItemBySku",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "sku",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ItemResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      },
+      "post" : {
+        "operationId" : "createItem",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateItemRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ItemResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      }
+    },
+    "/api/masterdata/items/{id}" : {
+      "get" : {
+        "operationId" : "getItem",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ItemResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      }
+    },
+    "/api/masterdata/locations" : {
+      "post" : {
+        "operationId" : "createLocation",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateLocationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LocationResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      }
+    },
+    "/api/masterdata/locations/{id}" : {
+      "get" : {
+        "operationId" : "getLocation",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LocationResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      }
+    },
+    "/api/masterdata/partners" : {
+      "post" : {
+        "operationId" : "createPartner",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreatePartnerRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PartnerResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      }
+    },
+    "/api/masterdata/partners/{id}" : {
+      "get" : {
+        "operationId" : "getPartner",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PartnerResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      }
+    },
+    "/api/masterdata/warehouses" : {
+      "post" : {
+        "operationId" : "createWarehouse",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateWarehouseRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WarehouseResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "master-data-controller" ]
+      }
+    },
+    "/api/payments/in" : {
+      "post" : {
+        "operationId" : "payIn",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PayInRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PaymentResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "payments-controller" ]
+      }
+    },
+    "/api/payments/out" : {
+      "post" : {
+        "operationId" : "payOut",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PayOutRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PaymentResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "payments-controller" ]
+      }
+    },
+    "/api/payments/{id}" : {
+      "get" : {
+        "operationId" : "getPayment",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PaymentResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "payments-controller" ]
+      }
+    },
+    "/api/purchasing/ap-aging" : {
+      "get" : {
+        "operationId" : "apAging",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "asOf",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApAgingReport"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      }
+    },
+    "/api/purchasing/goods-receipts" : {
+      "post" : {
+        "operationId" : "receive",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateGrnRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GoodsReceiptResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      }
+    },
+    "/api/purchasing/goods-receipts/{id}" : {
+      "get" : {
+        "operationId" : "getReceipt",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GoodsReceiptResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      }
+    },
+    "/api/purchasing/purchase-orders" : {
+      "post" : {
+        "operationId" : "createOrder_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreatePoRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PurchaseOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      }
+    },
+    "/api/purchasing/purchase-orders/{id}" : {
+      "get" : {
+        "operationId" : "getOrder_1",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PurchaseOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      }
+    },
+    "/api/purchasing/purchase-orders/{id}/confirm" : {
+      "post" : {
+        "operationId" : "confirm_1",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PurchaseOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      }
+    },
+    "/api/purchasing/vendor-bills" : {
+      "post" : {
+        "operationId" : "postBill",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateBillRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VendorBillResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      }
+    },
+    "/api/purchasing/vendor-bills/{id}" : {
+      "get" : {
+        "operationId" : "getBill",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VendorBillResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      }
+    },
+    "/api/reporting/balance-sheet" : {
+      "get" : {
+        "operationId" : "balanceSheet",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "asOf",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BalanceSheet"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "reporting-controller" ]
+      }
+    },
+    "/api/reporting/general-ledger/{accountCode}" : {
+      "get" : {
+        "operationId" : "generalLedger",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "accountCode",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "asOf",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/LedgerLineView"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "reporting-controller" ]
+      }
+    },
+    "/api/reporting/income-statement" : {
+      "get" : {
+        "operationId" : "incomeStatement",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "asOf",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IncomeStatement"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "reporting-controller" ]
+      }
+    },
+    "/api/reporting/reconciliation" : {
+      "get" : {
+        "operationId" : "reconciliation",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "asOf",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ReconciliationReport"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "reporting-controller" ]
+      }
+    },
+    "/api/reporting/trial-balance" : {
+      "get" : {
+        "operationId" : "trialBalance",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "asOf",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TrialBalance"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "reporting-controller" ]
+      }
+    },
+    "/api/sales/ar-aging" : {
+      "get" : {
+        "operationId" : "arAging",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "asOf",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ArAgingReport"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      }
+    },
+    "/api/sales/customer-returns" : {
+      "post" : {
+        "operationId" : "postReturn",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateReturnRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CustomerReturnResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      }
+    },
+    "/api/sales/customer-returns/{id}" : {
+      "get" : {
+        "operationId" : "getReturn",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CustomerReturnResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      }
+    },
+    "/api/sales/deliveries" : {
+      "post" : {
+        "operationId" : "deliver",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateDeliveryRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DeliveryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      }
+    },
+    "/api/sales/deliveries/{id}" : {
+      "get" : {
+        "operationId" : "getDelivery",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DeliveryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      }
+    },
+    "/api/sales/sales-invoices" : {
+      "post" : {
+        "operationId" : "postInvoice",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateInvoiceRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SalesInvoiceResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      }
+    },
+    "/api/sales/sales-invoices/{id}" : {
+      "get" : {
+        "operationId" : "getInvoice",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SalesInvoiceResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      }
+    },
+    "/api/sales/sales-orders" : {
+      "post" : {
+        "operationId" : "createOrder",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateSoRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SalesOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      }
+    },
+    "/api/sales/sales-orders/{id}" : {
+      "get" : {
+        "operationId" : "getOrder",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SalesOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      }
+    },
+    "/api/sales/sales-orders/{id}/confirm" : {
+      "post" : {
+        "operationId" : "confirm",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SalesOrderResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "sales-controller" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "AccountSubledgerValue" : {
+        "type" : "object",
+        "properties" : {
+          "accountCode" : {
+            "type" : "string"
+          },
+          "subledgerValue" : {
+            "type" : "string"
+          }
+        }
+      },
+      "AdjustmentResponse" : {
+        "type" : "object",
+        "properties" : {
+          "adjustmentNumber" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "journalEntryId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "locationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "movementGroupId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "postedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "qtyDelta" : {
+            "type" : "string"
+          },
+          "reason" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "unitCost" : {
+            "type" : "string"
+          }
+        }
+      },
+      "AllocationLine" : {
+        "type" : "object",
+        "properties" : {
+          "amount" : {
+            "type" : "string"
+          },
+          "billId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "AllocationView" : {
+        "type" : "object",
+        "properties" : {
+          "amount" : {
+            "type" : "string"
+          },
+          "documentId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "ApAgingReport" : {
+        "type" : "object",
+        "properties" : {
+          "current" : {
+            "type" : "string"
+          },
+          "days1to30" : {
+            "type" : "string"
+          },
+          "days31to60" : {
+            "type" : "string"
+          },
+          "days61to90" : {
+            "type" : "string"
+          },
+          "days90plus" : {
+            "type" : "string"
+          },
+          "total" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ArAgingReport" : {
+        "type" : "object",
+        "properties" : {
+          "current" : {
+            "type" : "string"
+          },
+          "days1to30" : {
+            "type" : "string"
+          },
+          "days31to60" : {
+            "type" : "string"
+          },
+          "days61to90" : {
+            "type" : "string"
+          },
+          "days90plus" : {
+            "type" : "string"
+          },
+          "total" : {
+            "type" : "string"
+          }
+        }
+      },
+      "BalanceSheet" : {
+        "type" : "object",
+        "properties" : {
+          "asOf" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "assets" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/StatementLine"
+            }
+          },
+          "balanced" : {
+            "type" : "boolean"
+          },
+          "equity" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/StatementLine"
+            }
+          },
+          "liabilities" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/StatementLine"
+            }
+          },
+          "netIncome" : {
+            "type" : "string"
+          },
+          "totalAssets" : {
+            "type" : "string"
+          },
+          "totalEquity" : {
+            "type" : "string"
+          },
+          "totalLiabilities" : {
+            "type" : "string"
+          }
+        }
+      },
+      "BillLine" : {
+        "type" : "object",
+        "properties" : {
+          "poLineId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "qty" : {
+            "type" : "string"
+          },
+          "unitPrice" : {
+            "type" : "string"
+          }
+        }
+      },
+      "BillLineView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lineNet" : {
+            "type" : "string"
+          },
+          "lineVat" : {
+            "type" : "string"
+          },
+          "matchStatus" : {
+            "type" : "string"
+          },
+          "poLineId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "qty" : {
+            "type" : "string"
+          },
+          "unitPrice" : {
+            "type" : "string"
+          }
+        }
+      },
+      "BomComponentView" : {
+        "type" : "object",
+        "properties" : {
+          "componentItemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lineNo" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "qtyPer" : {
+            "type" : "string"
+          },
+          "scrapPct" : {
+            "type" : "string"
+          }
+        }
+      },
+      "BomResponse" : {
+        "type" : "object",
+        "properties" : {
+          "components" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BomComponentView"
+            }
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "outputQty" : {
+            "type" : "string"
+          },
+          "parentItemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "version" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "CancelRequest" : {
+        "type" : "object",
+        "properties" : {
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "stockLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "ClearingBalance" : {
+        "type" : "object",
+        "properties" : {
+          "accountCode" : {
+            "type" : "string"
+          },
+          "balance" : {
+            "type" : "string"
+          },
+          "cleared" : {
+            "type" : "boolean"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CompleteRequest" : {
+        "type" : "object",
+        "properties" : {
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "qtyProduced" : {
+            "type" : "string"
+          },
+          "stockLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "CreateAdjustmentRequest" : {
+        "type" : "object",
+        "properties" : {
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "locationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "qtyDelta" : {
+            "type" : "string"
+          },
+          "reason" : {
+            "type" : "string"
+          },
+          "unitCost" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreateBillRequest" : {
+        "type" : "object",
+        "properties" : {
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BillLine"
+            }
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "purchaseOrderId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "taxRateCode" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreateBomComponent" : {
+        "type" : "object",
+        "properties" : {
+          "componentItemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "qtyPer" : {
+            "type" : "string"
+          },
+          "scrapPct" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreateBomRequest" : {
+        "type" : "object",
+        "properties" : {
+          "components" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CreateBomComponent"
+            }
+          },
+          "outputQty" : {
+            "type" : "string"
+          },
+          "parentItemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "CreateDeliveryRequest" : {
+        "type" : "object",
+        "properties" : {
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DeliveryLine"
+            }
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "salesOrderId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "stockLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "CreateGrnRequest" : {
+        "type" : "object",
+        "properties" : {
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ReceiptLine"
+            }
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "purchaseOrderId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "stockLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "CreateInvoiceRequest" : {
+        "type" : "object",
+        "properties" : {
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/InvoiceLine"
+            }
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "salesOrderId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "taxRateCode" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreateItemRequest" : {
+        "type" : "object",
+        "properties" : {
+          "itemType" : {
+            "type" : "string",
+            "enum" : [ "RAW", "WIP", "FINISHED", "SERVICE" ]
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "reorderPoint" : {
+            "type" : "string"
+          },
+          "reorderQty" : {
+            "type" : "string"
+          },
+          "sku" : {
+            "type" : "string"
+          },
+          "standardCost" : {
+            "type" : "string"
+          },
+          "stocked" : {
+            "type" : "boolean"
+          },
+          "uom" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreateLocationRequest" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string"
+          },
+          "locationType" : {
+            "type" : "string",
+            "enum" : [ "STOCK", "RECEIVING", "SHIPPING", "PRODUCTION_WIP", "SCRAP", "VENDOR", "CUSTOMER", "INVENTORY_LOSS" ]
+          },
+          "warehouseId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "CreatePartnerRequest" : {
+        "type" : "object",
+        "properties" : {
+          "apAccountCode" : {
+            "type" : "string"
+          },
+          "arAccountCode" : {
+            "type" : "string"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "customer" : {
+            "type" : "boolean"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "paymentTermsDays" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "taxId" : {
+            "type" : "string"
+          },
+          "vendor" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "CreatePoLine" : {
+        "type" : "object",
+        "properties" : {
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "qtyOrdered" : {
+            "type" : "string"
+          },
+          "unitPrice" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreatePoRequest" : {
+        "type" : "object",
+        "properties" : {
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CreatePoLine"
+            }
+          },
+          "orderDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "CreateReturnRequest" : {
+        "type" : "object",
+        "properties" : {
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "salesInvoiceId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "stockLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "CreateSoLine" : {
+        "type" : "object",
+        "properties" : {
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "qtyOrdered" : {
+            "type" : "string"
+          },
+          "unitPrice" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreateSoRequest" : {
+        "type" : "object",
+        "properties" : {
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CreateSoLine"
+            }
+          },
+          "orderDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "CreateWarehouseRequest" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreateWorkOrderRequest" : {
+        "type" : "object",
+        "properties" : {
+          "bomId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "qtyToProduce" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CurrentUserResponse" : {
+        "type" : "object",
+        "properties" : {
+          "roles" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "username" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CustomerReturnLineView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lineCogs" : {
+            "type" : "string"
+          },
+          "lineNet" : {
+            "type" : "string"
+          },
+          "lineVat" : {
+            "type" : "string"
+          },
+          "movementGroupId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "qty" : {
+            "type" : "string"
+          },
+          "soLineId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "stockJournalEntryId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "CustomerReturnResponse" : {
+        "type" : "object",
+        "properties" : {
+          "cogsAmount" : {
+            "type" : "string"
+          },
+          "creditNoteJournalEntryId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "goodsAmount" : {
+            "type" : "string"
+          },
+          "grossAmount" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CustomerReturnLineView"
+            }
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "postedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "returnNumber" : {
+            "type" : "string"
+          },
+          "salesInvoiceId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "salesOrderId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "vatAmount" : {
+            "type" : "string"
+          }
+        }
+      },
+      "DeliveryLine" : {
+        "type" : "object",
+        "properties" : {
+          "qty" : {
+            "type" : "string"
+          },
+          "soLineId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "DeliveryLineView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "journalEntryId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "movementGroupId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "qtyShipped" : {
+            "type" : "string"
+          },
+          "soLineId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "unitCost" : {
+            "type" : "string"
+          }
+        }
+      },
+      "DeliveryResponse" : {
+        "type" : "object",
+        "properties" : {
+          "deliveryNumber" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DeliveryLineView"
+            }
+          },
+          "postedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "salesOrderId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "status" : {
+            "type" : "string"
+          }
+        }
+      },
+      "FiscalPeriodResponse" : {
+        "type" : "object",
+        "properties" : {
+          "endDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "periodNo" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "startDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "yearCode" : {
+            "type" : "string"
+          }
+        }
+      },
+      "GoodsReceiptResponse" : {
+        "type" : "object",
+        "properties" : {
+          "grnNumber" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/GrnLineView"
+            }
+          },
+          "postedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "purchaseOrderId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "status" : {
+            "type" : "string"
+          }
+        }
+      },
+      "GrnLineView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "journalEntryId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "movementGroupId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "poLineId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "qtyReceived" : {
+            "type" : "string"
+          },
+          "unitCost" : {
+            "type" : "string"
+          }
+        }
+      },
+      "IncomeStatement" : {
+        "type" : "object",
+        "properties" : {
+          "asOf" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "expenses" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/StatementLine"
+            }
+          },
+          "netIncome" : {
+            "type" : "string"
+          },
+          "revenue" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/StatementLine"
+            }
+          },
+          "totalExpenses" : {
+            "type" : "string"
+          },
+          "totalRevenue" : {
+            "type" : "string"
+          }
+        }
+      },
+      "InvoiceLine" : {
+        "type" : "object",
+        "properties" : {
+          "qty" : {
+            "type" : "string"
+          },
+          "soLineId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "unitPrice" : {
+            "type" : "string"
+          }
+        }
+      },
+      "InvoiceLineView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lineCogs" : {
+            "type" : "string"
+          },
+          "lineNet" : {
+            "type" : "string"
+          },
+          "lineVat" : {
+            "type" : "string"
+          },
+          "qty" : {
+            "type" : "string"
+          },
+          "soLineId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "unitPrice" : {
+            "type" : "string"
+          }
+        }
+      },
+      "IssueRequest" : {
+        "type" : "object",
+        "properties" : {
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "stockLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "ItemResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemType" : {
+            "type" : "string",
+            "enum" : [ "RAW", "WIP", "FINISHED", "SERVICE" ]
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "reorderPoint" : {
+            "type" : "string"
+          },
+          "reorderQty" : {
+            "type" : "string"
+          },
+          "sku" : {
+            "type" : "string"
+          },
+          "standardCost" : {
+            "type" : "string"
+          },
+          "stocked" : {
+            "type" : "boolean"
+          },
+          "uom" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ItemStock" : {
+        "type" : "object",
+        "properties" : {
+          "avgUnitCost" : {
+            "type" : "string"
+          },
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "onHandQty" : {
+            "type" : "string"
+          },
+          "sku" : {
+            "type" : "string"
+          },
+          "totalValue" : {
+            "type" : "string"
+          }
+        }
+      },
+      "JournalEntryRequest" : {
+        "type" : "object",
+        "properties" : {
+          "currencyCode" : {
+            "type" : "string"
+          },
+          "journalCode" : {
+            "type" : "string"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Line"
+            }
+          },
+          "memo" : {
+            "type" : "string"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "sourceDocId" : {
+            "type" : "string"
+          },
+          "sourceDocType" : {
+            "type" : "string"
+          },
+          "sourceEvent" : {
+            "type" : "string"
+          }
+        }
+      },
+      "JournalEntryResponse" : {
+        "type" : "object",
+        "properties" : {
+          "currencyCode" : {
+            "type" : "string"
+          },
+          "entryNo" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "totalCredit" : {
+            "type" : "string"
+          },
+          "totalDebit" : {
+            "type" : "string"
+          }
+        }
+      },
+      "LedgerLineView" : {
+        "type" : "object",
+        "properties" : {
+          "accountCode" : {
+            "type" : "string"
+          },
+          "credit" : {
+            "type" : "string"
+          },
+          "debit" : {
+            "type" : "string"
+          },
+          "entryId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "entryNo" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "memo" : {
+            "type" : "string"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "sourceDocId" : {
+            "type" : "string"
+          },
+          "sourceDocType" : {
+            "type" : "string"
+          }
+        }
+      },
+      "Line" : {
+        "type" : "object",
+        "properties" : {
+          "accountCode" : {
+            "type" : "string"
+          },
+          "credit" : {
+            "type" : "string"
+          },
+          "debit" : {
+            "type" : "string"
+          },
+          "memo" : {
+            "type" : "string"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "LocationResponse" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "locationType" : {
+            "type" : "string",
+            "enum" : [ "STOCK", "RECEIVING", "SHIPPING", "PRODUCTION_WIP", "SCRAP", "VENDOR", "CUSTOMER", "INVENTORY_LOSS" ]
+          },
+          "warehouseId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "PartnerResponse" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "apAccountCode" : {
+            "type" : "string"
+          },
+          "arAccountCode" : {
+            "type" : "string"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "customer" : {
+            "type" : "boolean"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "paymentTermsDays" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "taxId" : {
+            "type" : "string"
+          },
+          "vendor" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "PayInRequest" : {
+        "type" : "object",
+        "properties" : {
+          "allocations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ReceiptAllocationLine"
+            }
+          },
+          "amount" : {
+            "type" : "string"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }
+      },
+      "PayOutRequest" : {
+        "type" : "object",
+        "properties" : {
+          "allocations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AllocationLine"
+            }
+          },
+          "amount" : {
+            "type" : "string"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }
+      },
+      "PaymentResponse" : {
+        "type" : "object",
+        "properties" : {
+          "allocations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AllocationView"
+            }
+          },
+          "amount" : {
+            "type" : "string"
+          },
+          "direction" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "journalEntryId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "payNumber" : {
+            "type" : "string"
+          },
+          "postedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "status" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PoLineView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lineNo" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "qtyBilled" : {
+            "type" : "string"
+          },
+          "qtyOrdered" : {
+            "type" : "string"
+          },
+          "qtyReceived" : {
+            "type" : "string"
+          },
+          "unitPrice" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PurchaseOrderResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PoLineView"
+            }
+          },
+          "orderDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "poNumber" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ReceiptAllocationLine" : {
+        "type" : "object",
+        "properties" : {
+          "amount" : {
+            "type" : "string"
+          },
+          "invoiceId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "ReceiptLine" : {
+        "type" : "object",
+        "properties" : {
+          "poLineId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "qty" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ReconciliationReport" : {
+        "type" : "object",
+        "properties" : {
+          "asOf" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "clearingAccounts" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ClearingBalance"
+            }
+          },
+          "healthy" : {
+            "type" : "boolean"
+          },
+          "subledgerChecks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SubledgerCheck"
+            }
+          },
+          "trialBalanceBalanced" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "ReorderItem" : {
+        "type" : "object",
+        "properties" : {
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "onHandQty" : {
+            "type" : "string"
+          },
+          "reorderPoint" : {
+            "type" : "string"
+          },
+          "reorderQty" : {
+            "type" : "string"
+          },
+          "sku" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ReorderReport" : {
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ReorderItem"
+            }
+          }
+        }
+      },
+      "SalesInvoiceResponse" : {
+        "type" : "object",
+        "properties" : {
+          "amountReceived" : {
+            "type" : "string"
+          },
+          "cogsAmount" : {
+            "type" : "string"
+          },
+          "goodsAmount" : {
+            "type" : "string"
+          },
+          "grossAmount" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "invoiceNumber" : {
+            "type" : "string"
+          },
+          "journalEntryId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/InvoiceLineView"
+            }
+          },
+          "openBalance" : {
+            "type" : "string"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "postedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "salesOrderId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "vatAmount" : {
+            "type" : "string"
+          }
+        }
+      },
+      "SalesOrderResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SoLineView"
+            }
+          },
+          "orderDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "soNumber" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          }
+        }
+      },
+      "SoLineView" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lineNo" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "qtyInvoiced" : {
+            "type" : "string"
+          },
+          "qtyOrdered" : {
+            "type" : "string"
+          },
+          "qtyShipped" : {
+            "type" : "string"
+          },
+          "unitPrice" : {
+            "type" : "string"
+          }
+        }
+      },
+      "StatementLine" : {
+        "type" : "object",
+        "properties" : {
+          "amount" : {
+            "type" : "string"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "SubledgerCheck" : {
+        "type" : "object",
+        "properties" : {
+          "accountCode" : {
+            "type" : "string"
+          },
+          "glControl" : {
+            "type" : "string"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "reconciled" : {
+            "type" : "boolean"
+          },
+          "subledger" : {
+            "type" : "string"
+          }
+        }
+      },
+      "TrialBalance" : {
+        "type" : "object",
+        "properties" : {
+          "asOf" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "balanced" : {
+            "type" : "boolean"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Line"
+            }
+          },
+          "totalCredit" : {
+            "type" : "string"
+          },
+          "totalDebit" : {
+            "type" : "string"
+          }
+        }
+      },
+      "TrialBalanceLine" : {
+        "type" : "object",
+        "properties" : {
+          "accountClass" : {
+            "type" : "string"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "totalCredit" : {
+            "type" : "string"
+          },
+          "totalDebit" : {
+            "type" : "string"
+          }
+        }
+      },
+      "TrialBalanceReport" : {
+        "type" : "object",
+        "properties" : {
+          "balanced" : {
+            "type" : "boolean"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TrialBalanceLine"
+            }
+          },
+          "totalCredit" : {
+            "type" : "string"
+          },
+          "totalDebit" : {
+            "type" : "string"
+          }
+        }
+      },
+      "VendorBillResponse" : {
+        "type" : "object",
+        "properties" : {
+          "amountPaid" : {
+            "type" : "string"
+          },
+          "billNumber" : {
+            "type" : "string"
+          },
+          "goodsAmount" : {
+            "type" : "string"
+          },
+          "grossAmount" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "journalEntryId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BillLineView"
+            }
+          },
+          "openBalance" : {
+            "type" : "string"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "postedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "purchaseOrderId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "vatAmount" : {
+            "type" : "string"
+          }
+        }
+      },
+      "WarehouseResponse" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "WorkOrderComponentView" : {
+        "type" : "object",
+        "properties" : {
+          "componentItemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "consumedQty" : {
+            "type" : "string"
+          },
+          "consumedValue" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "journalEntryId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lineNo" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "movementGroupId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "plannedQty" : {
+            "type" : "string"
+          }
+        }
+      },
+      "WorkOrderResponse" : {
+        "type" : "object",
+        "properties" : {
+          "bomId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "components" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/WorkOrderComponentView"
+            }
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "qtyProduced" : {
+            "type" : "string"
+          },
+          "qtyToProduce" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "totalComponentCost" : {
+            "type" : "string"
+          },
+          "wipLocationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "woNumber" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "basicAuth" : {
+        "scheme" : "basic",
+        "type" : "http"
+      }
+    }
+  }
+}

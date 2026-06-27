@@ -1,6 +1,8 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
+**Phase 7(全端化:React 前端 + 容器化 demo)進行中** — 把「後端完整但隱形」變成可 `docker compose up` 一鍵展示的全端產品。決策:全面覆蓋 CRUD、獨立 nginx 容器、springdoc-openapi + 從 spec 產生 TS client、補唯讀列表端點、BigDecimal 序列化為字串、stack 用最新穩定(React 19 + Mantine 9 + React Router 7 + Vite 8 + TS 5.9)。計畫見 `~/.claude/plans/lovely-shimmying-iverson.md`。**Stage 1(後端 enablement + 前端骨架)完成**:後端加 springdoc 3.0.3(對應 Boot 4;`/swagger-ui.html` 上線)、`GET /api/auth/me`(SPA 登入探針 + 角色來源,放 `iam.web` 不踩 ArchUnit)、自訂 `AuthenticationEntryPoint` 抑制 `WWW-Authenticate: Basic`(免瀏覽器原生彈窗)、全域 BigDecimal→JSON 字串(`JacksonConfig`,Jackson 3 `tools.jackson.*`)+ `SpringDocUtils.replaceWithClass(BigDecimal,String)` 讓 spec 一致;`OpenApiSpecIT`(MockMvc 匯出 spec、守命名衝突與金額型別)。前端 `frontend/`(Vite + React 19 + Mantine 9 + TS):OpenAPI→TS codegen(`openapi-typescript`+`openapi-fetch`)、認證/RBAC 層、AppShell、登入頁、8 模組 placeholder 路由。`mvn verify` 全綠(Surefire 57、IT 62);`npm run build` 綠。
+
 **Phase 3(訂單到收款)完成** — 分 4 段 PR 交付(SO→Delivery、CustomerInvoice、Receipt+AR 帳齡、CustomerReturn)。採「延後 COGS(deferred COGS)」鏡像 GR-IR:出貨成本停在過渡科目 1340,開票才認 COGS,「出貨↔開票」對稱清零。**O2C 驗收達成(`ArReconciliationIT`)**:全鏈跑完庫存↓、COGS+收入+Output VAT 入帳、1340→0、AR→0、AR 子帳==1200、試算表平衡;客戶退貨(credit note)全鏈沖回零。`mvn verify` 全綠(Surefire 45、IT 43)。**Phase 6(打磨與打包)完成** — 分 3 段 PR(RBAC、demo seed、README 收尾)。RBAC 4 角色(URL 授權 + 4 in-memory 使用者,ADR-0008);一鍵 demo seed(`DataSeeder`,profile `seed`)經真實過帳 service 灌完整 買→做→賣;README 收尾(模組對照表 + 各 published port、Mermaid ERD、ADR 索引、角色/seed 用法、roadmap 全標完成)。`mvn verify` 全綠(Surefire 55、IT 58)。**🎉 Phase 0–6 全數完成**(完整路線圖落地;19→24 個 PR、IT 58、CI 綠)。
 
 **Phase 5(報表與期間結)完成** — 分 3 段 PR(財務報表、對帳健康檢查、soft-close)。`reporting` read-side 模組:財務報表(試算表 as-of、資產負債表保留盈餘動態、損益表、總帳 drill-down)+ **對帳健康檢查(hero,`/api/reporting/reconciliation`)**:全域 TB 平 + 庫存/AP/AR 子帳==GL 控制科目(跨模組經各 `*.api`),過渡科目餘額一併呈現。**soft-close**:`/api/ledger/fiscal-years/{year}/periods/{n}/close|reopen`,關閉後該期間過帳被擋。`mvn verify` 全綠(Surefire 55、IT 52)。下一棒(待指示):Phase 6 打磨與打包(RBAC 補 4 角色、一鍵 demo seed、README/架構圖收尾)。
@@ -10,6 +12,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-27] 🌐 P7-S1 後端 API enablement + React 前端骨架(Phase 7 Stage 1)
+  - **後端**:`pom.xml` 加 `springdoc-openapi-starter-webmvc-ui` 3.0.3(實測:Maven Central 最新 3.0.3,parent=Boot 4.0.5,屬 Boot 4/Spring 7 線;2.8.x 是 Boot 3.5 不相容)。`application.properties` 設 docs 路徑 + `writer-with-order-by-keys=true`(spec 穩定)。`config/JacksonConfig`:全域 BigDecimal→JSON 字串(Jackson 3 `tools.jackson.databind`,`SimpleModule.addSerializer(new ToStringSerializer(BigDecimal.class))`,Spring Boot 4 自動收集 `JacksonModule` bean)。`config/OpenApiConfig`:basicAuth scheme + `SpringDocUtils.replaceWithClass(BigDecimal,String)`(讓 spec 也標 string,與 runtime 一致)。`iam/web/AuthController`:`GET /api/auth/me` 回 `{username, roles[]}`(去 ROLE_ 前綴)。`SecurityConfig`:放行 `/v3/api-docs`、`/swagger-ui`、`/webjars`,換自訂 `AuthenticationEntryPoint`(401 但不送 `WWW-Authenticate: Basic`,免瀏覽器原生彈窗)。
+  - **測試**:`AuthControllerIT`(未認證 401、admin 4 角色、sales 單角色)、`JacksonConfigTest`(BigDecimal→帶尺度字串)、`OpenApiSpecIT`(MockMvc 取 `/v3/api-docs`:OpenAPI 3.1、74 schemas、50 paths、**無 `_1` 命名衝突**、**無 `type:number`**、`grossAmount` 為 string;匯出 `target/openapi.json`)。`mvn verify` 全綠(Surefire 57、IT 62)。
+  - **前端**(`frontend/`,獨立 Vite 專案,不掛 Maven):React 19 + Mantine 9 + React Router 7 + Vite 8 + TS 5.9(注:TS 6 與 openapi-typescript 7 peer 衝突,故用 5.9 最新)。資料層 `openapi-typescript`(產 `src/api/schema.d.ts`,commit)+ `openapi-fetch`(typed client + 認證 middleware 注入 Basic、攔 401/403)+ TanStack Query v5;認證/RBAC(`credentials`/`roles` 鏡像 SecurityConfig/`AuthContext`/`RequireAuth`/`RequireRole`)、`AppLayout`(AppShell + 導覽 + 使用者選單)、`LoginPage`(含 4 個 demo 帳號快速登入)、`DashboardPage` + 8 模組 placeholder 路由。`npm run build`(`tsc -b && vite build`)綠。
+  - 環境限制:本機沙箱/VM 擋 Tomcat loopback(`SocketException: Invalid argument`),無法在此跑真實 web server / Vite dev server;故 spec 改用 MockMvc 匯出、前端僅以 `vite build` 型別檢查驗證,實機點擊驗證留待 Stage 8 的 Docker demo。
 - [2026-06-27] 📘 P6-S3 README/文件收尾(Phase 6 Stage 3,Phase 6 收尾)
   - README:架構段補齊全模組(sales/manufacturing/reporting/iam)+ 「模組 × 責任 × published port」對照表;`auth` 列改 HTTP Basic 4 角色;**Data model** 段加 Mermaid ERD(會計脊椎 + 各文件/庫存子帳);**ADR 索引**(0001–0008);Running 段補 seed profile 指令與角色帳號;roadmap 全段標完成。純文件變更,build 不受影響。
 - [2026-06-27] 🌱 P6-S2 一鍵 demo seed(Phase 6 Stage 2)
@@ -99,7 +106,8 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
-- (待指示)**Phase 0–6 全數完成** —— 總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / 打磨與打包,完整路線圖落地。`mvn verify` 全綠(Surefire 55、IT 58),CI 綠。可選後續:前端(React)、JWT/持久化使用者庫、上線 demo 部署、多階 BOM / FIFO 等延後範圍。
+- **Phase 7:全端化(React 前端 + 容器化 demo)** —— Stage 1(後端 enablement + 前端骨架)已完成。接著:Stage 2 主檔 CRUD + 列表端點 → Stage 3 儀表板/財報/對帳 hero → Stage 4 採購 P2P → Stage 5 銷售 O2C → Stage 6 製造 → Stage 7 進階(調整/手動分錄/期間結)→ Stage 8 容器化(後端+前端 Dockerfile、nginx 反代、`compose.demo.yaml`)+ screenshots + README 收尾。每 stage 一個 PR(merge 等確認)。
+- **基底 Phase 0–6 全數完成** —— 總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / 打磨與打包,完整路線圖落地,CI 綠。
 
 ## 待辦
 > 核心路線圖 Phase 0–6 已全部完成。以下為可選後續與刻意延後範圍(非缺漏)。
@@ -136,6 +144,11 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - **[P5] 期間只做 soft-close**:`FiscalPeriod.close/reopen`(OPEN↔CLOSED),過帳路徑既有 `isOpen()` 檢查擋下非 OPEN 期間(`PeriodNotOpenException`);hard-close(`LOCKED`,連沖銷都擋)與保留盈餘年結轉延後(資產負債表保留盈餘=Σ收入−費用 動態計算,規避 year-end close)。
 - **[P6] RBAC 放 web 邊界(URL 授權),非 service `@PreAuthorize`**:`SecurityConfig` 以 `authorizeHttpRequests`(URL+HTTP method)管控 4 角色(ADMIN/ACCOUNTANT/WAREHOUSE/SALES);單一 REST 入口下與 service 層守衛等價,且可避免 ~50 個 service 直呼的 IT 全要塞安全 context。4 個 in-memory 使用者(admin 持全角色為超級使用者,免角色階層),延續 HTTP Basic;JWT/持久化使用者庫延後。ADR-0008。
 - **[P6] 一鍵 demo seed 放 composition root**:`com.erp.bootstrap.DataSeeder`(`@Profile("seed")`)經**真實過帳 service**(非繞過不變量的原生 SQL)灌入完整 買→做→賣;因跨模組編排而置於 root(非業務模組,不受模組邊界規則限制),`VEND-DEMO` 已存在則跳過(idempotent)。
+- **[P7] springdoc 版本=3.0.3**:Spring Boot 4.1 須用 springdoc `3.0.x`(parent=Boot 4.0.5,Spring 7 線);`2.8.x` 綁 Boot 3.5 不相容。先前 solrsearch 顯示 2.8.6 為最新是過時快取,權威 `maven-metadata.xml` 才有 3.0.x。fallback(未用):若無相容 GA,改前端依 endpoint 手寫 `openapi.yaml`。
+- **[P7] BigDecimal 在 JSON=字串,且 spec 同步**:`JacksonConfig` 全域把 BigDecimal 序列化成字串(會計不碰 float;前端型別為 string)。**關鍵**:springdoc/swagger-core 從 Java 型別推導,不知道自訂 serializer,故必須另用 `SpringDocUtils.replaceWithClass(BigDecimal,String)` 讓 spec 也標 string,否則 spec(number)會與 runtime(string)不一致、前端型別說謊。`OpenApiSpecIT` 斷言 spec 無 `type:number` 守此不變量。
+- **[P7] `/api/auth/me` 放 iam.web**:`iam` 不在任何 ArchUnit 跨模組規則來源清單,新增 controller 安全、不需改 `ArchitectureTest`。此端點兼當「登入探針」(200=帳密對)與「角色來源」,維持 `anyRequest().authenticated()`(未認證 401)。自訂 `AuthenticationEntryPoint` 移除 `WWW-Authenticate: Basic` 以免瀏覽器原生彈窗蓋掉 SPA 登入頁。
+- **[P7] 前端=repo 內 `frontend/` 獨立 Vite 專案**,不掛 Maven build;資料層用 `openapi-typescript`(commit `schema.d.ts`)+ `openapi-fetch` 單一 typed client(middleware 注入 Basic、攔 401/403)+ TanStack Query。`schema.d.ts` 與 `openapi/openapi.json` 進版控,前端 build 不需後端在線。
+- **[P7] 環境=沙箱/VM 擋 Tomcat loopback**:本機無法跑真實 web server(`spring-boot:run` 起 Tomcat 報 `SocketException: Invalid argument: connect`)或 Vite dev server;OpenAPI spec 改以 MockMvc(`OpenApiSpecIT`)匯出,前端以 `vite build` 型別檢查驗證;實機點擊驗證留待 Stage 8 Docker demo(使用者機器 loopback 正常)。
 - **庫存估值=移動加權平均**(MVP 不做 PPV);standard-cost + 變異列為 v2(`Item.valuation_method` 保留欄)。
 - **並行=READ COMMITTED + 固定順序的悲觀鎖**(Sequence 先於 ItemCostState),不使用全域 SERIALIZABLE。
 - **編號**:只有 `JournalEntry.entry_no` 連號;業務文件用 unique-monotonic + prefix。
