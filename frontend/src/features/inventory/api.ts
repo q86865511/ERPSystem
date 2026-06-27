@@ -1,6 +1,22 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import { qk } from '../../api/queryKeys';
+import type { CreateAdjustmentRequest } from '../../api/types';
+
+export function useCreateAdjustment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: CreateAdjustmentRequest) => {
+      const { data, error } = await api.POST('/api/inventory/adjustments', { body });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['inventory'] });
+      qc.invalidateQueries({ queryKey: ['reporting'] });
+    },
+  });
+}
 
 export function useInventoryReconciliation() {
   return useQuery({
