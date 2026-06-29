@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Forced-command deploy wrapper for the Oracle host. Triggered by the restricted deploy SSH key
+# (see docs/DEPLOY.md). Copy this to a path OUTSIDE the repo clone — e.g. ~/erp-demo-deploy.sh — so
+# that `git reset --hard` below can't replace the script while it is still running (bash reads scripts
+# line by line; swapping the file mid-run corrupts execution).
+#
+#   cp scripts/oracle-deploy.sh.example ~/erp-demo-deploy.sh && chmod 700 ~/erp-demo-deploy.sh
+#
+# authorized_keys entry (note: command= does NOT expand $HOME — use an absolute path):
+#   command="/home/ubuntu/erp-demo-deploy.sh",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding ssh-ed25519 AAAA... erp-deploy
+set -euo pipefail
+mkdir -p "$HOME/backups/erp-demo"
+exec >> "$HOME/backups/erp-demo/cron.log" 2>&1
+
+echo "=== deploy $(date -Is) (cmd: ${SSH_ORIGINAL_COMMAND:-n/a}) ==="
+cd "$HOME/erp-demo-test"
+git fetch origin main
+git reset --hard origin/main
+docker compose -f compose.demo.yaml -f compose.oracle.yaml up -d --build --remove-orphans
+# Only dangling (untagged) layers — safe on a shared host. NEVER use -a / system prune / volume prune.
+docker image prune -f
+echo "=== done $(date -Is) @ $(git rev-parse --short HEAD) ==="
