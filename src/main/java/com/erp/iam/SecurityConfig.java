@@ -86,6 +86,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/purchasing/**").hasRole("WAREHOUSE")
                         .requestMatchers(HttpMethod.POST, "/api/inventory/**").hasRole("WAREHOUSE")
                         .requestMatchers(HttpMethod.POST, "/api/manufacturing/**").hasRole("WAREHOUSE")
+                        // The audit trail is admin-only (the one GET that is role-restricted).
+                        .requestMatchers(HttpMethod.GET, "/api/audit/**").hasRole("ADMIN")
                         // Everything else (reads, reports, /api/auth/me) just needs an authenticated user.
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2

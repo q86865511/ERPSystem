@@ -160,6 +160,8 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 **列印 / PDF**:發票、採購單、出貨單、試算表可一鍵列印(專用 A4 列印路由 + print CSS,瀏覽器「另存 PDF」),雙語沿用同一套 i18n。
 
+**審計軌跡(ADMIN-only)**:過帳、期間關閉/重開、登入成功/失敗都會寫入 append-only 的 `audit_log`(domain event + `AFTER_COMMIT` 監聽,只記真正 committed 的動作;DB trigger 擋改/刪)。ADMIN 角色可在「審計軌跡」頁依事件類型 / 操作者篩選檢視。
+
 ## 📊 資料模型
 
 會計脊椎(科目、平衡分錄、會計期間)是中心;每張業務文件把過帳連回分錄,庫存移動是 append-only 子帳並對帳到 GL。

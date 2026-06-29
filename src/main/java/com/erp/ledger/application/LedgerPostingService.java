@@ -1,11 +1,13 @@
 package com.erp.ledger.application;
 
 import com.erp.ledger.api.JournalEntryRequest;
+import com.erp.ledger.api.JournalPostedEvent;
 import com.erp.ledger.domain.Account;
 import com.erp.ledger.domain.FiscalPeriod;
 import com.erp.ledger.domain.Journal;
 import com.erp.ledger.domain.JournalEntry;
 import com.erp.ledger.domain.NumberSequence;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,17 +33,20 @@ public class LedgerPostingService {
     private final FiscalPeriodRepository fiscalPeriodRepository;
     private final JournalEntryRepository journalEntryRepository;
     private final NumberSequenceRepository numberSequenceRepository;
+    private final ApplicationEventPublisher events;
 
     public LedgerPostingService(AccountRepository accountRepository,
                                 JournalRepository journalRepository,
                                 FiscalPeriodRepository fiscalPeriodRepository,
                                 JournalEntryRepository journalEntryRepository,
-                                NumberSequenceRepository numberSequenceRepository) {
+                                NumberSequenceRepository numberSequenceRepository,
+                                ApplicationEventPublisher events) {
         this.accountRepository = accountRepository;
         this.journalRepository = journalRepository;
         this.fiscalPeriodRepository = fiscalPeriodRepository;
         this.journalEntryRepository = journalEntryRepository;
         this.numberSequenceRepository = numberSequenceRepository;
+        this.events = events;
     }
 
     @Transactional
@@ -94,7 +99,12 @@ public class LedgerPostingService {
         entry.markPosted(entryNo, actor, Instant.now());
         // saveAndFlush surfaces DB-level invariant violations (balance, immutability, idempotency)
         // inside this transaction rather than at an opaque commit boundary.
-        return journalEntryRepository.saveAndFlush(entry);
+        JournalEntry saved = journalEntryRepository.saveAndFlush(entry);
+        // Audit trail: published in-transaction, recorded by the audit listener after this commits.
+        events.publishEvent(new JournalPostedEvent(saved.getId(), saved.getEntryNo(),
+                saved.getPostingDate(), saved.getSourceDocType(), saved.getSourceDocId(),
+                saved.getMemo(), actor));
+        return saved;
     }
 
     private void validateStructure(JournalEntryRequest request) {

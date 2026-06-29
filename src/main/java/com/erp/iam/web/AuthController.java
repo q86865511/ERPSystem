@@ -1,9 +1,11 @@
 package com.erp.iam.web;
 
+import com.erp.iam.api.AuthAuditEvent;
 import com.erp.iam.api.Role;
 import com.erp.iam.application.JwtService;
 import com.erp.iam.application.UserRepository;
 import com.erp.iam.domain.User;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,12 +43,14 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserRepository users;
+    private final ApplicationEventPublisher events;
 
     public AuthController(AuthenticationManager authenticationManager, JwtService jwtService,
-                          UserRepository users) {
+                          UserRepository users, ApplicationEventPublisher events) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.users = users;
+        this.events = events;
     }
 
     /** Caller's name and roles (roles without Spring's {@code ROLE_} prefix). */
@@ -70,8 +74,10 @@ public class AuthController {
             auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         } catch (AuthenticationException e) {
+            events.publishEvent(new AuthAuditEvent(request.username(), false));
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
         }
+        events.publishEvent(new AuthAuditEvent(auth.getName(), true));
         List<String> roles = stripRolePrefix(auth.getAuthorities());
         String access = jwtService.createAccessToken(auth.getName(), roles);
         String refresh = jwtService.createRefreshToken(auth.getName());

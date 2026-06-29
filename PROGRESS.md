@@ -12,6 +12,13 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-29] 🛡️ audit_log 審計軌跡 + domain event 機制(待辦 D 之一,`mvn verify` 綠 / 前端 build 綠)
+  - **事件驅動、AFTER_COMMIT、append-only**。新 `com.erp.audit` 模組:`@TransactionalEventListener(AFTER_COMMIT, fallbackExecution=true)` 監聽 → 獨立 `AuditWriter`(`REQUIRES_NEW`)寫入 + 容錯(失敗記 ERROR,不影響業務)。`AFTER_COMMIT` 確保只記真正 committed 的動作(rollback 不留幽靈);`fallbackExecution` 接住無交易情境(登入)。
+  - **捕捉**:JOURNAL_POSTED(`LedgerPostingService.post` 是所有金流唯一過帳點 → 一點涵蓋全部)、PERIOD_CLOSED/REOPENED(`LedgerController` 期間 close/reopen,加 `Principal` 取 actor)、LOGIN_SUCCESS/FAILURE(`AuthController.login`)。事件型別放各模組 `api`(`ledger.api.JournalPostedEvent`/`FiscalPeriodChangedEvent`、`iam.api.AuthAuditEvent`)。
+  - **V16 migration**:`audit_log`(結構化欄位 + 索引)+ **append-only trigger**(複用 V4 擋 UPDATE/DELETE 模式)。日期範圍篩選暫緩(Postgres typeless-null 參數問題;先做 eventType/actor 篩選 + 分頁)。
+  - **API**:`GET /api/audit`(分頁,ADMIN-only,`SecurityConfig` 第一條對 GET 做角色限制)。**ArchUnit**:`audit_uses_only_published_ports`(audit 只依賴各模組 `*.api`)+ `no_module_depends_on_audit`。
+  - **前端**:ADMIN-only `/audit` 頁(`RequireRole`,Mantine 表格 + eventType/actor 篩選 + 分頁;openapi-fetch `pageable` 用 per-call querySerializer 攤平成 `page/size/sort` 以對應 Spring 綁定)+ 導覽列 ADMIN-only 項(NAV 加 `requiredRole` + `hasRole` 過濾)。i18n `audit.ts`(en/zh)+ `nav.audit`。
+  - **測試**:`AuditIT`(非 `@Transactional`,Testcontainers)6 案全綠 —— 過帳/期間/登入有記、rollback 不留列、append-only trigger、viewer ADMIN-only(401/403/200)。
 - [2026-06-29] 🖨️ PDF / 列印報表(待辦 D 之一,純前端,`npm run build` 綠)
   - **做法=專用列印路由(同分頁)**:`/print/sales-invoice/:id`、`/print/purchase-order/:id`、`/print/delivery/:id`、`/print/trial-balance?asOf=`,掛在 `AuthProvider` + `RequireAuth` 內、`AppLayout`(導覽殼)**外** → 乾淨 A4 版面、有 auth、無 chrome。`features/print/`:`PrintLayout`(gate `bootstrapping`+query loading,ready 後自動 `window.print()` + 手動「列印/返回」鈕,列印時隱藏)+ `PrintHeader`(公司抬頭/單號/日期/對象)+ 4 個列印頁(複用既有 `useInvoice/useOrder/useDelivery/useTrialBalance` + `usePartnerMap/useItemMap` + `MoneyText`)+ `print.css`(`@page A4`、表頭每頁重複、行不切斷)。
   - 各 detail Drawer(發票/PO/出貨)+ 試算表頁加「列印」按鈕 `navigate('/print/...')`(同分頁,access token 在記憶體免 silent-refresh)。i18n 新 `print.ts`(en/zh 成對)。**不需 migration、不需後端改動**;含 guest 可印。
@@ -184,10 +191,10 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - ✅ 唯讀 guest 帳號 + 登入頁預設,解決公開 demo 可寫。
 - 剩(可選後續):可撤銷 refresh(DB rotation)、使用者管理 UI、access token 過期的更積極處理。
 
-**D. 財會加值**
-- ✅ **hard-close + 保留盈餘年結轉(已做,2026-06-29)**:closing JE 沖平損益轉 3200 + 鎖期間 LOCKED。計畫見 `~/.claude/plans/tender-cuddling-starlight.md`,ADR-0009。
-- ✅ **PDF/列印報表(已做,2026-06-29)**:發票/PO/出貨單/試算表前端列印(專用路由 + print CSS),瀏覽器另存 PDF。
-- 待:獨立 append-only `audit_log` + 敏感動作事件監聽(PR2)。
+**D. 財會加值 —— 全數完成(2026-06-29)**
+- ✅ **hard-close + 保留盈餘年結轉**:closing JE 沖平損益轉 3200 + 鎖期間 LOCKED。計畫見 `~/.claude/plans/tender-cuddling-starlight.md`,ADR-0009。
+- ✅ **PDF/列印報表**:發票/PO/出貨單/試算表前端列印(專用路由 + print CSS),瀏覽器另存 PDF。
+- ✅ **append-only `audit_log` + 敏感動作事件監聽**:domain event(AFTER_COMMIT)記過帳/期間異動/登入,ADMIN-only 檢視頁;V16 + append-only trigger。
 
 **E. 品質 / 維運**
 - 並行測試擴到 sales/manufacturing(目前僅 inventory 有 concurrency IT);**前端無自動化測試**(只有 tsc + vite build,可加 Vitest/Playwright)。

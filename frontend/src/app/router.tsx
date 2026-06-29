@@ -1,7 +1,9 @@
 import { createBrowserRouter, Outlet } from 'react-router-dom';
 import { AuthProvider } from '../auth/AuthContext';
 import { RequireAuth } from '../auth/RequireAuth';
+import { RequireRole } from '../auth/RequireRole';
 import { AppLayout } from '../components/AppLayout';
+import { AuditPage } from '../features/audit/AuditPage';
 import { InventoryPage } from '../features/inventory/InventoryPage';
 import { LedgerPage } from '../features/ledger/LedgerPage';
 import { ManufacturingPage } from '../features/manufacturing/ManufacturingPage';
@@ -58,6 +60,14 @@ export const router = createBrowserRouter([
           { path: '/inventory', element: <InventoryPage /> },
           { path: '/reporting', element: <ReportsPage /> },
           { path: '/ledger', element: <LedgerPage /> },
+          {
+            path: '/audit',
+            element: (
+              <RequireRole role="ADMIN">
+                <AuditPage />
+              </RequireRole>
+            ),
+          },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
