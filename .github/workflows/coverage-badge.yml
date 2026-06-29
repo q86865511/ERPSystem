@@ -1,0 +1,51 @@
+name: Coverage Badge
+
+# Regenerate the in-repo coverage badge after CI passes on main, reusing the JaCoCo report CI already
+# produced (no re-running of the test suite). Kept OUT of the "CI" workflow so it can never affect the
+# CI conclusion that gates Deploy; the commit carries [skip ci] so it triggers neither CI nor Deploy.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: coverage-badge
+  cancel-in-progress: false
+
+jobs:
+  badge:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download coverage report from the CI run
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-reports
+          path: ci-reports
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate JaCoCo badges
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          jacoco-csv-file: ci-reports/site/jacoco/jacoco.csv
+          badges-directory: .github/badges
+          generate-coverage-badge: true
+          generate-branches-badge: true
+
+      - name: Commit badge if changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "文件: 更新覆蓋率 badge [skip ci]"
+          file_pattern: ".github/badges/*.svg"
+          branch: main

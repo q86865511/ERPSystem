@@ -1,0 +1,89 @@
+name: Security Scan
+
+# Trivy supply-chain scanning, report-only (exit-code 0 — never blocks deploy or merge); results upload to
+# the Security tab. A standalone workflow (not "CI"). Two scopes: filesystem (Maven + npm dependency CVEs,
+# IaC/Dockerfile misconfig, leaked secrets) on every change; container images (built from the repo's own
+# Dockerfiles) on main + weekly, since building both images is too slow to run on every PR.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '37 5 * * 1'  # weekly, Monday 05:37 UTC
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  filesystem:
+    name: Dependencies, config & secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scanners: vuln,misconfig,secret
+          severity: CRITICAL,HIGH
+          format: sarif
+          output: trivy-fs.sarif
+          exit-code: '0'
+
+      - name: Upload results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-fs.sarif
+          category: trivy-fs
+
+  images:
+    name: Container images
+    # Building both images is heavy; skip on PRs (runs on main pushes and the weekly schedule).
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -t erp-app:scan .
+
+      - name: Build frontend image
+        run: docker build -t erp-frontend:scan ./frontend
+
+      - name: Trivy scan — backend image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: erp-app:scan
+          severity: CRITICAL,HIGH
+          format: sarif
+          output: trivy-app.sarif
+          exit-code: '0'
+
+      - name: Trivy scan — frontend image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: erp-frontend:scan
+          severity: CRITICAL,HIGH
+          format: sarif
+          output: trivy-frontend.sarif
+          exit-code: '0'
+
+      - name: Upload backend image results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-app.sarif
+          category: trivy-image-backend
+
+      - name: Upload frontend image results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-frontend.sarif
+          category: trivy-image-frontend
