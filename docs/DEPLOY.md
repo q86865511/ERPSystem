@@ -42,9 +42,9 @@ live demo 跑在一台 Oracle Cloud(ARM64)主機上,與作品集主站及其他�
 
 ```bash
 # 1) 起 demo,前端只綁 localhost(只給 Caddy 接,不直接對外)
-git clone https://github.com/q86865511/ERPSystem.git ~/erp-demo && cd ~/erp-demo
-sed -i 's#- "8081:80"#- "127.0.0.1:8081:80"#' compose.demo.yaml
-docker compose -f compose.demo.yaml up --build -d
+#    用 compose.oracle.yaml overlay 把 frontend port !override 成 127.0.0.1:8081(不必再手動 sed)
+git clone https://github.com/q86865511/ERPSystem.git ~/erp-demo-test && cd ~/erp-demo-test
+docker compose -f compose.demo.yaml -f compose.oracle.yaml up --build -d
 
 # 2) Caddy 加一個子網域 block(/etc/caddy/Caddyfile),驗證後 reload
 #    http://erp.terrychou.com { bind 127.0.0.1; encode zstd gzip; reverse_proxy 127.0.0.1:8081 }
@@ -60,6 +60,48 @@ cloudflared tunnel route dns resume erp.terrychou.com   # 建立 Cloudflare DNS 
 
 > 改 Caddy / cloudflared 設定前先 `cp` 備份;`caddy validate` 通過再 reload。新子網域的 TLS 由 `*.terrychou.com` 的 Universal SSL 自動覆蓋。
 
+### 自動部署(merge 到 main → 自動上線)
+
+merge 到 `main` 且 CI 綠後,`.github/workflows/deploy.yml`(`workflow_run` 觸發)會 SSH 進 Oracle 觸發重新部署。設計重點:
+
+- **只在 main 的真實 push + CI 成功**才部署(`if` 同時檢查 `conclusion==success`、`head_branch==main`、`event==push`,擋掉 fork PR 的 CI 也會發 `workflow_run`)。`workflow_run` 永遠執行 default branch 上的 workflow 定義,所以 fork 改不動部署流程。
+- **受限部署金鑰**:authorized_keys 用 forced command 把這把專用 ed25519 金鑰鎖死成「只能跑部署 wrapper、拿不到 shell」,即使 GitHub secret 外洩,攻擊者也只能觸發「從 main 重新部署」,動不了這台共用主機的其他東西。
+- GitHub `production` environment 下的 secrets:`ORACLE_DEPLOY_KEY`(私鑰)、`ORACLE_HOST`、`ORACLE_USER`、`ORACLE_KNOWN_HOSTS`(`ssh-keyscan` 輸出,pin host key)。deploy job 設 `permissions: {}`、`concurrency: deploy-oracle`(序列化避免併發互踩)。
+- 實際 build 在 Oracle 上做(ARM 原生);workflow 本身不 build/push image。
+
+部署 wrapper(`scripts/oracle-deploy.sh.example` 的內容,在 Oracle 端 `cp` 成 **repo 外** 的 `~/erp-demo-deploy.sh`)做:`git fetch + reset --hard origin/main` → `docker compose -f compose.demo.yaml -f compose.oracle.yaml up -d --build --remove-orphans` → `docker image prune -f`(僅 dangling)。放 repo 外是為了避免 `git reset` 把正在執行的腳本檔換掉。log 在 `~/backups/erp-demo/cron.log`。
+
+> 加速方向(future):改由 CI build & push image 到 GHCR,Oracle 端只 `pull` 不 `build`(目前規模用本機 `--build` + layer cache 已足夠,故未做)。
+
+### 每晚自動重置
+
+公開 demo 是 `admin`/`admin`、人人可寫,訪客會累積測試資料。`scripts/reset-demo.sh` 由 cron 每晚跑 `down -v` + `up`(清 `pgdata` → app 在空庫上重新 seed 乾淨的 買→做→賣)。`down -v` 與 `up` **都帶兩個 `-f`**(漏 overlay 會讓 frontend 變回對外裸奔)。`down -v` 是 project-scoped(只動 `erp-demo`,不誤傷共用主機其他專案)。
+
+```cron
+# 05:00 Asia/Taipei = 21:00 UTC(機器為 UTC),避開 04:30 UTC 的 soulshard 備份
+0 21 * * * bash /home/ubuntu/erp-demo-test/scripts/reset-demo.sh >> /home/ubuntu/backups/erp-demo/cron.log 2>&1
+```
+
+重置期間有約 1.5–2.5 分鐘短暫不可用(postgres+app 重啟 + app healthcheck `start_period 60s` + seed)。
+
+### Oracle 端一次性設定(已套用)
+
+```bash
+mkdir -p ~/backups/erp-demo
+
+# 部署 wrapper 放 repo 外(避免 git reset self-modification)
+cp ~/erp-demo-test/scripts/oracle-deploy.sh.example ~/erp-demo-deploy.sh && chmod 700 ~/erp-demo-deploy.sh
+
+# 受限部署公鑰加進 authorized_keys(command= 用「絕對路徑」,它不展開 $HOME)
+# command="/home/ubuntu/erp-demo-deploy.sh",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding ssh-ed25519 AAAA... erp-deploy
+
+# 把部署目錄從舊的 sed 改動遷成 overlay(乾淨對齊 origin/main)
+cd ~/erp-demo-test && git checkout -- compose.demo.yaml && git fetch origin main && git reset --hard origin/main
+
+# 驗證 overlay 合併:ports 應只剩 127.0.0.1:8081:80
+docker compose -f compose.demo.yaml -f compose.oracle.yaml config | grep -i -A3 ports
+```
+
 ### demo 注意事項
 
-公開 demo 為 `admin`/`admin`,任何人可登入並建立文件;但後端強制 **借=貸** 與 **子帳==GL 控制科目** 不變量,所以對帳健康檢查恆為綠 —— 訪客動不壞帳本不變量,最多累積測試資料,`down -v` 即可重置。
+公開 demo 為 `admin`/`admin`,任何人可登入並建立文件;但後端強制 **借=貸** 與 **子帳==GL 控制科目** 不變量,所以對帳健康檢查恆為綠 —— 訪客動不壞帳本不變量,最多累積測試資料,且每晚 cron 會自動 `down -v` 重置(見上)。

@@ -1,0 +1,42 @@
+name: Deploy
+
+# Auto-deploy to the Oracle Cloud host after CI passes on main. Runs only on a real push to main
+# (not on PR/fork CI runs). The deploy step just triggers a restricted SSH key whose forced command
+# rebuilds the demo on the host — this workflow never builds or ships images itself.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+# No GITHUB_TOKEN scopes needed: this job only opens an SSH connection.
+permissions: {}
+
+# Serialize deploys so two quick merges can't recreate containers on top of each other.
+concurrency:
+  group: deploy-oracle
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Only when CI succeeded, on a push to main (excludes fork PR CI runs, which carry no secrets anyway).
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy over restricted SSH
+        env:
+          ORACLE_DEPLOY_KEY: ${{ secrets.ORACLE_DEPLOY_KEY }}
+          ORACLE_KNOWN_HOSTS: ${{ secrets.ORACLE_KNOWN_HOSTS }}
+          ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+          ORACLE_USER: ${{ secrets.ORACLE_USER }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$ORACLE_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          printf '%s\n' "$ORACLE_DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          # The forced command in authorized_keys ignores this argument; we still pass one so the
+          # host-side wrapper sees a non-empty SSH_ORIGINAL_COMMAND for its log.
+          ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes "$ORACLE_USER@$ORACLE_HOST" deploy
