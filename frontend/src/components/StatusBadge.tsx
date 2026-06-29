@@ -1,4 +1,6 @@
 import { Badge } from '@mantine/core';
+import { useI18n } from '../i18n';
+import type { TranslationKey } from '../i18n';
 
 const COLOR: Record<string, string> = {
   DRAFT: 'gray',
@@ -26,10 +28,14 @@ const COLOR: Record<string, string> = {
 };
 
 export function StatusBadge({ status }: { status: string | undefined }) {
+  const { t } = useI18n();
   if (!status) return null;
+  // status.* mirrors the backend enum codes; fall back to the prettified code for any unmapped token.
+  const key = `status.${status}` as TranslationKey;
+  const label = t(key);
   return (
     <Badge color={COLOR[status] ?? 'gray'} variant="light">
-      {status.replaceAll('_', ' ')}
+      {label === key ? status.replaceAll('_', ' ') : label}
     </Badge>
   );
 }

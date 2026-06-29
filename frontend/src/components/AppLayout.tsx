@@ -1,4 +1,15 @@
-import { AppShell, Avatar, Burger, Button, Group, Menu, NavLink, ScrollArea, Title } from '@mantine/core';
+import {
+  AppShell,
+  Avatar,
+  Burger,
+  Button,
+  Group,
+  Menu,
+  NavLink,
+  ScrollArea,
+  SegmentedControl,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconBook2,
@@ -13,22 +24,25 @@ import {
 } from '@tabler/icons-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
+import { useI18n } from '../i18n';
+import type { Locale, TranslationKey } from '../i18n';
 
-const NAV = [
-  { to: '/', label: 'Dashboard', icon: IconLayoutDashboard },
-  { to: '/masterdata', label: 'Master Data', icon: IconDatabase },
-  { to: '/purchasing', label: 'Purchasing', icon: IconShoppingCart },
-  { to: '/sales', label: 'Sales', icon: IconTruckDelivery },
-  { to: '/manufacturing', label: 'Manufacturing', icon: IconBuildingFactory2 },
-  { to: '/inventory', label: 'Inventory', icon: IconBoxSeam },
-  { to: '/reporting', label: 'Reporting', icon: IconReportAnalytics },
-  { to: '/ledger', label: 'Ledger', icon: IconBook2 },
+const NAV: { to: string; labelKey: TranslationKey; icon: typeof IconLayoutDashboard }[] = [
+  { to: '/', labelKey: 'nav.dashboard', icon: IconLayoutDashboard },
+  { to: '/masterdata', labelKey: 'nav.masterData', icon: IconDatabase },
+  { to: '/purchasing', labelKey: 'nav.purchasing', icon: IconShoppingCart },
+  { to: '/sales', labelKey: 'nav.sales', icon: IconTruckDelivery },
+  { to: '/manufacturing', labelKey: 'nav.manufacturing', icon: IconBuildingFactory2 },
+  { to: '/inventory', labelKey: 'nav.inventory', icon: IconBoxSeam },
+  { to: '/reporting', labelKey: 'nav.reporting', icon: IconReportAnalytics },
+  { to: '/ledger', labelKey: 'nav.ledger', icon: IconBook2 },
 ];
 
 export function AppLayout() {
   const [opened, { toggle, close }] = useDisclosure();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { locale, setLocale, t } = useI18n();
 
   return (
     <AppShell
@@ -40,29 +54,41 @@ export function AppLayout() {
         <Group h="100%" px="md" justify="space-between">
           <Group gap="sm">
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-            <Title order={4}>Manufacturing ERP</Title>
+            <Title order={4}>{t('app.title')}</Title>
           </Group>
-          <Menu position="bottom-end" withinPortal>
-            <Menu.Target>
-              <Button
-                variant="subtle"
-                color="gray"
-                leftSection={
-                  <Avatar size={26} radius="xl" color="indigo">
-                    {user?.username?.charAt(0).toUpperCase()}
-                  </Avatar>
-                }
-              >
-                {user?.username}
-              </Button>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Label>{user?.roles.join(', ') || 'No roles'}</Menu.Label>
-              <Menu.Item color="red" leftSection={<IconLogout size={16} />} onClick={logout}>
-                Sign out
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
+          <Group gap="sm">
+            <SegmentedControl
+              size="xs"
+              aria-label={t('common.language')}
+              value={locale}
+              onChange={(v) => setLocale(v as Locale)}
+              data={[
+                { label: '中', value: 'zh-TW' },
+                { label: 'EN', value: 'en' },
+              ]}
+            />
+            <Menu position="bottom-end" withinPortal>
+              <Menu.Target>
+                <Button
+                  variant="subtle"
+                  color="gray"
+                  leftSection={
+                    <Avatar size={26} radius="xl" color="indigo">
+                      {user?.username?.charAt(0).toUpperCase()}
+                    </Avatar>
+                  }
+                >
+                  {user?.username}
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label>{user?.roles.join(', ') || t('common.noRoles')}</Menu.Label>
+                <Menu.Item color="red" leftSection={<IconLogout size={16} />} onClick={logout}>
+                  {t('common.signOut')}
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </Group>
         </Group>
       </AppShell.Header>
 
@@ -77,7 +103,7 @@ export function AppLayout() {
                 key={item.to}
                 component={Link}
                 to={item.to}
-                label={item.label}
+                label={t(item.labelKey)}
                 leftSection={<Icon size={18} />}
                 active={active}
                 onClick={close}
