@@ -218,6 +218,9 @@ localStorage. i18n is a **dependency-free, self-built typed context** — transl
 compile time (a missing translation in either locale fails the `build`), and the date calendar switches dayjs
 locale; money/number formatting and backend codes are intentionally not translated.
 
+**Print / PDF**: sales invoices, purchase orders, delivery notes and the trial balance print in one click
+(dedicated A4 print routes + print CSS; the browser's "Save as PDF"), bilingual via the same i18n.
+
 ## 📊 Data model
 
 The accounting spine (accounts, balanced journal entries, fiscal periods) is the centre; every business

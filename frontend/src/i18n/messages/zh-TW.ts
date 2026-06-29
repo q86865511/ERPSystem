@@ -9,6 +9,7 @@ import { ledgerZh } from './modules/ledger';
 import { manufacturingZh } from './modules/manufacturing';
 import { masterdataZh } from './modules/masterdata';
 import { paymentsZh } from './modules/payments';
+import { printZh } from './modules/print';
 import { purchasingZh } from './modules/purchasing';
 import { reportingZh } from './modules/reporting';
 import { salesZh } from './modules/sales';
@@ -150,4 +151,5 @@ export const zhTW: Messages = {
   reporting: reportingZh,
   ledger: ledgerZh,
   payments: paymentsZh,
+  print: printZh,
 };

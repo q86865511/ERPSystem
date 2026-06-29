@@ -16,6 +16,7 @@ import { ledgerEn } from './modules/ledger';
 import { manufacturingEn } from './modules/manufacturing';
 import { masterdataEn } from './modules/masterdata';
 import { paymentsEn } from './modules/payments';
+import { printEn } from './modules/print';
 import { purchasingEn } from './modules/purchasing';
 import { reportingEn } from './modules/reporting';
 import { salesEn } from './modules/sales';
@@ -158,4 +159,5 @@ export const en = {
   reporting: reportingEn,
   ledger: ledgerEn,
   payments: paymentsEn,
+  print: printEn,
 };

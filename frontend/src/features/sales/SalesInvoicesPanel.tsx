@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Badge,
   Button,
@@ -31,6 +32,7 @@ const orDefault = (value: string | undefined, fallback: string) => value ?? fall
 
 export function SalesInvoicesPanel() {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const { canDo } = useAuth();
   const invoices = useInvoices();
   const orders = useOrders();
@@ -247,11 +249,20 @@ export function SalesInvoicesPanel() {
       >
         {detail.data && (
           <Stack>
-            <Group>
-              <StatusBadge status={detail.data.status} />
-              {detail.data.journalEntryId != null && (
-                <Badge variant="light">{t('sales.je', { id: detail.data.journalEntryId })}</Badge>
-              )}
+            <Group justify="space-between">
+              <Group>
+                <StatusBadge status={detail.data.status} />
+                {detail.data.journalEntryId != null && (
+                  <Badge variant="light">{t('sales.je', { id: detail.data.journalEntryId })}</Badge>
+                )}
+              </Group>
+              <Button
+                variant="default"
+                size="xs"
+                onClick={() => detailId && navigate(`/print/sales-invoice/${detailId}`)}
+              >
+                {t('print.print')}
+              </Button>
             </Group>
             <SimpleGrid cols={4}>
               <Text size="sm">

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Badge, Button, Drawer, Group, Loader, Modal, Select, Stack, Table, Text, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { DateInput } from '@mantine/dates';
@@ -18,6 +19,7 @@ const SHIPPABLE = new Set(['CONFIRMED', 'PARTIALLY_SHIPPED']);
 
 export function DeliveriesPanel() {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const { canDo } = useAuth();
   const deliveries = useDeliveries();
   const orders = useOrders();
@@ -189,7 +191,16 @@ export function DeliveriesPanel() {
       >
         {detail.data && (
           <Stack>
-            <StatusBadge status={detail.data.status} />
+            <Group justify="space-between">
+              <StatusBadge status={detail.data.status} />
+              <Button
+                variant="default"
+                size="xs"
+                onClick={() => detailId && navigate(`/print/delivery/${detailId}`)}
+              >
+                {t('print.print')}
+              </Button>
+            </Group>
             <Table>
               <Table.Thead>
                 <Table.Tr>
