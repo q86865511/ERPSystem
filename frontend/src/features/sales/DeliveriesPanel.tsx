@@ -8,6 +8,7 @@ import type { CreateDeliveryRequest } from '../../api/types';
 import { LocationSelect } from '../../components/EntitySelect';
 import { MoneyText } from '../../components/Money';
 import { StatusBadge } from '../../components/StatusBadge';
+import { useI18n } from '../../i18n';
 import { useItemMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
 import { notifyError, notifySuccess } from '../../lib/notify';
@@ -16,6 +17,7 @@ import { useCreateDelivery, useDeliveries, useDelivery, useOrder, useOrders } fr
 const SHIPPABLE = new Set(['CONFIRMED', 'PARTIALLY_SHIPPED']);
 
 export function DeliveriesPanel() {
+  const { t } = useI18n();
   const { canDo } = useAuth();
   const deliveries = useDeliveries();
   const orders = useOrders();
@@ -47,7 +49,7 @@ export function DeliveriesPanel() {
       .filter(([, q]) => q && Number(q) > 0)
       .map(([soLineId, qty]) => ({ soLineId: Number(soLineId), qty }));
     if (!soId || !locationId || lines.length === 0) {
-      notifyError('Pick an SO, a stock location, and at least one quantity');
+      notifyError(t('sales.delivery.needInput'));
       return;
     }
     const body: CreateDeliveryRequest = {
@@ -58,7 +60,7 @@ export function DeliveriesPanel() {
     };
     try {
       const d = await create.mutateAsync(body);
-      notifySuccess(`Delivery ${d?.deliveryNumber} posted`);
+      notifySuccess(t('sales.delivery.posted', { deliveryNumber: d?.deliveryNumber ?? '' }));
       close();
       if (d?.id != null) setDetailId(d.id);
     } catch (e) {
@@ -72,7 +74,7 @@ export function DeliveriesPanel() {
       {canDo('sales.delivery') && (
         <Group justify="flex-end">
           <Button leftSection={<IconPlus size={16} />} onClick={openForm}>
-            New delivery
+            {t('sales.delivery.new')}
           </Button>
         </Group>
       )}
@@ -80,9 +82,9 @@ export function DeliveriesPanel() {
       <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Delivery #</Table.Th>
-            <Table.Th>Posting date</Table.Th>
-            <Table.Th>Status</Table.Th>
+            <Table.Th>{t('sales.delivery.deliveryNumber')}</Table.Th>
+            <Table.Th>{t('sales.delivery.postingDate')}</Table.Th>
+            <Table.Th>{t('field.status')}</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
@@ -96,7 +98,7 @@ export function DeliveriesPanel() {
               </Table.Td>
               <Table.Td ta="right">
                 <Button size="xs" variant="subtle" onClick={() => setDetailId(d.id ?? null)}>
-                  View
+                  {t('common.view')}
                 </Button>
               </Table.Td>
             </Table.Tr>
@@ -105,16 +107,16 @@ export function DeliveriesPanel() {
       </Table>
       {!deliveries.isLoading && rows.length === 0 && (
         <Text c="dimmed" ta="center" py="md">
-          No deliveries yet.
+          {t('sales.delivery.empty')}
         </Text>
       )}
 
-      <Modal opened={opened} onClose={close} title="New delivery" size="xl">
+      <Modal opened={opened} onClose={close} title={t('sales.delivery.modalTitle')} size="xl">
         <Stack>
           <Group grow>
             <Select
-              label="Sales order"
-              placeholder="Confirmed SO"
+              label={t('sales.delivery.salesOrder')}
+              placeholder={t('sales.delivery.soPlaceholder')}
               searchable
               data={soOptions}
               value={soId != null ? String(soId) : null}
@@ -124,12 +126,12 @@ export function DeliveriesPanel() {
               }}
             />
             <LocationSelect
-              label="Ship-from location"
+              label={t('sales.delivery.shipFrom')}
               locationType="STOCK"
               value={locationId}
               onChange={setLocationId}
             />
-            <DateInput label="Posting date" value={postingDate} onChange={setPostingDate} />
+            <DateInput label={t('sales.delivery.postingDate')} value={postingDate} onChange={setPostingDate} />
           </Group>
 
           {soId && so.isLoading && <Loader size="sm" />}
@@ -137,11 +139,11 @@ export function DeliveriesPanel() {
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Item</Table.Th>
-                  <Table.Th ta="right">Ordered</Table.Th>
-                  <Table.Th ta="right">Shipped</Table.Th>
+                  <Table.Th>{t('field.item')}</Table.Th>
+                  <Table.Th ta="right">{t('sales.delivery.ordered')}</Table.Th>
+                  <Table.Th ta="right">{t('sales.delivery.shipped')}</Table.Th>
                   <Table.Th ta="right" w={120}>
-                    Ship now
+                    {t('sales.delivery.shipNow')}
                   </Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -169,10 +171,10 @@ export function DeliveriesPanel() {
 
           <Group justify="flex-end">
             <Button variant="default" onClick={close}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button onClick={submit} loading={create.isPending}>
-              Post delivery
+              {t('sales.delivery.post')}
             </Button>
           </Group>
         </Stack>
@@ -183,7 +185,7 @@ export function DeliveriesPanel() {
         onClose={() => setDetailId(null)}
         position="right"
         size="xl"
-        title={`Delivery ${detail.data?.deliveryNumber ?? ''}`}
+        title={t('sales.delivery.drawerTitle', { deliveryNumber: detail.data?.deliveryNumber ?? '' })}
       >
         {detail.data && (
           <Stack>
@@ -191,10 +193,10 @@ export function DeliveriesPanel() {
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Item</Table.Th>
-                  <Table.Th ta="right">Qty</Table.Th>
-                  <Table.Th ta="right">Unit cost</Table.Th>
-                  <Table.Th>Posting</Table.Th>
+                  <Table.Th>{t('field.item')}</Table.Th>
+                  <Table.Th ta="right">{t('sales.delivery.qty')}</Table.Th>
+                  <Table.Th ta="right">{t('field.unitCost')}</Table.Th>
+                  <Table.Th>{t('sales.delivery.posting')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -208,7 +210,7 @@ export function DeliveriesPanel() {
                     <Table.Td>
                       {l.journalEntryId != null && (
                         <Badge variant="light" size="sm">
-                          JE #{l.journalEntryId}
+                          {t('sales.je', { id: l.journalEntryId })}
                         </Badge>
                       )}
                     </Table.Td>
@@ -217,7 +219,7 @@ export function DeliveriesPanel() {
               </Table.Tbody>
             </Table>
             <Text size="xs" c="dimmed">
-              Shipped at cost: Dr Deferred-COGS / Cr Finished Goods (COGS is recognised at invoicing).
+              {t('sales.delivery.costNote')}
             </Text>
           </Stack>
         )}

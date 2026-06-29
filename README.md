@@ -156,6 +156,8 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 每張文件的詳情都把過帳結果攤開(關聯的 `journalEntryId`、`movementGroupId`、狀態流轉),呼應這個 ERP 的賣點:帳怎麼走,看得見。
 
+**中／英雙語 UI**:右上角「中 / EN」切換器即時切換語言,預設**跟隨瀏覽器**(`zh-*` → 繁中,其餘 → 英文),偏好存於 localStorage。i18n 為**自建的零依賴 typed context** —— 翻譯 key 在編譯期型別檢查(任一語言漏譯直接 `build` 失敗),日期月曆隨語言切 dayjs locale;金額/數字格式與後端代碼不在翻譯面。
+
 ## 📊 資料模型
 
 會計脊椎(科目、平衡分錄、會計期間)是中心;每張業務文件把過帳連回分錄,庫存移動是 append-only 子帳並對帳到 GL。

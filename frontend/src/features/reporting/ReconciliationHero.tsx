@@ -11,6 +11,7 @@ import {
 } from '@mantine/core';
 import { IconCheck, IconShieldCheck, IconShieldX, IconX } from '@tabler/icons-react';
 import { MoneyText } from '../../components/Money';
+import { useI18n } from '../../i18n';
 import { useReconciliation } from './api';
 
 function YesNo({ ok }: { ok: boolean | undefined }) {
@@ -26,6 +27,7 @@ function YesNo({ ok }: { ok: boolean | undefined }) {
 }
 
 export function ReconciliationHero({ asOf }: { asOf?: string }) {
+  const { t } = useI18n();
   const { data, isLoading, isError } = useReconciliation(asOf);
 
   const healthy = data?.healthy ?? false;
@@ -46,16 +48,24 @@ export function ReconciliationHero({ asOf }: { asOf?: string }) {
           </ThemeIcon>
           <Stack gap={0}>
             <Title order={3}>
-              {isLoading ? 'Checking the books…' : healthy ? 'Books reconcile' : 'Out of balance'}
+              {isLoading
+                ? t('reporting.reconciliation.checking')
+                : healthy
+                  ? t('reporting.reconciliation.reconcile')
+                  : t('reporting.reconciliation.outOfBalance')}
             </Title>
             <Text size="sm" c="dimmed">
-              Reconciliation health-check{data?.asOf ? ` · as of ${data.asOf}` : ''}
+              {data?.asOf
+                ? t('reporting.reconciliation.healthCheckAsOf', { asOf: data.asOf })
+                : t('reporting.reconciliation.healthCheck')}
             </Text>
           </Stack>
         </Group>
         {!isLoading && (
           <Badge size="lg" color={data?.trialBalanceBalanced ? 'teal' : 'red'} variant="light">
-            Trial balance {data?.trialBalanceBalanced ? 'balanced' : 'unbalanced'}
+            {data?.trialBalanceBalanced
+              ? t('reporting.reconciliation.trialBalanceBalanced')
+              : t('reporting.reconciliation.trialBalanceUnbalanced')}
           </Badge>
         )}
       </Group>
@@ -68,16 +78,16 @@ export function ReconciliationHero({ asOf }: { asOf?: string }) {
         <Stack gap="lg" mt="lg">
           <div>
             <Text fw={600} size="sm" mb="xs">
-              Subledgers vs GL control accounts
+              {t('reporting.reconciliation.subledgersTitle')}
             </Text>
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Subledger</Table.Th>
-                  <Table.Th>Account</Table.Th>
-                  <Table.Th ta="right">Subledger</Table.Th>
-                  <Table.Th ta="right">GL control</Table.Th>
-                  <Table.Th ta="center">Reconciled</Table.Th>
+                  <Table.Th>{t('reporting.reconciliation.subledger')}</Table.Th>
+                  <Table.Th>{t('reporting.trialBalance.account')}</Table.Th>
+                  <Table.Th ta="right">{t('reporting.reconciliation.subledger')}</Table.Th>
+                  <Table.Th ta="right">{t('reporting.reconciliation.glControl')}</Table.Th>
+                  <Table.Th ta="center">{t('reporting.reconciliation.reconciled')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -104,7 +114,7 @@ export function ReconciliationHero({ asOf }: { asOf?: string }) {
 
           <div>
             <Text fw={600} size="sm" mb="xs">
-              Clearing accounts (net to zero over a complete cycle)
+              {t('reporting.reconciliation.clearingTitle')}
             </Text>
             <Group gap="sm">
               {clearing.map((c) => (

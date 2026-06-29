@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Badge, Group, Loader, Table, Text } from '@mantine/core';
 import { MoneyText } from '../../components/Money';
+import { useI18n } from '../../i18n';
 import { GeneralLedgerDrawer } from './GeneralLedgerDrawer';
 import { useTrialBalance } from './api';
 
 export function TrialBalancePanel({ asOf }: { asOf?: string }) {
+  const { t } = useI18n();
   const { data, isLoading } = useTrialBalance(asOf);
   const [selected, setSelected] = useState<{ code: string; name?: string } | null>(null);
   const rows = data?.lines ?? [];
@@ -13,10 +15,10 @@ export function TrialBalancePanel({ asOf }: { asOf?: string }) {
     <>
       <Group justify="space-between" mb="sm">
         <Text size="sm" c="dimmed">
-          Click an account to drill into its ledger.
+          {t('reporting.trialBalance.drillHint')}
         </Text>
         <Badge color={data?.balanced ? 'teal' : 'red'} variant="light">
-          {data?.balanced ? 'Balanced' : 'Unbalanced'}
+          {data?.balanced ? t('reporting.trialBalance.balanced') : t('reporting.trialBalance.unbalanced')}
         </Badge>
       </Group>
 
@@ -28,11 +30,11 @@ export function TrialBalancePanel({ asOf }: { asOf?: string }) {
         <Table striped highlightOnHover>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>Code</Table.Th>
-              <Table.Th>Account</Table.Th>
-              <Table.Th>Class</Table.Th>
-              <Table.Th ta="right">Debit</Table.Th>
-              <Table.Th ta="right">Credit</Table.Th>
+              <Table.Th>{t('field.code')}</Table.Th>
+              <Table.Th>{t('reporting.trialBalance.account')}</Table.Th>
+              <Table.Th>{t('reporting.trialBalance.class')}</Table.Th>
+              <Table.Th ta="right">{t('field.debit')}</Table.Th>
+              <Table.Th ta="right">{t('field.credit')}</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -56,7 +58,7 @@ export function TrialBalancePanel({ asOf }: { asOf?: string }) {
           </Table.Tbody>
           <Table.Tfoot>
             <Table.Tr>
-              <Table.Th colSpan={3}>Total</Table.Th>
+              <Table.Th colSpan={3}>{t('field.total')}</Table.Th>
               <Table.Th ta="right">
                 <MoneyText value={data?.totalDebit} />
               </Table.Th>

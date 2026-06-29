@@ -1,0 +1,70 @@
+/**
+ * Ledger module message fragment (En + Zh). Merged into the core catalogues by the i18n index.
+ * Keys live under the `ledger.*` namespace. Shared labels (debit/credit/memo/status/...) are reused
+ * from `common.*` / `field.*` and intentionally NOT duplicated here.
+ */
+export const ledgerEn = {
+  page: {
+    title: 'Ledger',
+    subtitle: 'Manual journal entries and fiscal-period close',
+  },
+  tabs: {
+    manualEntry: 'Manual entry',
+    periods: 'Fiscal periods',
+  },
+  manual: {
+    requiresAccountant: 'Manual journal entries require the ACCOUNTANT role.',
+    postingDate: 'Posting date',
+    account: 'Account',
+    accountPlaceholder: 'Account',
+    balanced: 'Balanced',
+    unbalanced: 'Unbalanced',
+    postEntry: 'Post entry',
+    mustBalance: 'Entry must balance (total debit = total credit) with at least two lines',
+    posted: 'Journal entry #{entryNo} posted',
+  },
+  periods: {
+    requiresAccountant: 'Closing or reopening periods requires the ACCOUNTANT role.',
+    hint: 'Soft-close blocks postings dated in a closed period; reopen to allow them again.',
+    fiscalYearCode: 'Fiscal year code',
+    periodMonth: 'Period (month)',
+    closePeriod: 'Close period',
+    reopenPeriod: 'Reopen period',
+    alertTitle: 'Period {periodNo} · {yearCode}',
+    closed: 'Period {periodNo} closed',
+    reopened: 'Period {periodNo} reopened',
+  },
+};
+
+export const ledgerZh: typeof ledgerEn = {
+  page: {
+    title: '總帳',
+    subtitle: '手動分錄與會計期間結帳',
+  },
+  tabs: {
+    manualEntry: '手動分錄',
+    periods: '會計期間',
+  },
+  manual: {
+    requiresAccountant: '手動分錄需要 ACCOUNTANT 角色。',
+    postingDate: '過帳日期',
+    account: '科目',
+    accountPlaceholder: '科目',
+    balanced: '已平衡',
+    unbalanced: '未平衡',
+    postEntry: '過帳分錄',
+    mustBalance: '分錄必須平衡(借方合計 = 貸方合計)且至少兩行',
+    posted: '分錄 #{entryNo} 已過帳',
+  },
+  periods: {
+    requiresAccountant: '關閉或重開會計期間需要 ACCOUNTANT 角色。',
+    hint: '軟關閉會封鎖屬於已關閉期間的過帳;重開後即可再次過帳。',
+    fiscalYearCode: '會計年度代碼',
+    periodMonth: '期間(月份)',
+    closePeriod: '關閉期間',
+    reopenPeriod: '重開期間',
+    alertTitle: '期間 {periodNo} · {yearCode}',
+    closed: '期間 {periodNo} 已關閉',
+    reopened: '期間 {periodNo} 已重開',
+  },
+};

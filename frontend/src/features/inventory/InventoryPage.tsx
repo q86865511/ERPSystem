@@ -3,6 +3,7 @@ import { Card, Group, Loader, SimpleGrid, Stack, Table, Tabs, Text } from '@mant
 import { ItemSelect } from '../../components/EntitySelect';
 import { MoneyText } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
+import { useI18n } from '../../i18n';
 import { AdjustmentsPanel } from './AdjustmentsPanel';
 import { useInventoryReconciliation, useItemOnHand } from './api';
 
@@ -20,6 +21,7 @@ function Stat({ label, value, money }: { label: string; value?: string; money?: 
 }
 
 function OverviewPanel() {
+  const { t } = useI18n();
   const [itemId, setItemId] = useState<number | null>(null);
   const onHand = useItemOnHand(itemId);
   const recon = useInventoryReconciliation();
@@ -29,9 +31,9 @@ function OverviewPanel() {
     <Stack gap="lg">
       <Card withBorder radius="md" padding="lg">
         <Text fw={600} mb="sm">
-          On-hand lookup
+          {t('inventory.onHandLookup')}
         </Text>
-        <ItemSelect label="Item" placeholder="Pick an item" value={itemId} onChange={setItemId} maw={360} />
+        <ItemSelect label={t('field.item')} placeholder={t('inventory.pickItem')} value={itemId} onChange={setItemId} maw={360} />
         {itemId != null && onHand.isFetching && (
           <Group mt="md">
             <Loader size="sm" />
@@ -39,16 +41,16 @@ function OverviewPanel() {
         )}
         {onHand.data && (
           <SimpleGrid cols={{ base: 1, sm: 3 }} mt="md">
-            <Stat label="On hand" value={onHand.data.onHandQty} />
-            <Stat label="Avg unit cost" value={onHand.data.avgUnitCost} money />
-            <Stat label="Total value" value={onHand.data.totalValue} money />
+            <Stat label={t('inventory.onHand')} value={onHand.data.onHandQty} />
+            <Stat label={t('inventory.avgUnitCost')} value={onHand.data.avgUnitCost} money />
+            <Stat label={t('inventory.totalValue')} value={onHand.data.totalValue} money />
           </SimpleGrid>
         )}
       </Card>
 
       <Card withBorder radius="md" padding="lg">
         <Text fw={600} mb="sm">
-          Inventory subledger vs GL control accounts
+          {t('inventory.reconTitle')}
         </Text>
         {recon.isLoading ? (
           <Group justify="center" py="md">
@@ -58,8 +60,8 @@ function OverviewPanel() {
           <Table>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Account</Table.Th>
-                <Table.Th ta="right">Subledger value</Table.Th>
+                <Table.Th>{t('inventory.account')}</Table.Th>
+                <Table.Th ta="right">{t('inventory.subledgerValue')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -80,13 +82,14 @@ function OverviewPanel() {
 }
 
 export function InventoryPage() {
+  const { t } = useI18n();
   return (
     <>
-      <PageHeader title="Inventory" subtitle="On-hand stock, reconciliation and adjustments" />
+      <PageHeader title={t('nav.inventory')} subtitle={t('inventory.subtitle')} />
       <Tabs defaultValue="overview" keepMounted={false}>
         <Tabs.List mb="md">
-          <Tabs.Tab value="overview">Overview</Tabs.Tab>
-          <Tabs.Tab value="adjustments">Adjustments</Tabs.Tab>
+          <Tabs.Tab value="overview">{t('inventory.tabs.overview')}</Tabs.Tab>
+          <Tabs.Tab value="adjustments">{t('inventory.tabs.adjustments')}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="overview">
           <OverviewPanel />

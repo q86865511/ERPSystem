@@ -1,7 +1,9 @@
 import { Group, Loader, Table, Text } from '@mantine/core';
+import { useI18n } from '../../i18n';
 import { useReorderReport } from './api';
 
 export function ReorderReportPanel() {
+  const { t } = useI18n();
   const { data, isLoading } = useReorderReport();
   const rows = data?.items ?? [];
 
@@ -16,15 +18,15 @@ export function ReorderReportPanel() {
   return (
     <>
       <Text size="sm" c="dimmed" mb="sm">
-        Items at or below their reorder point.
+        {t('manufacturing.reorder.hint')}
       </Text>
       <Table striped>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Item</Table.Th>
-            <Table.Th ta="right">On hand</Table.Th>
-            <Table.Th ta="right">Reorder point</Table.Th>
-            <Table.Th ta="right">Reorder qty</Table.Th>
+            <Table.Th>{t('field.item')}</Table.Th>
+            <Table.Th ta="right">{t('manufacturing.reorder.onHand')}</Table.Th>
+            <Table.Th ta="right">{t('manufacturing.reorder.reorderPoint')}</Table.Th>
+            <Table.Th ta="right">{t('manufacturing.reorder.reorderQty')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -40,7 +42,7 @@ export function ReorderReportPanel() {
       </Table>
       {rows.length === 0 && (
         <Text c="dimmed" ta="center" py="md">
-          Nothing needs reordering.
+          {t('manufacturing.reorder.empty')}
         </Text>
       )}
     </>

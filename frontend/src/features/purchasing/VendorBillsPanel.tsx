@@ -22,6 +22,7 @@ import { MoneyText } from '../../components/Money';
 import { StatusBadge } from '../../components/StatusBadge';
 import { useItemMap, usePartnerMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
+import { useI18n } from '../../i18n';
 import { notifyError, notifySuccess } from '../../lib/notify';
 import { useBill, useBills, useCreateBill, useOrder, useOrders } from './api';
 
@@ -32,6 +33,7 @@ function field(value: string | undefined, fallback: string) {
 }
 
 export function VendorBillsPanel() {
+  const { t } = useI18n();
   const { canDo } = useAuth();
   const bills = useBills();
   const orders = useOrders();
@@ -64,7 +66,7 @@ export function VendorBillsPanel() {
 
   const submit = async () => {
     if (!poId || !po.data) {
-      notifyError('Pick a purchase order');
+      notifyError(t('purchasing.bill.pickPo'));
       return;
     }
     const lines = (po.data.lines ?? [])
@@ -76,7 +78,7 @@ export function VendorBillsPanel() {
       })
       .filter((l) => Number(l.qty) > 0);
     if (lines.length === 0) {
-      notifyError('Nothing to bill on this PO');
+      notifyError(t('purchasing.bill.nothingToBill'));
       return;
     }
     const body: CreateBillRequest = {
@@ -87,7 +89,7 @@ export function VendorBillsPanel() {
     };
     try {
       const bill = await create.mutateAsync(body);
-      notifySuccess(`Vendor bill ${bill?.billNumber} posted`);
+      notifySuccess(t('purchasing.bill.posted', { billNumber: bill?.billNumber ?? '' }));
       close();
       if (bill?.id != null) setDetailId(bill.id);
     } catch (e) {
@@ -101,7 +103,7 @@ export function VendorBillsPanel() {
       {canDo('purchasing.vendorBill') && (
         <Group justify="flex-end">
           <Button leftSection={<IconPlus size={16} />} onClick={openForm}>
-            New vendor bill
+            {t('purchasing.bill.new')}
           </Button>
         </Group>
       )}
@@ -110,11 +112,11 @@ export function VendorBillsPanel() {
         <Table striped highlightOnHover>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>Bill #</Table.Th>
-              <Table.Th>Vendor</Table.Th>
-              <Table.Th ta="right">Gross</Table.Th>
-              <Table.Th ta="right">Open</Table.Th>
-              <Table.Th>Status</Table.Th>
+              <Table.Th>{t('purchasing.bill.billNumber')}</Table.Th>
+              <Table.Th>{t('field.vendor')}</Table.Th>
+              <Table.Th ta="right">{t('field.gross')}</Table.Th>
+              <Table.Th ta="right">{t('purchasing.bill.open')}</Table.Th>
+              <Table.Th>{t('field.status')}</Table.Th>
               <Table.Th />
             </Table.Tr>
           </Table.Thead>
@@ -134,7 +136,7 @@ export function VendorBillsPanel() {
                 </Table.Td>
                 <Table.Td ta="right">
                   <Button size="xs" variant="subtle" onClick={() => setDetailId(b.id ?? null)}>
-                    View
+                    {t('common.view')}
                   </Button>
                 </Table.Td>
               </Table.Tr>
@@ -144,16 +146,16 @@ export function VendorBillsPanel() {
       </Table.ScrollContainer>
       {!bills.isLoading && rows.length === 0 && (
         <Text c="dimmed" ta="center" py="md">
-          No vendor bills yet.
+          {t('purchasing.bill.none')}
         </Text>
       )}
 
-      <Modal opened={opened} onClose={close} title="New vendor bill" size="xl">
+      <Modal opened={opened} onClose={close} title={t('purchasing.bill.new')} size="xl">
         <Stack>
           <Group grow>
             <Select
-              label="Purchase order"
-              placeholder="PO to bill"
+              label={t('purchasing.bill.purchaseOrder')}
+              placeholder={t('purchasing.bill.poToBillPlaceholder')}
               searchable
               data={poOptions}
               value={poId != null ? String(poId) : null}
@@ -163,11 +165,11 @@ export function VendorBillsPanel() {
               }}
             />
             <TextInput
-              label="Tax rate code"
+              label={t('purchasing.bill.taxRateCode')}
               value={taxRateCode}
               onChange={(e) => setTaxRateCode(e.currentTarget.value)}
             />
-            <DateInput label="Posting date" value={postingDate} onChange={setPostingDate} />
+            <DateInput label={t('purchasing.bill.postingDate')} value={postingDate} onChange={setPostingDate} />
           </Group>
 
           {poId && po.isLoading && <Loader size="sm" />}
@@ -175,14 +177,14 @@ export function VendorBillsPanel() {
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Item</Table.Th>
-                  <Table.Th ta="right">Received</Table.Th>
-                  <Table.Th ta="right">Billed</Table.Th>
+                  <Table.Th>{t('field.item')}</Table.Th>
+                  <Table.Th ta="right">{t('purchasing.bill.received')}</Table.Th>
+                  <Table.Th ta="right">{t('purchasing.bill.billed')}</Table.Th>
                   <Table.Th ta="right" w={110}>
-                    Qty
+                    {t('field.quantity')}
                   </Table.Th>
                   <Table.Th ta="right" w={120}>
-                    Unit price
+                    {t('field.unitPrice')}
                   </Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -224,10 +226,10 @@ export function VendorBillsPanel() {
 
           <Group justify="flex-end">
             <Button variant="default" onClick={close}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button onClick={submit} loading={create.isPending}>
-              Post bill
+              {t('purchasing.bill.postBill')}
             </Button>
           </Group>
         </Stack>
@@ -238,35 +240,37 @@ export function VendorBillsPanel() {
         onClose={() => setDetailId(null)}
         position="right"
         size="xl"
-        title={`Vendor bill ${detail.data?.billNumber ?? ''}`}
+        title={t('purchasing.bill.drawerTitle', { billNumber: detail.data?.billNumber ?? '' })}
       >
         {detail.data && (
           <Stack>
             <Group>
               <StatusBadge status={detail.data.status} />
               {detail.data.journalEntryId != null && (
-                <Badge variant="light">JE #{detail.data.journalEntryId}</Badge>
+                <Badge variant="light">
+                  {t('purchasing.bill.journalEntry', { id: detail.data.journalEntryId })}
+                </Badge>
               )}
             </Group>
             <SimpleGrid cols={3}>
               <Text size="sm">
-                Goods <MoneyText value={detail.data.goodsAmount} />
+                {t('purchasing.bill.goods')} <MoneyText value={detail.data.goodsAmount} />
               </Text>
               <Text size="sm">
-                VAT <MoneyText value={detail.data.vatAmount} />
+                {t('field.vat')} <MoneyText value={detail.data.vatAmount} />
               </Text>
               <Text size="sm">
-                Gross <MoneyText value={detail.data.grossAmount} />
+                {t('field.gross')} <MoneyText value={detail.data.grossAmount} />
               </Text>
             </SimpleGrid>
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Item</Table.Th>
-                  <Table.Th ta="right">Qty</Table.Th>
-                  <Table.Th ta="right">Net</Table.Th>
-                  <Table.Th ta="right">VAT</Table.Th>
-                  <Table.Th>Match</Table.Th>
+                  <Table.Th>{t('field.item')}</Table.Th>
+                  <Table.Th ta="right">{t('field.quantity')}</Table.Th>
+                  <Table.Th ta="right">{t('field.net')}</Table.Th>
+                  <Table.Th ta="right">{t('field.vat')}</Table.Th>
+                  <Table.Th>{t('purchasing.bill.match')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -288,7 +292,7 @@ export function VendorBillsPanel() {
               </Table.Tbody>
             </Table>
             <Text size="xs" c="dimmed">
-              Posted Dr GR-IR + Dr Input VAT / Cr AP; any price variance revalues inventory.
+              {t('purchasing.bill.postingNote')}
             </Text>
           </Stack>
         )}

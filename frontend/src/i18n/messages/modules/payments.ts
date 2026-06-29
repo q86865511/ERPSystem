@@ -1,0 +1,76 @@
+/**
+ * payments 模組(共用)字典片段:對外付款(out)與收款(in)。
+ * 結構由 En 定義,Zh 以 `: typeof paymentsEn` 約束,確保兩者 key 結構一致(不一致即編譯失敗)。
+ * 通用字串(common.* / field.*)沿用核心字典,不在此重複定義。
+ */
+export const paymentsEn = {
+  out: {
+    newPayment: 'New payment',
+    paymentNumber: 'Payment #',
+    noPayments: 'No payments yet.',
+    newVendorPayment: 'New vendor payment',
+    bill: 'Bill',
+    noOpenBills: 'No open bills for this vendor.',
+    postPayment: 'Post payment',
+    pickVendor: 'Pick a vendor and allocate to at least one bill',
+    posted: 'Payment {payNumber} posted',
+    drawerTitle: 'Payment {payNumber}',
+    postingNote: 'Posted Dr AP / Cr Cash and settled the allocated bills.',
+  },
+  in: {
+    newReceipt: 'New receipt',
+    receiptNumber: 'Receipt #',
+    noReceipts: 'No receipts yet.',
+    newCustomerReceipt: 'New customer receipt',
+    invoice: 'Invoice',
+    noOpenInvoices: 'No open invoices for this customer.',
+    postReceipt: 'Post receipt',
+    pickCustomer: 'Pick a customer and allocate to at least one invoice',
+    posted: 'Receipt {payNumber} posted',
+    drawerTitle: 'Receipt {payNumber}',
+    postingNote: 'Posted Dr Cash / Cr AR and settled the allocated invoices.',
+  },
+  postingDate: 'Posting date',
+  open: 'Open',
+  allocate: 'Allocate',
+  allocated: 'Allocated',
+  documentNumber: 'Document #',
+  je: 'JE #{id}',
+  totalLabel: 'Total: {amount}',
+};
+
+export const paymentsZh: typeof paymentsEn = {
+  out: {
+    newPayment: '新增付款',
+    paymentNumber: '付款編號',
+    noPayments: '尚無付款。',
+    newVendorPayment: '新增廠商付款',
+    bill: '帳單',
+    noOpenBills: '此供應商沒有未結帳單。',
+    postPayment: '過帳付款',
+    pickVendor: '請選擇供應商並至少配款到一張帳單',
+    posted: '付款 {payNumber} 已過帳',
+    drawerTitle: '付款 {payNumber}',
+    postingNote: '已過帳:借 應付帳款 / 貸 現金,並結清已配款的帳單。',
+  },
+  in: {
+    newReceipt: '新增收款',
+    receiptNumber: '收款編號',
+    noReceipts: '尚無收款。',
+    newCustomerReceipt: '新增客戶收款',
+    invoice: '發票',
+    noOpenInvoices: '此客戶沒有未結發票。',
+    postReceipt: '過帳收款',
+    pickCustomer: '請選擇客戶並至少配款到一張發票',
+    posted: '收款 {payNumber} 已過帳',
+    drawerTitle: '收款 {payNumber}',
+    postingNote: '已過帳:借 現金 / 貸 應收帳款,並結清已配款的發票。',
+  },
+  postingDate: '過帳日期',
+  open: '未結餘額',
+  allocate: '配款',
+  allocated: '已配款',
+  documentNumber: '文件編號',
+  je: '分錄 #{id}',
+  totalLabel: '合計:{amount}',
+};

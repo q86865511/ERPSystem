@@ -1,5 +1,6 @@
 import { Tabs } from '@mantine/core';
 import { PageHeader } from '../../components/PageHeader';
+import { useI18n } from '../../i18n';
 import { PaymentsInPanel } from '../payments/PaymentsInPanel';
 import { ArAgingPanel } from './ArAgingPanel';
 import { CustomerReturnsPanel } from './CustomerReturnsPanel';
@@ -8,17 +9,18 @@ import { SalesInvoicesPanel } from './SalesInvoicesPanel';
 import { SalesOrdersPanel } from './SalesOrdersPanel';
 
 export function SalesPage() {
+  const { t } = useI18n();
   return (
     <>
-      <PageHeader title="Sales" subtitle="Order to cash: order → deliver → invoice → receipt" />
+      <PageHeader title={t('sales.title')} subtitle={t('sales.subtitle')} />
       <Tabs defaultValue="orders" keepMounted={false}>
         <Tabs.List mb="md">
-          <Tabs.Tab value="orders">Sales orders</Tabs.Tab>
-          <Tabs.Tab value="deliveries">Deliveries</Tabs.Tab>
-          <Tabs.Tab value="invoices">Invoices</Tabs.Tab>
-          <Tabs.Tab value="receipts">Receipts</Tabs.Tab>
-          <Tabs.Tab value="returns">Returns</Tabs.Tab>
-          <Tabs.Tab value="ar-aging">AR aging</Tabs.Tab>
+          <Tabs.Tab value="orders">{t('sales.tabs.orders')}</Tabs.Tab>
+          <Tabs.Tab value="deliveries">{t('sales.tabs.deliveries')}</Tabs.Tab>
+          <Tabs.Tab value="invoices">{t('sales.tabs.invoices')}</Tabs.Tab>
+          <Tabs.Tab value="receipts">{t('sales.tabs.receipts')}</Tabs.Tab>
+          <Tabs.Tab value="returns">{t('sales.tabs.returns')}</Tabs.Tab>
+          <Tabs.Tab value="ar-aging">{t('sales.tabs.arAging')}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="orders">
           <SalesOrdersPanel />
