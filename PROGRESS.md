@@ -12,14 +12,14 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
-- [2026-06-29] 🔐 JWT 認證 + 持久化使用者(待辦 C,後端 `mvn verify` 綠 / 前端 build 綠;實機待驗)
+- [2026-06-29] 🔐 JWT 認證 + 持久化使用者(待辦 C,✅ 完成並實機驗證)
   - **取代 HTTP Basic + in-memory** 為 **JWT(Spring 原生 `oauth2-resource-server` + Nimbus HS256)**:access(15min,前端記憶體)+ refresh(7d,httpOnly cookie `SameSite=Lax`/`Path=/api/auth`/Secure 依 `app.jwt.cookie-secure`)。`SecurityConfig` 改 bearer + 保留授權矩陣 + 自訂 401 entrypoint + `JwtEncoder`/`JwtDecoder`/converter(roles claim→`ROLE_`)+ `BCryptPasswordEncoder` + `AuthenticationManager`。CSRF 維持關閉(Bearer 免疫 + refresh cookie 同源 + 跨站不可讀)。
   - **持久化使用者**:`V15` 建 `app_user`(roles CSV);`iam.domain.User`/`iam.api.Role`/`iam.application.{UserRepository,DbUserDetailsService,JwtService}`/`iam.JwtProperties`。**`UserSeeder`**(profile-independent 冪等 ApplicationRunner,放 bootstrap)以 bcrypt 建 5 帳號(密碼=帳號;**guest 空 roles=唯讀**)→ 任何 profile/測試/demo 都有使用者,與 `@Profile("seed")` 的 DataSeeder 解耦。
   - **端點**:`POST /api/auth/{login,refresh,logout}`(login 回 access + set refresh cookie;refresh 讀 cookie 重簽;logout 清 cookie),`GET /api/auth/me` 保留。`OpenApiConfig` 改 Bearer scheme。`application.properties` 加 `app.jwt.*` + `server.forward-headers-strategy=FRAMEWORK`。
   - **前端**:`credentials.ts`→access 記憶體 store;`client.ts` Bearer + 401 single-flight refresh + clone 重放;`AuthContext` login/logout 打端點 + 載入 silent refresh + `bootstrapping`;`RequireAuth` loading 防閃爍;`LoginPage` guest 預設入口;i18n `login.guestEntry`;重生 `schema.d.ts`。
   - **訪客唯讀**:guest 無寫角色 → GET 可讀、所有 POST 天然 403(RbacIT 加 guest 案例驗證)。
   - **測試**:`RbacIT`/`AuthControllerIT` 改 Bearer(注入 `JwtEncoder` mint,走真實 filter chain);新 `AuthFlowIT`(login/refresh/logout/guest + cookie 屬性 + bcrypt seed 可驗)。`mvn verify` IT 77 全綠;`npm run build` 綠。
-  - **部署**:`compose.oracle.yaml` 加 app `APP_JWT_COOKIE_SECURE=true` + `APP_JWT_SECRET=${APP_JWT_SECRET}`(走 Oracle `~/erp-demo-test/.env`,`.env` 已 gitignore)。**前後端單一 PR 原子部署**(避免自動部署損壞窗口)。實機待驗:silent refresh 還原、線上 https cookie 往返、guest 唯讀。
+  - **部署**:`compose.oracle.yaml` 加 app `APP_JWT_COOKIE_SECURE=true` + `APP_JWT_SECRET=${APP_JWT_SECRET}`(走 Oracle `~/erp-demo-test/.env`,`.env` 已 gitignore)。**前後端單一 PR 原子部署**(避免自動部署損壞窗口)。**實機驗證通過([PR #41](https://github.com/q86865511/ERPSystem/pull/41) merge→自動部署)**:UserSeeder 建 5 帳號、login guest 回 Secure cookie、guest GET 200/POST 403、舊 Basic 401、對帳 healthy;headless Playwright 6/7(silent refresh 重載還原 session、guest 唯讀無建立鈕、登出、admin 寫入 UI)—— 餘 1 為無 session 的 refresh 401 探針噪音(非錯誤)。
 - [2026-06-29] 🤖 demo 維運自動化:自動部署 + 每晚重置(待辦 E,✅ 全數完成並驗證)
   - **自動部署**:`.github/workflows/deploy.yml`(`on: workflow_run` of "CI",`if` 三閘門 `conclusion==success && head_branch==main && event==push` 擋掉 fork PR 的 CI),merge 到 main + CI 綠後 SSH 進 Oracle 觸發部署。`permissions: {}` + `concurrency: deploy-oracle` + 自寫 `ssh`(不靠第三方 action)+ known_hosts pin。實際 build 在 Oracle(ARM)做。
   - **受限部署金鑰**:Oracle authorized_keys 用 forced `command=`(絕對路徑)+ `no-pty` 等,讓專用金鑰只能跑部署 wrapper、拿不到 shell。wrapper(`scripts/oracle-deploy.sh.example` → repo 外 `~/erp-demo-deploy.sh` 避免 git reset self-modification)做 `fetch + reset --hard origin/main` → `compose ... up -d --build --remove-orphans` → `image prune -f`(僅 dangling)。
