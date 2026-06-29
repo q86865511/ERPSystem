@@ -12,6 +12,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-29] 🌐 i18n PR1 地基 + 共用層(中/英語言切換,待辦 B)
+  - **方案=自建輕量 typed context(零依賴)**,非 react-i18next(作品集「從零自建」敘事 + 零 peer-dep 風險 + 編譯期 key 型別安全 + bundle ~0)。新 `frontend/src/i18n/`:`messages/en.ts`(型別來源,**不加 `as const`** 讓 leaf 維持 `string`)+ `messages/zh-TW.ts`(`: Messages` 約束 → 漏譯直接 `tsc` 失敗)、`types.ts`(`TranslationKey` 為遞迴推導的點分 key union)、`detectLocale.ts`(navigator.language `zh-*`→繁中)、`localePreference.ts`(localStorage,key `erp.locale`,仿 `auth/credentials.ts`)、`I18nContext.tsx`(仿 `AuthContext`;`t()` 找不到回傳 key 不 crash、`{name}` 輕量插值;`useEffect` 同步 `<html lang>` + dayjs locale + 非 React 翻譯橋)、`useI18n.ts`、`translator.ts`(`tGlobal` 供 `notify.ts` 等非 React 模組)、`index.ts`。
+  - **Provider 樹**:`main.tsx` 在 `MantineProvider` 內加 `<I18nProvider>`(內部再包 `@mantine/dates` 的 `DatesProvider`,locale 隨 state)。**語言切換器**:`AppLayout` header user menu 左側 `SegmentedControl`「中 / EN」,切換即時、偏好持久化、無需 reload。
+  - **共用層抽字串**:`AppLayout`(8 導航 label + app 標題 + 登出/無角色)、`StatusBadge`(22 狀態 token → `status.*`,找不到 fallback 回 `replaceAll`)、`EntitySelect`(4 個 nothingFound + locationType label)、`LoginPage`/`DashboardPage`/`NotFoundPage`/`ForbiddenPage`、`lib/notify.ts`(fallback 字串經 `tGlobal`)。字典含 `common`/`nav`/`login`/`dashboard`/`status`/`itemType`/`locationType`/`select`,繁中用語對齊 README。
+  - **驗證**:`npm run build`(`tsc -b && vite build`)綠 —— 型別把關證明字典結構一致、key 無誤。8 個業務模組(`features/*`)字串留待 **PR2**(實機點測待使用者機器)。
 - [2026-06-27] 🐳 P7-S8 容器化 demo + 雙語 README(Phase 7 Stage 8,Phase 7 收尾)
   - **容器化**:後端 `Dockerfile`(multi-stage:`temurin:21-jdk-jammy` 用 mvnw `-DskipTests` build → `jarmode=tools extract --layers` 分層 → `temurin:21-jre-jammy` 非 root + curl;Windows mvnw `sed CRLF` + chmod)。`frontend/Dockerfile`(`node:22-slim` `npm ci` + `vite build` → `nginx:1.27-alpine`)。`frontend/nginx/nginx.conf`(SPA `try_files` + 反代 `/api`、`/v3/api-docs`、`/swagger-ui`、`/webjars` 到 `app:8080`,`proxy_pass` 不帶尾斜線保留路徑)。`compose.demo.yaml`(獨立於既有 `compose.yaml`:postgres+named volume+`pg_isready` healthcheck → app(`SPRING_DATASOURCE_*`、`SPRING_PROFILES_ACTIVE=seed`、`SPRING_DOCKER_COMPOSE_ENABLED=false`、actuator health、`start_period 60s`)→ frontend `8081:80`)。`.dockerignore`(根與 frontend;根保留 `.mvn/wrapper/maven-wrapper.properties`)。`DataSeeder` 確認冪等(VEND-DEMO 已存在即跳過),故保留 volume 重跑安全。`docker compose -f compose.demo.yaml build` 兩 image(app 528MB / frontend 75MB)build 成功。**修正**:後端 image 原用 `jarmode=tools` 分層 + 舊版 `JarLauncher` ENTRYPOINT → 容器 `ClassNotFoundException`,改為直接 `java -jar app.jar`(fat jar)。**在 Oracle Cloud(ARM64,`ssh oracle`)端到端實測通過**:三容器 healthy、`/api/auth/me` 回角色、**對帳 `healthy:true`**(seed 後帳對平)、BigDecimal 為字串、Swagger 200、未認證 401 無 WWW-Authenticate(見 [[oracle-deploy-target]] 記憶)。
   - **CI**:`.github/workflows/ci.yml` 加 `frontend` job(`actions/setup-node@v4` Node 22 + `npm ci` + `npm run build`),原 job 改名 `backend`。
@@ -139,8 +144,9 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - ✅ **README 截圖(已做)**:Playwright 截 8 頁 + Modal 放 `docs/screenshots/`,README(繁/英)嵌入儀表板 hero + 採購/製造/財報。
 - **前端 bundle 瘦身**:`@tabler/icons` barrel 使 JS >800KB(build 警告);改 per-icon import 或 code-split。
 
-**B. 前端中/英 i18n 切換(使用者要求,新)**
-- 目前前端 UI 全英文。需加 **中文/英文 語言切換**(react-i18next 或輕量 context;抽出全部 UI 字串為 zh/en;AppShell header 放切換器;偏好存 localStorage)。與雙語 README 對齊。規模約一個 stage。**決定**:預設語言**跟隨瀏覽器**(zh-* → 繁中,其餘 → 英文),使用者可手動覆寫。(使用者選定先實機點測再做 i18n。)
+**B. 前端中/英 i18n 切換(使用者要求,進行中)**
+- ✅ **PR1 地基 + 共用層(已做,2026-06-29)**:自建輕量 typed context(零依賴)、語言切換器、共用元件 + 4 頁 + notify 抽字串。預設跟隨瀏覽器、可手動覆寫存 localStorage。計畫見 `~/.claude/plans/tender-cuddling-starlight.md`。
+- **PR2 逐模組抽字串(待做)**:8 個業務模組 `features/*` 的 `<Module>Page` + `*Panel.tsx` 字串抽取 + 補字典分支;Grep 掃殘留收尾;README 補語言切換說明。
 
 **C. 安全**
 - JWT + 持久化使用者/角色庫(取代 HTTP Basic + 4 in-memory;前端 auth 層已抽象化好接)。

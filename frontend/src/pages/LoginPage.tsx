@@ -16,11 +16,13 @@ import { useForm } from '@mantine/form';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
+import { useI18n } from '../i18n';
 
 const DEMO_USERS = ['admin', 'accountant', 'warehouse', 'sales'];
 
 export function LoginPage() {
   const { login, user } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +42,7 @@ export function LoginPage() {
       await login(username, password);
       navigate(from, { replace: true });
     } catch {
-      setError('Invalid username or password');
+      setError(t('login.invalidCredentials'));
     } finally {
       setLoading(false);
     }
@@ -51,9 +53,9 @@ export function LoginPage() {
       <Card withBorder shadow="sm" radius="md" p="xl" w={400}>
         <Stack gap="md">
           <Stack gap={2}>
-            <Title order={3}>Manufacturing ERP</Title>
+            <Title order={3}>{t('app.title')}</Title>
             <Text size="sm" c="dimmed">
-              Sign in to continue
+              {t('login.subtitle')}
             </Text>
           </Stack>
 
@@ -66,24 +68,24 @@ export function LoginPage() {
           <form onSubmit={form.onSubmit((v) => submit(v.username, v.password))}>
             <Stack gap="sm">
               <TextInput
-                label="Username"
+                label={t('login.username')}
                 autoComplete="username"
                 required
                 {...form.getInputProps('username')}
               />
               <PasswordInput
-                label="Password"
+                label={t('login.password')}
                 autoComplete="current-password"
                 required
                 {...form.getInputProps('password')}
               />
               <Button type="submit" loading={loading} fullWidth mt="xs">
-                Sign in
+                {t('login.signIn')}
               </Button>
             </Stack>
           </form>
 
-          <Divider label="Demo accounts" labelPosition="center" />
+          <Divider label={t('login.demoAccounts')} labelPosition="center" />
           <Group grow gap="xs">
             {DEMO_USERS.map((name) => (
               <Button
@@ -98,7 +100,7 @@ export function LoginPage() {
             ))}
           </Group>
           <Text size="xs" c="dimmed" ta="center">
-            Each demo account's password equals its username.
+            {t('login.demoHint')}
           </Text>
         </Stack>
       </Card>

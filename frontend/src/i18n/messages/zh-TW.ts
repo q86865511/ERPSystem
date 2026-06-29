@@ -1,0 +1,101 @@
+/**
+ * 繁體中文(台灣)訊息檔。`: Messages` 約束強制結構與 `en.ts` 完全一致 —— 漏 key / 多 key / 錯巢狀都會
+ * 讓 `tsc`(`npm run build`)失敗,這是防漏譯的核心。用語對齊 README.md(採購單/收貨/廠商帳單/工單/
+ * 對帳/過帳…)。enum 的 value 維持後端代碼,這裡只翻顯示用的 label。
+ */
+import type { Messages } from '../types';
+
+export const zhTW: Messages = {
+  app: {
+    title: '製造業 ERP',
+  },
+  common: {
+    signOut: '登出',
+    backToDashboard: '回到儀表板',
+    error: '錯誤',
+    requestFailed: '請求失敗',
+    noRoles: '無角色',
+    language: '語言',
+    create: '建立',
+    cancel: '取消',
+    confirm: '確認',
+    save: '儲存',
+    view: '檢視',
+    addLine: '新增一行',
+  },
+  nav: {
+    dashboard: '儀表板',
+    masterData: '主檔',
+    purchasing: '採購',
+    sales: '銷售',
+    manufacturing: '製造',
+    inventory: '庫存',
+    reporting: '報表',
+    ledger: '總帳',
+  },
+  login: {
+    subtitle: '請登入以繼續',
+    username: '帳號',
+    password: '密碼',
+    signIn: '登入',
+    invalidCredentials: '帳號或密碼錯誤',
+    demoAccounts: '示範帳號',
+    demoHint: '每個示範帳號的密碼與帳號相同。',
+  },
+  dashboard: {
+    signedInAs: '登入身分',
+    totalAssets: '總資產',
+    totalLiabilities: '總負債',
+    netIncome: '淨利',
+  },
+  notFound: {
+    message: '找不到這個頁面。',
+  },
+  forbidden: {
+    message: '你沒有執行此操作所需的角色權限。',
+  },
+  select: {
+    noItems: '查無商品',
+    noPartners: '查無夥伴',
+    noWarehouses: '查無倉庫',
+    noLocations: '查無儲位',
+  },
+  status: {
+    DRAFT: '草稿',
+    CONFIRMED: '已確認',
+    PARTIALLY_RECEIVED: '部分收貨',
+    RECEIVED: '已收貨',
+    PARTIALLY_SHIPPED: '部分出貨',
+    SHIPPED: '已出貨',
+    PARTIALLY_PAID: '部分結清',
+    PAID: '已結清',
+    POSTED: '已過帳',
+    RETURNED: '已退回',
+    CLOSED: '已結案',
+    CANCELLED: '已取消',
+    IN_PROGRESS: '進行中',
+    RELEASED: '已下達',
+    DONE: '已完成',
+    MATCHED: '已配對',
+    PARTIAL: '部分配對',
+    UNMATCHED: '未配對',
+    OPEN: '開啟',
+    LOCKED: '已鎖定',
+  },
+  itemType: {
+    RAW: '原料',
+    WIP: '在製品',
+    FINISHED: '成品',
+    SERVICE: '服務',
+  },
+  locationType: {
+    STOCK: '庫存',
+    RECEIVING: '收貨區',
+    SHIPPING: '出貨區',
+    PRODUCTION_WIP: '生產在製',
+    SCRAP: '報廢',
+    VENDOR: '供應商',
+    CUSTOMER: '客戶',
+    INVENTORY_LOSS: '庫存損耗',
+  },
+};

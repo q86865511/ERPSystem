@@ -13,6 +13,7 @@ import '@mantine/notifications/styles.css';
 
 import { queryClient } from './app/queryClient';
 import { router } from './app/router';
+import { I18nProvider } from './i18n';
 import { theme } from './theme';
 
 const rootElement = document.getElementById('root');
@@ -23,13 +24,15 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <StrictMode>
     <MantineProvider theme={theme} defaultColorScheme="auto">
-      <Notifications />
-      <QueryClientProvider client={queryClient}>
-        <ModalsProvider>
-          <RouterProvider router={router} />
-        </ModalsProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
+      <I18nProvider>
+        <Notifications />
+        <QueryClientProvider client={queryClient}>
+          <ModalsProvider>
+            <RouterProvider router={router} />
+          </ModalsProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </I18nProvider>
     </MantineProvider>
   </StrictMode>,
 );
