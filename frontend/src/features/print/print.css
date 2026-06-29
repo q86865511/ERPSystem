@@ -1,0 +1,29 @@
+/* Print views render outside the AppShell (their own routes), so the page body holds only the document.
+   This sets an A4 page and hides the on-screen action bar when printing; the table rules keep headers
+   repeating and rows intact across page breaks (for the multi-row trial balance). */
+@page {
+  size: A4;
+  margin: 15mm;
+}
+
+.print-page {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+@media print {
+  .print-actions {
+    display: none !important;
+  }
+  .print-page {
+    max-width: none;
+    padding: 0;
+  }
+  thead {
+    display: table-header-group;
+  }
+  tr {
+    break-inside: avoid;
+  }
+}

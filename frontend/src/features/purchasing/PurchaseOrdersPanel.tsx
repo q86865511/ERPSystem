@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ActionIcon,
   Button,
@@ -33,6 +34,7 @@ function emptyLine(): LineForm {
 
 export function PurchaseOrdersPanel() {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const { canDo } = useAuth();
   const { data, isLoading } = useOrders();
   const partners = usePartnerMap();
@@ -212,12 +214,21 @@ export function PurchaseOrdersPanel() {
       >
         {detail.data && (
           <Stack>
-            <Group>
-              <StatusBadge status={detail.data.status} />
-              <Text c="dimmed" size="sm">
-                {detail.data.partnerId != null ? partners.get(detail.data.partnerId) : ''} ·{' '}
-                {detail.data.orderDate}
-              </Text>
+            <Group justify="space-between">
+              <Group>
+                <StatusBadge status={detail.data.status} />
+                <Text c="dimmed" size="sm">
+                  {detail.data.partnerId != null ? partners.get(detail.data.partnerId) : ''} ·{' '}
+                  {detail.data.orderDate}
+                </Text>
+              </Group>
+              <Button
+                variant="default"
+                size="xs"
+                onClick={() => detailId && navigate(`/print/purchase-order/${detailId}`)}
+              >
+                {t('print.print')}
+              </Button>
             </Group>
             <Table>
               <Table.Thead>

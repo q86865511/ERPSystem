@@ -12,6 +12,9 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-29] 🖨️ PDF / 列印報表(待辦 D 之一,純前端,`npm run build` 綠)
+  - **做法=專用列印路由(同分頁)**:`/print/sales-invoice/:id`、`/print/purchase-order/:id`、`/print/delivery/:id`、`/print/trial-balance?asOf=`,掛在 `AuthProvider` + `RequireAuth` 內、`AppLayout`(導覽殼)**外** → 乾淨 A4 版面、有 auth、無 chrome。`features/print/`:`PrintLayout`(gate `bootstrapping`+query loading,ready 後自動 `window.print()` + 手動「列印/返回」鈕,列印時隱藏)+ `PrintHeader`(公司抬頭/單號/日期/對象)+ 4 個列印頁(複用既有 `useInvoice/useOrder/useDelivery/useTrialBalance` + `usePartnerMap/useItemMap` + `MoneyText`)+ `print.css`(`@page A4`、表頭每頁重複、行不切斷)。
+  - 各 detail Drawer(發票/PO/出貨)+ 試算表頁加「列印」按鈕 `navigate('/print/...')`(同分頁,access token 在記憶體免 silent-refresh)。i18n 新 `print.ts`(en/zh 成對)。**不需 migration、不需後端改動**;含 guest 可印。
 - [2026-06-29] 📅 hard-close + 保留盈餘年結轉(待辦 D 之一,後端 `mvn verify` 綠 / 前端 build 綠)
   - **年結** `ledger.application.FiscalYearService.closeYear(yearCode, actor)`:組一張 closing JE 把當年收入借記/費用貸記歸零、淨額轉 `3200 Retained Earnings`(獲利貸、虧損借),經既有 `LedgerPostingService` 過帳(idempotency 鍵 `YEAR_END_CLOSE/yearCode/CLOSE`),再把全年期間 `lock()`(LOCKED)+ `FiscalYear.close()`。**損益來源用該年日期區間**(新 `GeneralLedgerRepository.accountBalancesBetween`)非全域 asOf,避免多年/測試污染。
   - **邊界**:虧損年(借 3200)、零餘額科目跳過、反常餘額依正負決定借貸側、**空白年只鎖期間不過 JE**、net=0 不加 3200 行;末期若 soft-closed 則交易內先 reopen 再過再鎖。
@@ -183,7 +186,8 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 
 **D. 財會加值**
 - ✅ **hard-close + 保留盈餘年結轉(已做,2026-06-29)**:closing JE 沖平損益轉 3200 + 鎖期間 LOCKED。計畫見 `~/.claude/plans/tender-cuddling-starlight.md`,ADR-0009。
-- 待:PDF/列印報表(發票/PO/出貨單/試算表)、獨立 append-only `audit_log` + 敏感動作事件監聽。
+- ✅ **PDF/列印報表(已做,2026-06-29)**:發票/PO/出貨單/試算表前端列印(專用路由 + print CSS),瀏覽器另存 PDF。
+- 待:獨立 append-only `audit_log` + 敏感動作事件監聽(PR2)。
 
 **E. 品質 / 維運**
 - 並行測試擴到 sales/manufacturing(目前僅 inventory 有 concurrency IT);**前端無自動化測試**(只有 tsc + vite build,可加 Vitest/Playwright)。

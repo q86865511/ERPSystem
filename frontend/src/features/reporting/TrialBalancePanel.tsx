@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Badge, Group, Loader, Table, Text } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
+import { Badge, Button, Group, Loader, Table, Text } from '@mantine/core';
 import { MoneyText } from '../../components/Money';
 import { useI18n } from '../../i18n';
 import { GeneralLedgerDrawer } from './GeneralLedgerDrawer';
@@ -7,6 +8,7 @@ import { useTrialBalance } from './api';
 
 export function TrialBalancePanel({ asOf }: { asOf?: string }) {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const { data, isLoading } = useTrialBalance(asOf);
   const [selected, setSelected] = useState<{ code: string; name?: string } | null>(null);
   const rows = data?.lines ?? [];
@@ -17,9 +19,18 @@ export function TrialBalancePanel({ asOf }: { asOf?: string }) {
         <Text size="sm" c="dimmed">
           {t('reporting.trialBalance.drillHint')}
         </Text>
-        <Badge color={data?.balanced ? 'teal' : 'red'} variant="light">
-          {data?.balanced ? t('reporting.trialBalance.balanced') : t('reporting.trialBalance.unbalanced')}
-        </Badge>
+        <Group gap="xs">
+          <Badge color={data?.balanced ? 'teal' : 'red'} variant="light">
+            {data?.balanced ? t('reporting.trialBalance.balanced') : t('reporting.trialBalance.unbalanced')}
+          </Badge>
+          <Button
+            variant="default"
+            size="xs"
+            onClick={() => navigate(`/print/trial-balance${asOf ? `?asOf=${asOf}` : ''}`)}
+          >
+            {t('print.print')}
+          </Button>
+        </Group>
       </Group>
 
       {isLoading ? (
