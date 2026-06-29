@@ -91,6 +91,7 @@ export const en = {
     signIn: 'Sign in',
     invalidCredentials: 'Invalid username or password',
     demoAccounts: 'Demo accounts',
+    guestEntry: 'Browse as guest (read-only)',
     demoHint: "Each demo account's password equals its username.",
   },
   dashboard: {

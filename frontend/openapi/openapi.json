@@ -10,9 +10,48 @@
     "description" : "Generated server url"
   } ],
   "security" : [ {
-    "basicAuth" : [ ]
+    "bearerAuth" : [ ]
   } ],
   "paths" : {
+    "/api/auth/login" : {
+      "post" : {
+        "operationId" : "login",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TokenResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "auth-controller" ]
+      }
+    },
+    "/api/auth/logout" : {
+      "post" : {
+        "operationId" : "logout",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "auth-controller" ]
+      }
+    },
     "/api/auth/me" : {
       "get" : {
         "operationId" : "me",
@@ -22,6 +61,32 @@
               "*/*" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/CurrentUserResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "auth-controller" ]
+      }
+    },
+    "/api/auth/refresh" : {
+      "post" : {
+        "operationId" : "refresh",
+        "parameters" : [ {
+          "in" : "cookie",
+          "name" : "refresh_token",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TokenResponse"
                 }
               }
             },
@@ -2941,6 +3006,17 @@
           }
         }
       },
+      "LoginRequest" : {
+        "type" : "object",
+        "properties" : {
+          "password" : {
+            "type" : "string"
+          },
+          "username" : {
+            "type" : "string"
+          }
+        }
+      },
       "PartnerResponse" : {
         "type" : "object",
         "properties" : {
@@ -3360,6 +3436,23 @@
           }
         }
       },
+      "TokenResponse" : {
+        "type" : "object",
+        "properties" : {
+          "accessToken" : {
+            "type" : "string"
+          },
+          "roles" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "username" : {
+            "type" : "string"
+          }
+        }
+      },
       "TrialBalance" : {
         "type" : "object",
         "properties" : {
@@ -3596,8 +3689,9 @@
       }
     },
     "securitySchemes" : {
-      "basicAuth" : {
-        "scheme" : "basic",
+      "bearerAuth" : {
+        "bearerFormat" : "JWT",
+        "scheme" : "bearer",
         "type" : "http"
       }
     }

@@ -1,5 +1,7 @@
 HELP.md
 CLAUDE_REVIEW_NOTES.md
+# Local/deploy secrets (e.g. APP_JWT_SECRET for compose.oracle.yaml). Never commit.
+.env
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

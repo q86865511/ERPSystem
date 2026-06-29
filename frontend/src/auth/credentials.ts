@@ -1,35 +1,24 @@
 /**
- * HTTP Basic credential storage. Held in sessionStorage (cleared when the tab closes, not shared across
- * tabs) so a refresh keeps the session. Basic auth requires resending the password on every request, so
- * it is stored here — a deliberate demo-grade trade-off; swapping to a token only changes this module and
- * the client's auth middleware, not the UI. See SecurityConfig.java for the deferred JWT note.
+ * Access-token store. The access token lives only in memory (this module variable) — never in storage — so
+ * an XSS payload can't lift it from localStorage. The refresh token is an httpOnly cookie the browser sends
+ * automatically to /api/auth; JS can't read it. A page reload loses the in-memory token; AuthProvider
+ * restores the session via a silent POST /api/auth/refresh on startup. Swapping the token transport only
+ * touches this module and the client's auth middleware, not the UI.
  */
-const KEY = 'erp.auth';
+let accessToken: string | null = null;
 
-export interface StoredCredentials {
-  username: string;
-  password: string;
-  roles: string[];
+export function getAccessToken(): string | null {
+  return accessToken;
 }
 
-export function loadCredentials(): StoredCredentials | null {
-  const raw = sessionStorage.getItem(KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as StoredCredentials;
-  } catch {
-    return null;
-  }
+export function setAccessToken(token: string | null): void {
+  accessToken = token;
 }
 
-export function saveCredentials(credentials: StoredCredentials): void {
-  sessionStorage.setItem(KEY, JSON.stringify(credentials));
+export function clearAccessToken(): void {
+  accessToken = null;
 }
 
-export function clearCredentials(): void {
-  sessionStorage.removeItem(KEY);
-}
-
-export function toBasicHeader(username: string, password: string): string {
-  return `Basic ${btoa(`${username}:${password}`)}`;
+export function toBearerHeader(token: string): string {
+  return `Bearer ${token}`;
 }
