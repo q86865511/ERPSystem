@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+    "/api/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/login": {
         parameters: {
             query?: never;
@@ -955,6 +971,18 @@ export interface components {
             days90plus?: string;
             total?: string;
         };
+        AuditLogResponse: {
+            actor?: string;
+            detail?: string;
+            eventType?: string;
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            occurredAt?: string;
+            refId?: string;
+            refType?: string;
+            summary?: string;
+        };
         BalanceSheet: {
             /** Format: date */
             asOf?: string;
@@ -1383,6 +1411,42 @@ export interface components {
             password?: string;
             username?: string;
         };
+        PageAuditLogResponse: {
+            content?: components["schemas"]["AuditLogResponse"][];
+            empty?: boolean;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            size?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        Pageable: {
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            sort?: string[];
+        };
+        PageableObject: {
+            /** Format: int64 */
+            offset?: number;
+            /** Format: int32 */
+            pageNumber?: number;
+            /** Format: int32 */
+            pageSize?: number;
+            paged?: boolean;
+            sort?: components["schemas"]["SortObject"];
+            unpaged?: boolean;
+        };
         PartnerResponse: {
             active?: boolean;
             apAccountCode?: string;
@@ -1529,6 +1593,11 @@ export interface components {
             qtyShipped?: string;
             unitPrice?: string;
         };
+        SortObject: {
+            empty?: boolean;
+            sorted?: boolean;
+            unsorted?: boolean;
+        };
         StatementLine: {
             amount?: string;
             code?: string;
@@ -1652,6 +1721,30 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    list: {
+        parameters: {
+            query: {
+                eventType?: string;
+                actor?: string;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageAuditLogResponse"];
+                };
+            };
+        };
+    };
     login: {
         parameters: {
             query?: never;

@@ -11,6 +11,7 @@
  * Per-module namespaces live in `./modules/*` fragments (one file per feature module) and are composed in
  * below. Each fragment's `*Zh` is typed `: typeof *En`, so a module's zh/en mismatch fails to compile.
  */
+import { auditEn } from './modules/audit';
 import { inventoryEn } from './modules/inventory';
 import { ledgerEn } from './modules/ledger';
 import { manufacturingEn } from './modules/manufacturing';
@@ -84,6 +85,7 @@ export const en = {
     inventory: 'Inventory',
     reporting: 'Reporting',
     ledger: 'Ledger',
+    audit: 'Audit Trail',
   },
   login: {
     subtitle: 'Sign in to continue',
@@ -160,4 +162,5 @@ export const en = {
   ledger: ledgerEn,
   payments: paymentsEn,
   print: printEn,
+  audit: auditEn,
 };

@@ -155,4 +155,23 @@ class ArchitectureTest {
                             "..purchasing.domain..", "..purchasing.application..", "..purchasing.web..",
                             "..sales.domain..", "..sales.application..", "..sales.web..",
                             "..inventory..", "..masterdata..", "..manufacturing..", "..reporting..");
+
+    // The audit module is a cross-cutting listener: it consumes other modules' published events/api only
+    // (e.g. ledger.api, iam.api), never their internals.
+    @ArchTest
+    static final ArchRule audit_uses_only_published_ports =
+            noClasses().that().resideInAPackage("..audit..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
+                            "..iam.domain..", "..iam.application..", "..iam.web..",
+                            "..masterdata..", "..inventory..", "..purchasing..", "..payments..",
+                            "..sales..", "..manufacturing..", "..reporting..");
+
+    // Nothing depends on the audit module; it only observes (via Spring events).
+    @ArchTest
+    static final ArchRule no_module_depends_on_audit =
+            noClasses().that().resideInAnyPackage("..ledger..", "..masterdata..", "..inventory..",
+                            "..purchasing..", "..sales..", "..manufacturing..", "..reporting..",
+                            "..payments..", "..iam..")
+                    .should().dependOnClassesThat().resideInAPackage("..audit..");
 }

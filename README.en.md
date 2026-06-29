@@ -221,6 +221,11 @@ locale; money/number formatting and backend codes are intentionally not translat
 **Print / PDF**: sales invoices, purchase orders, delivery notes and the trial balance print in one click
 (dedicated A4 print routes + print CSS; the browser's "Save as PDF"), bilingual via the same i18n.
 
+**Audit trail (ADMIN-only)**: journal postings, period close/reopen and login success/failure are written to
+an append-only `audit_log` (domain events + an `AFTER_COMMIT` listener, so only committed actions are
+recorded; a DB trigger blocks update/delete). ADMIN users browse the "Audit Trail" page, filterable by event
+type and actor.
+
 ## 📊 Data model
 
 The accounting spine (accounts, balanced journal entries, fiscal periods) is the centre; every business

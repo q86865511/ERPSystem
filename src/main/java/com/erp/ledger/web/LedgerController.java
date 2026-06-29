@@ -1,5 +1,6 @@
 package com.erp.ledger.web;
 
+import com.erp.ledger.api.FiscalPeriodChangedEvent;
 import com.erp.ledger.api.JournalEntryRequest;
 import com.erp.ledger.application.FiscalPeriodService;
 import com.erp.ledger.application.FiscalYearService;
@@ -8,6 +9,7 @@ import com.erp.ledger.application.LedgerReportService;
 import com.erp.ledger.application.TrialBalanceReport;
 import com.erp.ledger.domain.FiscalPeriod;
 import com.erp.ledger.domain.JournalEntry;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,13 +30,20 @@ public class LedgerController {
     private final LedgerReportService reportService;
     private final FiscalPeriodService fiscalPeriodService;
     private final FiscalYearService fiscalYearService;
+    private final ApplicationEventPublisher events;
 
     public LedgerController(LedgerPostingService postingService, LedgerReportService reportService,
-                           FiscalPeriodService fiscalPeriodService, FiscalYearService fiscalYearService) {
+                           FiscalPeriodService fiscalPeriodService, FiscalYearService fiscalYearService,
+                           ApplicationEventPublisher events) {
         this.postingService = postingService;
         this.reportService = reportService;
         this.fiscalPeriodService = fiscalPeriodService;
         this.fiscalYearService = fiscalYearService;
+        this.events = events;
+    }
+
+    private static String actor(Principal principal) {
+        return principal != null ? principal.getName() : "system";
     }
 
     /** API view of a fiscal period's soft-close status. */
@@ -63,14 +72,22 @@ public class LedgerController {
 
     /** Soft-closes a fiscal period — blocks new postings into it. */
     @PostMapping("/fiscal-years/{yearCode}/periods/{periodNo}/close")
-    public FiscalPeriodResponse closePeriod(@PathVariable String yearCode, @PathVariable int periodNo) {
-        return FiscalPeriodResponse.from(yearCode, fiscalPeriodService.close(yearCode, periodNo));
+    public FiscalPeriodResponse closePeriod(@PathVariable String yearCode, @PathVariable int periodNo,
+                                            Principal principal) {
+        FiscalPeriod period = fiscalPeriodService.close(yearCode, periodNo);
+        events.publishEvent(new FiscalPeriodChangedEvent(yearCode, periodNo,
+                period.getStatus().name(), actor(principal)));
+        return FiscalPeriodResponse.from(yearCode, period);
     }
 
     /** Reopens a soft-closed fiscal period. */
     @PostMapping("/fiscal-years/{yearCode}/periods/{periodNo}/reopen")
-    public FiscalPeriodResponse reopenPeriod(@PathVariable String yearCode, @PathVariable int periodNo) {
-        return FiscalPeriodResponse.from(yearCode, fiscalPeriodService.reopen(yearCode, periodNo));
+    public FiscalPeriodResponse reopenPeriod(@PathVariable String yearCode, @PathVariable int periodNo,
+                                             Principal principal) {
+        FiscalPeriod period = fiscalPeriodService.reopen(yearCode, periodNo);
+        events.publishEvent(new FiscalPeriodChangedEvent(yearCode, periodNo,
+                period.getStatus().name(), actor(principal)));
+        return FiscalPeriodResponse.from(yearCode, period);
     }
 
     /**

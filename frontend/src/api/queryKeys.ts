@@ -49,4 +49,8 @@ export const qk = {
     workOrder: (id: number) => ['manufacturing', 'work-order', id] as const,
     reorder: () => ['manufacturing', 'reorder'] as const,
   },
+  audit: {
+    list: (params: { eventType?: string; actor?: string; page: number; size: number }) =>
+      ['audit', 'list', params] as const,
+  },
 };

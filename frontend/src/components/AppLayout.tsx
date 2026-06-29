@@ -16,6 +16,7 @@ import {
   IconBoxSeam,
   IconBuildingFactory2,
   IconDatabase,
+  IconHistory,
   IconLayoutDashboard,
   IconLogout,
   IconReportAnalytics,
@@ -24,10 +25,16 @@ import {
 } from '@tabler/icons-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
+import type { Role } from '../auth/roles';
 import { useI18n } from '../i18n';
 import type { Locale, TranslationKey } from '../i18n';
 
-const NAV: { to: string; labelKey: TranslationKey; icon: typeof IconLayoutDashboard }[] = [
+const NAV: {
+  to: string;
+  labelKey: TranslationKey;
+  icon: typeof IconLayoutDashboard;
+  requiredRole?: Role;
+}[] = [
   { to: '/', labelKey: 'nav.dashboard', icon: IconLayoutDashboard },
   { to: '/masterdata', labelKey: 'nav.masterData', icon: IconDatabase },
   { to: '/purchasing', labelKey: 'nav.purchasing', icon: IconShoppingCart },
@@ -36,12 +43,13 @@ const NAV: { to: string; labelKey: TranslationKey; icon: typeof IconLayoutDashbo
   { to: '/inventory', labelKey: 'nav.inventory', icon: IconBoxSeam },
   { to: '/reporting', labelKey: 'nav.reporting', icon: IconReportAnalytics },
   { to: '/ledger', labelKey: 'nav.ledger', icon: IconBook2 },
+  { to: '/audit', labelKey: 'nav.audit', icon: IconHistory, requiredRole: 'ADMIN' },
 ];
 
 export function AppLayout() {
   const [opened, { toggle, close }] = useDisclosure();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout, hasRole } = useAuth();
   const { locale, setLocale, t } = useI18n();
 
   return (
@@ -94,7 +102,7 @@ export function AppLayout() {
 
       <AppShell.Navbar p="xs">
         <ScrollArea>
-          {NAV.map((item) => {
+          {NAV.filter((item) => !item.requiredRole || hasRole(item.requiredRole)).map((item) => {
             const active =
               item.to === '/' ? location.pathname === '/' : location.pathname.startsWith(item.to);
             const Icon = item.icon;
