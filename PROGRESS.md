@@ -12,6 +12,12 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-29] 🧪 CI 品質關卡(把既有嚴謹度變可見;`mvn verify` 綠 / YAML 驗證綠)
+  - **覆蓋率(JaCoCo)**:`prepare-agent`(單元/Surefire)+ `prepare-agent-integration`(IT/Failsafe)同寫一份 `jacoco.exec`,`verify` 出一份合併報告 → **指令 68.1% / 分支 57.3%**(多數邏輯由 ITs 涵蓋,故必須含 IT)。**報告為主、不擋 build**(不影響 main 自動部署)。
+  - **覆蓋率 badge=in-repo 自產**:新 `coverage-badge.yml` 以 `workflow_run`(CI 成功 + main + push)觸發 → 下載 CI 上傳的覆蓋率 artifact → `cicirello/jacoco-badge-generator` 產 SVG → 提交回 repo,訊息帶 `[skip ci]`(**不觸發 CI/Deploy、無迴圈**,鏡像 `deploy.yml` 模式)。先放初始 `.github/badges/{jacoco,branches}.svg` 免 README 圖破。
+  - **掃描(皆 report-only、獨立 workflow,不進 "CI" → 不擋部署)**:`codeql.yml`(SAST,Java manual build + JS none)、`security.yml`(Trivy fs:依賴/IaC/secret;Trivy image:build 兩個 image 後掃,僅 main+排程)→ SARIF 進 Security tab。
+  - **Dependabot**(`.github/dependabot.yml`):maven `/` + npm `/frontend` + github-actions,每週,Spring/Mantine/React 分組。
+  - **CI 報告 artifact**:`ci.yml` 上傳 JaCoCo HTML + Surefire/Failsafe(含 ArchUnit)結果 + 在 run summary 印覆蓋率。README(繁/英)加 Coverage/CodeQL/Security badge。
 - [2026-06-29] 🛡️ audit_log 審計軌跡 + domain event 機制(待辦 D 之一,`mvn verify` 綠 / 前端 build 綠)
   - **事件驅動、AFTER_COMMIT、append-only**。新 `com.erp.audit` 模組:`@TransactionalEventListener(AFTER_COMMIT, fallbackExecution=true)` 監聽 → 獨立 `AuditWriter`(`REQUIRES_NEW`)寫入 + 容錯(失敗記 ERROR,不影響業務)。`AFTER_COMMIT` 確保只記真正 committed 的動作(rollback 不留幽靈);`fallbackExecution` 接住無交易情境(登入)。
   - **捕捉**:JOURNAL_POSTED(`LedgerPostingService.post` 是所有金流唯一過帳點 → 一點涵蓋全部)、PERIOD_CLOSED/REOPENED(`LedgerController` 期間 close/reopen,加 `Principal` 取 actor)、LOGIN_SUCCESS/FAILURE(`AuthController.login`)。事件型別放各模組 `api`(`ledger.api.JournalPostedEvent`/`FiscalPeriodChangedEvent`、`iam.api.AuthAuditEvent`)。
@@ -197,7 +203,9 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - ✅ **append-only `audit_log` + 敏感動作事件監聽**:domain event(AFTER_COMMIT)記過帳/期間異動/登入,ADMIN-only 檢視頁;V16 + append-only trigger。
 
 **E. 品質 / 維運**
+- ✅ **CI 品質關卡(已做,2026-06-29)**:JaCoCo 覆蓋率(指令 68.1%/分支 57.3%,含 IT,報告為主不擋)+ in-repo 自產 badge(`coverage-badge.yml`,`[skip ci]` 無迴圈)+ CodeQL + Trivy(fs/image,report-only,SARIF→Security tab)+ Dependabot(maven/npm/actions)+ CI 上傳測試/ArchUnit/覆蓋率 artifact。
 - 並行測試擴到 sales/manufacturing(目前僅 inventory 有 concurrency IT);**前端無自動化測試**(只有 tsc + vite build,可加 Vitest/Playwright)。
+- 候選後續(plan-next-step workflow 排序):② 可觀測性(Micrometer + Prometheus + 業務指標 off events + 結構化日誌);③ 前端測試(Vitest+RTL/Playwright);分錄沖正(reversal + by-entry GET);bundle 瘦身 / a11y 當順手 rider。
 - ✅ **自動部署 + demo 定時重置(repo 部分已做,2026-06-29)**:`deploy.yml`(workflow_run + 受限金鑰)、`compose.oracle.yaml`、`scripts/reset-demo.sh` + cron。計畫見 `~/.claude/plans/tender-cuddling-starlight.md`;Oracle 一次性設定 + 端到端驗證待 merge 後做。
 
 **F. 刻意切割(YAGNI,不打算做)**

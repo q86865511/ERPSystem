@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main ]
 
+# Least privilege: jobs only read the repo. The coverage badge is committed by a separate
+# workflow_run-triggered workflow, so nothing here needs write access.
+permissions:
+  contents: read
+
 jobs:
   backend:
     runs-on: ubuntu-latest
@@ -24,6 +29,32 @@ jobs:
 
       # Testcontainers uses the Docker engine that is preinstalled on the
       # ubuntu-latest runner — no extra service container needed.
+
+      # Surface the coverage figure on the run page (report-only; JaCoCo never fails the build).
+      - name: Coverage summary
+        if: always()
+        run: |
+          csv=target/site/jacoco/jacoco.csv
+          if [ -f "$csv" ]; then
+            awk -F, 'NR>1 {miss+=$4; cov+=$5} END {
+              total=miss+cov; pct=(total>0)?100*cov/total:0;
+              printf "## Coverage: %.1f%% (instructions, unit + IT)\n", pct
+            }' "$csv" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Make the existing rigor one click away from the PR: full JaCoCo HTML report plus the raw
+      # Surefire/Failsafe/ArchUnit results (ArchUnit runs as JUnit, so its outcome is in surefire-reports).
+      - name: Upload test & coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-reports
+          path: |
+            target/site/jacoco/
+            target/surefire-reports/
+            target/failsafe-reports/
+          if-no-files-found: warn
+          retention-days: 14
 
   frontend:
     runs-on: ubuntu-latest

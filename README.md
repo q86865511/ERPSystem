@@ -8,6 +8,9 @@
 
 [![Live demo](https://img.shields.io/badge/live%20demo-erp.terrychou.com-success?logo=cloudflare&logoColor=white)](https://erp.terrychou.com)
 [![CI](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml/badge.svg)](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml)
+[![Coverage](.github/badges/jacoco.svg)](https://github.com/q86865511/ERPSystem/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/q86865511/ERPSystem/actions/workflows/codeql.yml/badge.svg)](https://github.com/q86865511/ERPSystem/actions/workflows/codeql.yml)
+[![Security](https://github.com/q86865511/ERPSystem/actions/workflows/security.yml/badge.svg)](https://github.com/q86865511/ERPSystem/actions/workflows/security.yml)
 [![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)](pom.xml)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-6db33f?logo=springboot&logoColor=white)](pom.xml)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169e1?logo=postgresql&logoColor=white)](compose.yaml)
