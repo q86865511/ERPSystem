@@ -211,6 +211,12 @@ It covers all 8 modules:
 Every document's detail surfaces its posting results (the linked `journalEntryId`, `movementGroupId`,
 status transitions) — making this ERP's selling point visible: you can see how the books move.
 
+**Bilingual UI (中／English)**: the "中 / EN" switch in the top bar changes language instantly; the default
+**follows the browser** (`zh-*` → Traditional Chinese, otherwise English) and the preference is stored in
+localStorage. i18n is a **dependency-free, self-built typed context** — translation keys are type-checked at
+compile time (a missing translation in either locale fails the `build`), and the date calendar switches dayjs
+locale; money/number formatting and backend codes are intentionally not translated.
+
 ## 📊 Data model
 
 The accounting spine (accounts, balanced journal entries, fiscal periods) is the centre; every business

@@ -11,10 +11,12 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { usePartnerMap } from '../masterdata/api';
 import { useInvoices } from '../sales/api';
 import { useAuth } from '../../auth/useAuth';
+import { useI18n } from '../../i18n';
 import { notifyError, notifySuccess } from '../../lib/notify';
 import { usePayIn, usePayment, usePayments } from './api';
 
 export function PaymentsInPanel() {
+  const { t } = useI18n();
   const { canDo } = useAuth();
   const payments = usePayments('IN');
   const invoices = useInvoices();
@@ -44,7 +46,7 @@ export function PaymentsInPanel() {
       .filter(([, a]) => a && Number(a) > 0)
       .map(([invoiceId, amount]) => ({ invoiceId: Number(invoiceId), amount }));
     if (!partnerId || allocations.length === 0) {
-      notifyError('Pick a customer and allocate to at least one invoice');
+      notifyError(t('payments.in.pickCustomer'));
       return;
     }
     const body: PayInRequest = {
@@ -55,7 +57,7 @@ export function PaymentsInPanel() {
     };
     try {
       const p = await pay.mutateAsync(body);
-      notifySuccess(`Receipt ${p?.payNumber} posted`);
+      notifySuccess(t('payments.in.posted', { payNumber: p?.payNumber ?? '' }));
       close();
       if (p?.id != null) setDetailId(p.id);
     } catch (e) {
@@ -69,7 +71,7 @@ export function PaymentsInPanel() {
       {canDo('payments.create') && (
         <Group justify="flex-end">
           <Button leftSection={<IconPlus size={16} />} onClick={openForm}>
-            New receipt
+            {t('payments.in.newReceipt')}
           </Button>
         </Group>
       )}
@@ -77,10 +79,10 @@ export function PaymentsInPanel() {
       <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Receipt #</Table.Th>
-            <Table.Th>Customer</Table.Th>
-            <Table.Th ta="right">Amount</Table.Th>
-            <Table.Th>Status</Table.Th>
+            <Table.Th>{t('payments.in.receiptNumber')}</Table.Th>
+            <Table.Th>{t('field.customer')}</Table.Th>
+            <Table.Th ta="right">{t('field.amount')}</Table.Th>
+            <Table.Th>{t('field.status')}</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
@@ -97,7 +99,7 @@ export function PaymentsInPanel() {
               </Table.Td>
               <Table.Td ta="right">
                 <Button size="xs" variant="subtle" onClick={() => setDetailId(p.id ?? null)}>
-                  View
+                  {t('common.view')}
                 </Button>
               </Table.Td>
             </Table.Tr>
@@ -106,15 +108,15 @@ export function PaymentsInPanel() {
       </Table>
       {!payments.isLoading && rows.length === 0 && (
         <Text c="dimmed" ta="center" py="md">
-          No receipts yet.
+          {t('payments.in.noReceipts')}
         </Text>
       )}
 
-      <Modal opened={opened} onClose={close} title="New customer receipt" size="lg">
+      <Modal opened={opened} onClose={close} title={t('payments.in.newCustomerReceipt')} size="lg">
         <Stack>
           <Group grow>
             <PartnerSelect
-              label="Customer"
+              label={t('field.customer')}
               customer
               value={partnerId}
               onChange={(id) => {
@@ -122,17 +124,17 @@ export function PaymentsInPanel() {
                 setAllocs({});
               }}
             />
-            <DateInput label="Posting date" value={postingDate} onChange={setPostingDate} />
+            <DateInput label={t('payments.postingDate')} value={postingDate} onChange={setPostingDate} />
           </Group>
 
           {partnerId && (
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Invoice</Table.Th>
-                  <Table.Th ta="right">Open</Table.Th>
+                  <Table.Th>{t('payments.in.invoice')}</Table.Th>
+                  <Table.Th ta="right">{t('payments.open')}</Table.Th>
                   <Table.Th ta="right" w={140}>
-                    Allocate
+                    {t('payments.allocate')}
                   </Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -160,7 +162,7 @@ export function PaymentsInPanel() {
                   <Table.Tr>
                     <Table.Td colSpan={3}>
                       <Text c="dimmed" size="sm">
-                        No open invoices for this customer.
+                        {t('payments.in.noOpenInvoices')}
                       </Text>
                     </Table.Td>
                   </Table.Tr>
@@ -170,13 +172,13 @@ export function PaymentsInPanel() {
           )}
 
           <Group justify="space-between">
-            <Text fw={600}>Total: {formatMoney(total)}</Text>
+            <Text fw={600}>{t('payments.totalLabel', { amount: formatMoney(total) })}</Text>
             <Group>
               <Button variant="default" onClick={close}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button onClick={submit} loading={pay.isPending}>
-                Post receipt
+                {t('payments.in.postReceipt')}
               </Button>
             </Group>
           </Group>
@@ -188,24 +190,24 @@ export function PaymentsInPanel() {
         onClose={() => setDetailId(null)}
         position="right"
         size="md"
-        title={`Receipt ${detail.data?.payNumber ?? ''}`}
+        title={t('payments.in.drawerTitle', { payNumber: detail.data?.payNumber ?? '' })}
       >
         {detail.data && (
           <Stack>
             <Group>
               <StatusBadge status={detail.data.status} />
               {detail.data.journalEntryId != null && (
-                <Badge variant="light">JE #{detail.data.journalEntryId}</Badge>
+                <Badge variant="light">{t('payments.je', { id: detail.data.journalEntryId })}</Badge>
               )}
             </Group>
             <Text>
-              Amount <MoneyText value={detail.data.amount} />
+              {t('field.amount')} <MoneyText value={detail.data.amount} />
             </Text>
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Document #</Table.Th>
-                  <Table.Th ta="right">Allocated</Table.Th>
+                  <Table.Th>{t('payments.documentNumber')}</Table.Th>
+                  <Table.Th ta="right">{t('payments.allocated')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -220,7 +222,7 @@ export function PaymentsInPanel() {
               </Table.Tbody>
             </Table>
             <Text size="xs" c="dimmed">
-              Posted Dr Cash / Cr AR and settled the allocated invoices.
+              {t('payments.in.postingNote')}
             </Text>
           </Stack>
         )}

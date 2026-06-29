@@ -3,6 +3,7 @@ import { Card, SimpleGrid, Stack, Text } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { MoneyText } from '../../components/Money';
+import { useI18n } from '../../i18n';
 import { useArAging } from './api';
 
 function Bucket({ label, value, strong }: { label: string; value?: string; strong?: boolean }) {
@@ -19,19 +20,20 @@ function Bucket({ label, value, strong }: { label: string; value?: string; stron
 }
 
 export function ArAgingPanel() {
+  const { t } = useI18n();
   const [asOf, setAsOf] = useState<string | null>(dayjs().format('YYYY-MM-DD'));
   const { data } = useArAging(asOf ?? undefined);
 
   return (
     <Stack>
-      <DateInput label="As of" value={asOf} onChange={setAsOf} maw={180} />
+      <DateInput label={t('field.asOf')} value={asOf} onChange={setAsOf} maw={180} />
       <SimpleGrid cols={{ base: 2, sm: 3, md: 6 }}>
-        <Bucket label="Current" value={data?.current} />
-        <Bucket label="1–30" value={data?.days1to30} />
-        <Bucket label="31–60" value={data?.days31to60} />
-        <Bucket label="61–90" value={data?.days61to90} />
-        <Bucket label="90+" value={data?.days90plus} />
-        <Bucket label="Total" value={data?.total} strong />
+        <Bucket label={t('sales.arAging.current')} value={data?.current} />
+        <Bucket label={t('sales.arAging.days1to30')} value={data?.days1to30} />
+        <Bucket label={t('sales.arAging.days31to60')} value={data?.days31to60} />
+        <Bucket label={t('sales.arAging.days61to90')} value={data?.days61to90} />
+        <Bucket label={t('sales.arAging.days90plus')} value={data?.days90plus} />
+        <Bucket label={t('field.total')} value={data?.total} strong />
       </SimpleGrid>
     </Stack>
   );

@@ -6,10 +6,12 @@ import dayjs from 'dayjs';
 import type { AdjustmentResponse, CreateAdjustmentRequest } from '../../api/types';
 import { ItemSelect, LocationSelect } from '../../components/EntitySelect';
 import { useAuth } from '../../auth/useAuth';
+import { useI18n } from '../../i18n';
 import { notifyError, notifySuccess } from '../../lib/notify';
 import { useCreateAdjustment } from './api';
 
 export function AdjustmentsPanel() {
+  const { t } = useI18n();
   const { canDo } = useAuth();
   const create = useCreateAdjustment();
   const [last, setLast] = useState<AdjustmentResponse | null>(null);
@@ -31,16 +33,16 @@ export function AdjustmentsPanel() {
       postingDate: dayjs().format('YYYY-MM-DD'),
     },
     validate: {
-      itemId: (v) => (v != null ? null : 'Pick an item'),
-      locationId: (v) => (v != null ? null : 'Pick a location'),
-      qtyDelta: (v) => (v ? null : 'Required (use a negative value to write down)'),
+      itemId: (v) => (v != null ? null : t('inventory.errPickItem')),
+      locationId: (v) => (v != null ? null : t('inventory.errPickLocation')),
+      qtyDelta: (v) => (v ? null : t('inventory.errQtyDeltaRequired')),
     },
   });
 
   if (!canDo('inventory.adjust')) {
     return (
       <Text c="dimmed" py="md">
-        Stock adjustments require the WAREHOUSE role.
+        {t('inventory.requiresWarehouseRole')}
       </Text>
     );
   }
@@ -57,7 +59,7 @@ export function AdjustmentsPanel() {
     try {
       const result = await create.mutateAsync(body);
       setLast(result ?? null);
-      notifySuccess(`Adjustment ${result?.adjustmentNumber} posted`);
+      notifySuccess(t('inventory.adjustmentPosted', { adjustmentNumber: result?.adjustmentNumber ?? '' }));
       form.setValues({ qtyDelta: '', unitCost: '', reason: '' });
     } catch (e) {
       notifyError(e);
@@ -69,37 +71,37 @@ export function AdjustmentsPanel() {
       <form onSubmit={submit}>
         <Stack>
           <ItemSelect
-            label="Item"
+            label={t('field.item')}
             value={form.values.itemId}
             onChange={(id) => form.setFieldValue('itemId', id)}
             error={form.errors.itemId}
           />
           <LocationSelect
-            label="Location"
+            label={t('field.location')}
             locationType="STOCK"
             value={form.values.locationId}
             onChange={(id) => form.setFieldValue('locationId', id)}
             error={form.errors.locationId}
           />
           <Group grow>
-            <TextInput label="Quantity delta" placeholder="e.g. 10 or -5" {...form.getInputProps('qtyDelta')} />
-            <TextInput label="Unit cost" placeholder="for write-ups" {...form.getInputProps('unitCost')} />
+            <TextInput label={t('inventory.quantityDelta')} placeholder={t('inventory.qtyDeltaPlaceholder')} {...form.getInputProps('qtyDelta')} />
+            <TextInput label={t('field.unitCost')} placeholder={t('inventory.unitCostPlaceholder')} {...form.getInputProps('unitCost')} />
           </Group>
-          <TextInput label="Reason" {...form.getInputProps('reason')} />
-          <DateInput label="Posting date" value={form.values.postingDate} onChange={(d) => form.setFieldValue('postingDate', d)} />
+          <TextInput label={t('field.reason')} {...form.getInputProps('reason')} />
+          <DateInput label={t('inventory.postingDate')} value={form.values.postingDate} onChange={(d) => form.setFieldValue('postingDate', d)} />
           <Group justify="flex-end">
             <Button type="submit" loading={create.isPending}>
-              Post adjustment
+              {t('inventory.postAdjustment')}
             </Button>
           </Group>
         </Stack>
       </form>
 
       {last && (
-        <Alert color="teal" variant="light" title={`Posted ${last.adjustmentNumber}`}>
+        <Alert color="teal" variant="light" title={t('inventory.postedTitle', { adjustmentNumber: last.adjustmentNumber ?? '' })}>
           <Group gap="xs">
-            <Text size="sm">qty {last.qtyDelta}</Text>
-            {last.journalEntryId != null && <Badge variant="light">JE #{last.journalEntryId}</Badge>}
+            <Text size="sm">{t('inventory.qtyLabel', { qtyDelta: last.qtyDelta ?? '' })}</Text>
+            {last.journalEntryId != null && <Badge variant="light">{t('inventory.je', { id: last.journalEntryId })}</Badge>}
           </Group>
         </Alert>
       )}

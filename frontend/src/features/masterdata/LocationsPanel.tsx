@@ -6,10 +6,13 @@ import { IconPlus } from '@tabler/icons-react';
 import { LOCATION_TYPES, type CreateLocationRequest } from '../../api/types';
 import { WarehouseSelect } from '../../components/EntitySelect';
 import { useAuth } from '../../auth/useAuth';
+import { useI18n } from '../../i18n';
+import type { TranslationKey } from '../../i18n';
 import { notifyError, notifySuccess } from '../../lib/notify';
 import { useCreateLocation, useLocations, useWarehouses } from './api';
 
 export function LocationsPanel() {
+  const { t } = useI18n();
   const { canDo } = useAuth();
   const [filterWarehouseId, setFilterWarehouseId] = useState<number | null>(null);
   const { data, isLoading } = useLocations(filterWarehouseId ?? undefined);
@@ -26,8 +29,8 @@ export function LocationsPanel() {
   const form = useForm({
     initialValues: { warehouseId: null as number | null, code: '', locationType: 'STOCK' },
     validate: {
-      warehouseId: (v) => (v != null ? null : 'Required'),
-      code: (v) => (v.trim() ? null : 'Required'),
+      warehouseId: (v) => (v != null ? null : t('masterdata.validation.required')),
+      code: (v) => (v.trim() ? null : t('masterdata.validation.required')),
     },
   });
 
@@ -38,7 +41,7 @@ export function LocationsPanel() {
         code: v.code,
         locationType: v.locationType as CreateLocationRequest['locationType'],
       });
-      notifySuccess(`Location ${v.code} created`);
+      notifySuccess(t('masterdata.locations.created', { code: v.code }));
       close();
       form.reset();
     } catch (e) {
@@ -46,13 +49,17 @@ export function LocationsPanel() {
     }
   });
 
+  const locationTypeOptions = LOCATION_TYPES.map((v) => ({
+    value: v,
+    label: t(`locationType.${v}` as TranslationKey),
+  }));
   const rows = data ?? [];
   return (
     <Stack>
       <Group justify="space-between">
         <WarehouseSelect
-          label="Filter by warehouse"
-          placeholder="All warehouses"
+          label={t('masterdata.locations.filterByWarehouse')}
+          placeholder={t('masterdata.locations.allWarehouses')}
           clearable
           value={filterWarehouseId}
           onChange={setFilterWarehouseId}
@@ -60,7 +67,7 @@ export function LocationsPanel() {
         />
         {canDo('masterdata.create') && (
           <Button leftSection={<IconPlus size={16} />} onClick={open} mt="auto">
-            New location
+            {t('masterdata.locations.new')}
           </Button>
         )}
       </Group>
@@ -68,16 +75,16 @@ export function LocationsPanel() {
       <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Code</Table.Th>
-            <Table.Th>Type</Table.Th>
-            <Table.Th>Warehouse</Table.Th>
+            <Table.Th>{t('field.code')}</Table.Th>
+            <Table.Th>{t('field.type')}</Table.Th>
+            <Table.Th>{t('field.warehouse')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {rows.map((l) => (
             <Table.Tr key={l.id}>
               <Table.Td>{l.code}</Table.Td>
-              <Table.Td>{l.locationType}</Table.Td>
+              <Table.Td>{t(`locationType.${l.locationType}` as TranslationKey)}</Table.Td>
               <Table.Td>{l.warehouseId != null ? (warehouseCode.get(l.warehouseId) ?? l.warehouseId) : '—'}</Table.Td>
             </Table.Tr>
           ))}
@@ -85,33 +92,33 @@ export function LocationsPanel() {
       </Table>
       {!isLoading && rows.length === 0 && (
         <Text c="dimmed" ta="center" py="md">
-          No locations.
+          {t('masterdata.locations.empty')}
         </Text>
       )}
 
-      <Modal opened={opened} onClose={close} title="New location">
+      <Modal opened={opened} onClose={close} title={t('masterdata.locations.new')}>
         <form onSubmit={submit}>
           <Stack>
             <WarehouseSelect
-              label="Warehouse"
+              label={t('field.warehouse')}
               required
               value={form.values.warehouseId}
               onChange={(id) => form.setFieldValue('warehouseId', id)}
               error={form.errors.warehouseId}
             />
-            <TextInput label="Code" required {...form.getInputProps('code')} />
+            <TextInput label={t('field.code')} required {...form.getInputProps('code')} />
             <Select
-              label="Type"
-              data={LOCATION_TYPES}
+              label={t('field.type')}
+              data={locationTypeOptions}
               allowDeselect={false}
               {...form.getInputProps('locationType')}
             />
             <Group justify="flex-end" mt="sm">
               <Button variant="default" onClick={close}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="submit" loading={create.isPending}>
-                Create
+                {t('common.create')}
               </Button>
             </Group>
           </Stack>

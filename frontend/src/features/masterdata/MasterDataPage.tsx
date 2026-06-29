@@ -1,20 +1,22 @@
 import { Tabs } from '@mantine/core';
 import { PageHeader } from '../../components/PageHeader';
+import { useI18n } from '../../i18n';
 import { ItemsPanel } from './ItemsPanel';
 import { LocationsPanel } from './LocationsPanel';
 import { PartnersPanel } from './PartnersPanel';
 import { WarehousesPanel } from './WarehousesPanel';
 
 export function MasterDataPage() {
+  const { t } = useI18n();
   return (
     <>
-      <PageHeader title="Master Data" subtitle="Items, partners, warehouses and locations" />
+      <PageHeader title={t('nav.masterData')} subtitle={t('masterdata.subtitle')} />
       <Tabs defaultValue="items" keepMounted={false}>
         <Tabs.List mb="md">
-          <Tabs.Tab value="items">Items</Tabs.Tab>
-          <Tabs.Tab value="partners">Partners</Tabs.Tab>
-          <Tabs.Tab value="warehouses">Warehouses</Tabs.Tab>
-          <Tabs.Tab value="locations">Locations</Tabs.Tab>
+          <Tabs.Tab value="items">{t('masterdata.tabs.items')}</Tabs.Tab>
+          <Tabs.Tab value="partners">{t('masterdata.tabs.partners')}</Tabs.Tab>
+          <Tabs.Tab value="warehouses">{t('masterdata.tabs.warehouses')}</Tabs.Tab>
+          <Tabs.Tab value="locations">{t('masterdata.tabs.locations')}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="items">
           <ItemsPanel />

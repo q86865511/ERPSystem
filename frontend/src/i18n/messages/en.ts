@@ -7,7 +7,19 @@
  * Key convention: `<area>.<element>`. Shared labels live under `common.*`; nav under `nav.*`; enum tokens
  * mirror the backend codes under `status.*` / `itemType.*` / `locationType.*` (value stays the code, only the
  * label is translated).
+ *
+ * Per-module namespaces live in `./modules/*` fragments (one file per feature module) and are composed in
+ * below. Each fragment's `*Zh` is typed `: typeof *En`, so a module's zh/en mismatch fails to compile.
  */
+import { inventoryEn } from './modules/inventory';
+import { ledgerEn } from './modules/ledger';
+import { manufacturingEn } from './modules/manufacturing';
+import { masterdataEn } from './modules/masterdata';
+import { paymentsEn } from './modules/payments';
+import { purchasingEn } from './modules/purchasing';
+import { reportingEn } from './modules/reporting';
+import { salesEn } from './modules/sales';
+
 export const en = {
   app: {
     title: 'Manufacturing ERP',
@@ -25,6 +37,42 @@ export const en = {
     save: 'Save',
     view: 'View',
     addLine: 'Add line',
+    submit: 'Submit',
+    close: 'Close',
+    details: 'Details',
+    actions: 'Actions',
+    all: 'All',
+    loading: 'Loading…',
+    noData: 'No data yet',
+  },
+  // Shared column / form-field labels reused across modules (keep wording consistent via the glossary).
+  field: {
+    date: 'Date',
+    status: 'Status',
+    type: 'Type',
+    name: 'Name',
+    code: 'Code',
+    quantity: 'Quantity',
+    unitPrice: 'Unit price',
+    unitCost: 'Unit cost',
+    amount: 'Amount',
+    total: 'Total',
+    net: 'Net',
+    vat: 'VAT',
+    gross: 'Gross',
+    memo: 'Memo',
+    item: 'Item',
+    partner: 'Partner',
+    vendor: 'Vendor',
+    customer: 'Customer',
+    warehouse: 'Warehouse',
+    location: 'Location',
+    dueDate: 'Due date',
+    asOf: 'As of',
+    openBalance: 'Open balance',
+    debit: 'Debit',
+    credit: 'Credit',
+    reason: 'Reason',
   },
   nav: {
     dashboard: 'Dashboard',
@@ -101,4 +149,12 @@ export const en = {
     CUSTOMER: 'Customer',
     INVENTORY_LOSS: 'Inventory loss',
   },
+  masterdata: masterdataEn,
+  purchasing: purchasingEn,
+  sales: salesEn,
+  manufacturing: manufacturingEn,
+  inventory: inventoryEn,
+  reporting: reportingEn,
+  ledger: ledgerEn,
+  payments: paymentsEn,
 };

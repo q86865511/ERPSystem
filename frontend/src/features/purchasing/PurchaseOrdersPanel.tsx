@@ -21,6 +21,7 @@ import { MoneyText } from '../../components/Money';
 import { StatusBadge } from '../../components/StatusBadge';
 import { useItemMap, usePartnerMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
+import { useI18n } from '../../i18n';
 import { notifyError, notifySuccess } from '../../lib/notify';
 import { useConfirmOrder, useCreateOrder, useOrder, useOrders } from './api';
 
@@ -31,6 +32,7 @@ function emptyLine(): LineForm {
 }
 
 export function PurchaseOrdersPanel() {
+  const { t } = useI18n();
   const { canDo } = useAuth();
   const { data, isLoading } = useOrders();
   const partners = usePartnerMap();
@@ -44,14 +46,14 @@ export function PurchaseOrdersPanel() {
   const form = useForm<{ partnerId: number | null; orderDate: string | null; lines: LineForm[] }>({
     initialValues: { partnerId: null, orderDate: dayjs().format('YYYY-MM-DD'), lines: [emptyLine()] },
     validate: {
-      partnerId: (v) => (v != null ? null : 'Pick a vendor'),
+      partnerId: (v) => (v != null ? null : t('purchasing.po.pickVendor')),
     },
   });
 
   const submit = form.onSubmit(async (v) => {
     const lines = v.lines.filter((l) => l.itemId != null && l.qtyOrdered && l.unitPrice);
     if (lines.length === 0) {
-      notifyError('Add at least one complete line');
+      notifyError(t('purchasing.po.lineRequired'));
       return;
     }
     const body: CreatePoRequest = {
@@ -65,7 +67,7 @@ export function PurchaseOrdersPanel() {
     };
     try {
       const po = await create.mutateAsync(body);
-      notifySuccess(`Purchase order ${po?.poNumber} created`);
+      notifySuccess(t('purchasing.po.created', { poNumber: po?.poNumber ?? '' }));
       close();
       form.reset();
       if (po?.id != null) setDetailId(po.id);
@@ -77,7 +79,7 @@ export function PurchaseOrdersPanel() {
   const doConfirm = async (id: number) => {
     try {
       await confirm.mutateAsync(id);
-      notifySuccess('Purchase order confirmed');
+      notifySuccess(t('purchasing.po.confirmed'));
     } catch (e) {
       notifyError(e);
     }
@@ -89,7 +91,7 @@ export function PurchaseOrdersPanel() {
       {canDo('purchasing.write') && (
         <Group justify="flex-end">
           <Button leftSection={<IconPlus size={16} />} onClick={open}>
-            New purchase order
+            {t('purchasing.po.new')}
           </Button>
         </Group>
       )}
@@ -98,10 +100,10 @@ export function PurchaseOrdersPanel() {
         <Table striped highlightOnHover>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>PO #</Table.Th>
-              <Table.Th>Vendor</Table.Th>
-              <Table.Th>Order date</Table.Th>
-              <Table.Th>Status</Table.Th>
+              <Table.Th>{t('purchasing.po.poNumber')}</Table.Th>
+              <Table.Th>{t('field.vendor')}</Table.Th>
+              <Table.Th>{t('purchasing.po.orderDate')}</Table.Th>
+              <Table.Th>{t('field.status')}</Table.Th>
               <Table.Th />
             </Table.Tr>
           </Table.Thead>
@@ -116,7 +118,7 @@ export function PurchaseOrdersPanel() {
                 </Table.Td>
                 <Table.Td ta="right">
                   <Button size="xs" variant="subtle" onClick={() => setDetailId(po.id ?? null)}>
-                    View
+                    {t('common.view')}
                   </Button>
                 </Table.Td>
               </Table.Tr>
@@ -126,44 +128,44 @@ export function PurchaseOrdersPanel() {
       </Table.ScrollContainer>
       {!isLoading && rows.length === 0 && (
         <Text c="dimmed" ta="center" py="md">
-          No purchase orders yet.
+          {t('purchasing.po.none')}
         </Text>
       )}
 
       {/* Create modal */}
-      <Modal opened={opened} onClose={close} title="New purchase order" size="xl">
+      <Modal opened={opened} onClose={close} title={t('purchasing.po.new')} size="xl">
         <form onSubmit={submit}>
           <Stack>
             <Group grow>
               <PartnerSelect
-                label="Vendor"
+                label={t('field.vendor')}
                 vendor
                 required
                 value={form.values.partnerId}
                 onChange={(id) => form.setFieldValue('partnerId', id)}
                 error={form.errors.partnerId}
               />
-              <DateInput label="Order date" value={form.values.orderDate} onChange={(d) => form.setFieldValue('orderDate', d)} />
+              <DateInput label={t('purchasing.po.orderDate')} value={form.values.orderDate} onChange={(d) => form.setFieldValue('orderDate', d)} />
             </Group>
 
             <Text fw={600} size="sm">
-              Lines
+              {t('purchasing.po.lines')}
             </Text>
             {form.values.lines.map((_, i) => (
               <Group key={i} align="flex-end" wrap="nowrap">
                 <ItemSelect
-                  label={i === 0 ? 'Item' : undefined}
+                  label={i === 0 ? t('field.item') : undefined}
                   value={form.values.lines[i]?.itemId ?? null}
                   onChange={(id) => form.setFieldValue(`lines.${i}.itemId`, id)}
                   style={{ flex: 1 }}
                 />
                 <TextInput
-                  label={i === 0 ? 'Qty' : undefined}
+                  label={i === 0 ? t('purchasing.po.qty') : undefined}
                   w={100}
                   {...form.getInputProps(`lines.${i}.qtyOrdered`)}
                 />
                 <TextInput
-                  label={i === 0 ? 'Unit price' : undefined}
+                  label={i === 0 ? t('field.unitPrice') : undefined}
                   w={120}
                   {...form.getInputProps(`lines.${i}.unitPrice`)}
                 />
@@ -184,16 +186,16 @@ export function PurchaseOrdersPanel() {
                 leftSection={<IconPlus size={14} />}
                 onClick={() => form.insertListItem('lines', emptyLine())}
               >
-                Add line
+                {t('common.addLine')}
               </Button>
             </Group>
 
             <Group justify="flex-end" mt="sm">
               <Button variant="default" onClick={close}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="submit" loading={create.isPending}>
-                Create
+                {t('common.create')}
               </Button>
             </Group>
           </Stack>
@@ -206,7 +208,7 @@ export function PurchaseOrdersPanel() {
         onClose={() => setDetailId(null)}
         position="right"
         size="xl"
-        title={`Purchase order ${detail.data?.poNumber ?? ''}`}
+        title={t('purchasing.po.drawerTitle', { poNumber: detail.data?.poNumber ?? '' })}
       >
         {detail.data && (
           <Stack>
@@ -220,11 +222,11 @@ export function PurchaseOrdersPanel() {
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Item</Table.Th>
-                  <Table.Th ta="right">Ordered</Table.Th>
-                  <Table.Th ta="right">Received</Table.Th>
-                  <Table.Th ta="right">Billed</Table.Th>
-                  <Table.Th ta="right">Unit price</Table.Th>
+                  <Table.Th>{t('field.item')}</Table.Th>
+                  <Table.Th ta="right">{t('purchasing.po.ordered')}</Table.Th>
+                  <Table.Th ta="right">{t('purchasing.po.received')}</Table.Th>
+                  <Table.Th ta="right">{t('purchasing.po.billed')}</Table.Th>
+                  <Table.Th ta="right">{t('field.unitPrice')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -244,7 +246,7 @@ export function PurchaseOrdersPanel() {
             {detail.data.status === 'DRAFT' && canDo('purchasing.write') && (
               <Group justify="flex-end">
                 <Button loading={confirm.isPending} onClick={() => detailId && doConfirm(detailId)}>
-                  Confirm order
+                  {t('purchasing.po.confirmOrder')}
                 </Button>
               </Group>
             )}

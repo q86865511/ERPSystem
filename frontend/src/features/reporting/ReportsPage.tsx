@@ -3,22 +3,24 @@ import { Tabs } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { PageHeader } from '../../components/PageHeader';
+import { useI18n } from '../../i18n';
 import { BalanceSheetPanel } from './BalanceSheetPanel';
 import { IncomeStatementPanel } from './IncomeStatementPanel';
 import { TrialBalancePanel } from './TrialBalancePanel';
 
 export function ReportsPage() {
+  const { t } = useI18n();
   const [asOf, setAsOf] = useState<string | null>(dayjs().format('YYYY-MM-DD'));
   const value = asOf ?? undefined;
 
   return (
     <>
       <PageHeader
-        title="Reports"
-        subtitle="Financial statements as of a date"
+        title={t('reporting.title')}
+        subtitle={t('reporting.subtitle')}
         actions={
           <DateInput
-            label="As of"
+            label={t('field.asOf')}
             value={asOf}
             onChange={setAsOf}
             maw={180}
@@ -28,9 +30,9 @@ export function ReportsPage() {
       />
       <Tabs defaultValue="trial-balance" keepMounted={false}>
         <Tabs.List mb="md">
-          <Tabs.Tab value="trial-balance">Trial balance</Tabs.Tab>
-          <Tabs.Tab value="income-statement">Income statement</Tabs.Tab>
-          <Tabs.Tab value="balance-sheet">Balance sheet</Tabs.Tab>
+          <Tabs.Tab value="trial-balance">{t('reporting.tabs.trialBalance')}</Tabs.Tab>
+          <Tabs.Tab value="income-statement">{t('reporting.tabs.incomeStatement')}</Tabs.Tab>
+          <Tabs.Tab value="balance-sheet">{t('reporting.tabs.balanceSheet')}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="trial-balance">
           <TrialBalancePanel asOf={value} />

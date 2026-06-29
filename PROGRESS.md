@@ -12,6 +12,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-29] 🌐 i18n PR2 逐模組抽字串(中/英語言切換完成,待辦 B 收尾)
+  - **8 個業務模組**(masterdata/purchasing/sales/manufacturing/inventory/reporting/ledger/payments)的 `<Module>Page` + 所有 `*Panel.tsx` UI 字串全抽成 `t()`。**字典改為模組化片段**:每模組一個 `i18n/messages/modules/<module>.ts`(`<module>En` + `<module>Zh: typeof <module>En`,自帶 en/zh 結構一致的編譯期把關),`en.ts`/`zh-TW.ts` import 後組合進核心。核心另加 `field.*`(共用欄位/表頭 label)+ `common.*` 擴充,搭配術語對照(對齊 README)確保跨模組一致。
+  - **執行方式**:用 Workflow 8 個 agent 並行(各只改自己模組目錄 + 建自己的片段檔,檔案互斥),我再集中接線 + 驗證。
+  - **修正**:reporting 片段多包了一層 `reporting:` → 接進後變 `reporting.reporting.*`,所有 reporting key 對不上(`tsc` 抓出),已拉平;3 處插值傳入 `xxx|undefined`(FiscalPeriodsPanel periodNo/yearCode、BomsPanel outputQty)→ 呼叫點 coerce;**`lib/notify.ts` `errorMessage` 加字串分支** —— 修掉既有 bug(`notifyError('字串')` 原本顯示「請求失敗」而非該訊息),讓 16 條 client 端驗證訊息真正顯示譯文。
+  - **驗證**:`npm run build`(`tsc -b && vite build`)綠(719 模組);三種 grep 殘留掃描(prop 英文字面值 / JSX 英文文字 / 帶空格英文字串)皆零。README(繁/英)補雙語 UI 說明。實機點測待使用者機器 / Oracle Docker demo。
 - [2026-06-29] 🌐 i18n PR1 地基 + 共用層(中/英語言切換,待辦 B)
   - **方案=自建輕量 typed context(零依賴)**,非 react-i18next(作品集「從零自建」敘事 + 零 peer-dep 風險 + 編譯期 key 型別安全 + bundle ~0)。新 `frontend/src/i18n/`:`messages/en.ts`(型別來源,**不加 `as const`** 讓 leaf 維持 `string`)+ `messages/zh-TW.ts`(`: Messages` 約束 → 漏譯直接 `tsc` 失敗)、`types.ts`(`TranslationKey` 為遞迴推導的點分 key union)、`detectLocale.ts`(navigator.language `zh-*`→繁中)、`localePreference.ts`(localStorage,key `erp.locale`,仿 `auth/credentials.ts`)、`I18nContext.tsx`(仿 `AuthContext`;`t()` 找不到回傳 key 不 crash、`{name}` 輕量插值;`useEffect` 同步 `<html lang>` + dayjs locale + 非 React 翻譯橋)、`useI18n.ts`、`translator.ts`(`tGlobal` 供 `notify.ts` 等非 React 模組)、`index.ts`。
   - **Provider 樹**:`main.tsx` 在 `MantineProvider` 內加 `<I18nProvider>`(內部再包 `@mantine/dates` 的 `DatesProvider`,locale 隨 state)。**語言切換器**:`AppLayout` header user menu 左側 `SegmentedControl`「中 / EN」,切換即時、偏好持久化、無需 reload。
@@ -144,9 +149,10 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - ✅ **README 截圖(已做)**:Playwright 截 8 頁 + Modal 放 `docs/screenshots/`,README(繁/英)嵌入儀表板 hero + 採購/製造/財報。
 - **前端 bundle 瘦身**:`@tabler/icons` barrel 使 JS >800KB(build 警告);改 per-icon import 或 code-split。
 
-**B. 前端中/英 i18n 切換(使用者要求,進行中)**
-- ✅ **PR1 地基 + 共用層(已做,2026-06-29)**:自建輕量 typed context(零依賴)、語言切換器、共用元件 + 4 頁 + notify 抽字串。預設跟隨瀏覽器、可手動覆寫存 localStorage。計畫見 `~/.claude/plans/tender-cuddling-starlight.md`。
-- **PR2 逐模組抽字串(待做)**:8 個業務模組 `features/*` 的 `<Module>Page` + `*Panel.tsx` 字串抽取 + 補字典分支;Grep 掃殘留收尾;README 補語言切換說明。
+**B. 前端中/英 i18n 切換(使用者要求)—— ✅ 完成(2026-06-29)**
+- ✅ **PR1 地基 + 共用層**:自建輕量 typed context(零依賴)、語言切換器、共用元件 + 4 頁 + notify 抽字串。預設跟隨瀏覽器、可手動覆寫存 localStorage。計畫見 `~/.claude/plans/tender-cuddling-starlight.md`。
+- ✅ **PR2 逐模組抽字串**:8 個業務模組全抽 `t()`、字典模組化片段、README 補說明。`npm run build` 綠。
+- 剩:實機點測(使用者機器 / Oracle demo);可選後續見 E。
 
 **C. 安全**
 - JWT + 持久化使用者/角色庫(取代 HTTP Basic + 4 in-memory;前端 auth 層已抽象化好接)。

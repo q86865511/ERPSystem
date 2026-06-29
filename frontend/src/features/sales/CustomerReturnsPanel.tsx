@@ -8,12 +8,14 @@ import type { CreateReturnRequest } from '../../api/types';
 import { LocationSelect } from '../../components/EntitySelect';
 import { MoneyText } from '../../components/Money';
 import { StatusBadge } from '../../components/StatusBadge';
+import { useI18n } from '../../i18n';
 import { useItemMap, usePartnerMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
 import { notifyError, notifySuccess } from '../../lib/notify';
 import { useCreateReturn, useInvoices, useReturn, useReturns } from './api';
 
 export function CustomerReturnsPanel() {
+  const { t } = useI18n();
   const { canDo } = useAuth();
   const returns = useReturns();
   const invoices = useInvoices();
@@ -41,7 +43,7 @@ export function CustomerReturnsPanel() {
 
   const submit = async () => {
     if (!invoiceId || !locationId) {
-      notifyError('Pick an invoice and a return-to location');
+      notifyError(t('sales.return.needInput'));
       return;
     }
     const body: CreateReturnRequest = {
@@ -51,7 +53,7 @@ export function CustomerReturnsPanel() {
     };
     try {
       const r = await create.mutateAsync(body);
-      notifySuccess(`Return ${r?.returnNumber} posted`);
+      notifySuccess(t('sales.return.posted', { returnNumber: r?.returnNumber ?? '' }));
       close();
       if (r?.id != null) setDetailId(r.id);
     } catch (e) {
@@ -65,7 +67,7 @@ export function CustomerReturnsPanel() {
       {canDo('sales.customerReturn') && (
         <Group justify="flex-end">
           <Button leftSection={<IconPlus size={16} />} onClick={openForm}>
-            New return
+            {t('sales.return.new')}
           </Button>
         </Group>
       )}
@@ -73,10 +75,10 @@ export function CustomerReturnsPanel() {
       <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Return #</Table.Th>
-            <Table.Th>Customer</Table.Th>
-            <Table.Th ta="right">Gross</Table.Th>
-            <Table.Th>Status</Table.Th>
+            <Table.Th>{t('sales.return.returnNumber')}</Table.Th>
+            <Table.Th>{t('field.customer')}</Table.Th>
+            <Table.Th ta="right">{t('field.gross')}</Table.Th>
+            <Table.Th>{t('field.status')}</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
@@ -93,7 +95,7 @@ export function CustomerReturnsPanel() {
               </Table.Td>
               <Table.Td ta="right">
                 <Button size="xs" variant="subtle" onClick={() => setDetailId(r.id ?? null)}>
-                  View
+                  {t('common.view')}
                 </Button>
               </Table.Td>
             </Table.Tr>
@@ -102,37 +104,36 @@ export function CustomerReturnsPanel() {
       </Table>
       {!returns.isLoading && rows.length === 0 && (
         <Text c="dimmed" ta="center" py="md">
-          No customer returns yet.
+          {t('sales.return.empty')}
         </Text>
       )}
 
-      <Modal opened={opened} onClose={close} title="New customer return" size="md">
+      <Modal opened={opened} onClose={close} title={t('sales.return.modalTitle')} size="md">
         <Stack>
           <Select
-            label="Invoice to return"
-            placeholder="Posted, unpaid invoice"
+            label={t('sales.return.invoiceToReturn')}
+            placeholder={t('sales.return.invoicePlaceholder')}
             searchable
             data={invoiceOptions}
             value={invoiceId != null ? String(invoiceId) : null}
             onChange={(v) => setInvoiceId(v ? Number(v) : null)}
           />
           <LocationSelect
-            label="Return to location"
+            label={t('sales.return.returnToLocation')}
             locationType="STOCK"
             value={locationId}
             onChange={setLocationId}
           />
-          <DateInput label="Posting date" value={postingDate} onChange={setPostingDate} />
+          <DateInput label={t('sales.return.postingDate')} value={postingDate} onChange={setPostingDate} />
           <Text size="xs" c="dimmed">
-            Posts a credit note that reverses the whole invoice (revenue, VAT, COGS) and returns the
-            goods to stock.
+            {t('sales.return.modalNote')}
           </Text>
           <Group justify="flex-end">
             <Button variant="default" onClick={close}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button onClick={submit} loading={create.isPending} color="grape">
-              Post return
+              {t('sales.return.post')}
             </Button>
           </Group>
         </Stack>
@@ -143,35 +144,37 @@ export function CustomerReturnsPanel() {
         onClose={() => setDetailId(null)}
         position="right"
         size="xl"
-        title={`Customer return ${detail.data?.returnNumber ?? ''}`}
+        title={t('sales.return.drawerTitle', { returnNumber: detail.data?.returnNumber ?? '' })}
       >
         {detail.data && (
           <Stack>
             <Group>
               <StatusBadge status={detail.data.status} />
               {detail.data.creditNoteJournalEntryId != null && (
-                <Badge variant="light">Credit note JE #{detail.data.creditNoteJournalEntryId}</Badge>
+                <Badge variant="light">
+                  {t('sales.return.creditNoteJe', { id: detail.data.creditNoteJournalEntryId })}
+                </Badge>
               )}
             </Group>
             <SimpleGrid cols={3}>
               <Text size="sm">
-                Goods <MoneyText value={detail.data.goodsAmount} />
+                {t('sales.return.goods')} <MoneyText value={detail.data.goodsAmount} />
               </Text>
               <Text size="sm">
-                VAT <MoneyText value={detail.data.vatAmount} />
+                {t('field.vat')} <MoneyText value={detail.data.vatAmount} />
               </Text>
               <Text size="sm">
-                COGS <MoneyText value={detail.data.cogsAmount} />
+                {t('sales.return.cogs')} <MoneyText value={detail.data.cogsAmount} />
               </Text>
             </SimpleGrid>
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Item</Table.Th>
-                  <Table.Th ta="right">Qty</Table.Th>
-                  <Table.Th ta="right">Net</Table.Th>
-                  <Table.Th ta="right">COGS</Table.Th>
-                  <Table.Th>Stock JE</Table.Th>
+                  <Table.Th>{t('field.item')}</Table.Th>
+                  <Table.Th ta="right">{t('sales.return.qty')}</Table.Th>
+                  <Table.Th ta="right">{t('field.net')}</Table.Th>
+                  <Table.Th ta="right">{t('sales.return.cogs')}</Table.Th>
+                  <Table.Th>{t('sales.return.stockJe')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -188,7 +191,7 @@ export function CustomerReturnsPanel() {
                     <Table.Td>
                       {l.stockJournalEntryId != null && (
                         <Badge variant="light" size="sm">
-                          JE #{l.stockJournalEntryId}
+                          {t('sales.je', { id: l.stockJournalEntryId })}
                         </Badge>
                       )}
                     </Table.Td>

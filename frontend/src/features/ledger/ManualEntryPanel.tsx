@@ -15,6 +15,7 @@ import { IconPlus, IconTrash } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { JournalEntryRequest } from '../../api/types';
 import { formatMoney, sumMoney } from '../../components/Money';
+import { useI18n } from '../../i18n';
 import { useTrialBalance } from '../reporting/api';
 import { useAuth } from '../../auth/useAuth';
 import { notifyError, notifySuccess } from '../../lib/notify';
@@ -24,6 +25,7 @@ type LineForm = { accountCode: string; debit: string; credit: string; memo: stri
 const emptyLine = (): LineForm => ({ accountCode: '', debit: '', credit: '', memo: '' });
 
 export function ManualEntryPanel() {
+  const { t } = useI18n();
   const { canDo } = useAuth();
   const tb = useTrialBalance();
   const create = useCreateJournalEntry();
@@ -43,7 +45,7 @@ export function ManualEntryPanel() {
   if (!canDo('ledger.post')) {
     return (
       <Text c="dimmed" py="md">
-        Manual journal entries require the ACCOUNTANT role.
+        {t('ledger.manual.requiresAccountant')}
       </Text>
     );
   }
@@ -62,7 +64,7 @@ export function ManualEntryPanel() {
         memo: l.memo.trim() || undefined,
       }));
     if (!balanced || lines.length < 2) {
-      notifyError('Entry must balance (total debit = total credit) with at least two lines');
+      notifyError(t('ledger.manual.mustBalance'));
       return;
     }
     const body: JournalEntryRequest = {
@@ -72,7 +74,7 @@ export function ManualEntryPanel() {
     };
     try {
       const result = await create.mutateAsync(body);
-      notifySuccess(`Journal entry #${result?.entryNo} posted`);
+      notifySuccess(t('ledger.manual.posted', { entryNo: result?.entryNo ?? '' }));
       form.reset();
     } catch (e) {
       notifyError(e);
@@ -82,17 +84,17 @@ export function ManualEntryPanel() {
   return (
     <Stack>
       <Group grow maw={520}>
-        <DateInput label="Posting date" value={form.values.postingDate} onChange={(d) => form.setFieldValue('postingDate', d)} />
-        <TextInput label="Memo" {...form.getInputProps('memo')} />
+        <DateInput label={t('ledger.manual.postingDate')} value={form.values.postingDate} onChange={(d) => form.setFieldValue('postingDate', d)} />
+        <TextInput label={t('field.memo')} {...form.getInputProps('memo')} />
       </Group>
 
       <Table>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th w={260}>Account</Table.Th>
-            <Table.Th w={140}>Debit</Table.Th>
-            <Table.Th w={140}>Credit</Table.Th>
-            <Table.Th>Memo</Table.Th>
+            <Table.Th w={260}>{t('ledger.manual.account')}</Table.Th>
+            <Table.Th w={140}>{t('field.debit')}</Table.Th>
+            <Table.Th w={140}>{t('field.credit')}</Table.Th>
+            <Table.Th>{t('field.memo')}</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
@@ -102,7 +104,7 @@ export function ManualEntryPanel() {
               <Table.Td>
                 <Select
                   searchable
-                  placeholder="Account"
+                  placeholder={t('ledger.manual.accountPlaceholder')}
                   data={accountOptions}
                   value={form.values.lines[i]?.accountCode || null}
                   onChange={(v) => form.setFieldValue(`lines.${i}.accountCode`, v ?? '')}
@@ -139,20 +141,20 @@ export function ManualEntryPanel() {
           leftSection={<IconPlus size={14} />}
           onClick={() => form.insertListItem('lines', emptyLine())}
         >
-          Add line
+          {t('common.addLine')}
         </Button>
         <Group>
-          <Text size="sm">Debit {formatMoney(totalDebit)}</Text>
-          <Text size="sm">Credit {formatMoney(totalCredit)}</Text>
+          <Text size="sm">{t('field.debit')} {formatMoney(totalDebit)}</Text>
+          <Text size="sm">{t('field.credit')} {formatMoney(totalCredit)}</Text>
           <Badge color={balanced ? 'teal' : 'red'} variant="light">
-            {balanced ? 'Balanced' : 'Unbalanced'}
+            {balanced ? t('ledger.manual.balanced') : t('ledger.manual.unbalanced')}
           </Badge>
         </Group>
       </Group>
 
       <Group justify="flex-end">
         <Button onClick={submit} loading={create.isPending} disabled={!balanced}>
-          Post entry
+          {t('ledger.manual.postEntry')}
         </Button>
       </Group>
     </Stack>

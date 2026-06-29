@@ -4,6 +4,14 @@
  * 對帳/過帳…)。enum 的 value 維持後端代碼,這裡只翻顯示用的 label。
  */
 import type { Messages } from '../types';
+import { inventoryZh } from './modules/inventory';
+import { ledgerZh } from './modules/ledger';
+import { manufacturingZh } from './modules/manufacturing';
+import { masterdataZh } from './modules/masterdata';
+import { paymentsZh } from './modules/payments';
+import { purchasingZh } from './modules/purchasing';
+import { reportingZh } from './modules/reporting';
+import { salesZh } from './modules/sales';
 
 export const zhTW: Messages = {
   app: {
@@ -22,6 +30,41 @@ export const zhTW: Messages = {
     save: '儲存',
     view: '檢視',
     addLine: '新增一行',
+    submit: '送出',
+    close: '關閉',
+    details: '詳情',
+    actions: '操作',
+    all: '全部',
+    loading: '載入中…',
+    noData: '尚無資料',
+  },
+  field: {
+    date: '日期',
+    status: '狀態',
+    type: '類型',
+    name: '名稱',
+    code: '代碼',
+    quantity: '數量',
+    unitPrice: '單價',
+    unitCost: '單位成本',
+    amount: '金額',
+    total: '合計',
+    net: '淨額',
+    vat: '稅額',
+    gross: '含稅總額',
+    memo: '摘要',
+    item: '商品',
+    partner: '夥伴',
+    vendor: '供應商',
+    customer: '客戶',
+    warehouse: '倉庫',
+    location: '儲位',
+    dueDate: '到期日',
+    asOf: '截至',
+    openBalance: '未結餘額',
+    debit: '借方',
+    credit: '貸方',
+    reason: '原因',
   },
   nav: {
     dashboard: '儀表板',
@@ -98,4 +141,12 @@ export const zhTW: Messages = {
     CUSTOMER: '客戶',
     INVENTORY_LOSS: '庫存損耗',
   },
+  masterdata: masterdataZh,
+  purchasing: purchasingZh,
+  sales: salesZh,
+  manufacturing: manufacturingZh,
+  inventory: inventoryZh,
+  reporting: reportingZh,
+  ledger: ledgerZh,
+  payments: paymentsZh,
 };

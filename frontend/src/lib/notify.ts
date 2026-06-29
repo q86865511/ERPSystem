@@ -1,8 +1,9 @@
 import { notifications } from '@mantine/notifications';
 import { tGlobal } from '../i18n';
 
-/** Extracts a human message from an openapi-fetch error (RFC 9457 problem+json body) or any throwable. */
+/** Extracts a human message from a plain string, an openapi-fetch error (RFC 9457 problem+json body), or any throwable. */
 export function errorMessage(error: unknown): string {
+  if (typeof error === 'string') return error;
   if (error && typeof error === 'object') {
     const e = error as { detail?: string; title?: string; message?: string };
     return e.detail ?? e.title ?? e.message ?? tGlobal('common.requestFailed');

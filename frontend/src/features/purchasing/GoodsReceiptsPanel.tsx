@@ -10,12 +10,14 @@ import { MoneyText } from '../../components/Money';
 import { StatusBadge } from '../../components/StatusBadge';
 import { useItemMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
+import { useI18n } from '../../i18n';
 import { notifyError, notifySuccess } from '../../lib/notify';
 import { useCreateReceipt, useOrder, useOrders, useReceipt, useReceipts } from './api';
 
 const RECEIVABLE = new Set(['CONFIRMED', 'PARTIALLY_RECEIVED']);
 
 export function GoodsReceiptsPanel() {
+  const { t } = useI18n();
   const { canDo } = useAuth();
   const receipts = useReceipts();
   const orders = useOrders();
@@ -47,7 +49,7 @@ export function GoodsReceiptsPanel() {
       .filter(([, q]) => q && Number(q) > 0)
       .map(([poLineId, qty]) => ({ poLineId: Number(poLineId), qty }));
     if (!poId || !locationId || lines.length === 0) {
-      notifyError('Pick a PO, a stock location, and at least one quantity');
+      notifyError(t('purchasing.grn.selectRequired'));
       return;
     }
     const body: CreateGrnRequest = {
@@ -58,7 +60,7 @@ export function GoodsReceiptsPanel() {
     };
     try {
       const grn = await create.mutateAsync(body);
-      notifySuccess(`Goods receipt ${grn?.grnNumber} posted`);
+      notifySuccess(t('purchasing.grn.posted', { grnNumber: grn?.grnNumber ?? '' }));
       close();
       if (grn?.id != null) setDetailId(grn.id);
     } catch (e) {
@@ -72,7 +74,7 @@ export function GoodsReceiptsPanel() {
       {canDo('purchasing.write') && (
         <Group justify="flex-end">
           <Button leftSection={<IconPlus size={16} />} onClick={openForm}>
-            New goods receipt
+            {t('purchasing.grn.new')}
           </Button>
         </Group>
       )}
@@ -80,9 +82,9 @@ export function GoodsReceiptsPanel() {
       <Table striped highlightOnHover>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>GRN #</Table.Th>
-            <Table.Th>Posting date</Table.Th>
-            <Table.Th>Status</Table.Th>
+            <Table.Th>{t('purchasing.grn.grnNumber')}</Table.Th>
+            <Table.Th>{t('purchasing.grn.postingDate')}</Table.Th>
+            <Table.Th>{t('field.status')}</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
@@ -96,7 +98,7 @@ export function GoodsReceiptsPanel() {
               </Table.Td>
               <Table.Td ta="right">
                 <Button size="xs" variant="subtle" onClick={() => setDetailId(g.id ?? null)}>
-                  View
+                  {t('common.view')}
                 </Button>
               </Table.Td>
             </Table.Tr>
@@ -105,16 +107,16 @@ export function GoodsReceiptsPanel() {
       </Table>
       {!receipts.isLoading && rows.length === 0 && (
         <Text c="dimmed" ta="center" py="md">
-          No goods receipts yet.
+          {t('purchasing.grn.none')}
         </Text>
       )}
 
-      <Modal opened={opened} onClose={close} title="New goods receipt" size="xl">
+      <Modal opened={opened} onClose={close} title={t('purchasing.grn.new')} size="xl">
         <Stack>
           <Group grow>
             <Select
-              label="Purchase order"
-              placeholder="Confirmed PO"
+              label={t('purchasing.grn.purchaseOrder')}
+              placeholder={t('purchasing.grn.confirmedPoPlaceholder')}
               searchable
               data={poOptions}
               value={poId != null ? String(poId) : null}
@@ -124,12 +126,12 @@ export function GoodsReceiptsPanel() {
               }}
             />
             <LocationSelect
-              label="Stock location"
+              label={t('purchasing.grn.stockLocation')}
               locationType="STOCK"
               value={locationId}
               onChange={setLocationId}
             />
-            <DateInput label="Posting date" value={postingDate} onChange={setPostingDate} />
+            <DateInput label={t('purchasing.grn.postingDate')} value={postingDate} onChange={setPostingDate} />
           </Group>
 
           {poId && po.isLoading && <Loader size="sm" />}
@@ -137,11 +139,11 @@ export function GoodsReceiptsPanel() {
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Item</Table.Th>
-                  <Table.Th ta="right">Ordered</Table.Th>
-                  <Table.Th ta="right">Received</Table.Th>
+                  <Table.Th>{t('field.item')}</Table.Th>
+                  <Table.Th ta="right">{t('purchasing.grn.ordered')}</Table.Th>
+                  <Table.Th ta="right">{t('purchasing.grn.received')}</Table.Th>
                   <Table.Th ta="right" w={120}>
-                    Receive now
+                    {t('purchasing.grn.receiveNow')}
                   </Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -169,10 +171,10 @@ export function GoodsReceiptsPanel() {
 
           <Group justify="flex-end">
             <Button variant="default" onClick={close}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button onClick={submit} loading={create.isPending}>
-              Post receipt
+              {t('purchasing.grn.postReceipt')}
             </Button>
           </Group>
         </Stack>
@@ -183,7 +185,7 @@ export function GoodsReceiptsPanel() {
         onClose={() => setDetailId(null)}
         position="right"
         size="xl"
-        title={`Goods receipt ${detail.data?.grnNumber ?? ''}`}
+        title={t('purchasing.grn.drawerTitle', { grnNumber: detail.data?.grnNumber ?? '' })}
       >
         {detail.data && (
           <Stack>
@@ -191,10 +193,10 @@ export function GoodsReceiptsPanel() {
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Item</Table.Th>
-                  <Table.Th ta="right">Qty</Table.Th>
-                  <Table.Th ta="right">Unit cost</Table.Th>
-                  <Table.Th>Posting</Table.Th>
+                  <Table.Th>{t('field.item')}</Table.Th>
+                  <Table.Th ta="right">{t('field.quantity')}</Table.Th>
+                  <Table.Th ta="right">{t('field.unitCost')}</Table.Th>
+                  <Table.Th>{t('purchasing.grn.posting')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -208,7 +210,7 @@ export function GoodsReceiptsPanel() {
                     <Table.Td>
                       {l.journalEntryId != null && (
                         <Badge variant="light" size="sm">
-                          JE #{l.journalEntryId}
+                          {t('purchasing.grn.journalEntry', { id: l.journalEntryId })}
                         </Badge>
                       )}
                     </Table.Td>
@@ -217,7 +219,7 @@ export function GoodsReceiptsPanel() {
               </Table.Tbody>
             </Table>
             <Text size="xs" c="dimmed">
-              Each line posted Dr Inventory / Cr GR-IR at moving-average cost.
+              {t('purchasing.grn.postingNote')}
             </Text>
           </Stack>
         )}

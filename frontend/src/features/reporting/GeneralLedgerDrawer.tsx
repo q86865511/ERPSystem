@@ -1,5 +1,6 @@
 import { Badge, Drawer, Group, Loader, Table, Text } from '@mantine/core';
 import { MoneyText } from '../../components/Money';
+import { useI18n } from '../../i18n';
 import { useGeneralLedger } from './api';
 
 const nonZero = (v: string | undefined) => v != null && Number(v) !== 0;
@@ -16,8 +17,10 @@ export function GeneralLedgerDrawer({
   asOf?: string;
   onClose: () => void;
 }) {
+  const { t } = useI18n();
   const { data, isLoading } = useGeneralLedger(accountCode, asOf);
   const rows = data ?? [];
+  const accountLabel = `${accountCode ?? ''}${accountName ? ` ${accountName}` : ''}`;
 
   return (
     <Drawer
@@ -25,7 +28,7 @@ export function GeneralLedgerDrawer({
       onClose={onClose}
       position="right"
       size="xl"
-      title={`General ledger — ${accountCode ?? ''}${accountName ? ` ${accountName}` : ''}`}
+      title={t('reporting.generalLedger.title', { account: accountLabel })}
     >
       {isLoading ? (
         <Group justify="center" py="xl">
@@ -37,12 +40,12 @@ export function GeneralLedgerDrawer({
             <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Date</Table.Th>
-                  <Table.Th>Entry</Table.Th>
-                  <Table.Th>Source</Table.Th>
-                  <Table.Th>Memo</Table.Th>
-                  <Table.Th ta="right">Debit</Table.Th>
-                  <Table.Th ta="right">Credit</Table.Th>
+                  <Table.Th>{t('field.date')}</Table.Th>
+                  <Table.Th>{t('reporting.generalLedger.entry')}</Table.Th>
+                  <Table.Th>{t('reporting.generalLedger.source')}</Table.Th>
+                  <Table.Th>{t('field.memo')}</Table.Th>
+                  <Table.Th ta="right">{t('field.debit')}</Table.Th>
+                  <Table.Th ta="right">{t('field.credit')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -71,7 +74,7 @@ export function GeneralLedgerDrawer({
           </Table.ScrollContainer>
           {rows.length === 0 && (
             <Text c="dimmed" ta="center" py="md">
-              No entries for this account.
+              {t('reporting.generalLedger.noEntries')}
             </Text>
           )}
         </>

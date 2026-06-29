@@ -1,6 +1,7 @@
 import { Table, Text } from '@mantine/core';
 import type { components } from '../../api/schema';
 import { MoneyText } from '../../components/Money';
+import { useI18n } from '../../i18n';
 
 type StatementLine = components['schemas']['StatementLine'];
 
@@ -14,6 +15,7 @@ export function StatementSection({
   lines: StatementLine[];
   total: string | undefined;
 }) {
+  const { t } = useI18n();
   return (
     <div>
       <Text fw={600} mb={4}>
@@ -34,7 +36,7 @@ export function StatementSection({
             <Table.Tr>
               <Table.Td colSpan={3}>
                 <Text c="dimmed" size="sm">
-                  No accounts.
+                  {t('reporting.statement.noAccounts')}
                 </Text>
               </Table.Td>
             </Table.Tr>
@@ -42,7 +44,9 @@ export function StatementSection({
         </Table.Tbody>
         <Table.Tfoot>
           <Table.Tr>
-            <Table.Th colSpan={2}>Total {title.toLowerCase()}</Table.Th>
+            <Table.Th colSpan={2}>
+              {t('reporting.statement.sectionTotal', { section: title })}
+            </Table.Th>
             <Table.Th ta="right">
               <MoneyText value={total} />
             </Table.Th>

@@ -1,16 +1,18 @@
 import { Tabs } from '@mantine/core';
 import { PageHeader } from '../../components/PageHeader';
+import { useI18n } from '../../i18n';
 import { FiscalPeriodsPanel } from './FiscalPeriodsPanel';
 import { ManualEntryPanel } from './ManualEntryPanel';
 
 export function LedgerPage() {
+  const { t } = useI18n();
   return (
     <>
-      <PageHeader title="Ledger" subtitle="Manual journal entries and fiscal-period close" />
+      <PageHeader title={t('ledger.page.title')} subtitle={t('ledger.page.subtitle')} />
       <Tabs defaultValue="manual-entry" keepMounted={false}>
         <Tabs.List mb="md">
-          <Tabs.Tab value="manual-entry">Manual entry</Tabs.Tab>
-          <Tabs.Tab value="periods">Fiscal periods</Tabs.Tab>
+          <Tabs.Tab value="manual-entry">{t('ledger.tabs.manualEntry')}</Tabs.Tab>
+          <Tabs.Tab value="periods">{t('ledger.tabs.periods')}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="manual-entry">
           <ManualEntryPanel />

@@ -21,6 +21,7 @@ import { MoneyText } from '../../components/Money';
 import { StatusBadge } from '../../components/StatusBadge';
 import { useItemMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
+import { useI18n } from '../../i18n';
 import { notifyError, notifySuccess } from '../../lib/notify';
 import {
   useBoms,
@@ -36,6 +37,7 @@ import {
 type ActionKind = 'issue' | 'complete' | 'cancel';
 
 export function WorkOrdersPanel() {
+  const { t } = useI18n();
   const { canDo } = useAuth();
   const writable = canDo('manufacturing.write');
   const list = useWorkOrders();
@@ -64,7 +66,10 @@ export function WorkOrdersPanel() {
 
   const bomOptions = (boms.data ?? [])
     .filter((b) => itemId == null || b.parentItemId === itemId)
-    .map((b) => ({ value: String(b.id), label: `v${b.version} (output ${b.outputQty})` }));
+    .map((b) => ({
+      value: String(b.id),
+      label: t('manufacturing.wo.bomOption', { version: b.version ?? '', outputQty: b.outputQty ?? '' }),
+    }));
 
   const openCreate = () => {
     setItemId(null);
@@ -75,13 +80,13 @@ export function WorkOrdersPanel() {
 
   const submitCreate = async () => {
     if (!itemId || !bomId || !qtyToProduce) {
-      notifyError('Pick an item, a BOM and a quantity');
+      notifyError(t('manufacturing.wo.pickItemBomQty'));
       return;
     }
     const body: CreateWorkOrderRequest = { itemId, bomId, qtyToProduce };
     try {
       const wo = await create.mutateAsync(body);
-      notifySuccess(`Work order ${wo?.woNumber} created`);
+      notifySuccess(t('manufacturing.wo.created', { woNumber: wo?.woNumber ?? '' }));
       close();
       if (wo?.id != null) setDetailId(wo.id);
     } catch (e) {
@@ -92,7 +97,7 @@ export function WorkOrdersPanel() {
   const doRelease = async (id: number) => {
     try {
       await release.mutateAsync(id);
-      notifySuccess('Work order released (BOM snapshotted)');
+      notifySuccess(t('manufacturing.wo.released'));
     } catch (e) {
       notifyError(e);
     }
@@ -106,16 +111,16 @@ export function WorkOrdersPanel() {
 
   const submitAction = async () => {
     if (detailId == null || !locationId) {
-      notifyError('Pick a stock location');
+      notifyError(t('manufacturing.wo.pickStockLocation'));
       return;
     }
     try {
       if (action === 'issue') {
         await issue.mutateAsync({ id: detailId, stockLocationId: locationId, postingDate: postingDate ?? undefined });
-        notifySuccess('Components issued to WIP');
+        notifySuccess(t('manufacturing.wo.componentsIssued'));
       } else if (action === 'complete') {
         if (!qtyProduced) {
-          notifyError('Enter quantity produced');
+          notifyError(t('manufacturing.wo.enterQtyProduced'));
           return;
         }
         await complete.mutateAsync({
@@ -124,10 +129,10 @@ export function WorkOrdersPanel() {
           stockLocationId: locationId,
           postingDate: postingDate ?? undefined,
         });
-        notifySuccess('Work order completed; finished goods received');
+        notifySuccess(t('manufacturing.wo.completed'));
       } else if (action === 'cancel') {
         await cancel.mutateAsync({ id: detailId, stockLocationId: locationId, postingDate: postingDate ?? undefined });
-        notifySuccess('Work order cancelled; issued components returned');
+        notifySuccess(t('manufacturing.wo.cancelled'));
       }
       setAction(null);
     } catch (e) {
@@ -142,7 +147,7 @@ export function WorkOrdersPanel() {
       {writable && (
         <Group justify="flex-end">
           <Button leftSection={<IconPlus size={16} />} onClick={openCreate}>
-            New work order
+            {t('manufacturing.wo.newWo')}
           </Button>
         </Group>
       )}
@@ -151,11 +156,11 @@ export function WorkOrdersPanel() {
         <Table striped highlightOnHover>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>WO #</Table.Th>
-              <Table.Th>Item</Table.Th>
-              <Table.Th ta="right">To produce</Table.Th>
-              <Table.Th ta="right">Produced</Table.Th>
-              <Table.Th>Status</Table.Th>
+              <Table.Th>{t('manufacturing.wo.woNumber')}</Table.Th>
+              <Table.Th>{t('field.item')}</Table.Th>
+              <Table.Th ta="right">{t('manufacturing.wo.toProduce')}</Table.Th>
+              <Table.Th ta="right">{t('manufacturing.wo.produced')}</Table.Th>
+              <Table.Th>{t('field.status')}</Table.Th>
               <Table.Th />
             </Table.Tr>
           </Table.Thead>
@@ -171,7 +176,7 @@ export function WorkOrdersPanel() {
                 </Table.Td>
                 <Table.Td ta="right">
                   <Button size="xs" variant="subtle" onClick={() => setDetailId(w.id ?? null)}>
-                    View
+                    {t('common.view')}
                   </Button>
                 </Table.Td>
               </Table.Tr>
@@ -181,15 +186,15 @@ export function WorkOrdersPanel() {
       </Table.ScrollContainer>
       {!list.isLoading && rows.length === 0 && (
         <Text c="dimmed" ta="center" py="md">
-          No work orders yet.
+          {t('manufacturing.wo.empty')}
         </Text>
       )}
 
       {/* Create */}
-      <Modal opened={opened} onClose={close} title="New work order" size="md">
+      <Modal opened={opened} onClose={close} title={t('manufacturing.wo.newWo')} size="md">
         <Stack>
           <ItemSelect
-            label="Finished item"
+            label={t('manufacturing.wo.finishedItem')}
             itemType="FINISHED"
             value={itemId}
             onChange={(id) => {
@@ -198,19 +203,19 @@ export function WorkOrdersPanel() {
             }}
           />
           <Select
-            label="BOM"
-            placeholder="BOM for this item"
+            label={t('manufacturing.wo.bom')}
+            placeholder={t('manufacturing.wo.bomPlaceholder')}
             data={bomOptions}
             value={bomId != null ? String(bomId) : null}
             onChange={(v) => setBomId(v ? Number(v) : null)}
           />
-          <TextInput label="Quantity to produce" value={qtyToProduce} onChange={(e) => setQtyToProduce(e.currentTarget.value)} />
+          <TextInput label={t('manufacturing.wo.qtyToProduce')} value={qtyToProduce} onChange={(e) => setQtyToProduce(e.currentTarget.value)} />
           <Group justify="flex-end">
             <Button variant="default" onClick={close}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button onClick={submitCreate} loading={create.isPending}>
-              Create
+              {t('common.create')}
             </Button>
           </Group>
         </Stack>
@@ -222,7 +227,7 @@ export function WorkOrdersPanel() {
         onClose={() => setDetailId(null)}
         position="right"
         size="xl"
-        title={`Work order ${detail.data?.woNumber ?? ''}`}
+        title={t('manufacturing.wo.drawerTitle', { woNumber: detail.data?.woNumber ?? '' })}
       >
         {detail.data && (
           <Stack>
@@ -230,25 +235,27 @@ export function WorkOrdersPanel() {
               <Group>
                 <StatusBadge status={status} />
                 <Text size="sm" c="dimmed">
-                  {detail.data.itemId != null ? items.get(detail.data.itemId) : ''} · produce{' '}
-                  {detail.data.qtyToProduce}
+                  {t('manufacturing.wo.produceSummary', {
+                    item: (detail.data.itemId != null ? items.get(detail.data.itemId) : '') ?? '',
+                    qty: detail.data.qtyToProduce ?? '',
+                  })}
                 </Text>
               </Group>
               <Text size="sm">
-                Component cost <MoneyText value={detail.data.totalComponentCost} />
+                {t('manufacturing.wo.componentCost')} <MoneyText value={detail.data.totalComponentCost} />
               </Text>
             </Group>
 
             {writable && (
               <Group>
                 <Button size="xs" disabled={status !== 'DRAFT'} loading={release.isPending} onClick={() => detailId && doRelease(detailId)}>
-                  Release
+                  {t('manufacturing.wo.release')}
                 </Button>
                 <Button size="xs" disabled={status !== 'RELEASED'} onClick={() => openAction('issue')}>
-                  Issue
+                  {t('manufacturing.wo.issue')}
                 </Button>
                 <Button size="xs" disabled={status !== 'IN_PROGRESS'} onClick={() => openAction('complete')}>
-                  Complete
+                  {t('manufacturing.wo.complete')}
                 </Button>
                 <Button
                   size="xs"
@@ -257,7 +264,7 @@ export function WorkOrdersPanel() {
                   disabled={status !== 'RELEASED' && status !== 'IN_PROGRESS'}
                   onClick={() => openAction('cancel')}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
               </Group>
             )}
@@ -265,11 +272,11 @@ export function WorkOrdersPanel() {
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Component</Table.Th>
-                  <Table.Th ta="right">Planned</Table.Th>
-                  <Table.Th ta="right">Consumed</Table.Th>
-                  <Table.Th ta="right">Value</Table.Th>
-                  <Table.Th>Posting</Table.Th>
+                  <Table.Th>{t('manufacturing.bom.component')}</Table.Th>
+                  <Table.Th ta="right">{t('manufacturing.wo.planned')}</Table.Th>
+                  <Table.Th ta="right">{t('manufacturing.wo.consumed')}</Table.Th>
+                  <Table.Th ta="right">{t('manufacturing.wo.value')}</Table.Th>
+                  <Table.Th>{t('manufacturing.wo.posting')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -286,7 +293,7 @@ export function WorkOrdersPanel() {
                     <Table.Td>
                       {c.journalEntryId != null && (
                         <Badge variant="light" size="sm">
-                          JE #{c.journalEntryId}
+                          {t('manufacturing.wo.jeBadge', { id: c.journalEntryId })}
                         </Badge>
                       )}
                     </Table.Td>
@@ -295,35 +302,55 @@ export function WorkOrdersPanel() {
               </Table.Tbody>
             </Table>
             <Text size="xs" c="dimmed">
-              Issue: Dr WIP / Cr components. Complete: Dr Finished Goods / Cr WIP at rolled cost.
+              {t('manufacturing.wo.postingHint')}
             </Text>
           </Stack>
         )}
       </Drawer>
 
       {/* Action modal (issue / complete / cancel) */}
-      <Modal opened={action != null} onClose={() => setAction(null)} title={`${action ?? ''} work order`} size="md">
+      <Modal
+        opened={action != null}
+        onClose={() => setAction(null)}
+        title={t('manufacturing.wo.actionTitle', {
+          action:
+            action === 'issue'
+              ? t('manufacturing.wo.actionIssue')
+              : action === 'complete'
+                ? t('manufacturing.wo.actionComplete')
+                : action === 'cancel'
+                  ? t('manufacturing.wo.actionCancel')
+                  : '',
+        })}
+        size="md"
+      >
         <Stack>
           <LocationSelect
-            label={action === 'complete' ? 'Receive finished goods into' : action === 'cancel' ? 'Return components to' : 'Issue components from'}
+            label={
+              action === 'complete'
+                ? t('manufacturing.wo.receiveInto')
+                : action === 'cancel'
+                  ? t('manufacturing.wo.returnTo')
+                  : t('manufacturing.wo.issueFrom')
+            }
             locationType="STOCK"
             value={locationId}
             onChange={setLocationId}
           />
           {action === 'complete' && (
-            <TextInput label="Quantity produced" value={qtyProduced} onChange={(e) => setQtyProduced(e.currentTarget.value)} />
+            <TextInput label={t('manufacturing.wo.quantityProduced')} value={qtyProduced} onChange={(e) => setQtyProduced(e.currentTarget.value)} />
           )}
-          <DateInput label="Posting date" value={postingDate} onChange={setPostingDate} />
+          <DateInput label={t('manufacturing.wo.postingDate')} value={postingDate} onChange={setPostingDate} />
           <Group justify="flex-end">
             <Button variant="default" onClick={() => setAction(null)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={submitAction}
               loading={issue.isPending || complete.isPending || cancel.isPending}
               color={action === 'cancel' ? 'red' : undefined}
             >
-              Confirm
+              {t('common.confirm')}
             </Button>
           </Group>
         </Stack>

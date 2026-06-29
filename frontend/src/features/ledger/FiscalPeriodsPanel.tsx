@@ -3,11 +3,13 @@ import { Alert, Button, Group, NumberInput, Stack, Text, TextInput } from '@mant
 import dayjs from 'dayjs';
 import type { FiscalPeriodResponse } from '../../api/types';
 import { StatusBadge } from '../../components/StatusBadge';
+import { useI18n } from '../../i18n';
 import { useAuth } from '../../auth/useAuth';
 import { notifyError, notifySuccess } from '../../lib/notify';
 import { useClosePeriod, useReopenPeriod } from './api';
 
 export function FiscalPeriodsPanel() {
+  const { t } = useI18n();
   const { canDo } = useAuth();
   const close = useClosePeriod();
   const reopen = useReopenPeriod();
@@ -18,7 +20,7 @@ export function FiscalPeriodsPanel() {
   if (!canDo('ledger.post')) {
     return (
       <Text c="dimmed" py="md">
-        Closing or reopening periods requires the ACCOUNTANT role.
+        {t('ledger.periods.requiresAccountant')}
       </Text>
     );
   }
@@ -28,7 +30,11 @@ export function FiscalPeriodsPanel() {
     try {
       const r = kind === 'close' ? await close.mutateAsync(args) : await reopen.mutateAsync(args);
       setResult(r ?? null);
-      notifySuccess(`Period ${periodNo} ${kind === 'close' ? 'closed' : 'reopened'}`);
+      notifySuccess(
+        kind === 'close'
+          ? t('ledger.periods.closed', { periodNo })
+          : t('ledger.periods.reopened', { periodNo }),
+      );
     } catch (e) {
       notifyError(e);
     }
@@ -37,23 +43,29 @@ export function FiscalPeriodsPanel() {
   return (
     <Stack maw={460}>
       <Text size="sm" c="dimmed">
-        Soft-close blocks postings dated in a closed period; reopen to allow them again.
+        {t('ledger.periods.hint')}
       </Text>
       <Group grow>
-        <TextInput label="Fiscal year code" value={yearCode} onChange={(e) => setYearCode(e.currentTarget.value)} />
-        <NumberInput label="Period (month)" min={1} max={12} value={periodNo} onChange={setPeriodNo} />
+        <TextInput label={t('ledger.periods.fiscalYearCode')} value={yearCode} onChange={(e) => setYearCode(e.currentTarget.value)} />
+        <NumberInput label={t('ledger.periods.periodMonth')} min={1} max={12} value={periodNo} onChange={setPeriodNo} />
       </Group>
       <Group>
         <Button color="orange" loading={close.isPending} onClick={() => run('close')}>
-          Close period
+          {t('ledger.periods.closePeriod')}
         </Button>
         <Button variant="default" loading={reopen.isPending} onClick={() => run('reopen')}>
-          Reopen period
+          {t('ledger.periods.reopenPeriod')}
         </Button>
       </Group>
 
       {result && (
-        <Alert variant="light" title={`Period ${result.periodNo} · ${result.yearCode}`}>
+        <Alert
+          variant="light"
+          title={t('ledger.periods.alertTitle', {
+            periodNo: result.periodNo ?? '',
+            yearCode: result.yearCode ?? '',
+          })}
+        >
           <Group gap="xs">
             <StatusBadge status={result.status} />
             <Text size="sm" c="dimmed">
