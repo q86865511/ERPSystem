@@ -12,6 +12,13 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-29] 📅 hard-close + 保留盈餘年結轉(待辦 D 之一,後端 `mvn verify` 綠 / 前端 build 綠)
+  - **年結** `ledger.application.FiscalYearService.closeYear(yearCode, actor)`:組一張 closing JE 把當年收入借記/費用貸記歸零、淨額轉 `3200 Retained Earnings`(獲利貸、虧損借),經既有 `LedgerPostingService` 過帳(idempotency 鍵 `YEAR_END_CLOSE/yearCode/CLOSE`),再把全年期間 `lock()`(LOCKED)+ `FiscalYear.close()`。**損益來源用該年日期區間**(新 `GeneralLedgerRepository.accountBalancesBetween`)非全域 asOf,避免多年/測試污染。
+  - **邊界**:虧損年(借 3200)、零餘額科目跳過、反常餘額依正負決定借貸側、**空白年只鎖期間不過 JE**、net=0 不加 3200 行;末期若 soft-closed 則交易內先 reopen 再過再鎖。
+  - **LOCKED 強制**:`FiscalPeriod.lock()`/`isLocked()`;`FiscalPeriodService` 的 reopen/close 對 LOCKED 丟 `PeriodLockedException`(422);`closeYear` 對已 CLOSED 年丟 `YearAlreadyClosedException`。
+  - **不需 migration**(LOCKED/3200/CLOSED 已就緒);**reporting 不改**(沖平讓動態本期損益年結後自然=0、3200 holds RE,資產負債表仍平衡)。RBAC 走既有 `/api/ledger/**`→ACCOUNTANT。`POST /api/ledger/fiscal-years/{yearCode}/close-year`。
+  - **前端**:Ledger 頁 `FiscalPeriodsPanel` 加「年度結帳」動作(紅鈕)+ 結果(淨利/結轉分錄號/鎖期數);`useCloseYear`;i18n 成對;重生 schema。
+  - **測試** `FiscalYearHardCloseIT`(用隔離年 2097 空白/2098 虧損/2099 獲利,`@Sql` 建,by-range 隔離不汙染 2026):歸零、3200 方向、LOCKED、擋 post/reopen/re-close、虧損、空白年。`mvn verify` IT 80 綠。**ADR-0009**。
 - [2026-06-29] 🔐 JWT 認證 + 持久化使用者(待辦 C,✅ 完成並實機驗證)
   - **取代 HTTP Basic + in-memory** 為 **JWT(Spring 原生 `oauth2-resource-server` + Nimbus HS256)**:access(15min,前端記憶體)+ refresh(7d,httpOnly cookie `SameSite=Lax`/`Path=/api/auth`/Secure 依 `app.jwt.cookie-secure`)。`SecurityConfig` 改 bearer + 保留授權矩陣 + 自訂 401 entrypoint + `JwtEncoder`/`JwtDecoder`/converter(roles claim→`ROLE_`)+ `BCryptPasswordEncoder` + `AuthenticationManager`。CSRF 維持關閉(Bearer 免疫 + refresh cookie 同源 + 跨站不可讀)。
   - **持久化使用者**:`V15` 建 `app_user`(roles CSV);`iam.domain.User`/`iam.api.Role`/`iam.application.{UserRepository,DbUserDetailsService,JwtService}`/`iam.JwtProperties`。**`UserSeeder`**(profile-independent 冪等 ApplicationRunner,放 bootstrap)以 bcrypt 建 5 帳號(密碼=帳號;**guest 空 roles=唯讀**)→ 任何 profile/測試/demo 都有使用者,與 `@Profile("seed")` 的 DataSeeder 解耦。
@@ -175,7 +182,8 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - 剩(可選後續):可撤銷 refresh(DB rotation)、使用者管理 UI、access token 過期的更積極處理。
 
 **D. 財會加值**
-- PDF/列印報表(發票/PO/出貨單/試算表)、獨立 append-only `audit_log` + 敏感動作事件監聽、hard-close + 保留盈餘年結轉(目前只 soft-close,保留盈餘動態算)。
+- ✅ **hard-close + 保留盈餘年結轉(已做,2026-06-29)**:closing JE 沖平損益轉 3200 + 鎖期間 LOCKED。計畫見 `~/.claude/plans/tender-cuddling-starlight.md`,ADR-0009。
+- 待:PDF/列印報表(發票/PO/出貨單/試算表)、獨立 append-only `audit_log` + 敏感動作事件監聽。
 
 **E. 品質 / 維運**
 - 並行測試擴到 sales/manufacturing(目前僅 inventory 有 concurrency IT);**前端無自動化測試**(只有 tsc + vite build,可加 Vitest/Playwright)。

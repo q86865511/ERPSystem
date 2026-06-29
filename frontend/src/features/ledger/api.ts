@@ -43,3 +43,17 @@ export function useReopenPeriod() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['reporting'] }),
   });
 }
+
+export function useCloseYear() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (yearCode: string) => {
+      const { data, error } = await api.POST('/api/ledger/fiscal-years/{yearCode}/close-year', {
+        params: { path: { yearCode } },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['reporting'] }),
+  });
+}

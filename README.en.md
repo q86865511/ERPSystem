@@ -207,7 +207,7 @@ It covers all 8 modules:
 - **Sales** — SO → delivery → invoice (shows COGS) → receipt → customer return (credit note, dual postings) + AR aging
 - **Manufacturing** — BOM authoring, work-order state machine (release/issue/complete/cancel, conditionally enabled), reorder report
 - **Inventory** — on-hand lookup, subledger reconciliation, stock adjustments
-- **Ledger** — manual journal entry (live debit=credit check), fiscal-period close/reopen
+- **Ledger** — manual journal entry (live debit=credit check), fiscal-period close/reopen, year-end close (carry P&L to retained earnings, lock the year)
 
 Every document's detail surfaces its posting results (the linked `journalEntryId`, `movementGroupId`,
 status transitions) — making this ERP's selling point visible: you can see how the books move.
@@ -265,7 +265,7 @@ OpenAPI-spec invariants (no schema-name collisions, money typed as string, no me
 (moving weighted-average, subledger reconciliation) → 2 procure-to-pay (GR-IR, Input VAT, variance
 revaluation, AP subledger) → 3 order-to-cash (Deferred-COGS, returns/credit notes, AR subledger) →
 **4 manufacturing (single-level BOM, work orders, WIP actual-cost roll-up — minimum show-worthy
-milestone)** → 5 reporting & period close (financial statements, reconciliation hero, soft-close) →
+milestone)** → 5 reporting & period close (financial statements, reconciliation hero, soft-close; later a hard-close year-end with retained-earnings carry-forward) →
 6 polish & packaging (RBAC, one-key seed, README/ADRs).
 
 **✅ Phase 7 (full-stack)**: backend enablement (springdoc, `/api/auth/me`, BigDecimal-as-string,
@@ -295,13 +295,14 @@ The senior-signal decisions, each written up under [docs/adr/](docs/adr/):
 6. [Deferred COGS](docs/adr/0006-deferred-cogs.md) — recognise cost at invoicing, the sales-side mirror of GR-IR.
 7. [Manufacturing WIP & actual-cost roll-up](docs/adr/0007-manufacturing-wip-and-actual-cost-rollup.md) — WIP clears to zero; finished goods at rolled actual cost.
 8. [RBAC via request authorization](docs/adr/0008-rbac-url-authorization.md) — four roles enforced at the single REST entry point.
+9. [Year-end close](docs/adr/0009-year-end-close.md) — closing entry zeroes P&L into retained earnings (3200); periods hard-locked.
 
 ## Document index
 
 | Document | Contents |
 |---|---|
 | [PROGRESS.md](PROGRESS.md) | Stage-by-stage progress, key decisions, environment notes |
-| [docs/adr/](docs/adr/) | Architecture decision records (ADR 0001–0008) |
+| [docs/adr/](docs/adr/) | Architecture decision records (ADR 0001–0009) |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Deployment: local one-command demo + cloud subdomain (Cloudflare Tunnel + Caddy) |
 | [compose.demo.yaml](compose.demo.yaml) | One-command demo (postgres + backend + frontend) |
 | [frontend/](frontend/) | React frontend (standalone Vite project) |

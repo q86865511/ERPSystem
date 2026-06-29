@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Soft-close of fiscal periods: closing a period blocks new postings into it (the posting service refuses
- * any entry whose date falls in a non-OPEN period); reopening restores it. Hard close (LOCKED, blocking
- * even reversals) and retained-earnings carry-forward are reserved for a later phase.
+ * any entry whose date falls in a non-OPEN period); reopening restores it. A period that has been
+ * hard-closed (LOCKED) by the year-end close ({@link FiscalYearService}) cannot be reopened or re-closed.
  */
 @Service
 public class FiscalPeriodService {
@@ -25,6 +25,9 @@ public class FiscalPeriodService {
     @Transactional
     public FiscalPeriod close(String yearCode, int periodNo) {
         FiscalPeriod period = resolve(yearCode, periodNo);
+        if (period.isLocked()) {
+            throw new PeriodLockedException(yearCode, periodNo);
+        }
         period.close();
         return fiscalPeriodRepository.saveAndFlush(period);
     }
@@ -32,6 +35,9 @@ public class FiscalPeriodService {
     @Transactional
     public FiscalPeriod reopen(String yearCode, int periodNo) {
         FiscalPeriod period = resolve(yearCode, periodNo);
+        if (period.isLocked()) {
+            throw new PeriodLockedException(yearCode, periodNo);
+        }
         period.reopen();
         return fiscalPeriodRepository.saveAndFlush(period);
     }

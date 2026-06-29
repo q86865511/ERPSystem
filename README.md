@@ -152,7 +152,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 - **銷售** —— SO → 出貨 → 發票(顯示 COGS)→ 收款 → 客戶退貨(credit note 雙帳)+ AR 帳齡
 - **製造** —— BOM 建單、工單狀態機(release/issue/complete/cancel 條件啟用)、再訂點
 - **庫存** —— 在庫查詢、子帳對帳、庫存調整
-- **總帳** —— 手動分錄(即時借貸平衡檢核)、會計期間關閉/重開
+- **總帳** —— 手動分錄(即時借貸平衡檢核)、會計期間關閉/重開、年度結帳(損益轉保留盈餘、鎖定年度)
 
 每張文件的詳情都把過帳結果攤開(關聯的 `journalEntryId`、`movementGroupId`、狀態流轉),呼應這個 ERP 的賣點:帳怎麼走,看得見。
 
@@ -197,7 +197,7 @@ cd frontend && npm run build      # tsc -b && vite build
 
 ## 🗺️ 路線圖
 
-**✅ Phase 0–6(後端)**:Phase 0 walking skeleton(總帳脊椎)→ 1 商品與庫存(移動加權平均、子帳對帳)→ 2 採購到付款(GR-IR、Input VAT、價差重估、AP 子帳)→ 3 訂單到收款(Deferred-COGS、退貨/credit note、AR 子帳)→ **4 製造(單階 BOM、工單、WIP 實際成本滾算 —— 最低可展示里程碑)** → 5 報表與期間結(財務報表、對帳 hero、soft-close)→ 6 打磨與打包(RBAC 4 角色、一鍵 seed、README/ADR)。
+**✅ Phase 0–6(後端)**:Phase 0 walking skeleton(總帳脊椎)→ 1 商品與庫存(移動加權平均、子帳對帳)→ 2 採購到付款(GR-IR、Input VAT、價差重估、AP 子帳)→ 3 訂單到收款(Deferred-COGS、退貨/credit note、AR 子帳)→ **4 製造(單階 BOM、工單、WIP 實際成本滾算 —— 最低可展示里程碑)** → 5 報表與期間結(財務報表、對帳 hero、soft-close;後續加 hard-close 年結與保留盈餘結轉)→ 6 打磨與打包(RBAC 4 角色、一鍵 seed、README/ADR)。
 
 **✅ Phase 7(全端化)**:後端 enablement(springdoc、`/api/auth/me`、BigDecimal-as-string、各模組唯讀列表端點)+ React 前端(8 階段:骨架 → 主檔 → 儀表板/財報 → 採購 → 銷售 → 製造 → 進階 → 容器化)+ 一鍵 `docker compose` demo。
 
@@ -218,13 +218,14 @@ cd frontend && npm run build      # tsc -b && vite build
 6. [Deferred COGS](docs/adr/0006-deferred-cogs.md) —— 開票才認 COGS,銷售側鏡像 GR-IR。
 7. [製造 WIP 與實際成本滾算](docs/adr/0007-manufacturing-wip-and-actual-cost-rollup.md) —— WIP 歸零;成品走滾算實際成本。
 8. [RBAC 走請求授權](docs/adr/0008-rbac-url-authorization.md) —— 4 角色在單一 REST 入口強制。
+9. [年結與保留盈餘結轉](docs/adr/0009-year-end-close.md) —— closing JE 沖平損益轉 3200,鎖期間 hard-close。
 
 ## 文件索引
 
 | 文件 | 內容 |
 |---|---|
 | [PROGRESS.md](PROGRESS.md) | 逐階段進度、重要決策紀錄、環境備忘 |
-| [docs/adr/](docs/adr/) | 架構決策紀錄(ADR 0001–0008) |
+| [docs/adr/](docs/adr/) | 架構決策紀錄(ADR 0001–0009) |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | 部署:本機一鍵 demo + 雲端子網域(Cloudflare Tunnel + Caddy) |
 | [compose.demo.yaml](compose.demo.yaml) | 一鍵 demo(postgres + 後端 + 前端) |
 | [frontend/](frontend/) | React 前端(獨立 Vite 專案) |

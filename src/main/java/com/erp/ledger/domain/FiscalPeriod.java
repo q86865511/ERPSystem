@@ -58,4 +58,13 @@ public class FiscalPeriod {
     public void reopen() {
         this.status = FiscalPeriodStatus.OPEN;
     }
+
+    /** Hard close: locks this period as part of the year-end close. A locked period cannot be reopened. */
+    public void lock() {
+        this.status = FiscalPeriodStatus.LOCKED;
+    }
+
+    public boolean isLocked() {
+        return status == FiscalPeriodStatus.LOCKED;
+    }
 }

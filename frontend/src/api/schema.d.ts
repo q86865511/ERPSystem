@@ -116,6 +116,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ledger/fiscal-years/{yearCode}/close-year": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["closeYear"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ledger/fiscal-years/{yearCode}/periods/{periodNo}/close": {
         parameters: {
             query?: never;
@@ -1618,6 +1634,15 @@ export interface components {
             wipLocationId?: number;
             woNumber?: string;
         };
+        YearEndCloseResult: {
+            /** Format: int64 */
+            closingEntryNo?: number;
+            netIncome?: string;
+            /** Format: int32 */
+            periodsLocked?: number;
+            yearCode?: string;
+            yearStatus?: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -1773,6 +1798,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AccountSubledgerValue"][];
+                };
+            };
+        };
+    };
+    closeYear: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                yearCode: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["YearEndCloseResult"];
                 };
             };
         };

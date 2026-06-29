@@ -28,6 +28,15 @@ public class GeneralLedgerQueryService implements GeneralLedgerQuery {
                 .toList();
     }
 
+    /** Posted balances within a date range (inclusive). Internal to the ledger module (not on the port);
+        used by the year-end close to scope revenue/expense to a single fiscal year. */
+    public List<AccountBalance> accountBalancesBetween(LocalDate from, LocalDate to) {
+        return generalLedgerRepository.accountBalancesBetween(from, to).stream()
+                .map(r -> new AccountBalance(r.getCode(), r.getName(), r.getAccountClass(),
+                        r.getNormalBalance(), r.getTotalDebit(), r.getTotalCredit()))
+                .toList();
+    }
+
     @Override
     public List<LedgerLineView> linesForAccount(String accountCode, LocalDate asOf) {
         return generalLedgerRepository.linesForAccountAsOf(accountCode, asOf).stream()

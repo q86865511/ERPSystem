@@ -2,6 +2,7 @@ package com.erp.ledger.web;
 
 import com.erp.ledger.api.JournalEntryRequest;
 import com.erp.ledger.application.FiscalPeriodService;
+import com.erp.ledger.application.FiscalYearService;
 import com.erp.ledger.application.LedgerPostingService;
 import com.erp.ledger.application.LedgerReportService;
 import com.erp.ledger.application.TrialBalanceReport;
@@ -26,12 +27,14 @@ public class LedgerController {
     private final LedgerPostingService postingService;
     private final LedgerReportService reportService;
     private final FiscalPeriodService fiscalPeriodService;
+    private final FiscalYearService fiscalYearService;
 
     public LedgerController(LedgerPostingService postingService, LedgerReportService reportService,
-                           FiscalPeriodService fiscalPeriodService) {
+                           FiscalPeriodService fiscalPeriodService, FiscalYearService fiscalYearService) {
         this.postingService = postingService;
         this.reportService = reportService;
         this.fiscalPeriodService = fiscalPeriodService;
+        this.fiscalYearService = fiscalYearService;
     }
 
     /** API view of a fiscal period's soft-close status. */
@@ -68,5 +71,16 @@ public class LedgerController {
     @PostMapping("/fiscal-years/{yearCode}/periods/{periodNo}/reopen")
     public FiscalPeriodResponse reopenPeriod(@PathVariable String yearCode, @PathVariable int periodNo) {
         return FiscalPeriodResponse.from(yearCode, fiscalPeriodService.reopen(yearCode, periodNo));
+    }
+
+    /**
+     * Year-end hard close: posts the closing entry (revenue/expense → retained earnings 3200) and locks
+     * every period of the year. Irreversible — locked periods cannot be reopened.
+     */
+    @PostMapping("/fiscal-years/{yearCode}/close-year")
+    public FiscalYearService.YearEndCloseResult closeYear(@PathVariable String yearCode,
+                                                          Principal principal) {
+        String actor = principal != null ? principal.getName() : "system";
+        return fiscalYearService.closeYear(yearCode, actor);
     }
 }
