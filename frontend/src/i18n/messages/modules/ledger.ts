@@ -33,6 +33,14 @@ export const ledgerEn = {
     alertTitle: 'Period {periodNo} · {yearCode}',
     closed: 'Period {periodNo} closed',
     reopened: 'Period {periodNo} reopened',
+    yearEndTitle: 'Year-end close',
+    yearEndHint: 'Posts the closing entry (revenue/expense → retained earnings) and locks every period of the year. Irreversible.',
+    closeYear: 'Close year {yearCode}',
+    yearClosed: 'Year {yearCode} closed',
+    netIncome: 'Net income',
+    closingEntry: 'Closing entry #{entryNo}',
+    noClosingEntry: 'No closing entry (no profit/loss activity)',
+    periodsLocked: '{count} periods locked',
   },
 };
 
@@ -66,5 +74,13 @@ export const ledgerZh: typeof ledgerEn = {
     alertTitle: '期間 {periodNo} · {yearCode}',
     closed: '期間 {periodNo} 已關閉',
     reopened: '期間 {periodNo} 已重開',
+    yearEndTitle: '年度結帳',
+    yearEndHint: '過帳結轉分錄(收入/費用 → 保留盈餘)並鎖定該年所有期間。不可逆。',
+    closeYear: '年度結帳 {yearCode}',
+    yearClosed: '{yearCode} 年度已結帳',
+    netIncome: '本期淨利',
+    closingEntry: '結轉分錄 #{entryNo}',
+    noClosingEntry: '無結轉分錄(該年無損益)',
+    periodsLocked: '已鎖定 {count} 個期間',
   },
 };

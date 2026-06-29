@@ -46,6 +46,7 @@ export type AdjustmentResponse = Schemas['AdjustmentResponse'];
 export type JournalEntryRequest = Schemas['JournalEntryRequest'];
 export type JournalEntryResponse = Schemas['JournalEntryResponse'];
 export type FiscalPeriodResponse = Schemas['FiscalPeriodResponse'];
+export type YearEndCloseResult = Schemas['YearEndCloseResult'];
 
 // --- Manufacturing (Stage 6) ---
 export type BomResponse = Schemas['BomResponse'];

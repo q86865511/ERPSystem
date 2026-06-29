@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface FiscalPeriodRepository extends JpaRepository<FiscalPeriod, Long> {
@@ -14,4 +15,6 @@ public interface FiscalPeriodRepository extends JpaRepository<FiscalPeriod, Long
     Optional<FiscalPeriod> findByDate(@Param("date") LocalDate date);
 
     Optional<FiscalPeriod> findByFiscalYearIdAndPeriodNo(Long fiscalYearId, int periodNo);
+
+    List<FiscalPeriod> findByFiscalYearIdOrderByPeriodNo(Long fiscalYearId);
 }

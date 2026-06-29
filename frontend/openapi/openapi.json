@@ -172,6 +172,32 @@
         "tags" : [ "inventory-controller" ]
       }
     },
+    "/api/ledger/fiscal-years/{yearCode}/close-year" : {
+      "post" : {
+        "operationId" : "closeYear",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "yearCode",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/YearEndCloseResult"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "ledger-controller" ]
+      }
+    },
     "/api/ledger/fiscal-years/{yearCode}/periods/{periodNo}/close" : {
       "post" : {
         "operationId" : "closePeriod",
@@ -3683,6 +3709,28 @@
             "format" : "int64"
           },
           "woNumber" : {
+            "type" : "string"
+          }
+        }
+      },
+      "YearEndCloseResult" : {
+        "type" : "object",
+        "properties" : {
+          "closingEntryNo" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "netIncome" : {
+            "type" : "string"
+          },
+          "periodsLocked" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "yearCode" : {
+            "type" : "string"
+          },
+          "yearStatus" : {
             "type" : "string"
           }
         }

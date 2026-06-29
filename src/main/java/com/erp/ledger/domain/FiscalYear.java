@@ -38,4 +38,13 @@ public class FiscalYear {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private FiscalYearStatus status;
+
+    /** Marks the year closed once its year-end carry-forward has posted and its periods are locked. */
+    public void close() {
+        this.status = FiscalYearStatus.CLOSED;
+    }
+
+    public boolean isClosed() {
+        return status == FiscalYearStatus.CLOSED;
+    }
 }
