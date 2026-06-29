@@ -12,13 +12,13 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
-- [2026-06-29] 🤖 demo 維運自動化:自動部署 + 每晚重置(待辦 E,repo 部分)
+- [2026-06-29] 🤖 demo 維運自動化:自動部署 + 每晚重置(待辦 E,✅ 全數完成並驗證)
   - **自動部署**:`.github/workflows/deploy.yml`(`on: workflow_run` of "CI",`if` 三閘門 `conclusion==success && head_branch==main && event==push` 擋掉 fork PR 的 CI),merge 到 main + CI 綠後 SSH 進 Oracle 觸發部署。`permissions: {}` + `concurrency: deploy-oracle` + 自寫 `ssh`(不靠第三方 action)+ known_hosts pin。實際 build 在 Oracle(ARM)做。
   - **受限部署金鑰**:Oracle authorized_keys 用 forced `command=`(絕對路徑)+ `no-pty` 等,讓專用金鑰只能跑部署 wrapper、拿不到 shell。wrapper(`scripts/oracle-deploy.sh.example` → repo 外 `~/erp-demo-deploy.sh` 避免 git reset self-modification)做 `fetch + reset --hard origin/main` → `compose ... up -d --build --remove-orphans` → `image prune -f`(僅 dangling)。
   - **port overlay**:新 `compose.oracle.yaml`(`frontend.ports: !override ["127.0.0.1:8081:80"]`),取代部署目錄原本未提交的 sed 改動;本機 `docker compose config` 實證合併後只剩單一 loopback port。base `compose.demo.yaml` 不變(保留 `8081:80` 供本機一鍵 demo)。
   - **每晚重置**:`scripts/reset-demo.sh`(雙 `-f`、`down -v` + `up`、不 `--build`),cron `0 21 * * *` UTC(=05:00 台北,避開 04:30 soulshard 備份),清訪客累積資料後重新 seed。
   - **共用主機安全**:所有 docker 操作 project-scoped(`name: erp-demo`);`image prune` 僅 dangling、絕不 `-a`/`system`/`volume prune`;`down -v`/`--remove-orphans` 不誤傷 steam/soulshard。`.gitattributes` 加 `*.sh text eol=lf`。`docs/DEPLOY.md` 更新(sed→overlay + 自動部署/重置/一次性設定段 + GHCR future note)。
-  - **待**:merge 後做 GitHub `production` environment + secrets、Oracle 一次性設定、端到端驗證(受限金鑰拒 shell、小 PR 觸發部署、手動 reset)。
+  - **已完成設定 + 驗證(2026-06-29)**:GitHub `production` environment + 4 secrets(host key 已與 Oracle 比對一致);Oracle 裝 wrapper + 受限金鑰 + reset cron。**端到端驗證通過**:#39 merge → CI → `workflow_run` Deploy **success**(自動把部署目錄遷成 overlay、frontend 綁 `127.0.0.1:8081`、其他專案不受影響);forced-command 證據 `(cmd: deploy)`;手動 `reset-demo.sh` 跑通(`down -v` + 重 seed → 對帳 `healthy:true`、其他專案 volume 完好)。
 - [2026-06-29] 🌐 i18n PR2 逐模組抽字串(中/英語言切換完成,待辦 B 收尾)
   - **8 個業務模組**(masterdata/purchasing/sales/manufacturing/inventory/reporting/ledger/payments)的 `<Module>Page` + 所有 `*Panel.tsx` UI 字串全抽成 `t()`。**字典改為模組化片段**:每模組一個 `i18n/messages/modules/<module>.ts`(`<module>En` + `<module>Zh: typeof <module>En`,自帶 en/zh 結構一致的編譯期把關),`en.ts`/`zh-TW.ts` import 後組合進核心。核心另加 `field.*`(共用欄位/表頭 label)+ `common.*` 擴充,搭配術語對照(對齊 README)確保跨模組一致。
   - **執行方式**:用 Workflow 8 個 agent 並行(各只改自己模組目錄 + 建自己的片段檔,檔案互斥),我再集中接線 + 驗證。
