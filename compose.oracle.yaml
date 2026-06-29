@@ -10,6 +10,13 @@
 # Note: deliberately no top-level `name:` here — the project name (erp-demo) comes from compose.demo.yaml.
 # Adding a different name would split the project and break the scope of `down`/`--remove-orphans`.
 services:
+  app:
+    environment:
+      # The browser is HTTPS (Cloudflare terminates TLS) even though the app sees HTTP behind the proxy,
+      # so the refresh cookie must be marked Secure here (it is not in the plain-HTTP local demo).
+      APP_JWT_COOKIE_SECURE: "true"
+      # Required — supply via ~/erp-demo-test/.env (compose auto-loads it). NEVER commit the value.
+      APP_JWT_SECRET: ${APP_JWT_SECRET:?APP_JWT_SECRET must be set (see ~/erp-demo-test/.env)}
   frontend:
     ports: !override
       - "127.0.0.1:8081:80"

@@ -1,6 +1,6 @@
 # 部署(Deployment)
 
-線上 demo:**<https://erp.terrychou.com>**(HTTP Basic:`admin` / `admin`;Swagger 在 `/swagger-ui.html`)。
+線上 demo:**<https://erp.terrychou.com>**(JWT 認證;預設以唯讀 `guest` 進入,試寫入用角色帳號如 `admin`/`admin`;Swagger 在 `/swagger-ui.html`)。
 
 本專案有兩種跑法:**本機一鍵 demo**(可攜、人人可跑)與**雲端子網域部署**(目前 live 的那套)。
 
@@ -75,7 +75,7 @@ merge 到 `main` 且 CI 綠後,`.github/workflows/deploy.yml`(`workflow_run` 觸
 
 ### 每晚自動重置
 
-公開 demo 是 `admin`/`admin`、人人可寫,訪客會累積測試資料。`scripts/reset-demo.sh` 由 cron 每晚跑 `down -v` + `up`(清 `pgdata` → app 在空庫上重新 seed 乾淨的 買→做→賣)。`down -v` 與 `up` **都帶兩個 `-f`**(漏 overlay 會讓 frontend 變回對外裸奔)。`down -v` 是 project-scoped(只動 `erp-demo`,不誤傷共用主機其他專案)。
+公開 demo 預設唯讀 guest,但角色帳號(admin 等)仍可寫入並累積測試資料。`scripts/reset-demo.sh` 由 cron 每晚跑 `down -v` + `up`(清 `pgdata` → app 在空庫上重新 seed 乾淨的 買→做→賣)。`down -v` 與 `up` **都帶兩個 `-f`**(漏 overlay 會讓 frontend 變回對外裸奔)。`down -v` 是 project-scoped(只動 `erp-demo`,不誤傷共用主機其他專案)。
 
 ```cron
 # 05:00 Asia/Taipei = 21:00 UTC(機器為 UTC),避開 04:30 UTC 的 soulshard 備份
@@ -100,8 +100,11 @@ cd ~/erp-demo-test && git checkout -- compose.demo.yaml && git fetch origin main
 
 # 驗證 overlay 合併:ports 應只剩 127.0.0.1:8081:80
 docker compose -f compose.demo.yaml -f compose.oracle.yaml config | grep -i -A3 ports
+
+# JWT secret(compose.oracle.yaml 用 ${APP_JWT_SECRET};compose 自動載入此 .env,且 git reset 不碰未追蹤檔)
+printf 'APP_JWT_SECRET=%s\n' "$(openssl rand -base64 48)" > ~/erp-demo-test/.env && chmod 600 ~/erp-demo-test/.env
 ```
 
 ### demo 注意事項
 
-公開 demo 為 `admin`/`admin`,任何人可登入並建立文件;但後端強制 **借=貸** 與 **子帳==GL 控制科目** 不變量,所以對帳健康檢查恆為綠 —— 訪客動不壞帳本不變量,最多累積測試資料,且每晚 cron 會自動 `down -v` 重置(見上)。
+公開 demo 預設以唯讀 `guest` 進入(只能讀,所有寫入 403);要試寫入用角色帳號(如 `admin`/`admin`)。後端強制 **借=貸** 與 **子帳==GL 控制科目** 不變量,所以對帳健康檢查恆為綠 —— 訪客動不壞帳本不變量,最多累積測試資料,且每晚 cron 會自動 `down -v` 重置(見上)。

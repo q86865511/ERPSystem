@@ -113,8 +113,8 @@ zero after a complete cycle. This one report is the project's hero artifact.
 
 ## 🚀 Quick start
 
-**Live demo (nothing to install)**: <https://erp.terrychou.com> (sign in `admin`/`admin`; Swagger at
-`/swagger-ui.html`). Deployment architecture: [docs/DEPLOY.md](docs/DEPLOY.md).
+**Live demo (nothing to install)**: <https://erp.terrychou.com> (defaults to a read-only `guest`; use a role
+account like `admin`/`admin` to try writes. Swagger at `/swagger-ui.html`). Deployment: [docs/DEPLOY.md](docs/DEPLOY.md).
 
 Or run it locally (prerequisite: **Docker** — everything runs in containers, no local JDK/Node):
 
@@ -124,8 +124,8 @@ docker compose -f compose.demo.yaml up --build
 ```
 
 - Frontend: <http://localhost:8081>
-- Interactive API docs (Swagger UI): <http://localhost:8081/swagger-ui.html> (click **Authorize**, use `admin`/`admin`)
-- Seeded users (HTTP Basic): `admin/admin` (all roles), `accountant/accountant`, `warehouse/warehouse`, `sales/sales`
+- Interactive API docs (Swagger UI): <http://localhost:8081/swagger-ui.html> (get an access token from `POST /api/auth/login`, then click **Authorize**)
+- Seeded users (JWT, password == username): `guest` (read-only, the login default), `admin` (all roles), `accountant`, `warehouse`, `sales`
 - On startup the app posts a full buy → make → sell slice through the **real services** (`DataSeeder`
   is idempotent — it skips when the demo vendor already exists, so re-running `up` against the kept
   volume is safe)
@@ -183,7 +183,7 @@ an nginx container that reverse-proxies to the backend on a single origin.
 | Persistence | Spring Data JPA / Hibernate + Flyway migrations |
 | Boundary enforcement | ArchUnit (CI-enforced) |
 | Money & quantity | `BigDecimal` value objects — `Money` (`NUMERIC(19,4)`) and `Quantity`/cost (`NUMERIC(19,6)`), never `float`; serialized as JSON **strings** |
-| Auth | Spring Security + HTTP Basic, four roles (ADMIN / ACCOUNTANT / WAREHOUSE / SALES); JWT deferred |
+| Auth | Spring Security + **JWT** (access in memory + refresh httpOnly cookie), persisted bcrypt users, four roles (ADMIN / ACCOUNTANT / WAREHOUSE / SALES) + read-only guest |
 | API docs | springdoc-openapi (OpenAPI 3.1) + Swagger UI (`/swagger-ui.html`) |
 | Testing | JUnit + Testcontainers (real Postgres) |
 | Frontend | React 19 + TypeScript + Mantine 9 + Vite 8 + TanStack Query + React Router |
@@ -193,7 +193,8 @@ an nginx container that reverse-proxies to the backend on a single origin.
 
 `frontend/` is a standalone Vite project (not part of the Maven build). Its data layer uses
 **`openapi-typescript`** (types generated from the spec) + **`openapi-fetch`** (a type-safe client whose
-middleware injects HTTP Basic and parses RFC 9457 ProblemDetail) + **TanStack Query**; routing is React
+middleware injects the JWT Bearer token + retries once on 401 after a silent refresh, and parses RFC 9457
+ProblemDetail) + **TanStack Query**; routing is React
 Router; UI is Mantine 9. RBAC mirrors the backend's POST authorization matrix as UI hints only
 (hide/disable buttons) — the backend still enforces.
 
@@ -277,8 +278,10 @@ dashboard/reports → purchasing → sales → manufacturing → advanced → co
 Multi-currency/FX, multi-tenancy (never), FIFO/standard-cost variances, a tax engine beyond one VAT
 line, approval workflows, full time-phased MRP, lot/serial tracking, routings/work-centers/labor,
 multi-warehouse transfers, multi-level BOM.
-**Security**: currently HTTP Basic + in-memory users; JWT + a persisted user/role store is a deliberate
-deferral (the frontend auth layer is already abstracted to swap it in).
+**Security**: **JWT (access + refresh) + a persisted bcrypt user/role store**, replacing the earlier HTTP
+Basic + in-memory users; the access token lives in memory and the refresh token in an httpOnly cookie (silent
+refresh on reload), and the public demo defaults to a read-only guest. Revocable refresh (DB rotation) and a
+user-management UI remain future work.
 
 ## 📐 Architecture decision records
 

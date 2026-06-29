@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, setAuthErrorHandlers } from '../api/client';
-import { clearCredentials, loadCredentials, saveCredentials } from './credentials';
+import { clearAccessToken, setAccessToken } from './credentials';
 import { canDo, hasRole, type Role, type WriteAction } from './roles';
 
 export interface AuthUser {
@@ -11,6 +11,8 @@ export interface AuthUser {
 
 export interface AuthContextValue {
   user: AuthUser | null;
+  /** True while the on-load silent refresh is in flight; route guards wait rather than bounce to /login. */
+  bootstrapping: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   hasRole: (role: Role) => boolean;
@@ -21,16 +23,15 @@ export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    const c = loadCredentials();
-    return c ? { username: c.username, roles: c.roles } : null;
-  });
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [bootstrapping, setBootstrapping] = useState(true);
 
-  // Wire the API client's 401/403 reactions to navigation (registered once).
+  // Wire the API client's 401/403 reactions to navigation (registered once). The client refreshes the
+  // access token itself on 401; onUnauthorized only fires once the refresh has also failed.
   useEffect(() => {
     setAuthErrorHandlers({
       onUnauthorized: () => {
-        clearCredentials();
+        clearAccessToken();
         setUser(null);
         navigate('/login');
       },
@@ -40,34 +41,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, [navigate]);
 
+  // Silent refresh on load: the access token lives only in memory, so a reload starts with none. If a valid
+  // refresh cookie is present, mint a fresh access token and restore the session before guards run.
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      const { data, error } = await api.POST('/api/auth/refresh', {});
+      if (active && !error && data) {
+        setAccessToken(data.accessToken ?? null);
+        setUser({ username: data.username ?? '', roles: data.roles ?? [] });
+      }
+      if (active) {
+        setBootstrapping(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const login = useCallback(async (username: string, password: string) => {
-    // Save first so the request middleware attaches the Basic header to the probe call.
-    saveCredentials({ username, password, roles: [] });
-    const { data, error } = await api.GET('/api/auth/me');
+    const { data, error } = await api.POST('/api/auth/login', { body: { username, password } });
     if (error || !data) {
-      clearCredentials();
       throw new Error('Invalid username or password');
     }
-    const roles = data.roles ?? [];
-    saveCredentials({ username, password, roles });
-    setUser({ username: data.username ?? username, roles });
+    setAccessToken(data.accessToken ?? null);
+    setUser({ username: data.username ?? username, roles: data.roles ?? [] });
   }, []);
 
   const logout = useCallback(() => {
-    clearCredentials();
-    setUser(null);
-    navigate('/login');
+    // Clear the server's refresh cookie, then drop local state regardless of the call's outcome.
+    void api.POST('/api/auth/logout', {}).finally(() => {
+      clearAccessToken();
+      setUser(null);
+      navigate('/login');
+    });
   }, [navigate]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
+      bootstrapping,
       login,
       logout,
       hasRole: (role) => hasRole(user?.roles ?? [], role),
       canDo: (action) => canDo(user?.roles ?? [], action),
     }),
-    [user, login, logout],
+    [user, bootstrapping, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -77,7 +77,7 @@
 
 ## 🚀 快速開始
 
-**線上 demo(免安裝)**:<https://erp.terrychou.com>(登入 `admin`/`admin`;Swagger 在 `/swagger-ui.html`)。部署架構見 [docs/DEPLOY.md](docs/DEPLOY.md)。
+**線上 demo(免安裝)**:<https://erp.terrychou.com>(預設以唯讀 `guest` 進入;要試寫入用角色帳號如 `admin`/`admin`。Swagger 在 `/swagger-ui.html`)。部署架構見 [docs/DEPLOY.md](docs/DEPLOY.md)。
 
 或在本機跑(前置:**Docker**,全程在容器內,不需裝 JDK/Node):
 
@@ -87,8 +87,8 @@ docker compose -f compose.demo.yaml up --build
 ```
 
 - 前端入口:<http://localhost:8081>
-- 互動式 API 文件(Swagger UI):<http://localhost:8081/swagger-ui.html>(按 **Authorize**,用 `admin`/`admin`)
-- 內建 4 個帳號(HTTP Basic):`admin/admin`(全角色)、`accountant/accountant`、`warehouse/warehouse`、`sales/sales`
+- 互動式 API 文件(Swagger UI):<http://localhost:8081/swagger-ui.html>(`POST /api/auth/login` 取 access token,按 **Authorize** 貼上)
+- 內建帳號(JWT,密碼=帳號):`guest`(唯讀,登入頁預設)、`admin`(全角色)、`accountant`、`warehouse`、`sales`
 - 啟動時會經**真實過帳 service** 灌入完整 買→做→賣(`DataSeeder` 為冪等:demo 廠商已存在則跳過,故保留 volume 重跑 `up` 安全)
 
 > 想要全新一份資料時:`docker compose -f compose.demo.yaml down -v` 清掉 volume 再 `up`。
@@ -133,7 +133,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 | 持久化 | Spring Data JPA / Hibernate + Flyway migrations |
 | 邊界強制 | ArchUnit(CI 強制) |
 | 金額與數量 | `BigDecimal` value object —— `Money`(`NUMERIC(19,4)`)、`Quantity`/cost(`NUMERIC(19,6)`),絕不用 `float`;JSON 序列化為**字串** |
-| 認證 | Spring Security + HTTP Basic,4 角色(ADMIN / ACCOUNTANT / WAREHOUSE / SALES);JWT 延後 |
+| 認證 | Spring Security + **JWT**(access 記憶體 + refresh httpOnly cookie),持久化使用者(bcrypt),4 角色(ADMIN / ACCOUNTANT / WAREHOUSE / SALES)+ 唯讀 guest |
 | API 文件 | springdoc-openapi(OpenAPI 3.1)+ Swagger UI(`/swagger-ui.html`) |
 | 測試 | JUnit + Testcontainers(真 Postgres) |
 | 前端 | React 19 + TypeScript + Mantine 9 + Vite 8 + TanStack Query + React Router |
@@ -141,7 +141,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 ## 🖥️ 前端
 
-`frontend/` 是獨立的 Vite 專案(不掛進 Maven build)。資料層用 **`openapi-typescript`**(從 spec 產生型別)+ **`openapi-fetch`**(型別安全 client,middleware 注入 HTTP Basic、解析 RFC 9457 ProblemDetail)+ **TanStack Query**;路由用 React Router;UI 用 Mantine 9。RBAC 在前端鏡像後端的 POST 授權矩陣,僅作「隱藏/停用按鈕」的提示(真正強制在後端)。
+`frontend/` 是獨立的 Vite 專案(不掛進 Maven build)。資料層用 **`openapi-typescript`**(從 spec 產生型別)+ **`openapi-fetch`**(型別安全 client,middleware 注入 JWT Bearer + 401 自動 refresh 重試、解析 RFC 9457 ProblemDetail)+ **TanStack Query**;路由用 React Router;UI 用 Mantine 9。RBAC 在前端鏡像後端的 POST 授權矩陣,僅作「隱藏/停用按鈕」的提示(真正強制在後端)。
 
 涵蓋全部 8 個模組:
 
@@ -204,7 +204,7 @@ cd frontend && npm run build      # tsc -b && vite build
 ## ⚠️ 刻意切割(非缺漏)
 
 多幣別/FX、多租戶(永不)、FIFO/標準成本+變異、單一 VAT 以外的稅引擎、簽核流程、完整時間相位 MRP、批號/序號、工序/工作中心/人工製費、多倉調撥、多階 BOM。
-**安全**:目前 HTTP Basic + in-memory 使用者;JWT + 持久化使用者/角色庫為刻意延後(前端 auth 層已抽象化以利日後抽換)。
+**安全**:**JWT(access + refresh)+ 持久化使用者/角色庫(bcrypt)**,取代早期的 HTTP Basic + in-memory。access token 放前端記憶體、refresh token 放 httpOnly cookie(頁面重載 silent refresh 還原);公開 demo 預設唯讀 guest。未來可加可撤銷 refresh(DB rotation)、使用者管理 UI。
 
 ## 📐 架構決策紀錄(ADR)
 

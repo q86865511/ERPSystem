@@ -18,7 +18,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import { useI18n } from '../i18n';
 
-const DEMO_USERS = ['admin', 'accountant', 'warehouse', 'sales'];
+const ROLE_USERS = ['admin', 'accountant', 'warehouse', 'sales'];
 
 export function LoginPage() {
   const { login, user } = useAuth();
@@ -86,8 +86,11 @@ export function LoginPage() {
           </form>
 
           <Divider label={t('login.demoAccounts')} labelPosition="center" />
+          <Button variant="light" disabled={loading} onClick={() => submit('guest', 'guest')}>
+            {t('login.guestEntry')}
+          </Button>
           <Group grow gap="xs">
-            {DEMO_USERS.map((name) => (
+            {ROLE_USERS.map((name) => (
               <Button
                 key={name}
                 size="xs"

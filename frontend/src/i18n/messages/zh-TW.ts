@@ -83,6 +83,7 @@ export const zhTW: Messages = {
     signIn: '登入',
     invalidCredentials: '帳號或密碼錯誤',
     demoAccounts: '示範帳號',
+    guestEntry: '以 guest 唯讀瀏覽',
     demoHint: '每個示範帳號的密碼與帳號相同。',
   },
   dashboard: {

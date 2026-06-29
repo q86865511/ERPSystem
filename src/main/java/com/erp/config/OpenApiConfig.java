@@ -12,13 +12,14 @@ import org.springframework.context.annotation.Configuration;
 import java.math.BigDecimal;
 
 /**
- * Top-level OpenAPI metadata plus an HTTP Basic security scheme, so Swagger UI shows an "Authorize"
- * button (use {@code admin}/{@code admin}) and the generated client knows requests carry Basic auth.
+ * Top-level OpenAPI metadata plus a JWT Bearer security scheme, so Swagger UI shows an "Authorize" button
+ * (paste an access token from {@code POST /api/auth/login}) and the generated client knows requests carry
+ * a Bearer token.
  */
 @Configuration
 public class OpenApiConfig {
 
-    private static final String BASIC_AUTH = "basicAuth";
+    private static final String BEARER_AUTH = "bearerAuth";
 
     static {
         // Document BigDecimal as a string in the spec, matching the runtime serialization
@@ -35,8 +36,9 @@ public class OpenApiConfig {
                         .version("0.0.1")
                         .description("Modular-monolith manufacturing ERP — double-entry ledger, "
                                 + "inventory, procure-to-pay, order-to-cash, manufacturing and reporting."))
-                .components(new Components().addSecuritySchemes(BASIC_AUTH,
-                        new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("basic")))
-                .addSecurityItem(new SecurityRequirement().addList(BASIC_AUTH));
+                .components(new Components().addSecuritySchemes(BEARER_AUTH,
+                        new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer")
+                                .bearerFormat("JWT")))
+                .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH));
     }
 }
