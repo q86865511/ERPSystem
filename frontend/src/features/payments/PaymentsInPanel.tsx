@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Badge, Button, Drawer, Group, Modal, Stack, Table, Text, TextInput } from '@mantine/core';
+import { Badge, Button, Group, Modal, Stack, Table, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { DateInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { PayInRequest } from '../../api/types';
 import { PartnerSelect } from '../../components/EntitySelect';
-import { MoneyText, formatMoney, sumMoney } from '../../components/Money';
-import { StatusBadge } from '../../components/StatusBadge';
+import { sumMoney } from '../../components/Money';
+import { AmountAllocationTable, DataTable, DetailDrawer, MoneyText, StatusBadge } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { usePartnerMap } from '../masterdata/api';
 import { useInvoices } from '../sales/api';
 import { useAuth } from '../../auth/useAuth';
@@ -39,7 +40,6 @@ export function PaymentsInPanel() {
   const openInvoices = (invoices.data ?? []).filter(
     (i) => i.partnerId === partnerId && i.id != null && Number(i.openBalance ?? 0) > 0,
   );
-  const total = sumMoney(Object.values(allocs));
 
   const submit = async () => {
     const allocations = Object.entries(allocs)
@@ -66,6 +66,17 @@ export function PaymentsInPanel() {
   };
 
   const rows = payments.data ?? [];
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'receiptNumber', label: t('payments.in.receiptNumber'), render: (p) => p.payNumber },
+    {
+      key: 'customer',
+      label: t('field.customer'),
+      render: (p) => (p.partnerId != null ? (partners.get(p.partnerId) ?? p.partnerId) : '—'),
+    },
+    { key: 'amount', label: t('field.amount'), align: 'right', render: (p) => <MoneyText value={p.amount} /> },
+    { key: 'status', label: t('field.status'), render: (p) => <StatusBadge status={p.status} /> },
+  ];
+
   return (
     <Stack>
       {canDo('payments.create') && (
@@ -76,41 +87,14 @@ export function PaymentsInPanel() {
         </Group>
       )}
 
-      <Table striped highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('payments.in.receiptNumber')}</Table.Th>
-            <Table.Th>{t('field.customer')}</Table.Th>
-            <Table.Th ta="right">{t('field.amount')}</Table.Th>
-            <Table.Th>{t('field.status')}</Table.Th>
-            <Table.Th />
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((p) => (
-            <Table.Tr key={p.id}>
-              <Table.Td>{p.payNumber}</Table.Td>
-              <Table.Td>{p.partnerId != null ? (partners.get(p.partnerId) ?? p.partnerId) : '—'}</Table.Td>
-              <Table.Td ta="right">
-                <MoneyText value={p.amount} />
-              </Table.Td>
-              <Table.Td>
-                <StatusBadge status={p.status} />
-              </Table.Td>
-              <Table.Td ta="right">
-                <Button size="xs" variant="subtle" onClick={() => setDetailId(p.id ?? null)}>
-                  {t('common.view')}
-                </Button>
-              </Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {!payments.isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('payments.in.noReceipts')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(p) => p.id ?? p.payNumber ?? ''}
+        isLoading={payments.isLoading}
+        emptyMessage={t('payments.in.noReceipts')}
+        onRowClick={(p) => setDetailId(p.id ?? null)}
+      />
 
       <Modal opened={opened} onClose={close} title={t('payments.in.newCustomerReceipt')} size="lg">
         <Stack>
@@ -128,72 +112,40 @@ export function PaymentsInPanel() {
           </Group>
 
           {partnerId && (
-            <Table>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('payments.in.invoice')}</Table.Th>
-                  <Table.Th ta="right">{t('payments.open')}</Table.Th>
-                  <Table.Th ta="right" w={140}>
-                    {t('payments.allocate')}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {openInvoices.map((i) => (
-                  <Table.Tr key={i.id}>
-                    <Table.Td>{i.invoiceNumber}</Table.Td>
-                    <Table.Td ta="right">
-                      <MoneyText value={i.openBalance} />
-                    </Table.Td>
-                    <Table.Td>
-                      <TextInput
-                        size="xs"
-                        placeholder={i.openBalance}
-                        value={i.id != null ? (allocs[i.id] ?? '') : ''}
-                        onChange={(e) =>
-                          i.id != null &&
-                          setAllocs((a) => ({ ...a, [i.id as number]: e.currentTarget.value }))
-                        }
-                      />
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-                {openInvoices.length === 0 && (
-                  <Table.Tr>
-                    <Table.Td colSpan={3}>
-                      <Text c="dimmed" size="sm">
-                        {t('payments.in.noOpenInvoices')}
-                      </Text>
-                    </Table.Td>
-                  </Table.Tr>
-                )}
-              </Table.Tbody>
-            </Table>
+            <AmountAllocationTable
+              rows={openInvoices.map((i) => ({
+                id: i.id as number,
+                openBalance: i.openBalance,
+                label: i.invoiceNumber ?? String(i.id),
+              }))}
+              allocs={allocs}
+              onChange={setAllocs}
+              documentLabel={t('payments.in.invoice')}
+              amountLabel={t('payments.allocate')}
+              totalLabel={t('payments.totalLabel', { amount: '' })}
+              emptyMessage={t('payments.in.noOpenInvoices')}
+            />
           )}
 
-          <Group justify="space-between">
-            <Text fw={600}>{t('payments.totalLabel', { amount: formatMoney(total) })}</Text>
-            <Group>
-              <Button variant="default" onClick={close}>
-                {t('common.cancel')}
-              </Button>
-              <Button onClick={submit} loading={pay.isPending}>
-                {t('payments.in.postReceipt')}
-              </Button>
-            </Group>
+          <Group justify="flex-end">
+            <Button variant="default" onClick={close}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={submit} loading={pay.isPending}>
+              {t('payments.in.postReceipt')}
+            </Button>
           </Group>
         </Stack>
       </Modal>
 
-      <Drawer
+      <DetailDrawer
         opened={detailId != null}
         onClose={() => setDetailId(null)}
-        position="right"
-        size="md"
         title={t('payments.in.drawerTitle', { payNumber: detail.data?.payNumber ?? '' })}
+        size="md"
       >
         {detail.data && (
-          <Stack>
+          <>
             <Group>
               <StatusBadge status={detail.data.status} />
               {detail.data.journalEntryId != null && (
@@ -224,9 +176,9 @@ export function PaymentsInPanel() {
             <Text size="xs" c="dimmed">
               {t('payments.in.postingNote')}
             </Text>
-          </Stack>
+          </>
         )}
-      </Drawer>
+      </DetailDrawer>
     </Stack>
   );
 }

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Badge,
   Button,
-  Drawer,
   Group,
   Loader,
   Modal,
@@ -19,8 +18,8 @@ import { DateInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { CreateInvoiceRequest } from '../../api/types';
-import { MoneyText } from '../../components/Money';
-import { StatusBadge } from '../../components/StatusBadge';
+import { DataTable, DetailDrawer, MoneyText, StatusBadge } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useI18n } from '../../i18n';
 import { useItemMap, usePartnerMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
@@ -99,6 +98,34 @@ export function SalesInvoicesPanel() {
   };
 
   const rows = invoices.data ?? [];
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'invoiceNumber', label: t('sales.invoice.invoiceNumber') },
+    {
+      key: 'customer',
+      label: t('field.customer'),
+      render: (b) => (b.partnerId != null ? (partners.get(b.partnerId) ?? b.partnerId) : '—'),
+    },
+    {
+      key: 'gross',
+      label: t('field.gross'),
+      align: 'right',
+      render: (b) => <MoneyText value={b.grossAmount} />,
+    },
+    {
+      key: 'cogs',
+      label: t('sales.invoice.cogs'),
+      align: 'right',
+      render: (b) => <MoneyText value={b.cogsAmount} />,
+    },
+    {
+      key: 'open',
+      label: t('sales.invoice.open'),
+      align: 'right',
+      render: (b) => <MoneyText value={b.openBalance} />,
+    },
+    { key: 'status', label: t('field.status'), render: (b) => <StatusBadge status={b.status} /> },
+  ];
+
   return (
     <Stack>
       {canDo('sales.invoice') && (
@@ -109,51 +136,15 @@ export function SalesInvoicesPanel() {
         </Group>
       )}
 
-      <Table.ScrollContainer minWidth={760}>
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>{t('sales.invoice.invoiceNumber')}</Table.Th>
-              <Table.Th>{t('field.customer')}</Table.Th>
-              <Table.Th ta="right">{t('field.gross')}</Table.Th>
-              <Table.Th ta="right">{t('sales.invoice.cogs')}</Table.Th>
-              <Table.Th ta="right">{t('sales.invoice.open')}</Table.Th>
-              <Table.Th>{t('field.status')}</Table.Th>
-              <Table.Th />
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {rows.map((b) => (
-              <Table.Tr key={b.id}>
-                <Table.Td>{b.invoiceNumber}</Table.Td>
-                <Table.Td>{b.partnerId != null ? (partners.get(b.partnerId) ?? b.partnerId) : '—'}</Table.Td>
-                <Table.Td ta="right">
-                  <MoneyText value={b.grossAmount} />
-                </Table.Td>
-                <Table.Td ta="right">
-                  <MoneyText value={b.cogsAmount} />
-                </Table.Td>
-                <Table.Td ta="right">
-                  <MoneyText value={b.openBalance} />
-                </Table.Td>
-                <Table.Td>
-                  <StatusBadge status={b.status} />
-                </Table.Td>
-                <Table.Td ta="right">
-                  <Button size="xs" variant="subtle" onClick={() => setDetailId(b.id ?? null)}>
-                    {t('common.view')}
-                  </Button>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
-      {!invoices.isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('sales.invoice.empty')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(b) => b.id ?? b.invoiceNumber ?? ''}
+        isLoading={invoices.isLoading}
+        emptyMessage={t('sales.invoice.empty')}
+        onRowClick={(b) => setDetailId(b.id ?? null)}
+        minWidth={760}
+      />
 
       <Modal opened={opened} onClose={close} title={t('sales.invoice.modalTitle')} size="xl">
         <Stack>
@@ -240,29 +231,29 @@ export function SalesInvoicesPanel() {
         </Stack>
       </Modal>
 
-      <Drawer
+      <DetailDrawer
         opened={detailId != null}
         onClose={() => setDetailId(null)}
-        position="right"
-        size="xl"
         title={t('sales.invoice.drawerTitle', { invoiceNumber: detail.data?.invoiceNumber ?? '' })}
+        footer={
+          <Group justify="flex-end">
+            <Button
+              variant="default"
+              size="xs"
+              onClick={() => detailId && navigate(`/print/sales-invoice/${detailId}`)}
+            >
+              {t('print.print')}
+            </Button>
+          </Group>
+        }
       >
         {detail.data && (
-          <Stack>
-            <Group justify="space-between">
-              <Group>
-                <StatusBadge status={detail.data.status} />
-                {detail.data.journalEntryId != null && (
-                  <Badge variant="light">{t('sales.je', { id: detail.data.journalEntryId })}</Badge>
-                )}
-              </Group>
-              <Button
-                variant="default"
-                size="xs"
-                onClick={() => detailId && navigate(`/print/sales-invoice/${detailId}`)}
-              >
-                {t('print.print')}
-              </Button>
+          <>
+            <Group>
+              <StatusBadge status={detail.data.status} />
+              {detail.data.journalEntryId != null && (
+                <Badge variant="light">{t('sales.je', { id: detail.data.journalEntryId })}</Badge>
+              )}
             </Group>
             <SimpleGrid cols={4}>
               <Text size="sm">
@@ -309,9 +300,9 @@ export function SalesInvoicesPanel() {
             <Text size="xs" c="dimmed">
               {t('sales.invoice.glNote')}
             </Text>
-          </Stack>
+          </>
         )}
-      </Drawer>
+      </DetailDrawer>
     </Stack>
   );
 }
