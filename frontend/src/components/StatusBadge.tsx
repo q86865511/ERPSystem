@@ -4,7 +4,8 @@ import type { TranslationKey } from '../i18n';
 
 const COLOR: Record<string, string> = {
   DRAFT: 'gray',
-  CONFIRMED: 'blue',
+  // "Active / in-our-hands" primary states map to the brand terracotta (was 'blue' pre-2.2).
+  CONFIRMED: 'terracotta',
   PARTIALLY_RECEIVED: 'yellow',
   RECEIVED: 'teal',
   PARTIALLY_SHIPPED: 'yellow',
@@ -15,8 +16,8 @@ const COLOR: Record<string, string> = {
   RETURNED: 'grape',
   CLOSED: 'teal',
   CANCELLED: 'red',
-  IN_PROGRESS: 'blue',
-  RELEASED: 'blue',
+  IN_PROGRESS: 'terracotta',
+  RELEASED: 'terracotta',
   DONE: 'teal',
   // bill match status
   MATCHED: 'teal',
