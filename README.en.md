@@ -229,6 +229,12 @@ an append-only `audit_log` (domain events + an `AFTER_COMMIT` listener, so only 
 recorded; a DB trigger blocks update/delete). ADMIN users browse the "Audit Trail" page, filterable by event
 type and actor.
 
+**Observability**: Micrometer exposes metrics at `/actuator/prometheus` (reachable only on the internal
+network) — business counters derived from the same domain events (postings/logins/period changes) plus a
+reconciliation-health gauge, alongside free HTTP/JVM/pool metrics; structured (ECS) JSON logging and a
+per-request correlation id. An optional `docker compose -f compose.demo.yaml -f compose.observability.yaml up`
+brings up Prometheus + Grafana with a preloaded dashboard. See [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md).
+
 ## 📊 Data model
 
 The accounting spine (accounts, balanced journal entries, fiscal periods) is the centre; every business

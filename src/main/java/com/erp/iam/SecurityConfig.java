@@ -64,6 +64,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
+                        // Prometheus scrape endpoint: open, but reachable only on the internal Docker
+                        // network (nginx never proxies /actuator), so it is not publicly exposed. Other
+                        // actuator endpoints stay behind the catch-all authenticated() rule.
+                        .requestMatchers("/actuator/prometheus").permitAll()
                         // Interactive API docs and the OpenAPI spec are open for dev/demo; a fronting
                         // nginx withholds these paths in production.
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/v3/api-docs.yaml",

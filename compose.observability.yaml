@@ -1,0 +1,46 @@
+name: erp-demo
+
+# Optional observability stack — layer ON TOP of the demo (do NOT run alone):
+#   docker compose -f compose.demo.yaml -f compose.observability.yaml up --build
+# Adds Prometheus (scrapes app:8080/actuator/prometheus over the internal network — the endpoint is never
+# published by the frontend nginx) and Grafana with a preloaded dashboard, and flips the app to structured
+# JSON logging via the 'json' profile. Grafana: http://localhost:3000 (admin/admin). Prometheus: :9090.
+services:
+  app:
+    environment:
+      # Layer the json profile on top of seed -> ECS JSON console logs (application-json.properties).
+      SPRING_PROFILES_ACTIVE: seed,json
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - promdata:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [erpnet]
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafanadata:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks: [erpnet]
+
+volumes:
+  promdata:
+  grafanadata:

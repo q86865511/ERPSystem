@@ -1,0 +1,10 @@
+# Scrapes the ERP backend's Micrometer endpoint over the internal Docker network (app:8080). This path is
+# never published by the frontend nginx, so metrics stay internal even though the app permits the endpoint.
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: erp-app
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['app:8080']

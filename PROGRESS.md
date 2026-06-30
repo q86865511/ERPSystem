@@ -12,6 +12,12 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-30] 📈 可觀測性(Micrometer/Prometheus 指標 + 結構化日誌 + 關聯 ID;前端 build 綠 / ArchUnit 綠,ObservabilityIT 待 Docker 跑完)
+  - **指標**:加 `micrometer-registry-prometheus`,`management.endpoints.web.exposure.include=health,info,prometheus`(**窄白名單,絕不用 `*`** 以免洩漏 jwt secret/DB 密碼)。新 `com.erp.observation` 模組 `MetricsEventListener`(@TransactionalEventListener AFTER_COMMIT + fallbackExecution,**複用既有 domain event**)發三個有界標籤 counter:`erp_journal_postings_total{sourceDocType}`、`erp_auth_logins_total{result}`、`erp_fiscal_period_changes_total{action}`;另在 `com.erp.reporting` 加 `ReconciliationHealthGauge`(MeterBinder)`erp_reconciliation_healthy`(讀取時計算、60s 節流)。
+  - **關鍵設計**:對帳健康做成 **gauge 而非 HealthIndicator**(否則讀到 0 會翻掉 `/actuator/health` → compose healthcheck 失敗 → 前端 `depends_on: service_healthy` 死鎖);標籤**只用有界欄位**(不放 actor/單號,避免 cardinality 爆炸);`/actuator/prometheus` 為 `permitAll` 但 **nginx 不反代 `/actuator`** → 公網不可達,只內部 docker 網路可抓。
+  - **日誌**:`RequestCorrelationFilter`(最高優先序,排在 security 前)讀/產 `X-Request-Id` → MDC `correlationId` → 每行 log 帶 + 回寫 header(輸入經淨化防 log forging);nginx 加 `proxy_set_header X-Request-Id $request_id`。JSON 結構化日誌(ECS)由 `json` profile 控制(`application-json.properties`,觀測 overlay 啟用),預設人類可讀。
+  - **可選 overlay**:`compose.observability.yaml`(Prometheus + Grafana + 預載 ERP Overview 儀表板,並把 app 切 `seed,json`)—— **不在預設 demo**,保持一鍵 demo 精簡。`monitoring/` 放 prometheus.yml + grafana provisioning/dashboard。
+  - **ArchUnit**:新 `observation_uses_only_published_ports` + `no_module_depends_on_observation`(21 條全綠)。**測試**:`ObservabilityIT`(MockMvc)驗端點開放/含業務+系統指標/窄暴露(env 401)/關聯 ID 回寫。文件 `docs/OBSERVABILITY.md` + DEPLOY 註記。
 - [2026-06-29] 🧪 CI 品質關卡(把既有嚴謹度變可見;`mvn verify` 綠 / YAML 驗證綠)
   - **覆蓋率(JaCoCo)**:`prepare-agent`(單元/Surefire)+ `prepare-agent-integration`(IT/Failsafe)同寫一份 `jacoco.exec`,`verify` 出一份合併報告 → **指令 68.1% / 分支 57.3%**(多數邏輯由 ITs 涵蓋,故必須含 IT)。**報告為主、不擋 build**(不影響 main 自動部署)。
   - **覆蓋率 badge=in-repo 自產**:新 `coverage-badge.yml` 以 `workflow_run`(CI 成功 + main + push)觸發 → 下載 CI 上傳的覆蓋率 artifact → `cicirello/jacoco-badge-generator` 產 SVG → 提交回 repo,訊息帶 `[skip ci]`(**不觸發 CI/Deploy、無迴圈**,鏡像 `deploy.yml` 模式)。先放初始 `.github/badges/{jacoco,branches}.svg` 免 README 圖破。
@@ -205,7 +211,8 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 **E. 品質 / 維運**
 - ✅ **CI 品質關卡(已做,2026-06-29)**:JaCoCo 覆蓋率(指令 68.1%/分支 57.3%,含 IT,報告為主不擋)+ in-repo 自產 badge(`coverage-badge.yml`,`[skip ci]` 無迴圈)+ CodeQL + Trivy(fs/image,report-only,SARIF→Security tab)+ Dependabot(maven/npm/actions)+ CI 上傳測試/ArchUnit/覆蓋率 artifact。
 - 並行測試擴到 sales/manufacturing(目前僅 inventory 有 concurrency IT);**前端無自動化測試**(只有 tsc + vite build,可加 Vitest/Playwright)。
-- 候選後續(plan-next-step workflow 排序):② 可觀測性(Micrometer + Prometheus + 業務指標 off events + 結構化日誌);③ 前端測試(Vitest+RTL/Playwright);分錄沖正(reversal + by-entry GET);bundle 瘦身 / a11y 當順手 rider。
+- ✅ **可觀測性(已做,2026-06-30)**:Micrometer/Prometheus 指標(業務 counter off events + 對帳 gauge)+ 結構化日誌 + 關聯 ID + 可選 Prometheus/Grafana overlay。
+- 候選後續(plan-next-step workflow 排序):③ 前端測試(Vitest+RTL/Playwright);分錄沖正(reversal + by-entry GET);bundle 瘦身 / a11y 當順手 rider。
 - ✅ **自動部署 + demo 定時重置(repo 部分已做,2026-06-29)**:`deploy.yml`(workflow_run + 受限金鑰)、`compose.oracle.yaml`、`scripts/reset-demo.sh` + cron。計畫見 `~/.claude/plans/tender-cuddling-starlight.md`;Oracle 一次性設定 + 端到端驗證待 merge 後做。
 
 **F. 刻意切割(YAGNI,不打算做)**

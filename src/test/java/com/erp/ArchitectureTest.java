@@ -174,4 +174,23 @@ class ArchitectureTest {
                             "..purchasing..", "..sales..", "..manufacturing..", "..reporting..",
                             "..payments..", "..iam..")
                     .should().dependOnClassesThat().resideInAPackage("..audit..");
+
+    // The observation module (metrics listener) is, like audit, a cross-cutting event consumer: it touches
+    // other modules' published events/api only, never their internals.
+    @ArchTest
+    static final ArchRule observation_uses_only_published_ports =
+            noClasses().that().resideInAPackage("..observation..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
+                            "..iam.domain..", "..iam.application..", "..iam.web..",
+                            "..masterdata..", "..inventory..", "..purchasing..", "..payments..",
+                            "..sales..", "..manufacturing..", "..reporting..", "..audit..");
+
+    // Nothing depends on the observation module; it only observes (via Spring events / a servlet filter).
+    @ArchTest
+    static final ArchRule no_module_depends_on_observation =
+            noClasses().that().resideInAnyPackage("..ledger..", "..masterdata..", "..inventory..",
+                            "..purchasing..", "..sales..", "..manufacturing..", "..reporting..",
+                            "..payments..", "..iam..", "..audit..")
+                    .should().dependOnClassesThat().resideInAPackage("..observation..");
 }
