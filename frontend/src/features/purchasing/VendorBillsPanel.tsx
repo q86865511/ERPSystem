@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   Badge,
   Button,
-  Drawer,
   Group,
   Loader,
   Modal,
@@ -18,8 +17,8 @@ import { DateInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { CreateBillRequest } from '../../api/types';
-import { MoneyText } from '../../components/Money';
-import { StatusBadge } from '../../components/StatusBadge';
+import { DataTable, DetailDrawer, MoneyText, StatusBadge } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useItemMap, usePartnerMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
 import { useI18n } from '../../i18n';
@@ -98,6 +97,28 @@ export function VendorBillsPanel() {
   };
 
   const rows = bills.data ?? [];
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'billNumber', label: t('purchasing.bill.billNumber') },
+    {
+      key: 'vendor',
+      label: t('field.vendor'),
+      render: (b) => (b.partnerId != null ? (partners.get(b.partnerId) ?? b.partnerId) : '—'),
+    },
+    {
+      key: 'gross',
+      label: t('field.gross'),
+      align: 'right',
+      render: (b) => <MoneyText value={b.grossAmount} />,
+    },
+    {
+      key: 'open',
+      label: t('purchasing.bill.open'),
+      align: 'right',
+      render: (b) => <MoneyText value={b.openBalance} />,
+    },
+    { key: 'status', label: t('field.status'), render: (b) => <StatusBadge status={b.status} /> },
+  ];
+
   return (
     <Stack>
       {canDo('purchasing.vendorBill') && (
@@ -108,47 +129,15 @@ export function VendorBillsPanel() {
         </Group>
       )}
 
-      <Table.ScrollContainer minWidth={720}>
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>{t('purchasing.bill.billNumber')}</Table.Th>
-              <Table.Th>{t('field.vendor')}</Table.Th>
-              <Table.Th ta="right">{t('field.gross')}</Table.Th>
-              <Table.Th ta="right">{t('purchasing.bill.open')}</Table.Th>
-              <Table.Th>{t('field.status')}</Table.Th>
-              <Table.Th />
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {rows.map((b) => (
-              <Table.Tr key={b.id}>
-                <Table.Td>{b.billNumber}</Table.Td>
-                <Table.Td>{b.partnerId != null ? (partners.get(b.partnerId) ?? b.partnerId) : '—'}</Table.Td>
-                <Table.Td ta="right">
-                  <MoneyText value={b.grossAmount} />
-                </Table.Td>
-                <Table.Td ta="right">
-                  <MoneyText value={b.openBalance} />
-                </Table.Td>
-                <Table.Td>
-                  <StatusBadge status={b.status} />
-                </Table.Td>
-                <Table.Td ta="right">
-                  <Button size="xs" variant="subtle" onClick={() => setDetailId(b.id ?? null)}>
-                    {t('common.view')}
-                  </Button>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
-      {!bills.isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('purchasing.bill.none')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(b) => b.id ?? b.billNumber ?? ''}
+        isLoading={bills.isLoading}
+        emptyMessage={t('purchasing.bill.none')}
+        onRowClick={(b) => setDetailId(b.id ?? null)}
+        minWidth={720}
+      />
 
       <Modal opened={opened} onClose={close} title={t('purchasing.bill.new')} size="xl">
         <Stack>
@@ -235,15 +224,13 @@ export function VendorBillsPanel() {
         </Stack>
       </Modal>
 
-      <Drawer
+      <DetailDrawer
         opened={detailId != null}
         onClose={() => setDetailId(null)}
-        position="right"
-        size="xl"
         title={t('purchasing.bill.drawerTitle', { billNumber: detail.data?.billNumber ?? '' })}
       >
         {detail.data && (
-          <Stack>
+          <>
             <Group>
               <StatusBadge status={detail.data.status} />
               {detail.data.journalEntryId != null && (
@@ -294,9 +281,9 @@ export function VendorBillsPanel() {
             <Text size="xs" c="dimmed">
               {t('purchasing.bill.postingNote')}
             </Text>
-          </Stack>
+          </>
         )}
-      </Drawer>
+      </DetailDrawer>
     </Stack>
   );
 }

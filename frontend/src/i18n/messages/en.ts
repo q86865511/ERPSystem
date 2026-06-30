@@ -40,6 +40,7 @@ export const en = {
     save: 'Save',
     view: 'View',
     addLine: 'Add line',
+    removeLine: 'Remove line',
     submit: 'Submit',
     close: 'Close',
     details: 'Details',

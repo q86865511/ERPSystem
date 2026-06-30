@@ -1,16 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  ActionIcon,
-  Button,
-  Drawer,
-  Group,
-  Modal,
-  Stack,
-  Table,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { ActionIcon, Button, Group, Modal, Stack, Table, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { DateInput } from '@mantine/dates';
@@ -18,8 +8,8 @@ import { IconPlus, IconTrash } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { CreatePoRequest } from '../../api/types';
 import { ItemSelect, PartnerSelect } from '../../components/EntitySelect';
-import { MoneyText } from '../../components/Money';
-import { StatusBadge } from '../../components/StatusBadge';
+import { DataTable, DetailDrawer, MoneyText, StateButton, StatusBadge } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useItemMap, usePartnerMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
 import { useI18n } from '../../i18n';
@@ -88,6 +78,17 @@ export function PurchaseOrdersPanel() {
   };
 
   const rows = data ?? [];
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'poNumber', label: t('purchasing.po.poNumber') },
+    {
+      key: 'vendor',
+      label: t('field.vendor'),
+      render: (po) => (po.partnerId != null ? (partners.get(po.partnerId) ?? po.partnerId) : '—'),
+    },
+    { key: 'orderDate', label: t('purchasing.po.orderDate') },
+    { key: 'status', label: t('field.status'), render: (po) => <StatusBadge status={po.status} /> },
+  ];
+
   return (
     <Stack>
       {canDo('purchasing.write') && (
@@ -98,41 +99,15 @@ export function PurchaseOrdersPanel() {
         </Group>
       )}
 
-      <Table.ScrollContainer minWidth={620}>
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>{t('purchasing.po.poNumber')}</Table.Th>
-              <Table.Th>{t('field.vendor')}</Table.Th>
-              <Table.Th>{t('purchasing.po.orderDate')}</Table.Th>
-              <Table.Th>{t('field.status')}</Table.Th>
-              <Table.Th />
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {rows.map((po) => (
-              <Table.Tr key={po.id}>
-                <Table.Td>{po.poNumber}</Table.Td>
-                <Table.Td>{po.partnerId != null ? (partners.get(po.partnerId) ?? po.partnerId) : '—'}</Table.Td>
-                <Table.Td>{po.orderDate}</Table.Td>
-                <Table.Td>
-                  <StatusBadge status={po.status} />
-                </Table.Td>
-                <Table.Td ta="right">
-                  <Button size="xs" variant="subtle" onClick={() => setDetailId(po.id ?? null)}>
-                    {t('common.view')}
-                  </Button>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
-      {!isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('purchasing.po.none')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(po) => po.id ?? po.poNumber ?? ''}
+        isLoading={isLoading}
+        emptyMessage={t('purchasing.po.none')}
+        onRowClick={(po) => setDetailId(po.id ?? null)}
+        minWidth={620}
+      />
 
       {/* Create modal */}
       <Modal opened={opened} onClose={close} title={t('purchasing.po.new')} size="xl">
@@ -174,6 +149,7 @@ export function PurchaseOrdersPanel() {
                 <ActionIcon
                   variant="subtle"
                   color="red"
+                  aria-label={t('common.removeLine')}
                   disabled={form.values.lines.length === 1}
                   onClick={() => form.removeListItem('lines', i)}
                 >
@@ -205,15 +181,26 @@ export function PurchaseOrdersPanel() {
       </Modal>
 
       {/* Detail drawer */}
-      <Drawer
+      <DetailDrawer
         opened={detailId != null}
         onClose={() => setDetailId(null)}
-        position="right"
-        size="xl"
         title={t('purchasing.po.drawerTitle', { poNumber: detail.data?.poNumber ?? '' })}
+        footer={
+          detail.data?.status === 'DRAFT' && canDo('purchasing.write') ? (
+            <Group justify="flex-end">
+              <StateButton
+                label={t('purchasing.po.confirmOrder')}
+                loading={confirm.isPending}
+                onClick={() => {
+                  if (detailId != null) void doConfirm(detailId);
+                }}
+              />
+            </Group>
+          ) : undefined
+        }
       >
         {detail.data && (
-          <Stack>
+          <>
             <Group justify="space-between">
               <Group>
                 <StatusBadge status={detail.data.status} />
@@ -254,16 +241,9 @@ export function PurchaseOrdersPanel() {
                 ))}
               </Table.Tbody>
             </Table>
-            {detail.data.status === 'DRAFT' && canDo('purchasing.write') && (
-              <Group justify="flex-end">
-                <Button loading={confirm.isPending} onClick={() => detailId && doConfirm(detailId)}>
-                  {t('purchasing.po.confirmOrder')}
-                </Button>
-              </Group>
-            )}
-          </Stack>
+          </>
         )}
-      </Drawer>
+      </DetailDrawer>
     </Stack>
   );
 }

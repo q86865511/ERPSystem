@@ -33,6 +33,7 @@ export const zhTW: Messages = {
     save: '儲存',
     view: '檢視',
     addLine: '新增一行',
+    removeLine: '刪除此行',
     submit: '送出',
     close: '關閉',
     details: '詳情',
