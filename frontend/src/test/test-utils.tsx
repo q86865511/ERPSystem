@@ -14,7 +14,10 @@ import { theme } from '../theme';
  * > Router), mirroring main.tsx. A FRESH QueryClient per call (retry off, gcTime Infinity) keeps tests
  * isolated and stops error-path queries from retrying/hanging.
  */
-export function renderWithProviders(ui: ReactElement, options?: { route?: string }): RenderResult {
+export function renderWithProviders(
+  ui: ReactElement,
+  options?: { route?: string; colorScheme?: 'light' | 'dark' },
+): RenderResult {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false, gcTime: Number.POSITIVE_INFINITY },
@@ -24,7 +27,8 @@ export function renderWithProviders(ui: ReactElement, options?: { route?: string
 
   function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <MantineProvider theme={theme} defaultColorScheme="light">
+      // `forceColorScheme` pins the scheme for dark-mode parity tests; default stays light when unset.
+      <MantineProvider theme={theme} defaultColorScheme="light" forceColorScheme={options?.colorScheme}>
         <I18nProvider>
           <Notifications />
           <QueryClientProvider client={queryClient}>
