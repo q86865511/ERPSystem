@@ -6,6 +6,7 @@ import com.erp.ledger.api.JournalEntryRequest.Line;
 import com.erp.ledger.api.LedgerPosting;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureMetrics // @SpringBootTest disables metrics export by default; re-enable so /actuator/prometheus exists
 class ObservabilityIT {
 
     private static final AtomicInteger SEQ = new AtomicInteger();
