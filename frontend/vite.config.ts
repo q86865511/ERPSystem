@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -11,6 +12,29 @@ export default defineConfig({
       '/api': 'http://localhost:8080',
       '/v3/api-docs': 'http://localhost:8080',
       '/swagger-ui': 'http://localhost:8080',
+    },
+  },
+  // Vitest: jsdom component/unit tests run without a server (works in the sandbox). The setup file
+  // installs the jsdom shims Mantine needs and resets module singletons between tests.
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.ts'],
+    css: true,
+    // Only our Vitest tests; the Playwright specs under e2e/ (*.spec.ts) are run by `npm run e2e`.
+    include: ['src/**/*.test.{ts,tsx}'],
+    coverage: {
+      provider: 'v8',
+      reportsDirectory: './coverage',
+      // Report-only (no thresholds): generated on demand, not a gate.
+      exclude: [
+        'src/api/schema.d.ts',
+        'src/main.tsx',
+        'src/test/**',
+        '**/*.test.{ts,tsx}',
+        '**/*.d.ts',
+        '*.config.*',
+      ],
     },
   },
 });

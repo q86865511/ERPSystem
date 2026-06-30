@@ -235,6 +235,11 @@ reconciliation-health gauge, alongside free HTTP/JVM/pool metrics; structured (E
 per-request correlation id. An optional `docker compose -f compose.demo.yaml -f compose.observability.yaml up`
 brings up Prometheus + Grafana with a preloaded dashboard. See [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md).
 
+**Testing**: 90 backend Testcontainers integration tests + ArchUnit boundaries + reconciliation/year-end
+acceptance (`mvn verify`); frontend Vitest + React Testing Library (BigInt money math, the RBAC matrix, i18n,
+the **single-flight 401→refresh→replay** JWT flow, the `RequireRole` guard) run in CI after every build; a
+Playwright chromium smoke runs in a separate non-blocking `e2e` workflow against the live demo.
+
 ## 📊 Data model
 
 The accounting spine (accounts, balanced journal entries, fiscal periods) is the centre; every business
