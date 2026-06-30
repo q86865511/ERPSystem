@@ -1,24 +1,13 @@
 import { useState } from 'react';
-import {
-  Badge,
-  Button,
-  Drawer,
-  Group,
-  Modal,
-  Select,
-  Stack,
-  Table,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { Badge, Button, Group, Modal, Select, Stack, Table, Text, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { DateInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { CreateWorkOrderRequest } from '../../api/types';
 import { ItemSelect, LocationSelect } from '../../components/EntitySelect';
-import { MoneyText } from '../../components/Money';
-import { StatusBadge } from '../../components/StatusBadge';
+import { DataTable, DetailDrawer, MoneyText, StateButton, StatusBadge } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useItemMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
 import { useI18n } from '../../i18n';
@@ -142,6 +131,18 @@ export function WorkOrdersPanel() {
 
   const status = detail.data?.status;
   const rows = list.data ?? [];
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'woNumber', label: t('manufacturing.wo.woNumber') },
+    {
+      key: 'item',
+      label: t('field.item'),
+      render: (w) => (w.itemId != null ? (items.get(w.itemId) ?? w.itemId) : '—'),
+    },
+    { key: 'qtyToProduce', label: t('manufacturing.wo.toProduce'), align: 'right' },
+    { key: 'qtyProduced', label: t('manufacturing.wo.produced'), align: 'right' },
+    { key: 'status', label: t('field.status'), render: (w) => <StatusBadge status={w.status} /> },
+  ];
+
   return (
     <Stack>
       {writable && (
@@ -152,43 +153,15 @@ export function WorkOrdersPanel() {
         </Group>
       )}
 
-      <Table.ScrollContainer minWidth={640}>
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>{t('manufacturing.wo.woNumber')}</Table.Th>
-              <Table.Th>{t('field.item')}</Table.Th>
-              <Table.Th ta="right">{t('manufacturing.wo.toProduce')}</Table.Th>
-              <Table.Th ta="right">{t('manufacturing.wo.produced')}</Table.Th>
-              <Table.Th>{t('field.status')}</Table.Th>
-              <Table.Th />
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {rows.map((w) => (
-              <Table.Tr key={w.id}>
-                <Table.Td>{w.woNumber}</Table.Td>
-                <Table.Td>{w.itemId != null ? (items.get(w.itemId) ?? w.itemId) : '—'}</Table.Td>
-                <Table.Td ta="right">{w.qtyToProduce}</Table.Td>
-                <Table.Td ta="right">{w.qtyProduced}</Table.Td>
-                <Table.Td>
-                  <StatusBadge status={w.status} />
-                </Table.Td>
-                <Table.Td ta="right">
-                  <Button size="xs" variant="subtle" onClick={() => setDetailId(w.id ?? null)}>
-                    {t('common.view')}
-                  </Button>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
-      {!list.isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('manufacturing.wo.empty')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(w) => w.id ?? w.woNumber ?? ''}
+        isLoading={list.isLoading}
+        emptyMessage={t('manufacturing.wo.empty')}
+        onRowClick={(w) => setDetailId(w.id ?? null)}
+        minWidth={640}
+      />
 
       {/* Create */}
       <Modal opened={opened} onClose={close} title={t('manufacturing.wo.newWo')} size="md">
@@ -222,15 +195,48 @@ export function WorkOrdersPanel() {
       </Modal>
 
       {/* Detail with state-machine actions */}
-      <Drawer
+      <DetailDrawer
         opened={detailId != null}
         onClose={() => setDetailId(null)}
-        position="right"
-        size="xl"
         title={t('manufacturing.wo.drawerTitle', { woNumber: detail.data?.woNumber ?? '' })}
+        footer={
+          writable && detail.data ? (
+            <Group>
+              <StateButton
+                label={t('manufacturing.wo.release')}
+                disabled={status !== 'DRAFT'}
+                disabledReason={t('manufacturing.wo.releaseHint')}
+                loading={release.isPending}
+                onClick={() => {
+                  if (detailId != null) void doRelease(detailId);
+                }}
+              />
+              <StateButton
+                label={t('manufacturing.wo.issue')}
+                disabled={status !== 'RELEASED'}
+                disabledReason={t('manufacturing.wo.issueHint')}
+                onClick={() => openAction('issue')}
+              />
+              <StateButton
+                label={t('manufacturing.wo.complete')}
+                disabled={status !== 'IN_PROGRESS'}
+                disabledReason={t('manufacturing.wo.completeHint')}
+                onClick={() => openAction('complete')}
+              />
+              <StateButton
+                label={t('common.cancel')}
+                color="red"
+                variant="light"
+                disabled={status !== 'RELEASED' && status !== 'IN_PROGRESS'}
+                disabledReason={t('manufacturing.wo.cancelHint')}
+                onClick={() => openAction('cancel')}
+              />
+            </Group>
+          ) : undefined
+        }
       >
         {detail.data && (
-          <Stack>
+          <>
             <Group justify="space-between">
               <Group>
                 <StatusBadge status={status} />
@@ -245,29 +251,6 @@ export function WorkOrdersPanel() {
                 {t('manufacturing.wo.componentCost')} <MoneyText value={detail.data.totalComponentCost} />
               </Text>
             </Group>
-
-            {writable && (
-              <Group>
-                <Button size="xs" disabled={status !== 'DRAFT'} loading={release.isPending} onClick={() => detailId && doRelease(detailId)}>
-                  {t('manufacturing.wo.release')}
-                </Button>
-                <Button size="xs" disabled={status !== 'RELEASED'} onClick={() => openAction('issue')}>
-                  {t('manufacturing.wo.issue')}
-                </Button>
-                <Button size="xs" disabled={status !== 'IN_PROGRESS'} onClick={() => openAction('complete')}>
-                  {t('manufacturing.wo.complete')}
-                </Button>
-                <Button
-                  size="xs"
-                  color="red"
-                  variant="light"
-                  disabled={status !== 'RELEASED' && status !== 'IN_PROGRESS'}
-                  onClick={() => openAction('cancel')}
-                >
-                  {t('common.cancel')}
-                </Button>
-              </Group>
-            )}
 
             <Table>
               <Table.Thead>
@@ -304,9 +287,9 @@ export function WorkOrdersPanel() {
             <Text size="xs" c="dimmed">
               {t('manufacturing.wo.postingHint')}
             </Text>
-          </Stack>
+          </>
         )}
-      </Drawer>
+      </DetailDrawer>
 
       {/* Action modal (issue / complete / cancel) */}
       <Modal
