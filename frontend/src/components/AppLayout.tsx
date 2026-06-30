@@ -1,9 +1,12 @@
+import { Suspense } from 'react';
 import {
   AppShell,
   Avatar,
   Burger,
   Button,
+  Center,
   Group,
+  Loader,
   Menu,
   NavLink,
   ScrollArea,
@@ -122,7 +125,15 @@ export function AppLayout() {
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <Outlet />
+        <Suspense
+          fallback={
+            <Center py="xl">
+              <Loader color="indigo" />
+            </Center>
+          }
+        >
+          <Outlet />
+        </Suspense>
       </AppShell.Main>
     </AppShell>
   );
