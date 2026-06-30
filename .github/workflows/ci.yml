@@ -76,3 +76,12 @@ jobs:
       - name: Type-check & build
         run: npm run build
         working-directory: frontend
+
+      # Unit + component tests (Vitest/jsdom — no server needed) and a typecheck of the test sources.
+      - name: Test
+        run: npm run test:run
+        working-directory: frontend
+
+      - name: Typecheck tests
+        run: npm run test:types
+        working-directory: frontend

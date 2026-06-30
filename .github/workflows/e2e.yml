@@ -1,0 +1,52 @@
+name: E2E
+
+# Playwright smoke against a running target (the deployed demo by default). Standalone + non-blocking: it
+# runs on manual dispatch and a daily schedule, never as a required gate on PRs/merges (the sandbox can't
+# serve the app, and targeting the live demo couples results to deploy state / the nightly reset).
+on:
+  workflow_dispatch:
+    inputs:
+      baseUrl:
+        description: Target base URL
+        required: false
+        default: https://erp.terrychou.com
+  schedule:
+    - cron: '17 6 * * *'  # daily 06:17 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install
+        run: npm ci
+        working-directory: frontend
+
+      - name: Install Playwright chromium
+        run: npx playwright install --with-deps chromium
+        working-directory: frontend
+
+      - name: Run smoke tests
+        run: npm run e2e
+        working-directory: frontend
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.baseUrl || 'https://erp.terrychou.com' }}
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
