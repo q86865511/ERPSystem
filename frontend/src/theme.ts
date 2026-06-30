@@ -106,11 +106,18 @@ export const theme = createTheme({
     Table: Table.extend({
       defaultProps: {
         borderColor: 'var(--app-color-border)',
-        stripedColor: 'var(--mantine-color-terracotta-0)',
-        highlightOnHoverColor: 'var(--mantine-color-terracotta-1)',
+        // Scheme-AWARE warm tints. `terracotta-light`/`-light-hover` resolve to soft terracotta beige in
+        // light and warm-dark tones in dark. (The earlier `terracotta-0`/`-1` were fixed-light ramp
+        // indices — near-white hex that was invisible on white in light and glaring white on dark.)
+        stripedColor: 'var(--mantine-color-terracotta-light)',
+        highlightOnHoverColor: 'var(--mantine-color-terracotta-light-hover)',
       },
       styles: {
-        th: { backgroundColor: 'var(--mantine-color-terracotta-0)', fontWeight: 500 },
+        th: {
+          backgroundColor: 'var(--mantine-color-terracotta-light-hover)',
+          color: 'var(--mantine-color-terracotta-light-color)',
+          fontWeight: 500,
+        },
       },
     }),
     // Active tab underline + label already follow the primary (terracotta); make it explicit.
