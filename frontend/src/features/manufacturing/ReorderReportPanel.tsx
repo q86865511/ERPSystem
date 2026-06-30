@@ -1,4 +1,6 @@
-import { Group, Loader, Table, Text } from '@mantine/core';
+import { Text } from '@mantine/core';
+import { DataTable } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useI18n } from '../../i18n';
 import { useReorderReport } from './api';
 
@@ -7,44 +9,39 @@ export function ReorderReportPanel() {
   const { data, isLoading } = useReorderReport();
   const rows = data?.items ?? [];
 
-  if (isLoading) {
-    return (
-      <Group justify="center" py="xl">
-        <Loader />
-      </Group>
-    );
-  }
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'item', label: t('field.item'), render: (r) => r.name },
+    {
+      key: 'onHandQty',
+      label: t('manufacturing.reorder.onHand'),
+      align: 'right',
+      render: (r) => (
+        <Text c={Number(r.onHandQty ?? 0) <= Number(r.reorderPoint ?? 0) ? 'red' : undefined}>
+          {r.onHandQty}
+        </Text>
+      ),
+    },
+    {
+      key: 'reorderPoint',
+      label: t('manufacturing.reorder.reorderPoint'),
+      align: 'right',
+      render: (r) => r.reorderPoint,
+    },
+    { key: 'reorderQty', label: t('manufacturing.reorder.reorderQty'), align: 'right' },
+  ];
 
   return (
     <>
       <Text size="sm" c="dimmed" mb="sm">
         {t('manufacturing.reorder.hint')}
       </Text>
-      <Table striped>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('field.item')}</Table.Th>
-            <Table.Th ta="right">{t('manufacturing.reorder.onHand')}</Table.Th>
-            <Table.Th ta="right">{t('manufacturing.reorder.reorderPoint')}</Table.Th>
-            <Table.Th ta="right">{t('manufacturing.reorder.reorderQty')}</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((r) => (
-            <Table.Tr key={r.itemId}>
-              <Table.Td>{r.name}</Table.Td>
-              <Table.Td ta="right">{r.onHandQty}</Table.Td>
-              <Table.Td ta="right">{r.reorderPoint}</Table.Td>
-              <Table.Td ta="right">{r.reorderQty}</Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('manufacturing.reorder.empty')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(r) => r.itemId ?? r.name ?? ''}
+        isLoading={isLoading}
+        emptyMessage={t('manufacturing.reorder.empty')}
+      />
     </>
   );
 }

@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { ActionIcon, Button, Drawer, Group, Modal, Stack, Table, Text, TextInput } from '@mantine/core';
+import { ActionIcon, Button, Group, Modal, Stack, Table, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import type { BomResponse, CreateBomRequest } from '../../api/types';
 import { ItemSelect } from '../../components/EntitySelect';
-import { StatusBadge } from '../../components/StatusBadge';
+import { DataTable, DetailDrawer, StatusBadge } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useItemMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
 import { useI18n } from '../../i18n';
@@ -58,6 +59,17 @@ export function BomsPanel() {
   });
 
   const rows = data ?? [];
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    {
+      key: 'parentItem',
+      label: t('manufacturing.bom.parentItem'),
+      render: (b) => (b.parentItemId != null ? (items.get(b.parentItemId) ?? b.parentItemId) : '—'),
+    },
+    { key: 'version', label: t('manufacturing.bom.version'), align: 'right' },
+    { key: 'outputQty', label: t('manufacturing.bom.outputQty'), align: 'right' },
+    { key: 'status', label: t('field.status'), render: (b) => <StatusBadge status={b.status} /> },
+  ];
+
   return (
     <Stack>
       {canDo('manufacturing.write') && (
@@ -68,39 +80,14 @@ export function BomsPanel() {
         </Group>
       )}
 
-      <Table striped highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('manufacturing.bom.parentItem')}</Table.Th>
-            <Table.Th ta="right">{t('manufacturing.bom.version')}</Table.Th>
-            <Table.Th ta="right">{t('manufacturing.bom.outputQty')}</Table.Th>
-            <Table.Th>{t('field.status')}</Table.Th>
-            <Table.Th />
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((b) => (
-            <Table.Tr key={b.id}>
-              <Table.Td>{b.parentItemId != null ? (items.get(b.parentItemId) ?? b.parentItemId) : '—'}</Table.Td>
-              <Table.Td ta="right">{b.version}</Table.Td>
-              <Table.Td ta="right">{b.outputQty}</Table.Td>
-              <Table.Td>
-                <StatusBadge status={b.status} />
-              </Table.Td>
-              <Table.Td ta="right">
-                <Button size="xs" variant="subtle" onClick={() => setDetail(b)}>
-                  {t('common.view')}
-                </Button>
-              </Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {!isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('manufacturing.bom.empty')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(b) => b.id ?? ''}
+        isLoading={isLoading}
+        emptyMessage={t('manufacturing.bom.empty')}
+        onRowClick={(b) => setDetail(b)}
+      />
 
       <Modal opened={opened} onClose={close} title={t('manufacturing.bom.newBomTitle')} size="xl">
         <form onSubmit={submit}>
@@ -132,6 +119,7 @@ export function BomsPanel() {
                 <ActionIcon
                   variant="subtle"
                   color="red"
+                  aria-label={t('common.removeLine')}
                   disabled={form.values.components.length === 1}
                   onClick={() => form.removeListItem('components', i)}
                 >
@@ -161,18 +149,17 @@ export function BomsPanel() {
         </form>
       </Modal>
 
-      <Drawer
+      <DetailDrawer
         opened={detail != null}
         onClose={() => setDetail(null)}
-        position="right"
-        size="lg"
         title={t('manufacturing.bom.drawerTitle', {
           item: detail?.parentItemId != null ? (items.get(detail.parentItemId) ?? '') : '',
           version: detail?.version ?? '',
         })}
+        size="lg"
       >
         {detail && (
-          <Stack>
+          <>
             <Group>
               <StatusBadge status={detail.status} />
               <Text size="sm" c="dimmed">
@@ -199,9 +186,9 @@ export function BomsPanel() {
                 ))}
               </Table.Tbody>
             </Table>
-          </Stack>
+          </>
         )}
-      </Drawer>
+      </DetailDrawer>
     </Stack>
   );
 }
