@@ -14,6 +14,24 @@ export default defineConfig({
       '/swagger-ui': 'http://localhost:8080',
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Pin vendor code into stable chunks so an app change doesn't bust the (cached) framework code.
+        // Rolldown (Vite 8) wants the function form of manualChunks, not Rollup's object map.
+        manualChunks(id: string) {
+          const path = id.replace(/\\/g, '/');
+          if (!path.includes('/node_modules/')) return undefined;
+          if (path.includes('/@mantine/')) return 'vendor-mantine';
+          if (path.includes('/@tanstack/')) return 'vendor-query';
+          if (/\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(path)) {
+            return 'vendor-react';
+          }
+          return undefined;
+        },
+      },
+    },
+  },
   // Vitest: jsdom component/unit tests run without a server (works in the sandbox). The setup file
   // installs the jsdom shims Mantine needs and resets module singletons between tests.
   test: {
