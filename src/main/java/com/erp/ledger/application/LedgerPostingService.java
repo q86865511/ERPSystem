@@ -6,6 +6,8 @@ import com.erp.ledger.domain.Account;
 import com.erp.ledger.domain.FiscalPeriod;
 import com.erp.ledger.domain.Journal;
 import com.erp.ledger.domain.JournalEntry;
+import com.erp.ledger.domain.JournalEntryStatus;
+import com.erp.ledger.domain.JournalLine;
 import com.erp.ledger.domain.NumberSequence;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -105,6 +109,56 @@ public class LedgerPostingService {
                 saved.getPostingDate(), saved.getSourceDocType(), saved.getSourceDocId(),
                 saved.getMemo(), actor));
         return saved;
+    }
+
+    /**
+     * Posts a reversing entry that offsets a manual POSTED entry — corrections are made by reversal, never
+     * by editing. The reversal mirrors the original line-for-line with debit/credit swapped and posts
+     * through {@link #post}, inheriting period-OPEN, balance, gapless numbering and the posted event. Both
+     * entries stay POSTED, linked by {@code reverses}/{@code reversedBy}, so their lines net to zero in
+     * every {@code status='POSTED'} balance query. Only manual entries (no subledger source) are reversible
+     * here; a document-sourced entry must be reversed via its owning module so the subledger stays equal to
+     * its GL control account.
+     */
+    @Transactional
+    public JournalEntry reverse(Long entryNo, LocalDate reversalDate, String memo, String actor) {
+        JournalEntry original = journalEntryRepository.findByEntryNo(entryNo)
+                .orElseThrow(() -> new EntryNotFoundException(entryNo));
+        if (original.getStatus() != JournalEntryStatus.POSTED) {
+            throw new EntryNotReversibleException("entry #" + entryNo + " is " + original.getStatus()
+                    + "; only a POSTED entry can be reversed");
+        }
+        if (!original.isManual()) {
+            throw new EntryNotReversibleException("entry #" + entryNo + " is document-sourced ("
+                    + original.getSourceDocType() + "); reverse it through its owning document");
+        }
+        if (original.isReversed()) {
+            throw new EntryNotReversibleException("entry #" + entryNo + " is already reversed by entry #"
+                    + original.getReversedByEntryId());
+        }
+
+        LocalDate date = reversalDate != null ? reversalDate : LocalDate.now();
+        String reversalMemo = memo != null && !memo.isBlank() ? memo : "Reversal of #" + entryNo;
+
+        List<JournalEntryRequest.Line> reversedLines = new ArrayList<>();
+        for (JournalLine line : original.getLines()) {
+            Account account = accountRepository.findById(line.getAccountId())
+                    .orElseThrow(() -> new AccountNotFoundException(String.valueOf(line.getAccountId())));
+            // Swap sides verbatim (no negation/netting) so debit-total == credit-total stays exact.
+            reversedLines.add(new JournalEntryRequest.Line(account.getCode(), line.getCredit(),
+                    line.getDebit(), line.getMemo(), line.getPartnerId()));
+        }
+
+        JournalEntryRequest request = new JournalEntryRequest(null, date, reversalMemo,
+                original.getCurrencyCode(), null, null, null, reversedLines);
+        JournalEntry reversal = post(request, actor);
+
+        // Link both directions; both rows stay POSTED (the immutability trigger permits these columns).
+        reversal.markReverses(original.getId());
+        original.markReversedBy(reversal.getId());
+        journalEntryRepository.saveAndFlush(reversal);
+        journalEntryRepository.saveAndFlush(original);
+        return reversal;
     }
 
     private void validateStructure(JournalEntryRequest request) {

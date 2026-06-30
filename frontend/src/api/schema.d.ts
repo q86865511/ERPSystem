@@ -196,6 +196,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ledger/journal-entries/{entryNo}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["journalEntry"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ledger/journal-entries/{entryNo}/reverse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reverse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ledger/trial-balance": {
         parameters: {
             query?: never;
@@ -1352,6 +1384,33 @@ export interface components {
             sku?: string;
             totalValue?: string;
         };
+        JournalEntryDetail: {
+            currencyCode?: string;
+            /** Format: int64 */
+            entryNo?: number;
+            lines?: components["schemas"]["JournalEntryDetailLine"][];
+            memo?: string;
+            /** Format: date */
+            postingDate?: string;
+            /** Format: int64 */
+            reversedByEntryNo?: number;
+            /** Format: int64 */
+            reversesEntryNo?: number;
+            sourceDocId?: string;
+            sourceDocType?: string;
+            status?: string;
+            totalCredit?: string;
+            totalDebit?: string;
+        };
+        JournalEntryDetailLine: {
+            accountCode?: string;
+            accountName?: string;
+            credit?: string;
+            debit?: string;
+            memo?: string;
+            /** Format: int64 */
+            partnerId?: number;
+        };
         JournalEntryLine: {
             accountCode?: string;
             credit?: string;
@@ -1546,6 +1605,11 @@ export interface components {
         };
         ReorderReport: {
             items?: components["schemas"]["ReorderItem"][];
+        };
+        ReverseEntryRequest: {
+            memo?: string;
+            /** Format: date */
+            reversalDate?: string;
         };
         SalesInvoiceResponse: {
             amountReceived?: string;
@@ -1973,6 +2037,54 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["JournalEntryRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["JournalEntryResponse"];
+                };
+            };
+        };
+    };
+    journalEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entryNo: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["JournalEntryDetail"];
+                };
+            };
+        };
+    };
+    reverse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entryNo: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ReverseEntryRequest"];
             };
         };
         responses: {

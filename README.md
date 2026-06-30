@@ -163,11 +163,13 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 **列印 / PDF**:發票、採購單、出貨單、試算表可一鍵列印(專用 A4 列印路由 + print CSS,瀏覽器「另存 PDF」),雙語沿用同一套 i18n。
 
+**分錄沖正(correcting entries)**:不可變帳本的更正以「沖正分錄」為之 —— 對手動分錄一鍵產生一張逐行借↔貸對調的鏡像分錄(原分錄永不編輯,雙方維持 POSTED、互相連結、淨額歸零)。只限手動分錄(子帳來源分錄須經其來源模組沖正,以維持子帳==GL)。Ledger 頁「沖正」分頁:輸入分錄號 → 載入明細 → 確認。
+
 **審計軌跡(ADMIN-only)**:過帳、期間關閉/重開、登入成功/失敗都會寫入 append-only 的 `audit_log`(domain event + `AFTER_COMMIT` 監聽,只記真正 committed 的動作;DB trigger 擋改/刪)。ADMIN 角色可在「審計軌跡」頁依事件類型 / 操作者篩選檢視。
 
 **可觀測性**:Micrometer 在 `/actuator/prometheus`(僅內部網路可達)暴露指標 —— 複用同一套 domain event 發業務 counter(過帳/登入/期間)+ 對帳健康 gauge,外加免費的 HTTP/JVM/連線池指標;結構化(ECS)JSON 日誌 + 每筆請求的關聯 ID。可選 `docker compose -f compose.demo.yaml -f compose.observability.yaml up` 起 Prometheus + Grafana(預載儀表板)。詳見 [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md)。
 
-**測試**:後端 90 個 Testcontainers 整合測試 + ArchUnit 邊界 + 對帳/年結驗收(`mvn verify`);前端 Vitest + React Testing Library(金額 BigInt 數學、RBAC 矩陣、i18n、**單飛 401→refresh→replay** JWT 流程、`RequireRole` 守衛),CI 每次 build 後跑;Playwright chromium smoke 走非阻斷的 `e2e` workflow(對線上 demo)。
+**測試**:後端 97 個 Testcontainers 整合測試 + ArchUnit 邊界 + 對帳/年結驗收(`mvn verify`);前端 Vitest + React Testing Library(金額 BigInt 數學、RBAC 矩陣、i18n、**單飛 401→refresh→replay** JWT 流程、`RequireRole` 守衛),CI 每次 build 後跑;Playwright chromium smoke 走非阻斷的 `e2e` workflow(對線上 demo)。
 
 ## 📊 資料模型
 
@@ -230,6 +232,7 @@ cd frontend && npm run build      # tsc -b && vite build
 7. [製造 WIP 與實際成本滾算](docs/adr/0007-manufacturing-wip-and-actual-cost-rollup.md) —— WIP 歸零;成品走滾算實際成本。
 8. [RBAC 走請求授權](docs/adr/0008-rbac-url-authorization.md) —— 4 角色在單一 REST 入口強制。
 9. [年結與保留盈餘結轉](docs/adr/0009-year-end-close.md) —— closing JE 沖平損益轉 3200,鎖期間 hard-close。
+10. [分錄沖正](docs/adr/0010-journal-entry-reversal.md) —— append-only 更正以鏡像沖正分錄為之;僅限手動分錄,雙方維持 POSTED。
 
 ## 文件索引
 

@@ -12,6 +12,13 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-30] ↩️ 分錄沖正(correcting entries)+ by-entry GET(`mvn verify` 97 IT 綠 / 前端 build+測試綠)
+  - **append-only 更正以「沖正分錄」為之**:`LedgerPostingService.reverse(entryNo, date, memo, actor)` 組一張逐行 **借↔貸對調**(金額照抄不取負)的鏡像分錄,經唯一過帳點 `post()` 過帳(繼承平衡/連號/期間 OPEN/事件)。
+  - **三大正確性護欄**(ADR-0010):① **僅限手動分錄**(`source_doc_type==null`,否則 422 —— 沖子帳來源分錄會讓 AP/AR/庫存子帳 ≠ GL,破壞對帳;文件更正走各自模組如客戶退貨);② **原分錄維持 POSTED**,只設 `reversed_by_entry_id`(所有餘額查詢 filter `status='POSTED'`,翻成 REVERSED 會讓原分錄消失而鏡像又扣 → 2 倍變動);③ 沖正日期須落在 **OPEN 期間**(預設今天)、**禁重複沖正**(同交易設旗標)、沖正不帶 source key。
+  - **無 migration**:V1 早已有 `reverses_entry_id`/`reversed_by_entry_id` 欄位,且不可變 trigger 允許更新這兩欄(status 維持 POSTED)。
+  - **API**:`GET /api/ledger/journal-entries/{entryNo}`(補 by-entry 明細缺口:表頭+行+解析科目碼/名+沖正連結)+ `POST .../{entryNo}/reverse`(ACCOUNTANT;404/422 護欄)。`JournalEntryDetailLine` 用 `@Schema(name=...)` 避開命名衝突。
+  - **前端**:Ledger 頁加「沖正」分頁(輸入 entryNo → 載入明細 → 確認沖正;`canDo('ledger.post')` 限定,已沖正/非手動則禁用 + 提示)。i18n `ledger.reversal.*`(en/zh)。
+  - **測試**:`JournalEntryReversalIT`(7 案)—— 鏡像沖平+雙向連結、拒沖子帳來源(422)、拒重複沖正、須落 OPEN 期間、未知分錄 404、by-entry GET 帶連結、guest reverse 403。事件機制讓 audit/metrics 自動涵蓋沖正(JOURNAL_POSTED)。
 - [2026-06-30] 🧪 前端自動化測試(補前端 0 測試的落差;`build` + `test:types` + `test:run` 36 案全綠)
   - **工具鏈**:Vitest 4 + jsdom + React Testing Library 16(+ user-event、jest-dom)。設定**內嵌**在 `vite.config.ts`(`/// <reference types="vitest/config" />` + `test` 區塊,globals/jsdom/setupFiles/coverage v8 報告為主不設門檻)。
   - **與嚴格 build 隔離**:`tsconfig.app.json` 排除 `*.test.*` + `src/test`,所以 `tsc -b`(`npm run build`/CI)不碰測試;測試型別檢查走獨立 `tsconfig.vitest.json`(standalone、含 vitest/jest-dom types)+ `npm run test:types`。
@@ -219,7 +226,8 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - ✅ **前端自動化測試(已做,2026-06-30)**:Vitest + RTL 單元/元件 + 單飛 refresh 整合測 + RequireRole 元件測;CI 跑 `test:run`/`test:types`;Playwright smoke 走非阻斷 `e2e.yml`。
 - 並行測試擴到 sales/manufacturing(目前僅 inventory 有 concurrency IT)。
 - ✅ **可觀測性(已做,2026-06-30)**:Micrometer/Prometheus 指標(業務 counter off events + 對帳 gauge)+ 結構化日誌 + 關聯 ID + 可選 Prometheus/Grafana overlay。
-- 候選後續(plan-next-step workflow 排序):分錄沖正(reversal + by-entry GET);bundle 瘦身 / a11y 當順手 rider。
+- ✅ **分錄沖正(已做,2026-06-30)**:reversal 服務 + by-entry GET + 沖正 UI;ADR-0010。
+- 候選後續:後端並行測試擴 sales/manufacturing;bundle 瘦身 / a11y 當順手 rider。
 - ✅ **自動部署 + demo 定時重置(repo 部分已做,2026-06-29)**:`deploy.yml`(workflow_run + 受限金鑰)、`compose.oracle.yaml`、`scripts/reset-demo.sh` + cron。計畫見 `~/.claude/plans/tender-cuddling-starlight.md`;Oracle 一次性設定 + 端到端驗證待 merge 後做。
 
 **F. 刻意切割(YAGNI,不打算做)**

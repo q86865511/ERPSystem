@@ -334,6 +334,69 @@
         "tags" : [ "ledger-controller" ]
       }
     },
+    "/api/ledger/journal-entries/{entryNo}" : {
+      "get" : {
+        "operationId" : "journalEntry",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "entryNo",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/JournalEntryDetail"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "ledger-controller" ]
+      }
+    },
+    "/api/ledger/journal-entries/{entryNo}/reverse" : {
+      "post" : {
+        "operationId" : "reverse",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "entryNo",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ReverseEntryRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/JournalEntryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "ledger-controller" ]
+      }
+    },
     "/api/ledger/trial-balance" : {
       "get" : {
         "operationId" : "trialBalance_1",
@@ -2962,6 +3025,78 @@
           }
         }
       },
+      "JournalEntryDetail" : {
+        "type" : "object",
+        "properties" : {
+          "currencyCode" : {
+            "type" : "string"
+          },
+          "entryNo" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/JournalEntryDetailLine"
+            }
+          },
+          "memo" : {
+            "type" : "string"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "reversedByEntryNo" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "reversesEntryNo" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "sourceDocId" : {
+            "type" : "string"
+          },
+          "sourceDocType" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "totalCredit" : {
+            "type" : "string"
+          },
+          "totalDebit" : {
+            "type" : "string"
+          }
+        }
+      },
+      "JournalEntryDetailLine" : {
+        "type" : "object",
+        "properties" : {
+          "accountCode" : {
+            "type" : "string"
+          },
+          "accountName" : {
+            "type" : "string"
+          },
+          "credit" : {
+            "type" : "string"
+          },
+          "debit" : {
+            "type" : "string"
+          },
+          "memo" : {
+            "type" : "string"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
       "JournalEntryLine" : {
         "type" : "object",
         "properties" : {
@@ -3472,6 +3607,18 @@
             "items" : {
               "$ref" : "#/components/schemas/ReorderItem"
             }
+          }
+        }
+      },
+      "ReverseEntryRequest" : {
+        "type" : "object",
+        "properties" : {
+          "memo" : {
+            "type" : "string"
+          },
+          "reversalDate" : {
+            "type" : "string",
+            "format" : "date"
           }
         }
       },

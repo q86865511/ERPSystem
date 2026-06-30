@@ -166,4 +166,26 @@ public class JournalEntry {
     public List<JournalLine> getLines() {
         return Collections.unmodifiableList(lines);
     }
+
+    /** A manual entry has no subledger source document — the only kind safe to reverse directly. */
+    public boolean isManual() {
+        return sourceDocType == null;
+    }
+
+    /** True once a reversing entry has been posted against this one. */
+    public boolean isReversed() {
+        return reversedByEntryId != null;
+    }
+
+    /** Links this (reversing) entry to the entry it offsets. Sets only the link; status stays POSTED. */
+    public void markReverses(long originalEntryId) {
+        this.reversesEntryId = originalEntryId;
+    }
+
+    /** Records that this entry has been reversed by another. Sets only the link; status stays POSTED so the
+     *  original's lines remain in every {@code status='POSTED'} balance query and net to zero against the
+     *  reversal — flipping to REVERSED would drop them and double-count. */
+    public void markReversedBy(long reversingEntryId) {
+        this.reversedByEntryId = reversingEntryId;
+    }
 }
