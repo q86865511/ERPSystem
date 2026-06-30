@@ -1,23 +1,14 @@
 import { useState } from 'react';
-import {
-  Badge,
-  Button,
-  Drawer,
-  Group,
-  Modal,
-  Stack,
-  Table,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { Badge, Button, Group, Modal, Stack, Table, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { DateInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { PayOutRequest } from '../../api/types';
 import { PartnerSelect } from '../../components/EntitySelect';
-import { MoneyText, formatMoney, sumMoney } from '../../components/Money';
-import { StatusBadge } from '../../components/StatusBadge';
+import { sumMoney } from '../../components/Money';
+import { AmountAllocationTable, DataTable, DetailDrawer, MoneyText, StatusBadge } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { usePartnerMap } from '../masterdata/api';
 import { useBills } from '../purchasing/api';
 import { useAuth } from '../../auth/useAuth';
@@ -49,7 +40,6 @@ export function PaymentsOutPanel() {
   const openBills = (bills.data ?? []).filter(
     (b) => b.partnerId === partnerId && b.id != null && Number(b.openBalance ?? 0) > 0,
   );
-  const total = sumMoney(Object.values(allocs));
 
   const submit = async () => {
     const allocations = Object.entries(allocs)
@@ -76,6 +66,17 @@ export function PaymentsOutPanel() {
   };
 
   const rows = payments.data ?? [];
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'paymentNumber', label: t('payments.out.paymentNumber'), render: (p) => p.payNumber },
+    {
+      key: 'vendor',
+      label: t('field.vendor'),
+      render: (p) => (p.partnerId != null ? (partners.get(p.partnerId) ?? p.partnerId) : '—'),
+    },
+    { key: 'amount', label: t('field.amount'), align: 'right', render: (p) => <MoneyText value={p.amount} /> },
+    { key: 'status', label: t('field.status'), render: (p) => <StatusBadge status={p.status} /> },
+  ];
+
   return (
     <Stack>
       {canDo('payments.create') && (
@@ -86,41 +87,14 @@ export function PaymentsOutPanel() {
         </Group>
       )}
 
-      <Table striped highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('payments.out.paymentNumber')}</Table.Th>
-            <Table.Th>{t('field.vendor')}</Table.Th>
-            <Table.Th ta="right">{t('field.amount')}</Table.Th>
-            <Table.Th>{t('field.status')}</Table.Th>
-            <Table.Th />
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((p) => (
-            <Table.Tr key={p.id}>
-              <Table.Td>{p.payNumber}</Table.Td>
-              <Table.Td>{p.partnerId != null ? (partners.get(p.partnerId) ?? p.partnerId) : '—'}</Table.Td>
-              <Table.Td ta="right">
-                <MoneyText value={p.amount} />
-              </Table.Td>
-              <Table.Td>
-                <StatusBadge status={p.status} />
-              </Table.Td>
-              <Table.Td ta="right">
-                <Button size="xs" variant="subtle" onClick={() => setDetailId(p.id ?? null)}>
-                  {t('common.view')}
-                </Button>
-              </Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {!payments.isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('payments.out.noPayments')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(p) => p.id ?? p.payNumber ?? ''}
+        isLoading={payments.isLoading}
+        emptyMessage={t('payments.out.noPayments')}
+        onRowClick={(p) => setDetailId(p.id ?? null)}
+      />
 
       <Modal opened={opened} onClose={close} title={t('payments.out.newVendorPayment')} size="lg">
         <Stack>
@@ -138,72 +112,40 @@ export function PaymentsOutPanel() {
           </Group>
 
           {partnerId && (
-            <Table>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('payments.out.bill')}</Table.Th>
-                  <Table.Th ta="right">{t('payments.open')}</Table.Th>
-                  <Table.Th ta="right" w={140}>
-                    {t('payments.allocate')}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {openBills.map((b) => (
-                  <Table.Tr key={b.id}>
-                    <Table.Td>{b.billNumber}</Table.Td>
-                    <Table.Td ta="right">
-                      <MoneyText value={b.openBalance} />
-                    </Table.Td>
-                    <Table.Td>
-                      <TextInput
-                        size="xs"
-                        placeholder={b.openBalance}
-                        value={b.id != null ? (allocs[b.id] ?? '') : ''}
-                        onChange={(e) =>
-                          b.id != null &&
-                          setAllocs((a) => ({ ...a, [b.id as number]: e.currentTarget.value }))
-                        }
-                      />
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-                {openBills.length === 0 && (
-                  <Table.Tr>
-                    <Table.Td colSpan={3}>
-                      <Text c="dimmed" size="sm">
-                        {t('payments.out.noOpenBills')}
-                      </Text>
-                    </Table.Td>
-                  </Table.Tr>
-                )}
-              </Table.Tbody>
-            </Table>
+            <AmountAllocationTable
+              rows={openBills.map((b) => ({
+                id: b.id as number,
+                openBalance: b.openBalance,
+                label: b.billNumber ?? String(b.id),
+              }))}
+              allocs={allocs}
+              onChange={setAllocs}
+              documentLabel={t('payments.out.bill')}
+              amountLabel={t('payments.allocate')}
+              totalLabel={t('payments.totalLabel', { amount: '' })}
+              emptyMessage={t('payments.out.noOpenBills')}
+            />
           )}
 
-          <Group justify="space-between">
-            <Text fw={600}>{t('payments.totalLabel', { amount: formatMoney(total) })}</Text>
-            <Group>
-              <Button variant="default" onClick={close}>
-                {t('common.cancel')}
-              </Button>
-              <Button onClick={submit} loading={pay.isPending}>
-                {t('payments.out.postPayment')}
-              </Button>
-            </Group>
+          <Group justify="flex-end">
+            <Button variant="default" onClick={close}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={submit} loading={pay.isPending}>
+              {t('payments.out.postPayment')}
+            </Button>
           </Group>
         </Stack>
       </Modal>
 
-      <Drawer
+      <DetailDrawer
         opened={detailId != null}
         onClose={() => setDetailId(null)}
-        position="right"
-        size="md"
         title={t('payments.out.drawerTitle', { payNumber: detail.data?.payNumber ?? '' })}
+        size="md"
       >
         {detail.data && (
-          <Stack>
+          <>
             <Group>
               <StatusBadge status={detail.data.status} />
               {detail.data.journalEntryId != null && (
@@ -234,9 +176,9 @@ export function PaymentsOutPanel() {
             <Text size="xs" c="dimmed">
               {t('payments.out.postingNote')}
             </Text>
-          </Stack>
+          </>
         )}
-      </Drawer>
+      </DetailDrawer>
     </Stack>
   );
 }

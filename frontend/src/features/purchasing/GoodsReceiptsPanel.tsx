@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Badge, Button, Drawer, Group, Loader, Modal, Select, Stack, Table, Text, TextInput } from '@mantine/core';
+import { Badge, Button, Group, Loader, Modal, Select, Stack, Table, Text, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { DateInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { CreateGrnRequest } from '../../api/types';
 import { LocationSelect } from '../../components/EntitySelect';
-import { MoneyText } from '../../components/Money';
-import { StatusBadge } from '../../components/StatusBadge';
+import { DataTable, DetailDrawer, MoneyText, StatusBadge } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useItemMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
 import { useI18n } from '../../i18n';
@@ -69,6 +69,12 @@ export function GoodsReceiptsPanel() {
   };
 
   const rows = receipts.data ?? [];
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'grnNumber', label: t('purchasing.grn.grnNumber') },
+    { key: 'postingDate', label: t('purchasing.grn.postingDate') },
+    { key: 'status', label: t('field.status'), render: (g) => <StatusBadge status={g.status} /> },
+  ];
+
   return (
     <Stack>
       {canDo('purchasing.write') && (
@@ -79,37 +85,14 @@ export function GoodsReceiptsPanel() {
         </Group>
       )}
 
-      <Table striped highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('purchasing.grn.grnNumber')}</Table.Th>
-            <Table.Th>{t('purchasing.grn.postingDate')}</Table.Th>
-            <Table.Th>{t('field.status')}</Table.Th>
-            <Table.Th />
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((g) => (
-            <Table.Tr key={g.id}>
-              <Table.Td>{g.grnNumber}</Table.Td>
-              <Table.Td>{g.postingDate}</Table.Td>
-              <Table.Td>
-                <StatusBadge status={g.status} />
-              </Table.Td>
-              <Table.Td ta="right">
-                <Button size="xs" variant="subtle" onClick={() => setDetailId(g.id ?? null)}>
-                  {t('common.view')}
-                </Button>
-              </Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {!receipts.isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('purchasing.grn.none')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(g) => g.id ?? g.grnNumber ?? ''}
+        isLoading={receipts.isLoading}
+        emptyMessage={t('purchasing.grn.none')}
+        onRowClick={(g) => setDetailId(g.id ?? null)}
+      />
 
       <Modal opened={opened} onClose={close} title={t('purchasing.grn.new')} size="xl">
         <Stack>
@@ -180,15 +163,13 @@ export function GoodsReceiptsPanel() {
         </Stack>
       </Modal>
 
-      <Drawer
+      <DetailDrawer
         opened={detailId != null}
         onClose={() => setDetailId(null)}
-        position="right"
-        size="xl"
         title={t('purchasing.grn.drawerTitle', { grnNumber: detail.data?.grnNumber ?? '' })}
       >
         {detail.data && (
-          <Stack>
+          <>
             <StatusBadge status={detail.data.status} />
             <Table>
               <Table.Thead>
@@ -221,9 +202,9 @@ export function GoodsReceiptsPanel() {
             <Text size="xs" c="dimmed">
               {t('purchasing.grn.postingNote')}
             </Text>
-          </Stack>
+          </>
         )}
-      </Drawer>
+      </DetailDrawer>
     </Stack>
   );
 }
