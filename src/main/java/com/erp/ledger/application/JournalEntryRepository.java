@@ -10,4 +10,7 @@ public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long
     /** Idempotency lookup: a source document/event posts at most one live entry. */
     Optional<JournalEntry> findBySourceDocTypeAndSourceDocIdAndSourceEvent(
             String sourceDocType, String sourceDocId, String sourceEvent);
+
+    /** Lookup by the gapless business number (used by the by-entry GET and the reverse target lookup). */
+    Optional<JournalEntry> findByEntryNo(Long entryNo);
 }

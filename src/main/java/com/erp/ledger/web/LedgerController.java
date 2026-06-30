@@ -4,6 +4,8 @@ import com.erp.ledger.api.FiscalPeriodChangedEvent;
 import com.erp.ledger.api.JournalEntryRequest;
 import com.erp.ledger.application.FiscalPeriodService;
 import com.erp.ledger.application.FiscalYearService;
+import com.erp.ledger.application.JournalEntryDetail;
+import com.erp.ledger.application.JournalEntryQueryService;
 import com.erp.ledger.application.LedgerPostingService;
 import com.erp.ledger.application.LedgerReportService;
 import com.erp.ledger.application.TrialBalanceReport;
@@ -30,17 +32,23 @@ public class LedgerController {
     private final LedgerReportService reportService;
     private final FiscalPeriodService fiscalPeriodService;
     private final FiscalYearService fiscalYearService;
+    private final JournalEntryQueryService journalEntryQueryService;
     private final ApplicationEventPublisher events;
 
     public LedgerController(LedgerPostingService postingService, LedgerReportService reportService,
                            FiscalPeriodService fiscalPeriodService, FiscalYearService fiscalYearService,
+                           JournalEntryQueryService journalEntryQueryService,
                            ApplicationEventPublisher events) {
         this.postingService = postingService;
         this.reportService = reportService;
         this.fiscalPeriodService = fiscalPeriodService;
         this.fiscalYearService = fiscalYearService;
+        this.journalEntryQueryService = journalEntryQueryService;
         this.events = events;
     }
+
+    /** Optional body for a reversal: a posting date (must land in an OPEN period) + memo, both defaultable. */
+    public record ReverseEntryRequest(LocalDate reversalDate, String memo) {}
 
     private static String actor(Principal principal) {
         return principal != null ? principal.getName() : "system";
@@ -62,6 +70,27 @@ public class LedgerController {
         String actor = principal != null ? principal.getName() : "system";
         JournalEntry entry = postingService.post(request, actor);
         return ResponseEntity.status(HttpStatus.CREATED).body(JournalEntryResponse.from(entry));
+    }
+
+    /** Full detail of one entry (header + lines + reversal links), by its gapless business number. */
+    @GetMapping("/journal-entries/{entryNo}")
+    public JournalEntryDetail journalEntry(@PathVariable Long entryNo) {
+        return journalEntryQueryService.findDetail(entryNo);
+    }
+
+    /**
+     * Reverses a manual POSTED entry by posting a mirror entry that offsets it (debit/credit swapped). The
+     * reversal lands in the given date's OPEN period (default today). Document-sourced and already-reversed
+     * entries are refused (422); an unknown entry is 404.
+     */
+    @PostMapping("/journal-entries/{entryNo}/reverse")
+    public ResponseEntity<JournalEntryResponse> reverse(@PathVariable Long entryNo,
+                                                        @RequestBody(required = false) ReverseEntryRequest request,
+                                                        Principal principal) {
+        LocalDate date = request != null ? request.reversalDate() : null;
+        String memo = request != null ? request.memo() : null;
+        JournalEntry reversal = postingService.reverse(entryNo, date, memo, actor(principal));
+        return ResponseEntity.status(HttpStatus.CREATED).body(JournalEntryResponse.from(reversal));
     }
 
     /** The trial balance — proof that the posted ledger nets to zero. */

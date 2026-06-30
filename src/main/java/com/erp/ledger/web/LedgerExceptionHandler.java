@@ -1,6 +1,7 @@
 package com.erp.ledger.web;
 
 import com.erp.ledger.application.AccountNotFoundException;
+import com.erp.ledger.application.EntryNotFoundException;
 import com.erp.ledger.application.InvalidLedgerRequestException;
 import com.erp.ledger.application.LedgerException;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,12 @@ public class LedgerExceptionHandler {
     @ExceptionHandler({InvalidLedgerRequestException.class, AccountNotFoundException.class})
     public ProblemDetail onBadRequest(LedgerException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    /** A reversal/detail target that doesn't exist is a 404. */
+    @ExceptionHandler(EntryNotFoundException.class)
+    public ProblemDetail onNotFound(EntryNotFoundException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     /** Other ledger rule violations (unbalanced entry, closed period) are unprocessable. */

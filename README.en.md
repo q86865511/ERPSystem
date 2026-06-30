@@ -224,6 +224,12 @@ locale; money/number formatting and backend codes are intentionally not translat
 **Print / PDF**: sales invoices, purchase orders, delivery notes and the trial balance print in one click
 (dedicated A4 print routes + print CSS; the browser's "Save as PDF"), bilingual via the same i18n.
 
+**Journal-entry reversal (correcting entries)**: corrections to the immutable ledger are made by a reversing
+entry — one click mirrors a manual entry line-for-line with debit/credit swapped (the original is never
+edited; both stay POSTED, linked, and net to zero). Manual entries only (document-sourced entries reverse
+through their owning module so subledgers stay equal to GL). Ledger page → "Reversal" tab: enter the entry
+number → load detail → confirm.
+
 **Audit trail (ADMIN-only)**: journal postings, period close/reopen and login success/failure are written to
 an append-only `audit_log` (domain events + an `AFTER_COMMIT` listener, so only committed actions are
 recorded; a DB trigger blocks update/delete). ADMIN users browse the "Audit Trail" page, filterable by event
@@ -235,7 +241,7 @@ reconciliation-health gauge, alongside free HTTP/JVM/pool metrics; structured (E
 per-request correlation id. An optional `docker compose -f compose.demo.yaml -f compose.observability.yaml up`
 brings up Prometheus + Grafana with a preloaded dashboard. See [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md).
 
-**Testing**: 90 backend Testcontainers integration tests + ArchUnit boundaries + reconciliation/year-end
+**Testing**: 97 backend Testcontainers integration tests + ArchUnit boundaries + reconciliation/year-end
 acceptance (`mvn verify`); frontend Vitest + React Testing Library (BigInt money math, the RBAC matrix, i18n,
 the **single-flight 401→refresh→replay** JWT flow, the `RequireRole` guard) run in CI after every build; a
 Playwright chromium smoke runs in a separate non-blocking `e2e` workflow against the live demo.
@@ -318,6 +324,7 @@ The senior-signal decisions, each written up under [docs/adr/](docs/adr/):
 7. [Manufacturing WIP & actual-cost roll-up](docs/adr/0007-manufacturing-wip-and-actual-cost-rollup.md) — WIP clears to zero; finished goods at rolled actual cost.
 8. [RBAC via request authorization](docs/adr/0008-rbac-url-authorization.md) — four roles enforced at the single REST entry point.
 9. [Year-end close](docs/adr/0009-year-end-close.md) — closing entry zeroes P&L into retained earnings (3200); periods hard-locked.
+10. [Journal-entry reversal](docs/adr/0010-journal-entry-reversal.md) — append-only corrections via a mirror reversing entry; manual entries only, both stay POSTED.
 
 ## Document index
 
