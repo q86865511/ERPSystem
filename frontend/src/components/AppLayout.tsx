@@ -70,7 +70,39 @@ export function AppLayout() {
         <Group h="100%" px="md" justify="space-between">
           <Group gap="sm">
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-            <Title order={4}>{t('app.title')}</Title>
+            <Link
+              to="/"
+              aria-label={t('app.title')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                textDecoration: 'none',
+                // Scheme-aware terracotta: terracotta-6 in light, lighter terracotta-4 in dark.
+                color: 'var(--mantine-color-terracotta-text)',
+              }}
+            >
+              {/* Ledger-balance mark; `currentColor` inherits the terracotta link color above. */}
+              <svg
+                width={28}
+                height={28}
+                viewBox="0 0 64 64"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden
+                style={{ flexShrink: 0 }}
+              >
+                <path d="M 32 22 L 28 28 L 36 28 Z" fill="currentColor" />
+                <rect x="12" y="24" width="16" height="3" rx="1.5" fill="currentColor" opacity="0.9" />
+                <circle cx="15" cy="25.5" r="1.5" fill="currentColor" opacity="0.7" />
+                <rect x="36" y="26" width="16" height="3" rx="1.5" fill="currentColor" opacity="0.85" />
+                <circle cx="49" cy="27.5" r="1.5" fill="currentColor" opacity="0.7" />
+                <line x1="12" y1="38" x2="52" y2="38" stroke="currentColor" strokeWidth={1.5} opacity="0.6" />
+                <line x1="12" y1="42" x2="52" y2="42" stroke="currentColor" strokeWidth={1.5} opacity="0.5" />
+              </svg>
+              <Title order={4} style={{ margin: 0 }}>
+                {t('app.title')}
+              </Title>
+            </Link>
           </Group>
           <Group gap="sm">
             <SegmentedControl

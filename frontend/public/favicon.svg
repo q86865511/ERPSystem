@@ -1,0 +1,23 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ERP">
+  <!-- Ledger / double-entry-in-balance mark: fulcrum triangle, two offset balance arms (debit/credit)
+       with weights, and two ledger lines. Self-adapting to the browser's color scheme so the tab icon
+       stays legible on light and dark chrome. -->
+  <style>
+    .bg { fill: #FAF7F4; stroke: #D4C9BD; }
+    .mark { fill: #C0532E; }
+    .markline { stroke: #C0532E; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #2A1F1A; stroke: #4A3A30; }
+      .mark { fill: #E8937D; }
+      .markline { stroke: #E8937D; }
+    }
+  </style>
+  <circle class="bg" cx="32" cy="32" r="31" stroke-width="1"/>
+  <path class="mark" d="M 32 22 L 28 28 L 36 28 Z"/>
+  <rect class="mark" x="12" y="24" width="16" height="3" rx="1.5" opacity="0.9"/>
+  <circle class="mark" cx="15" cy="25.5" r="1.5" opacity="0.7"/>
+  <rect class="mark" x="36" y="26" width="16" height="3" rx="1.5" opacity="0.85"/>
+  <circle class="mark" cx="49" cy="27.5" r="1.5" opacity="0.7"/>
+  <line class="markline" x1="12" y1="38" x2="52" y2="38" stroke-width="1.5" opacity="0.6"/>
+  <line class="markline" x1="12" y1="42" x2="52" y2="42" stroke-width="1.5" opacity="0.5"/>
+</svg>
