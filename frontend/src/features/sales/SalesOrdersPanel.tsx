@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActionIcon, Button, Drawer, Group, Modal, Stack, Table, Text, TextInput } from '@mantine/core';
+import { ActionIcon, Button, Group, Modal, Stack, Table, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { DateInput } from '@mantine/dates';
@@ -7,8 +7,8 @@ import { IconPlus, IconTrash } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { CreateSoRequest } from '../../api/types';
 import { ItemSelect, PartnerSelect } from '../../components/EntitySelect';
-import { MoneyText } from '../../components/Money';
-import { StatusBadge } from '../../components/StatusBadge';
+import { DataTable, DetailDrawer, MoneyText, StateButton, StatusBadge } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useI18n } from '../../i18n';
 import { useItemMap, usePartnerMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
@@ -71,6 +71,17 @@ export function SalesOrdersPanel() {
   };
 
   const rows = data ?? [];
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'soNumber', label: t('sales.order.soNumber') },
+    {
+      key: 'customer',
+      label: t('field.customer'),
+      render: (so) => (so.partnerId != null ? (partners.get(so.partnerId) ?? so.partnerId) : '—'),
+    },
+    { key: 'orderDate', label: t('sales.order.orderDate') },
+    { key: 'status', label: t('field.status'), render: (so) => <StatusBadge status={so.status} /> },
+  ];
+
   return (
     <Stack>
       {canDo('sales.order') && (
@@ -81,41 +92,15 @@ export function SalesOrdersPanel() {
         </Group>
       )}
 
-      <Table.ScrollContainer minWidth={620}>
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>{t('sales.order.soNumber')}</Table.Th>
-              <Table.Th>{t('field.customer')}</Table.Th>
-              <Table.Th>{t('sales.order.orderDate')}</Table.Th>
-              <Table.Th>{t('field.status')}</Table.Th>
-              <Table.Th />
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {rows.map((so) => (
-              <Table.Tr key={so.id}>
-                <Table.Td>{so.soNumber}</Table.Td>
-                <Table.Td>{so.partnerId != null ? (partners.get(so.partnerId) ?? so.partnerId) : '—'}</Table.Td>
-                <Table.Td>{so.orderDate}</Table.Td>
-                <Table.Td>
-                  <StatusBadge status={so.status} />
-                </Table.Td>
-                <Table.Td ta="right">
-                  <Button size="xs" variant="subtle" onClick={() => setDetailId(so.id ?? null)}>
-                    {t('common.view')}
-                  </Button>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
-      {!isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('sales.order.empty')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(so) => so.id ?? so.soNumber ?? ''}
+        isLoading={isLoading}
+        emptyMessage={t('sales.order.empty')}
+        onRowClick={(so) => setDetailId(so.id ?? null)}
+        minWidth={620}
+      />
 
       <Modal opened={opened} onClose={close} title={t('sales.order.modalTitle')} size="xl">
         <form onSubmit={submit}>
@@ -147,6 +132,7 @@ export function SalesOrdersPanel() {
                 <ActionIcon
                   variant="subtle"
                   color="red"
+                  aria-label={t('common.removeLine')}
                   disabled={form.values.lines.length === 1}
                   onClick={() => form.removeListItem('lines', i)}
                 >
@@ -176,15 +162,26 @@ export function SalesOrdersPanel() {
         </form>
       </Modal>
 
-      <Drawer
+      <DetailDrawer
         opened={detailId != null}
         onClose={() => setDetailId(null)}
-        position="right"
-        size="xl"
         title={t('sales.order.drawerTitle', { soNumber: detail.data?.soNumber ?? '' })}
+        footer={
+          detail.data?.status === 'DRAFT' && canDo('sales.order') ? (
+            <Group justify="flex-end">
+              <StateButton
+                label={t('sales.order.confirm')}
+                loading={confirm.isPending}
+                onClick={() => {
+                  if (detailId != null) void doConfirm(detailId);
+                }}
+              />
+            </Group>
+          ) : undefined
+        }
       >
         {detail.data && (
-          <Stack>
+          <>
             <Group>
               <StatusBadge status={detail.data.status} />
               <Text c="dimmed" size="sm">
@@ -216,16 +213,9 @@ export function SalesOrdersPanel() {
                 ))}
               </Table.Tbody>
             </Table>
-            {detail.data.status === 'DRAFT' && canDo('sales.order') && (
-              <Group justify="flex-end">
-                <Button loading={confirm.isPending} onClick={() => detailId && doConfirm(detailId)}>
-                  {t('sales.order.confirm')}
-                </Button>
-              </Group>
-            )}
-          </Stack>
+          </>
         )}
-      </Drawer>
+      </DetailDrawer>
     </Stack>
   );
 }

@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, Drawer, Group, Loader, Modal, Select, Stack, Table, Text, TextInput } from '@mantine/core';
+import { Badge, Button, Group, Loader, Modal, Select, Stack, Table, Text, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { DateInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { CreateDeliveryRequest } from '../../api/types';
 import { LocationSelect } from '../../components/EntitySelect';
-import { MoneyText } from '../../components/Money';
-import { StatusBadge } from '../../components/StatusBadge';
+import { DataTable, DetailDrawer, MoneyText, StatusBadge } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useI18n } from '../../i18n';
 import { useItemMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
@@ -71,6 +71,12 @@ export function DeliveriesPanel() {
   };
 
   const rows = deliveries.data ?? [];
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'deliveryNumber', label: t('sales.delivery.deliveryNumber') },
+    { key: 'postingDate', label: t('sales.delivery.postingDate') },
+    { key: 'status', label: t('field.status'), render: (d) => <StatusBadge status={d.status} /> },
+  ];
+
   return (
     <Stack>
       {canDo('sales.delivery') && (
@@ -81,37 +87,14 @@ export function DeliveriesPanel() {
         </Group>
       )}
 
-      <Table striped highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('sales.delivery.deliveryNumber')}</Table.Th>
-            <Table.Th>{t('sales.delivery.postingDate')}</Table.Th>
-            <Table.Th>{t('field.status')}</Table.Th>
-            <Table.Th />
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((d) => (
-            <Table.Tr key={d.id}>
-              <Table.Td>{d.deliveryNumber}</Table.Td>
-              <Table.Td>{d.postingDate}</Table.Td>
-              <Table.Td>
-                <StatusBadge status={d.status} />
-              </Table.Td>
-              <Table.Td ta="right">
-                <Button size="xs" variant="subtle" onClick={() => setDetailId(d.id ?? null)}>
-                  {t('common.view')}
-                </Button>
-              </Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {!deliveries.isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('sales.delivery.empty')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(d) => d.id ?? d.deliveryNumber ?? ''}
+        isLoading={deliveries.isLoading}
+        emptyMessage={t('sales.delivery.empty')}
+        onRowClick={(d) => setDetailId(d.id ?? null)}
+      />
 
       <Modal opened={opened} onClose={close} title={t('sales.delivery.modalTitle')} size="xl">
         <Stack>
@@ -182,25 +165,25 @@ export function DeliveriesPanel() {
         </Stack>
       </Modal>
 
-      <Drawer
+      <DetailDrawer
         opened={detailId != null}
         onClose={() => setDetailId(null)}
-        position="right"
-        size="xl"
         title={t('sales.delivery.drawerTitle', { deliveryNumber: detail.data?.deliveryNumber ?? '' })}
+        footer={
+          <Group justify="flex-end">
+            <Button
+              variant="default"
+              size="xs"
+              onClick={() => detailId && navigate(`/print/delivery/${detailId}`)}
+            >
+              {t('print.print')}
+            </Button>
+          </Group>
+        }
       >
         {detail.data && (
-          <Stack>
-            <Group justify="space-between">
-              <StatusBadge status={detail.data.status} />
-              <Button
-                variant="default"
-                size="xs"
-                onClick={() => detailId && navigate(`/print/delivery/${detailId}`)}
-              >
-                {t('print.print')}
-              </Button>
-            </Group>
+          <>
+            <StatusBadge status={detail.data.status} />
             <Table>
               <Table.Thead>
                 <Table.Tr>
@@ -232,9 +215,9 @@ export function DeliveriesPanel() {
             <Text size="xs" c="dimmed">
               {t('sales.delivery.costNote')}
             </Text>
-          </Stack>
+          </>
         )}
-      </Drawer>
+      </DetailDrawer>
     </Stack>
   );
 }

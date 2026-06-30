@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Badge, Button, Drawer, Group, Modal, Select, SimpleGrid, Stack, Table, Text } from '@mantine/core';
+import { Badge, Button, Group, Modal, Select, SimpleGrid, Stack, Table, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { DateInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { CreateReturnRequest } from '../../api/types';
 import { LocationSelect } from '../../components/EntitySelect';
-import { MoneyText } from '../../components/Money';
-import { StatusBadge } from '../../components/StatusBadge';
+import { DataTable, DetailDrawer, MoneyText, StatusBadge } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useI18n } from '../../i18n';
 import { useItemMap, usePartnerMap } from '../masterdata/api';
 import { useAuth } from '../../auth/useAuth';
@@ -62,6 +62,22 @@ export function CustomerReturnsPanel() {
   };
 
   const rows = returns.data ?? [];
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'returnNumber', label: t('sales.return.returnNumber') },
+    {
+      key: 'customer',
+      label: t('field.customer'),
+      render: (r) => (r.partnerId != null ? (partners.get(r.partnerId) ?? r.partnerId) : '—'),
+    },
+    {
+      key: 'gross',
+      label: t('field.gross'),
+      align: 'right',
+      render: (r) => <MoneyText value={r.grossAmount} />,
+    },
+    { key: 'status', label: t('field.status'), render: (r) => <StatusBadge status={r.status} /> },
+  ];
+
   return (
     <Stack>
       {canDo('sales.customerReturn') && (
@@ -72,41 +88,14 @@ export function CustomerReturnsPanel() {
         </Group>
       )}
 
-      <Table striped highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('sales.return.returnNumber')}</Table.Th>
-            <Table.Th>{t('field.customer')}</Table.Th>
-            <Table.Th ta="right">{t('field.gross')}</Table.Th>
-            <Table.Th>{t('field.status')}</Table.Th>
-            <Table.Th />
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((r) => (
-            <Table.Tr key={r.id}>
-              <Table.Td>{r.returnNumber}</Table.Td>
-              <Table.Td>{r.partnerId != null ? (partners.get(r.partnerId) ?? r.partnerId) : '—'}</Table.Td>
-              <Table.Td ta="right">
-                <MoneyText value={r.grossAmount} />
-              </Table.Td>
-              <Table.Td>
-                <StatusBadge status={r.status} />
-              </Table.Td>
-              <Table.Td ta="right">
-                <Button size="xs" variant="subtle" onClick={() => setDetailId(r.id ?? null)}>
-                  {t('common.view')}
-                </Button>
-              </Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {!returns.isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('sales.return.empty')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(r) => r.id ?? r.returnNumber ?? ''}
+        isLoading={returns.isLoading}
+        emptyMessage={t('sales.return.empty')}
+        onRowClick={(r) => setDetailId(r.id ?? null)}
+      />
 
       <Modal opened={opened} onClose={close} title={t('sales.return.modalTitle')} size="md">
         <Stack>
@@ -139,15 +128,13 @@ export function CustomerReturnsPanel() {
         </Stack>
       </Modal>
 
-      <Drawer
+      <DetailDrawer
         opened={detailId != null}
         onClose={() => setDetailId(null)}
-        position="right"
-        size="xl"
         title={t('sales.return.drawerTitle', { returnNumber: detail.data?.returnNumber ?? '' })}
       >
         {detail.data && (
-          <Stack>
+          <>
             <Group>
               <StatusBadge status={detail.data.status} />
               {detail.data.creditNoteJournalEntryId != null && (
@@ -199,9 +186,9 @@ export function CustomerReturnsPanel() {
                 ))}
               </Table.Tbody>
             </Table>
-          </Stack>
+          </>
         )}
-      </Drawer>
+      </DetailDrawer>
     </Stack>
   );
 }
