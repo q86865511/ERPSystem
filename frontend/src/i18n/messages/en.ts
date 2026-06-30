@@ -33,6 +33,7 @@ export const en = {
     requestFailed: 'Request failed',
     noRoles: 'No roles',
     language: 'Language',
+    colorScheme: 'Color scheme',
     create: 'Create',
     cancel: 'Cancel',
     confirm: 'Confirm',
@@ -75,6 +76,11 @@ export const en = {
     debit: 'Debit',
     credit: 'Credit',
     reason: 'Reason',
+  },
+  theme: {
+    light: 'Light',
+    dark: 'Dark',
+    auto: 'Auto',
   },
   nav: {
     dashboard: 'Dashboard',
