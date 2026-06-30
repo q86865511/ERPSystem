@@ -1,0 +1,28 @@
+/* Plus Jakarta Sans — self-hosted variable woff2 (latin subset, ~27 KB), so the Docker demo needs no
+   external font CDN at runtime. One file covers the 400–700 range used by the theme. */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('./assets/fonts/PlusJakartaSans-latin.woff2') format('woff2');
+}
+
+/* Warm page/card/border surfaces that Mantine doesn't derive from the gray ramp, pinned per scheme. The
+   page is warm off-white (not pure white) and cards are white for contrast; dark mode is warm-dark. */
+:root,
+[data-mantine-color-scheme='light'] {
+  --mantine-color-body: #faf7f4;
+  --app-color-card: #ffffff;
+  --app-color-border: #e8ded7;
+}
+
+[data-mantine-color-scheme='dark'] {
+  --mantine-color-body: #1a1410;
+  --app-color-card: #2a2420;
+  --app-color-border: #3a3430;
+}
+
+body {
+  background-color: var(--mantine-color-body);
+}

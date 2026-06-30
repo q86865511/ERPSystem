@@ -12,6 +12,7 @@ import {
   ScrollArea,
   SegmentedControl,
   Title,
+  useMantineColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -19,11 +20,14 @@ import {
   IconBoxSeam,
   IconBuildingFactory2,
   IconDatabase,
+  IconDeviceDesktop,
   IconHistory,
   IconLayoutDashboard,
   IconLogout,
+  IconMoon,
   IconReportAnalytics,
   IconShoppingCart,
+  IconSun,
   IconTruckDelivery,
 } from '@tabler/icons-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
@@ -54,6 +58,7 @@ export function AppLayout() {
   const location = useLocation();
   const { user, logout, hasRole } = useAuth();
   const { locale, setLocale, t } = useI18n();
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   return (
     <AppShell
@@ -70,6 +75,17 @@ export function AppLayout() {
           <Group gap="sm">
             <SegmentedControl
               size="xs"
+              aria-label={t('common.colorScheme')}
+              value={colorScheme}
+              onChange={(v) => setColorScheme(v as 'light' | 'dark' | 'auto')}
+              data={[
+                { value: 'light', label: <IconSun size={15} role="img" aria-label={t('theme.light')} /> },
+                { value: 'dark', label: <IconMoon size={15} role="img" aria-label={t('theme.dark')} /> },
+                { value: 'auto', label: <IconDeviceDesktop size={15} role="img" aria-label={t('theme.auto')} /> },
+              ]}
+            />
+            <SegmentedControl
+              size="xs"
               aria-label={t('common.language')}
               value={locale}
               onChange={(v) => setLocale(v as Locale)}
@@ -84,7 +100,7 @@ export function AppLayout() {
                   variant="subtle"
                   color="gray"
                   leftSection={
-                    <Avatar size={26} radius="xl" color="indigo">
+                    <Avatar size={26} radius="xl" color="terracotta">
                       {user?.username?.charAt(0).toUpperCase()}
                     </Avatar>
                   }
@@ -128,7 +144,7 @@ export function AppLayout() {
         <Suspense
           fallback={
             <Center py="xl">
-              <Loader color="indigo" />
+              <Loader color="terracotta" />
             </Center>
           }
         >

@@ -26,7 +26,7 @@ const TrialBalancePrint = lazy(() => import('../features/print/TrialBalancePrint
 
 const routeFallback = (
   <Center h="100vh">
-    <Loader color="indigo" />
+    <Loader color="terracotta" />
   </Center>
 );
 

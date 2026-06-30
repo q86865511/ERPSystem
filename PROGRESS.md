@@ -14,6 +14,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-06-30] 🖥️ Warm Terracotta 重設計 **PR 2.1:theme 地基**(`build` + 36 測試 + types 綠)
+  - 全新 `theme.ts`:terracotta 主色 ramp(`#C0532E`,`primaryShade` light6/dark5、`autoContrast`)+ 暖灰中性 ramp + radius/spacing/shadows/headings;字體 **Plus Jakarta Sans 自託管**(latin 變體 woff2 27KB,Vite 雜湊打包)+ CJK 系統字堆疊。`src/index.css`:`@font-face` + 暖色 surface CSS vars(`--mantine-color-body`/`--app-color-card`/`--app-color-border`,淺 + 深)。
+  - **深/淺色切換**:header 新增色彩模式 `SegmentedControl`(☀/🌙/⚙ Tabler icon + `role=img`/`aria-label`);`index.html` 加首屏防閃 script(讀 Mantine `mantine-color-scheme-value`)+ `theme-color`。
+  - **全 app 一次換膚**為暖陶土(面板零 hardcoded 顏色,靠 theme 繼承);殘留 `indigo`(Avatar / route Loader)改 terracotta。i18n `common.colorScheme` + `theme.light/dark/auto`(en/zh 成對)。
+  - 視覺/深色模式實機待 Oracle demo 點測(沙箱無 dev server)。
 - [2026-06-30] 🖥️ 前端 bundle 瘦身(重設計 Phase 1;`build` 綠 / 36 測試綠 / types 綠)
   - **route-level code-split**(`React.lazy` + `Suspense`):8 模組頁 + audit + 4 列印頁各自成 chunk;最大 chunk **890KB→414KB**(gzip 256→128KB)、**>500KB 警告消除**;`AppLayout` 的 `Outlet` 包 `Suspense`,頁面 chunk 載入時保留導覽殼(只在內容區顯示 loader)。
   - **vendor manualChunks**(rolldown 函式形式,非 Rollup 物件):react/mantine/query 分離為穩定快取 chunk,app entry 降至 **55KB**(gzip 19KB)。

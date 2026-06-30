@@ -26,6 +26,7 @@ export const zhTW: Messages = {
     requestFailed: '請求失敗',
     noRoles: '無角色',
     language: '語言',
+    colorScheme: '色彩模式',
     create: '建立',
     cancel: '取消',
     confirm: '確認',
@@ -67,6 +68,11 @@ export const zhTW: Messages = {
     debit: '借方',
     credit: '貸方',
     reason: '原因',
+  },
+  theme: {
+    light: '淺色',
+    dark: '深色',
+    auto: '自動',
   },
   nav: {
     dashboard: '儀表板',
