@@ -20,7 +20,12 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - **StatusBadge**:`CONFIRMED`/`IN_PROGRESS`/`RELEASED` 三個「進行中/在手上」主要狀態由 `blue` → `terracotta`(spec §4.2);其餘 17 狀態原樣,i18n 不動。
   - **嚴格 TS(9.4.0 逐一對 `.d.ts` 驗證)**:每覆寫用 `.extend`(value import,非裸物件)、`styles`/`vars` function 未用參數 `_` 前綴(`noUnusedParameters`)、Input 邊框變數走 `styles.wrapper` 自訂屬性(`--input-bd` 不在 typed CSS-var union,用 typed `vars` 會編譯失敗)。
   - **測試**:新增 `StatusBadge.test.tsx` —— 重映斷言(active→terracotta 且不再 blue、控制組 red/teal/gray)+ light/dark parity(badge 標記兩配色一致)+ 代表性快照(spec §11/§7.2,快照編入 terracotta token);`renderWithProviders` 加可選 `colorScheme`(`forceColorScheme`,向後相容)。既有 36 + 新 20 = **56 測試綠**。
-  - **re-scope**:spec §4.3 的 ~14 個新共用元件**不在 2.2 造**,逐模組(2.4+)隨採用而建。視覺/深色實機待 merge 部署後在 Oracle/Docker demo 點測。
+  - **re-scope**:spec §4.3 的 ~14 個新共用元件**不在 2.2 造**,逐模組(2.4+)隨採用而建。
+  - **PR #63 已 merge → 自動部署**。實機檢視後修正暖色 scheme-awareness(見下)。
+- [2026-06-30] 🎨 PR 2.2 微修:表格暖色改 scheme-aware(實機回饋)
+  - **問題**:`theme.ts` Table override 的表頭/stripe/hover 用了**固定亮色** ramp index(`terracotta-0`/`-1`,#FDF8F5/#F9F0EB)—— 兩配色都不變,故淺色下幾乎看不見(太淺)、深色下變刺眼白底(黑白分色)。
+  - **修正**:改用 scheme-aware 語意變數 `terracotta-light`/`-light-hover`(+ 表頭文字 `-light-color`):淺色 → 暖陶土米色(`#F0DFCC`/`#F9F0EB`)、深色 → 暖深調(`#4F2215`/`#39180F`)。
+  - **視覺自驗**:沙箱無 dev server,改以 **headless chromium(Playwright)對忠實靜態 repro 截圖**,雙配色 before/after 並排確認(淺色可見不刺、深色暖而不白)。`build` + 56 測試 + types 綠。
 - [2026-06-30] 🖥️ Warm Terracotta 重設計 **PR 2.1:theme 地基**(`build` + 36 測試 + types 綠)
   - 全新 `theme.ts`:terracotta 主色 ramp(`#C0532E`,`primaryShade` light6/dark5、`autoContrast`)+ 暖灰中性 ramp + radius/spacing/shadows/headings;字體 **Plus Jakarta Sans 自託管**(latin 變體 woff2 27KB,Vite 雜湊打包)+ CJK 系統字堆疊。`src/index.css`:`@font-face` + 暖色 surface CSS vars(`--mantine-color-body`/`--app-color-card`/`--app-color-border`,淺 + 深)。
   - **深/淺色切換**:header 新增色彩模式 `SegmentedControl`(☀/🌙/⚙ Tabler icon + `role=img`/`aria-label`);`index.html` 加首屏防閃 script(讀 Mantine `mantine-color-scheme-value`)+ `theme-color`。
@@ -216,7 +221,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - **🎨 Warm Terracotta UI/UX 重新設計(大型多 PR,規劃完成、實作未起,2026-06-30)** —— 與我以視覺 mockup 互動定案:暖中性 + **terracotta `#C0532E`** 主色、淺色為主 + **保留深色切換**、Plus Jakarta Sans(Latin 自託管 2 weights)+ CJK 系統字、Mantine 之上 **bespoke 設計層**(theme + theme.components + ~14 共用元件)、**逐頁重做**、新增 **網頁 icon/favicon/logo** + **新手引導 tour**(手刻、localStorage、雙語)、a11y 折入。**關鍵發現**:feature 面板零 hardcoded 顏色(grep `src/features` 0 命中)→ 多數頁面靠 theme 繼承自動換膚,「逐頁重做」實際工量遠小於字面。
   - **節奏(spec §10)**:Phase 1 = bundle 瘦身 + 後端並行測試(先做);Phase 2 = 重設計(PR 2.1 theme 地基 → 2.2 元件層 → 2.3 logo → 2.4–2.8 逐模組 → 2.9 tour → 2.10 a11y);Phase 3 = 文件 + 重拍截圖;Phase 4 = 履歷 repo(同一 GitHub 帳號,細節待給)。
   - **文件**:設計 spec `docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md`;首個 PR 計畫 `docs/superpowers/plans/2026-06-30-bundle-slimming.md`(route code-split + vendor manualChunks + @tabler barrel per-icon)。
-  - **進度**:Phase 1 bundle 瘦身 ✅(PR #61)、**PR 2.1 theme 地基 ✅ 已上線**(PR #62:terracotta `theme.ts` + 自託管 Plus Jakarta Sans + 深淺色切換 + 暖色 CSS vars)、**PR 2.2 元件層覆寫 + StatusBadge 重映 ✅**(`theme.components` 14 元件 `.extend` 覆寫 + 3 狀態 → terracotta + dark parity 測試;build/56 測試/types 綠,PR 待開)。**下一步 = PR 2.3 logo/favicon**(spec §5 已有兩色 ledger SVG mark)。**re-scope 決定**:spec §4.3 的 ~14 個新共用元件**不在 2.2 一次造**,改逐模組 PR(2.4+)隨採用而建,避免死碼/猜 API。
+  - **進度**:Phase 1 bundle 瘦身 ✅(PR #61)、**PR 2.1 theme 地基 ✅ 已上線**(PR #62:terracotta `theme.ts` + 自託管 Plus Jakarta Sans + 深淺色切換 + 暖色 CSS vars)、**PR 2.2 元件層覆寫 + StatusBadge 重映 ✅ 已 merge**(PR #63:`theme.components` 14 元件 `.extend` 覆寫 + 3 狀態 → terracotta + dark parity 測試)+ **實機回饋微修**(表格暖色改 scheme-aware,Playwright headless 截圖自驗;待開 fix PR)。**下一步 = PR 2.3 logo/favicon**(spec §5 已有兩色 ledger SVG mark)。**re-scope 決定**:spec §4.3 的 ~14 個新共用元件**不在 2.2 一次造**,改逐模組 PR(2.4+)隨採用而建,避免死碼/猜 API。
 - **🎉 Phase 7(全端化)Stage 1–8 全數完成** —— 全部 8 個模組皆有完整 React 前端,一鍵 `docker compose -f compose.demo.yaml up --build` 起 postgres + 自動 seed 後端 + 前端;雙語 README。每 stage 一個 PR。Stage 8 PR 待 merge。**可選後續**:在使用者機器上實跑 `up` 驗收 + 補前端畫面 screenshots(`docs/`);JWT/持久化使用者庫;雲端部署;前端 bundle code-split(@tabler/icons barrel)。
 - **基底 Phase 0–6 全數完成** —— 總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / 打磨與打包,完整路線圖落地,CI 綠。
 
