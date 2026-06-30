@@ -1,9 +1,10 @@
-import { Button, Group, Modal, Select, Stack, Switch, Table, Text, TextInput } from '@mantine/core';
+import { Button, Group, Modal, Select, Stack, Switch, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus } from '@tabler/icons-react';
 import { ITEM_TYPES, type CreateItemRequest } from '../../api/types';
-import { MoneyText } from '../../components/Money';
+import { DataTable, MoneyText } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useAuth } from '../../auth/useAuth';
 import { useI18n } from '../../i18n';
 import type { TranslationKey } from '../../i18n';
@@ -46,6 +47,29 @@ export function ItemsPanel() {
 
   const itemTypeOptions = ITEM_TYPES.map((v) => ({ value: v, label: t(`itemType.${v}` as TranslationKey) }));
   const rows = data ?? [];
+
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'sku', label: t('masterdata.items.th.sku') },
+    { key: 'name', label: t('field.name') },
+    {
+      key: 'itemType',
+      label: t('field.type'),
+      render: (i) => t(`itemType.${i.itemType}` as TranslationKey),
+    },
+    { key: 'uom', label: t('masterdata.items.th.uom') },
+    {
+      key: 'stocked',
+      label: t('masterdata.items.th.stocked'),
+      render: (i) => (i.stocked ? t('masterdata.items.yes') : t('masterdata.items.no')),
+    },
+    {
+      key: 'standardCost',
+      label: t('masterdata.items.th.stdCost'),
+      align: 'right',
+      render: (i) => <MoneyText value={i.standardCost} />,
+    },
+  ];
+
   return (
     <Stack>
       {canDo('masterdata.create') && (
@@ -56,39 +80,14 @@ export function ItemsPanel() {
         </Group>
       )}
 
-      <Table.ScrollContainer minWidth={640}>
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>{t('masterdata.items.th.sku')}</Table.Th>
-              <Table.Th>{t('field.name')}</Table.Th>
-              <Table.Th>{t('field.type')}</Table.Th>
-              <Table.Th>{t('masterdata.items.th.uom')}</Table.Th>
-              <Table.Th>{t('masterdata.items.th.stocked')}</Table.Th>
-              <Table.Th ta="right">{t('masterdata.items.th.stdCost')}</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {rows.map((i) => (
-              <Table.Tr key={i.id}>
-                <Table.Td>{i.sku}</Table.Td>
-                <Table.Td>{i.name}</Table.Td>
-                <Table.Td>{t(`itemType.${i.itemType}` as TranslationKey)}</Table.Td>
-                <Table.Td>{i.uom}</Table.Td>
-                <Table.Td>{i.stocked ? t('masterdata.items.yes') : t('masterdata.items.no')}</Table.Td>
-                <Table.Td ta="right">
-                  <MoneyText value={i.standardCost} />
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
-      {!isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('masterdata.items.empty')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(i) => i.id ?? i.sku ?? ''}
+        isLoading={isLoading}
+        emptyMessage={t('masterdata.items.empty')}
+        minWidth={640}
+      />
 
       <Modal opened={opened} onClose={close} title={t('masterdata.items.new')}>
         <form onSubmit={submit}>

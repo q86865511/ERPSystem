@@ -6,7 +6,6 @@ import {
   NumberInput,
   Stack,
   Switch,
-  Table,
   Text,
   TextInput,
 } from '@mantine/core';
@@ -14,6 +13,8 @@ import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus } from '@tabler/icons-react';
 import { useAuth } from '../../auth/useAuth';
+import { DataTable } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useI18n } from '../../i18n';
 import { notifyError, notifySuccess } from '../../lib/notify';
 import { useCreatePartner, usePartners } from './api';
@@ -64,6 +65,32 @@ export function PartnersPanel() {
   });
 
   const rows = data ?? [];
+
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'code', label: t('field.code') },
+    { key: 'name', label: t('field.name') },
+    {
+      key: 'roles',
+      label: t('masterdata.partners.th.roles'),
+      render: (p) => (
+        <Group gap={4}>
+          {p.vendor && <Badge variant="light">{t('field.vendor')}</Badge>}
+          {p.customer && (
+            <Badge variant="light" color="grape">
+              {t('field.customer')}
+            </Badge>
+          )}
+        </Group>
+      ),
+    },
+    {
+      key: 'taxId',
+      label: t('masterdata.partners.th.taxId'),
+      render: (p) => p.taxId ?? '—',
+    },
+    { key: 'paymentTermsDays', label: t('masterdata.partners.th.terms'), align: 'right' },
+  ];
+
   return (
     <Stack>
       {canDo('masterdata.create') && (
@@ -74,44 +101,14 @@ export function PartnersPanel() {
         </Group>
       )}
 
-      <Table.ScrollContainer minWidth={680}>
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>{t('field.code')}</Table.Th>
-              <Table.Th>{t('field.name')}</Table.Th>
-              <Table.Th>{t('masterdata.partners.th.roles')}</Table.Th>
-              <Table.Th>{t('masterdata.partners.th.taxId')}</Table.Th>
-              <Table.Th ta="right">{t('masterdata.partners.th.terms')}</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {rows.map((p) => (
-              <Table.Tr key={p.id}>
-                <Table.Td>{p.code}</Table.Td>
-                <Table.Td>{p.name}</Table.Td>
-                <Table.Td>
-                  <Group gap={4}>
-                    {p.vendor && <Badge variant="light">{t('field.vendor')}</Badge>}
-                    {p.customer && (
-                      <Badge variant="light" color="grape">
-                        {t('field.customer')}
-                      </Badge>
-                    )}
-                  </Group>
-                </Table.Td>
-                <Table.Td>{p.taxId ?? '—'}</Table.Td>
-                <Table.Td ta="right">{p.paymentTermsDays}</Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
-      {!isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('masterdata.partners.empty')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(p) => p.id ?? p.code ?? ''}
+        isLoading={isLoading}
+        emptyMessage={t('masterdata.partners.empty')}
+        minWidth={680}
+      />
 
       <Modal opened={opened} onClose={close} title={t('masterdata.partners.new')}>
         <form onSubmit={submit}>
