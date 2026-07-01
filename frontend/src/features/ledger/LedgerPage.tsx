@@ -1,12 +1,14 @@
 import { Tabs } from '@mantine/core';
 import { PageHeader } from '../../components/PageHeader';
 import { useI18n } from '../../i18n';
+import { useTabParam } from '../../hooks/useTabParam';
 import { FiscalPeriodsPanel } from './FiscalPeriodsPanel';
 import { ManualEntryPanel } from './ManualEntryPanel';
 import { ReversalPanel } from './ReversalPanel';
 
 export function LedgerPage() {
   const { t } = useI18n();
+  const [tab, setTab] = useTabParam('manual-entry');
   return (
     <>
       <PageHeader
@@ -14,7 +16,7 @@ export function LedgerPage() {
         subtitle={t('ledger.page.subtitle')}
         onboardingId="module-ledger"
       />
-      <Tabs defaultValue="manual-entry" keepMounted={false}>
+      <Tabs value={tab} onChange={setTab} keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="manual-entry">{t('ledger.tabs.manualEntry')}</Tabs.Tab>
           <Tabs.Tab value="reversal">{t('ledger.tabs.reversal')}</Tabs.Tab>

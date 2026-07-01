@@ -38,21 +38,101 @@ import { useI18n } from '../i18n';
 import type { Locale, TranslationKey } from '../i18n';
 import { useOnboardingTour } from '../onboarding/useOnboardingTour';
 
+/** A sidebar sub-item: `value` is the module page's tab id (deep-linked as `?tab=`); `labelKey` reuses the
+ *  module's existing tab i18n key. */
+interface NavChild {
+  value: string;
+  labelKey: TranslationKey;
+}
+
 const NAV: {
   to: string;
   labelKey: TranslationKey;
   icon: typeof IconLayoutDashboard;
   requiredRole?: Role;
   onboardingId?: string;
+  children?: NavChild[];
 }[] = [
   { to: '/', labelKey: 'nav.dashboard', icon: IconLayoutDashboard },
-  { to: '/masterdata', labelKey: 'nav.masterData', icon: IconDatabase },
-  { to: '/purchasing', labelKey: 'nav.purchasing', icon: IconShoppingCart, onboardingId: 'nav-purchasing' },
-  { to: '/sales', labelKey: 'nav.sales', icon: IconTruckDelivery },
-  { to: '/manufacturing', labelKey: 'nav.manufacturing', icon: IconBuildingFactory2 },
-  { to: '/inventory', labelKey: 'nav.inventory', icon: IconBoxSeam },
-  { to: '/reporting', labelKey: 'nav.reporting', icon: IconReportAnalytics },
-  { to: '/ledger', labelKey: 'nav.ledger', icon: IconBook2 },
+  {
+    to: '/masterdata',
+    labelKey: 'nav.masterData',
+    icon: IconDatabase,
+    children: [
+      { value: 'items', labelKey: 'masterdata.tabs.items' },
+      { value: 'partners', labelKey: 'masterdata.tabs.partners' },
+      { value: 'warehouses', labelKey: 'masterdata.tabs.warehouses' },
+      { value: 'locations', labelKey: 'masterdata.tabs.locations' },
+    ],
+  },
+  {
+    to: '/purchasing',
+    labelKey: 'nav.purchasing',
+    icon: IconShoppingCart,
+    onboardingId: 'nav-purchasing',
+    children: [
+      { value: 'orders', labelKey: 'purchasing.tabs.orders' },
+      { value: 'receipts', labelKey: 'purchasing.tabs.receipts' },
+      { value: 'bills', labelKey: 'purchasing.tabs.bills' },
+      { value: 'payments', labelKey: 'purchasing.tabs.payments' },
+      { value: 'ap-aging', labelKey: 'purchasing.tabs.apAging' },
+    ],
+  },
+  {
+    to: '/sales',
+    labelKey: 'nav.sales',
+    icon: IconTruckDelivery,
+    children: [
+      { value: 'orders', labelKey: 'sales.tabs.orders' },
+      { value: 'deliveries', labelKey: 'sales.tabs.deliveries' },
+      { value: 'invoices', labelKey: 'sales.tabs.invoices' },
+      { value: 'receipts', labelKey: 'sales.tabs.receipts' },
+      { value: 'returns', labelKey: 'sales.tabs.returns' },
+      { value: 'ar-aging', labelKey: 'sales.tabs.arAging' },
+    ],
+  },
+  {
+    to: '/manufacturing',
+    labelKey: 'nav.manufacturing',
+    icon: IconBuildingFactory2,
+    children: [
+      { value: 'dashboard', labelKey: 'manufacturing.tabs.dashboard' },
+      { value: 'work-orders', labelKey: 'manufacturing.tabs.workOrders' },
+      { value: 'boms', labelKey: 'manufacturing.tabs.boms' },
+      { value: 'reorder', labelKey: 'manufacturing.tabs.reorder' },
+    ],
+  },
+  {
+    to: '/inventory',
+    labelKey: 'nav.inventory',
+    icon: IconBoxSeam,
+    children: [
+      { value: 'dashboard', labelKey: 'inventory.tabs.dashboard' },
+      { value: 'overview', labelKey: 'inventory.tabs.overview' },
+      { value: 'adjustments', labelKey: 'inventory.tabs.adjustments' },
+    ],
+  },
+  {
+    to: '/reporting',
+    labelKey: 'nav.reporting',
+    icon: IconReportAnalytics,
+    children: [
+      { value: 'overview', labelKey: 'reporting.overview.tab' },
+      { value: 'trial-balance', labelKey: 'reporting.tabs.trialBalance' },
+      { value: 'income-statement', labelKey: 'reporting.tabs.incomeStatement' },
+      { value: 'balance-sheet', labelKey: 'reporting.tabs.balanceSheet' },
+    ],
+  },
+  {
+    to: '/ledger',
+    labelKey: 'nav.ledger',
+    icon: IconBook2,
+    children: [
+      { value: 'manual-entry', labelKey: 'ledger.tabs.manualEntry' },
+      { value: 'reversal', labelKey: 'ledger.tabs.reversal' },
+      { value: 'periods', labelKey: 'ledger.tabs.periods' },
+    ],
+  },
   { to: '/audit', labelKey: 'nav.audit', icon: IconHistory, requiredRole: 'ADMIN' },
 ];
 
@@ -166,6 +246,24 @@ export function AppLayout() {
             const active =
               item.to === '/' ? location.pathname === '/' : location.pathname.startsWith(item.to);
             const Icon = item.icon;
+            if (!item.children) {
+              return (
+                <NavLink
+                  key={item.to}
+                  component={Link}
+                  to={item.to}
+                  label={t(item.labelKey)}
+                  leftSection={<Icon size={18} />}
+                  active={active}
+                  onClick={close}
+                  data-onboarding={item.onboardingId}
+                />
+              );
+            }
+            // The active module auto-expands (accordion-follows-route); the current `?tab=` (or the first
+            // child when none) is the active sub-item.
+            const currentTab = new URLSearchParams(location.search).get('tab');
+            const activeTab = currentTab ?? item.children[0]?.value;
             return (
               <NavLink
                 key={item.to}
@@ -174,9 +272,22 @@ export function AppLayout() {
                 label={t(item.labelKey)}
                 leftSection={<Icon size={18} />}
                 active={active}
+                opened={active}
                 onClick={close}
                 data-onboarding={item.onboardingId}
-              />
+                childrenOffset={28}
+              >
+                {item.children.map((child) => (
+                  <NavLink
+                    key={child.value}
+                    component={Link}
+                    to={`${item.to}?tab=${child.value}`}
+                    label={t(child.labelKey)}
+                    active={active && activeTab === child.value}
+                    onClick={close}
+                  />
+                ))}
+              </NavLink>
             );
           })}
         </ScrollArea>

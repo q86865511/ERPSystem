@@ -1,6 +1,7 @@
 import { Tabs } from '@mantine/core';
 import { PageHeader } from '../../components/PageHeader';
 import { useI18n } from '../../i18n';
+import { useTabParam } from '../../hooks/useTabParam';
 import { BomsPanel } from './BomsPanel';
 import { ManufacturingDashboardPanel } from './ManufacturingDashboardPanel';
 import { ReorderReportPanel } from './ReorderReportPanel';
@@ -8,6 +9,7 @@ import { WorkOrdersPanel } from './WorkOrdersPanel';
 
 export function ManufacturingPage() {
   const { t } = useI18n();
+  const [tab, setTab] = useTabParam('dashboard');
   return (
     <>
       <PageHeader
@@ -15,7 +17,7 @@ export function ManufacturingPage() {
         subtitle={t('manufacturing.page.subtitle')}
         onboardingId="module-manufacturing"
       />
-      <Tabs defaultValue="dashboard" keepMounted={false}>
+      <Tabs value={tab} onChange={setTab} keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="dashboard">{t('manufacturing.tabs.dashboard')}</Tabs.Tab>
           <Tabs.Tab value="work-orders">{t('manufacturing.tabs.workOrders')}</Tabs.Tab>

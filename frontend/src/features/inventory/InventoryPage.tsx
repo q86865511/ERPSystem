@@ -5,6 +5,7 @@ import { ItemSelect } from '../../components/EntitySelect';
 import { MoneyText } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { useI18n } from '../../i18n';
+import { useTabParam } from '../../hooks/useTabParam';
 import { AdjustmentsPanel } from './AdjustmentsPanel';
 import { InventoryDashboardPanel } from './InventoryDashboardPanel';
 import { useInventoryReconciliation, useItemOnHand } from './api';
@@ -72,10 +73,11 @@ function OverviewPanel() {
 
 export function InventoryPage() {
   const { t } = useI18n();
+  const [tab, setTab] = useTabParam('dashboard');
   return (
     <>
       <PageHeader title={t('nav.inventory')} subtitle={t('inventory.subtitle')} onboardingId="module-inventory" />
-      <Tabs defaultValue="dashboard" keepMounted={false}>
+      <Tabs value={tab} onChange={setTab} keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="dashboard">{t('inventory.tabs.dashboard')}</Tabs.Tab>
           <Tabs.Tab value="overview">{t('inventory.tabs.overview')}</Tabs.Tab>

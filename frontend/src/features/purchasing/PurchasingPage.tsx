@@ -1,6 +1,7 @@
 import { Tabs } from '@mantine/core';
 import { PageHeader } from '../../components/PageHeader';
 import { useI18n } from '../../i18n';
+import { useTabParam } from '../../hooks/useTabParam';
 import { PaymentsOutPanel } from '../payments/PaymentsOutPanel';
 import { ApAgingPanel } from './ApAgingPanel';
 import { GoodsReceiptsPanel } from './GoodsReceiptsPanel';
@@ -9,10 +10,11 @@ import { VendorBillsPanel } from './VendorBillsPanel';
 
 export function PurchasingPage() {
   const { t } = useI18n();
+  const [tab, setTab] = useTabParam('orders');
   return (
     <>
       <PageHeader title={t('purchasing.title')} subtitle={t('purchasing.subtitle')} onboardingId="module-purchasing" />
-      <Tabs defaultValue="orders" keepMounted={false}>
+      <Tabs value={tab} onChange={setTab} keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="orders">{t('purchasing.tabs.orders')}</Tabs.Tab>
           <Tabs.Tab value="receipts">{t('purchasing.tabs.receipts')}</Tabs.Tab>
