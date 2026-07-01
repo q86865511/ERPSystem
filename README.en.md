@@ -186,7 +186,7 @@ an nginx container that reverse-proxies to the backend on a single origin.
 | `manufacturing` | BOM, work orders, WIP issue/completion, reorder report | — |
 | `payments` | Customer/vendor payments + allocation (in/out) | — |
 | `reporting` | Read-side financial statements + reconciliation health-check | — |
-| `hr` | Employees, departments and positions (HR master data) | `HrQuery` |
+| `hr` | Employees, departments, positions + attendance / leave / timesheets (HR) | `HrQuery` |
 | `iam` | Authentication & role-based authorization | — |
 
 | Layer | Choice |
@@ -221,7 +221,7 @@ It covers all 9 modules:
 - **Manufacturing** — BOM authoring, work-order state machine (release/issue/complete/cancel, conditionally enabled), reorder report
 - **Inventory** — on-hand lookup, subledger reconciliation, stock adjustments
 - **Ledger** — manual journal entry (live debit=credit check), fiscal-period close/reopen, year-end close (carry P&L to retained earnings, lock the year)
-- **Human Resources** — employees / departments / positions master data + an HR dashboard (headcount, average salary, headcount-by-department donut)
+- **Human Resources** — employees / departments / positions master data + **attendance / leave (approval workflow) / timesheets (submit → approve)** + an HR dashboard (headcount, average salary, headcount-by-department donut, attendance rate, pending leave)
 
 Every document's detail surfaces its posting results (the linked `journalEntryId`, `movementGroupId`,
 status transitions) — making this ERP's selling point visible: you can see how the books move.
