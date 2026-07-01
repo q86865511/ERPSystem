@@ -79,14 +79,15 @@ zero after a complete cycle. This one report is the project's hero artifact.
 |---|---|---|
 | <img src="docs/screenshots/03-purchasing.png" alt="Purchasing"> | <img src="docs/screenshots/05-manufacturing.png" alt="Manufacturing"> | <img src="docs/screenshots/07-reporting.png" alt="Reports"> |
 
-**The "Warm Terracotta" redesign** (warm terracotta palette + dark mode + a hand-rolled onboarding tour):
+**The "Blue Enterprise" redesign** (blue enterprise palette + dark mode + a hand-rolled onboarding tour):
 
 | Dark mode | Onboarding tour (13 steps, one per module landing page) |
 |---|---|
 | <img src="docs/screenshots/10-dark-mode.png" alt="Dark mode"> | <img src="docs/screenshots/11-onboarding-tour.png" alt="Onboarding tour"> |
 
-> Captured by headless Playwright against the live demo; the same run verified login + all 8 pages
-> rendering + a form modal opening, with **zero console/runtime errors**.
+> Captured by headless Playwright against a **local production build**, with `/api` mocked from data
+> snapshotted off the live demo (see [frontend/scripts/](frontend/scripts/README.md)); covers light/dark,
+> every module page, a form modal, and the onboarding tour.
 
 ## ✨ Highlights
 
@@ -209,7 +210,7 @@ Router; UI is Mantine 9. RBAC mirrors the backend's POST authorization matrix as
 
 It covers all 8 modules:
 
-- **Dashboard** — the reconciliation health-check hero (subledgers vs GL, clearing accounts at zero) + assets/liabilities/net-income summary
+- **Dashboard** — KPI tiles (revenue / net income / orders / receivables / inventory value) + an order-pipeline funnel + an inventory donut + alerts + the reconciliation health-check hero (subledgers vs GL, clearing accounts at zero)
 - **Reports** — trial balance (click an account to drill into its ledger), income statement, balance sheet (shared as-of date)
 - **Master data** — items / partners / warehouses / locations CRUD + reusable selectors
 - **Purchasing** — PO (multi-line + confirm) → goods receipt (partial) → vendor bill (FIFO match status) → payment + AP aging
@@ -241,14 +242,12 @@ an append-only `audit_log` (domain events + an `AFTER_COMMIT` listener, so only 
 recorded; a DB trigger blocks update/delete). ADMIN users browse the "Audit Trail" page, filterable by event
 type and actor.
 
-> 🔵 **"Blue Enterprise" redesign in progress**: the frontend is moving from Warm Terracotta to a blue
-> enterprise-SaaS look with data-viz-dense dashboards (`@mantine/charts`: KPI deltas / aging donuts /
-> trends / treemap / Gantt). The primary color is now blue (`#2563EB`) with a cool slate neutral scale;
-> the first end-to-end dashboard is the **finance overview** (real AR/AP aging donuts + KPIs + the
-> reconciliation hero). The design-system **architecture** described below (`theme.components` + the shared
-> component layer + light/dark + localStorage preference) is unchanged — only the **palette** turned blue.
-> Screenshots on this page are still Warm Terracotta; they'll be re-shot once all four dashboards land and
-> the app is deployed.
+> 🔵 **"Blue Enterprise" redesign (Phase 1 shipped)**: the frontend has moved from Warm Terracotta to a
+> blue enterprise-SaaS look (primary `#2563EB` + a cool slate neutral scale) and is deployed — **the
+> screenshots on this page are the blue version**. Four `@mantine/charts` data dashboards (ERP overview /
+> finance center / inventory / manufacturing) are wired to real endpoints; the deeper widgets (per-item
+> heat treemap, supplier on-time rate, work-order Gantt, OEE, cash-flow / budget-variance / KPI deltas) are
+> still honestly marked **PLANNED**, to be filled in by later backend PRs.
 
 **The design system (Blue Enterprise)**: a self-built Mantine theme — a blue enterprise primary color
 (`#2563EB`) + a cool slate neutral scale + a self-hosted Plus Jakarta Sans;
@@ -335,6 +334,13 @@ terracotta primary, warm-gray neutral scale, self-hosted font), 7 shared compone
 page), and an accessibility sweep (every icon-only control has an `aria-label`; Modals/Drawers rely
 throughout on Mantine's built-in focus-trap). Delivered as 12 PRs (`#62`–`#73`); design spec at
 [docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md](docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md).
+
+**✅ The "Blue Enterprise" redesign (Phase 1)**: the site-wide primary color moved from Warm Terracotta to a
+blue enterprise look (`#2563EB` + cool slate), introducing `@mantine/charts` and shared chart components
+(`KpiTile` / `DonutCard`); it delivered four data dashboards wired to real endpoints (ERP overview / finance
+center / inventory / manufacturing), a collapsible nested nav + URL-driven tabs, and re-shot every screenshot
+in blue (`#76`, `#77`). Deeper data widgets (treemap / Gantt / OEE / supplier on-time / cash-flow /
+budget-variance) are queued as later backend PRs.
 
 ## ⚠️ Consciously deferred (not gaps)
 

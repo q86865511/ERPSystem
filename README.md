@@ -64,13 +64,13 @@
 |---|---|---|
 | <img src="docs/screenshots/03-purchasing.png" alt="採購"> | <img src="docs/screenshots/05-manufacturing.png" alt="製造"> | <img src="docs/screenshots/07-reporting.png" alt="財報"> |
 
-**「Warm Terracotta」重新設計**(暖陶土主色 + 深色模式 + 手刻新手導覽):
+**「Blue Enterprise」重設計**(藍色企業主色 + 深色模式 + 手刻新手導覽):
 
 | 深色模式 | 新手導覽(13 步,涵蓋每個模組首頁) |
 |---|---|
 | <img src="docs/screenshots/10-dark-mode.png" alt="深色模式"> | <img src="docs/screenshots/11-onboarding-tour.png" alt="新手導覽"> |
 
-> 畫面由 headless Playwright 對 live demo 自動截圖;同一輪也驗證了登入 + 全部 8 頁渲染 + 表單開啟,**零 console/runtime 錯誤**。
+> 畫面由 headless Playwright 對**本機 production build** 自動截圖(`/api` 以擷取自 live demo 的資料 mock,見 [frontend/scripts/](frontend/scripts/README.md));深/淺色、各模組頁、開窗與新手導覽皆涵蓋。
 
 ## ✨ 技術亮點
 
@@ -154,7 +154,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 涵蓋全部 8 個模組:
 
-- **儀表板** —— 對帳健康檢查 hero(子帳 vs GL、過渡科目歸零)+ 總資產/負債/淨利摘要
+- **儀表板** —— KPI 磚(營收 / 淨利 / 訂單 / 應收 / 在庫值)+ 訂單漏斗 + 庫存甜甜圈 + 警示 + 對帳健康檢查 hero(子帳 vs GL、過渡科目歸零)
 - **報表** —— 試算表(點科目開總帳鑽取 Drawer)、損益表、資產負債表(共用 as-of 日期)
 - **主檔** —— 商品 / 夥伴 / 倉庫 / 儲位 CRUD + 可複用選擇器
 - **採購** —— PO(多行 + 確認)→ 收貨(部分收)→ 廠商帳單(FIFO matchStatus)→ 付款 + AP 帳齡
@@ -173,7 +173,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 **審計軌跡(ADMIN-only)**:過帳、期間關閉/重開、登入成功/失敗都會寫入 append-only 的 `audit_log`(domain event + `AFTER_COMMIT` 監聽,只記真正 committed 的動作;DB trigger 擋改/刪)。ADMIN 角色可在「審計軌跡」頁依事件類型 / 操作者篩選檢視。
 
-> 🔵 **「Blue Enterprise」重設計進行中**:前端正由 Warm Terracotta 轉為藍色企業 SaaS 風 + 數據視覺化密集的儀表板(`@mantine/charts`:KPI 環比 / 帳齡甜甜圈 / 趨勢 / treemap / Gantt)。主色改藍(`#2563EB`)+ 冷 slate 中性色;第一張端到端儀表板為**財務總覽**(真實 AR/AP 帳齡甜甜圈 + KPI + 對帳 hero)。下方設計系統敘述的**架構**(`theme.components` + 共用元件層 + 深/淺色 + localStorage 偏好)不變,僅**色盤換藍**;本頁截圖仍為 Warm Terracotta 版,待四張儀表板落地、部署後統一重拍。
+> 🔵 **「Blue Enterprise」重設計(Phase 1 已上線)**:前端已由 Warm Terracotta 換為藍色企業 SaaS 風(主色 `#2563EB` + 冷 slate 中性色)並部署上線,**本頁截圖皆為藍色版**。四張 `@mantine/charts` 資料儀表板(ERP 總覽 / 財務中心 / 庫存 / 生產)已接真實端點;更深的 widget(逐品項熱度 treemap、供應商準時率、工單 Gantt、OEE、現金流 / 預算差異 / KPI 環比)仍誠實標示為 **PLANNED**,由後續後端 PR 補上。
 
 **設計系統(Blue Enterprise)**:自建的 Mantine theme —— 藍色企業主色(`#2563EB`)+ 冷 slate 中性色階 + 自託管 Plus Jakarta Sans;深/淺色模式右上角即時切換(預設跟隨系統,偏好存 localStorage)。元件層採 `theme.components` 全域覆寫(表格、卡片、輸入框等)加上共用元件(`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`KpiTile`/`DonutCard`/`AmountAllocationTable`/`EmptyState`/強化版 `PageHeader`)—— 隨模組實際採用而建,不預先造死碼。
 
@@ -227,6 +227,8 @@ cd frontend && npm run build      # tsc -b && vite build
 **✅ Phase 7(全端化)**:後端 enablement(springdoc、`/api/auth/me`、BigDecimal-as-string、各模組唯讀列表端點)+ React 前端(8 階段:骨架 → 主檔 → 儀表板/財報 → 採購 → 銷售 → 製造 → 進階 → 容器化)+ 一鍵 `docker compose` demo。
 
 **✅「Warm Terracotta」UI/UX 重新設計**:全站 theme + `theme.components` 元件層覆寫(暖陶土主色、暖灰中性色階、自託管字體)、7 個隨採用而建的共用元件、8 大模組逐頁打磨、手刻新手導覽(13 步,涵蓋每個模組首頁)、a11y 折入(icon-only 控制皆有 `aria-label`,Modal/Drawer 全面延用 Mantine 內建 focus-trap)。分 12 個 PR 交付(`#62`–`#73`),設計 spec 見 [docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md](docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md)。
+
+**✅「Blue Enterprise」重設計(Phase 1)**:全站主色由 Warm Terracotta 換為藍色企業風(`#2563EB` + 冷 slate),導入 `@mantine/charts` 與共用圖表元件(`KpiTile` / `DonutCard`),交付四張接真實端點的資料儀表板(ERP 總覽 / 財務中心 / 庫存 / 生產)、可摺疊巢狀導覽 + URL 驅動分頁,並重拍全部截圖為藍色版(`#76`、`#77`)。更深的資料 widget(treemap / Gantt / OEE / 供應商準時率 / 現金流 / 預算差異)列為後續後端 PR。
 
 ## ⚠️ 刻意切割(非缺漏)
 

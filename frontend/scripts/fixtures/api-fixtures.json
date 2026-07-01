@@ -1,0 +1,522 @@
+{
+  "auth": {
+    "accessToken": "demo-access-token",
+    "username": "admin",
+    "roles": [
+      "ACCOUNTANT",
+      "ADMIN",
+      "SALES",
+      "WAREHOUSE"
+    ]
+  },
+  "get": {
+    "/api/reporting/income-statement": {
+      "asOf": "2026-07-01",
+      "revenue": [
+        {
+          "code": "4100",
+          "name": "Sales Revenue",
+          "amount": "600.0000"
+        }
+      ],
+      "expenses": [
+        {
+          "code": "5100",
+          "name": "COGS",
+          "amount": "300.0000"
+        }
+      ],
+      "totalRevenue": "600.0000",
+      "totalExpenses": "300.0000",
+      "netIncome": "300.0000"
+    },
+    "/api/reporting/balance-sheet": {
+      "asOf": "2026-07-01",
+      "assets": [
+        {
+          "code": "1010",
+          "name": "Cash / Bank",
+          "amount": "-420.0000"
+        },
+        {
+          "code": "1200",
+          "name": "Accounts Receivable",
+          "amount": "0.0000"
+        },
+        {
+          "code": "1310",
+          "name": "Inventory - Raw Materials",
+          "amount": "500.0000"
+        },
+        {
+          "code": "1320",
+          "name": "Work-In-Process (WIP)",
+          "amount": "0.0000"
+        },
+        {
+          "code": "1330",
+          "name": "Inventory - Finished Goods",
+          "amount": "200.0000"
+        },
+        {
+          "code": "1340",
+          "name": "Deferred COGS (Shipped Not Invoiced)",
+          "amount": "0.0000"
+        },
+        {
+          "code": "1450",
+          "name": "Input VAT",
+          "amount": "50.0000"
+        }
+      ],
+      "liabilities": [
+        {
+          "code": "2100",
+          "name": "Accounts Payable",
+          "amount": "0.0000"
+        },
+        {
+          "code": "2150",
+          "name": "GR-IR Clearing",
+          "amount": "0.0000"
+        },
+        {
+          "code": "2400",
+          "name": "Output VAT Payable",
+          "amount": "30.0000"
+        }
+      ],
+      "equity": [
+        {
+          "code": "RE",
+          "name": "Current-period earnings",
+          "amount": "300.0000"
+        }
+      ],
+      "totalAssets": "330.0000",
+      "totalLiabilities": "30.0000",
+      "totalEquity": "300.0000",
+      "netIncome": "300.0000",
+      "balanced": true
+    },
+    "/api/reporting/trial-balance": {
+      "asOf": "2026-07-01",
+      "lines": [
+        {
+          "code": "1010",
+          "name": "Cash / Bank",
+          "accountClass": "ASSET",
+          "debit": "630.0000",
+          "credit": "1050.0000"
+        },
+        {
+          "code": "1200",
+          "name": "Accounts Receivable",
+          "accountClass": "ASSET",
+          "debit": "630.0000",
+          "credit": "630.0000"
+        },
+        {
+          "code": "1310",
+          "name": "Inventory - Raw Materials",
+          "accountClass": "ASSET",
+          "debit": "1000.0000",
+          "credit": "500.0000"
+        },
+        {
+          "code": "1320",
+          "name": "Work-In-Process (WIP)",
+          "accountClass": "ASSET",
+          "debit": "500.0000",
+          "credit": "500.0000"
+        },
+        {
+          "code": "1330",
+          "name": "Inventory - Finished Goods",
+          "accountClass": "ASSET",
+          "debit": "500.0000",
+          "credit": "300.0000"
+        },
+        {
+          "code": "1340",
+          "name": "Deferred COGS (Shipped Not Invoiced)",
+          "accountClass": "ASSET",
+          "debit": "300.0000",
+          "credit": "300.0000"
+        },
+        {
+          "code": "1450",
+          "name": "Input VAT",
+          "accountClass": "ASSET",
+          "debit": "50.0000",
+          "credit": "0.0000"
+        },
+        {
+          "code": "2100",
+          "name": "Accounts Payable",
+          "accountClass": "LIABILITY",
+          "debit": "1050.0000",
+          "credit": "1050.0000"
+        },
+        {
+          "code": "2150",
+          "name": "GR-IR Clearing",
+          "accountClass": "LIABILITY",
+          "debit": "1000.0000",
+          "credit": "1000.0000"
+        },
+        {
+          "code": "2400",
+          "name": "Output VAT Payable",
+          "accountClass": "LIABILITY",
+          "debit": "0.0000",
+          "credit": "30.0000"
+        },
+        {
+          "code": "4100",
+          "name": "Sales Revenue",
+          "accountClass": "REVENUE",
+          "debit": "0.0000",
+          "credit": "600.0000"
+        },
+        {
+          "code": "5100",
+          "name": "COGS",
+          "accountClass": "EXPENSE",
+          "debit": "300.0000",
+          "credit": "0.0000"
+        }
+      ],
+      "totalDebit": "5960.0000",
+      "totalCredit": "5960.0000",
+      "balanced": true
+    },
+    "/api/reporting/reconciliation": {
+      "asOf": "2026-07-01",
+      "healthy": true,
+      "trialBalanceBalanced": true,
+      "subledgerChecks": [
+        {
+          "label": "Inventory",
+          "accountCode": "1310",
+          "subledger": "500.0000",
+          "glControl": "500.0000",
+          "reconciled": true
+        },
+        {
+          "label": "Inventory",
+          "accountCode": "1330",
+          "subledger": "200.0000",
+          "glControl": "200.0000",
+          "reconciled": true
+        },
+        {
+          "label": "Accounts Payable",
+          "accountCode": "2100",
+          "subledger": "0",
+          "glControl": "0.0000",
+          "reconciled": true
+        },
+        {
+          "label": "Accounts Receivable",
+          "accountCode": "1200",
+          "subledger": "0",
+          "glControl": "0.0000",
+          "reconciled": true
+        }
+      ],
+      "clearingAccounts": [
+        {
+          "accountCode": "2150",
+          "name": "GR-IR Clearing",
+          "balance": "0.0000",
+          "cleared": true
+        },
+        {
+          "accountCode": "1340",
+          "name": "Deferred COGS (Shipped Not Invoiced)",
+          "balance": "0.0000",
+          "cleared": true
+        },
+        {
+          "accountCode": "1320",
+          "name": "Work-In-Process (WIP)",
+          "balance": "0.0000",
+          "cleared": true
+        }
+      ]
+    },
+    "/api/sales/sales-orders": [
+      {
+        "id": 1,
+        "soNumber": "SO-000001",
+        "partnerId": 2,
+        "orderDate": "2026-06-30",
+        "status": "SHIPPED",
+        "lines": [
+          {
+            "id": 1,
+            "lineNo": 1,
+            "itemId": 2,
+            "qtyOrdered": "30.000000",
+            "qtyShipped": "30.000000",
+            "qtyInvoiced": "30.000000",
+            "unitPrice": "20.000000"
+          }
+        ]
+      }
+    ],
+    "/api/sales/deliveries": [
+      {
+        "id": 1,
+        "deliveryNumber": "DLV-000001",
+        "salesOrderId": 1,
+        "postingDate": "2026-06-30",
+        "status": "POSTED",
+        "postedAt": "2026-06-30T21:00:23.246872Z",
+        "lines": [
+          {
+            "id": 1,
+            "soLineId": 1,
+            "itemId": 2,
+            "qtyShipped": "30.000000",
+            "unitCost": "10.000000",
+            "movementGroupId": "177b9ee8-a436-4fae-99b8-c8530c9925a5",
+            "journalEntryId": 6
+          }
+        ]
+      }
+    ],
+    "/api/sales/sales-invoices": [
+      {
+        "id": 1,
+        "invoiceNumber": "INV-000001",
+        "salesOrderId": 1,
+        "partnerId": 2,
+        "postingDate": "2026-06-30",
+        "goodsAmount": "600.0000",
+        "vatAmount": "30.0000",
+        "cogsAmount": "300.0000",
+        "grossAmount": "630.0000",
+        "amountReceived": "630.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 7,
+        "postedAt": "2026-06-30T21:00:23.310085Z",
+        "lines": [
+          {
+            "id": 1,
+            "soLineId": 1,
+            "itemId": 2,
+            "qty": "30.000000",
+            "unitPrice": "20.000000",
+            "lineNet": "600.0000",
+            "lineVat": "30.0000",
+            "lineCogs": "300.0000"
+          }
+        ]
+      }
+    ],
+    "/api/sales/customer-returns": [],
+    "/api/sales/ar-aging": {
+      "current": "0",
+      "days1to30": "0",
+      "days31to60": "0",
+      "days61to90": "0",
+      "days90plus": "0",
+      "total": "0"
+    },
+    "/api/purchasing/purchase-orders": [
+      {
+        "id": 1,
+        "poNumber": "PO-000001",
+        "partnerId": 1,
+        "orderDate": "2026-06-30",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 1,
+            "lineNo": 1,
+            "itemId": 1,
+            "qtyOrdered": "100.000000",
+            "qtyReceived": "100.000000",
+            "qtyBilled": "100.000000",
+            "unitPrice": "10.000000"
+          }
+        ]
+      }
+    ],
+    "/api/purchasing/goods-receipts": [
+      {
+        "id": 1,
+        "grnNumber": "GRN-000001",
+        "purchaseOrderId": 1,
+        "postingDate": "2026-06-30",
+        "status": "POSTED",
+        "postedAt": "2026-06-30T21:00:22.835230Z",
+        "lines": [
+          {
+            "id": 1,
+            "poLineId": 1,
+            "itemId": 1,
+            "qtyReceived": "100.000000",
+            "unitCost": "10.000000",
+            "movementGroupId": "646d1251-ca20-4dc9-b054-354e145e975f",
+            "journalEntryId": 1
+          }
+        ]
+      }
+    ],
+    "/api/purchasing/vendor-bills": [
+      {
+        "id": 1,
+        "billNumber": "BILL-000001",
+        "purchaseOrderId": 1,
+        "partnerId": 1,
+        "postingDate": "2026-06-30",
+        "goodsAmount": "1000.0000",
+        "vatAmount": "50.0000",
+        "grossAmount": "1050.0000",
+        "amountPaid": "1050.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 2,
+        "postedAt": "2026-06-30T21:00:23.039034Z",
+        "lines": [
+          {
+            "id": 1,
+            "poLineId": 1,
+            "itemId": 1,
+            "qty": "100.000000",
+            "unitPrice": "10.000000",
+            "lineNet": "1000.0000",
+            "lineVat": "50.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      }
+    ],
+    "/api/purchasing/ap-aging": {
+      "current": "0",
+      "days1to30": "0",
+      "days31to60": "0",
+      "days61to90": "0",
+      "days90plus": "0",
+      "total": "0"
+    },
+    "/api/inventory/reconciliation": [
+      {
+        "accountCode": "1310",
+        "subledgerValue": "500.0000"
+      },
+      {
+        "accountCode": "1330",
+        "subledgerValue": "200.0000"
+      }
+    ],
+    "/api/manufacturing/boms": [
+      {
+        "id": 1,
+        "parentItemId": 2,
+        "version": 1,
+        "outputQty": "1.000000",
+        "status": "ACTIVE",
+        "components": [
+          {
+            "id": 1,
+            "lineNo": 1,
+            "componentItemId": 1,
+            "qtyPer": "1.000000",
+            "scrapPct": "0.000000"
+          }
+        ]
+      }
+    ],
+    "/api/manufacturing/work-orders": [
+      {
+        "id": 1,
+        "woNumber": "WO-000001",
+        "itemId": 2,
+        "bomId": 1,
+        "qtyToProduce": "50.000000",
+        "qtyProduced": "50.000000",
+        "wipLocationId": 4,
+        "totalComponentCost": "500.0000",
+        "status": "DONE",
+        "components": [
+          {
+            "id": 1,
+            "lineNo": 1,
+            "componentItemId": 1,
+            "plannedQty": "50.000000",
+            "consumedQty": "50.000000",
+            "consumedValue": "500.0000",
+            "movementGroupId": "38fc6e33-729c-455e-987c-afcea4396d81",
+            "journalEntryId": 4
+          }
+        ]
+      }
+    ],
+    "/api/manufacturing/reorder-report": {
+      "items": []
+    },
+    "/api/masterdata/items": [
+      {
+        "id": 2,
+        "sku": "FG-DEMO",
+        "name": "Demo Finished Good",
+        "itemType": "FINISHED",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "0.000000",
+        "reorderPoint": null,
+        "reorderQty": null
+      },
+      {
+        "id": 1,
+        "sku": "RM-DEMO",
+        "name": "Demo Raw Material",
+        "itemType": "RAW",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "10.000000",
+        "reorderPoint": "20.000000",
+        "reorderQty": "100.000000"
+      }
+    ],
+    "/api/masterdata/partners": [
+      {
+        "id": 2,
+        "code": "CUST-DEMO",
+        "name": "Demo Customer",
+        "vendor": false,
+        "customer": true,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
+      },
+      {
+        "id": 1,
+        "code": "VEND-DEMO",
+        "name": "Demo Vendor",
+        "vendor": true,
+        "customer": false,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
+      }
+    ],
+    "/api/masterdata/warehouses": [
+      {
+        "id": 1,
+        "code": "WH1",
+        "name": "Main Warehouse",
+        "active": true
+      }
+    ]
+  }
+}
