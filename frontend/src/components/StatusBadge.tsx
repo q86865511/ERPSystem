@@ -26,6 +26,17 @@ const COLOR: Record<string, string> = {
   // fiscal period status
   OPEN: 'teal',
   LOCKED: 'red',
+  // HR leave / timesheet lifecycle
+  PENDING: 'yellow',
+  APPROVED: 'teal',
+  REJECTED: 'red',
+  SUBMITTED: 'brand',
+  // HR attendance
+  PRESENT: 'teal',
+  ABSENT: 'red',
+  LATE: 'yellow',
+  LEAVE: 'grape',
+  REMOTE: 'brand',
 };
 
 export function StatusBadge({ status }: { status: string | undefined }) {

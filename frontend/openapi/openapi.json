@@ -15,7 +15,7 @@
   "paths" : {
     "/api/audit" : {
       "get" : {
-        "operationId" : "list",
+        "operationId" : "list_3",
         "parameters" : [ {
           "in" : "query",
           "name" : "eventType",
@@ -134,6 +134,69 @@
           }
         },
         "tags" : [ "auth-controller" ]
+      }
+    },
+    "/api/hr/attendance" : {
+      "get" : {
+        "operationId" : "list_2",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "employeeId",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "in" : "query",
+          "name" : "month",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/AttendanceResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "attendance-controller" ]
+      },
+      "post" : {
+        "operationId" : "record",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateAttendanceRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AttendanceResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "attendance-controller" ]
       }
     },
     "/api/hr/departments" : {
@@ -293,6 +356,124 @@
         "tags" : [ "hr-controller" ]
       }
     },
+    "/api/hr/leave-requests" : {
+      "get" : {
+        "operationId" : "list_1",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "employeeId",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "in" : "query",
+          "name" : "status",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "PENDING", "APPROVED", "REJECTED" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/LeaveRequestResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "leave-controller" ]
+      },
+      "post" : {
+        "operationId" : "submit_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateLeaveRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LeaveRequestResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "leave-controller" ]
+      }
+    },
+    "/api/hr/leave-requests/{id}/approve" : {
+      "post" : {
+        "operationId" : "approve_1",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LeaveRequestResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "leave-controller" ]
+      }
+    },
+    "/api/hr/leave-requests/{id}/reject" : {
+      "post" : {
+        "operationId" : "reject",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LeaveRequestResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "leave-controller" ]
+      }
+    },
     "/api/hr/positions" : {
       "get" : {
         "operationId" : "listPositions",
@@ -365,6 +546,124 @@
           }
         },
         "tags" : [ "hr-controller" ]
+      }
+    },
+    "/api/hr/timesheets" : {
+      "get" : {
+        "operationId" : "list",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "employeeId",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "in" : "query",
+          "name" : "status",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "DRAFT", "SUBMITTED", "APPROVED" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/TimesheetResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "timesheet-controller" ]
+      },
+      "post" : {
+        "operationId" : "create",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateTimesheetRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TimesheetResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "timesheet-controller" ]
+      }
+    },
+    "/api/hr/timesheets/{id}/approve" : {
+      "post" : {
+        "operationId" : "approve",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TimesheetResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "timesheet-controller" ]
+      }
+    },
+    "/api/hr/timesheets/{id}/submit" : {
+      "post" : {
+        "operationId" : "submit",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TimesheetResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "timesheet-controller" ]
       }
     },
     "/api/inventory/adjustments" : {
@@ -2285,6 +2584,33 @@
           }
         }
       },
+      "AttendanceResponse" : {
+        "type" : "object",
+        "properties" : {
+          "employeeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "note" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "PRESENT", "ABSENT", "LATE", "LEAVE", "REMOTE" ]
+          },
+          "workDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "workedHours" : {
+            "type" : "string"
+          }
+        }
+      },
       "AuditLogResponse" : {
         "type" : "object",
         "properties" : {
@@ -2529,6 +2855,29 @@
           }
         }
       },
+      "CreateAttendanceRequest" : {
+        "type" : "object",
+        "properties" : {
+          "employeeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "note" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "PRESENT", "ABSENT", "LATE", "LEAVE", "REMOTE" ]
+          },
+          "workDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "workedHours" : {
+            "type" : "string"
+          }
+        }
+      },
       "CreateBillRequest" : {
         "type" : "object",
         "properties" : {
@@ -2729,6 +3078,33 @@
           }
         }
       },
+      "CreateLeaveRequest" : {
+        "type" : "object",
+        "properties" : {
+          "days" : {
+            "type" : "string"
+          },
+          "employeeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "endDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "leaveType" : {
+            "type" : "string",
+            "enum" : [ "ANNUAL", "SICK", "PERSONAL", "UNPAID" ]
+          },
+          "reason" : {
+            "type" : "string"
+          },
+          "startDate" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }
+      },
       "CreateLocationRequest" : {
         "type" : "object",
         "properties" : {
@@ -2871,6 +3247,28 @@
           "partnerId" : {
             "type" : "integer",
             "format" : "int64"
+          }
+        }
+      },
+      "CreateTimesheetRequest" : {
+        "type" : "object",
+        "properties" : {
+          "employeeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "note" : {
+            "type" : "string"
+          },
+          "overtimeHours" : {
+            "type" : "string"
+          },
+          "regularHours" : {
+            "type" : "string"
+          },
+          "weekEnding" : {
+            "type" : "string",
+            "format" : "date"
           }
         }
       },
@@ -3534,6 +3932,48 @@
           }
         }
       },
+      "LeaveRequestResponse" : {
+        "type" : "object",
+        "properties" : {
+          "days" : {
+            "type" : "string"
+          },
+          "decidedBy" : {
+            "type" : "string"
+          },
+          "decidedOn" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "employeeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "endDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "leaveType" : {
+            "type" : "string",
+            "enum" : [ "ANNUAL", "SICK", "PERSONAL", "UNPAID" ]
+          },
+          "reason" : {
+            "type" : "string"
+          },
+          "startDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "PENDING", "APPROVED", "REJECTED" ]
+          }
+        }
+      },
       "LedgerLineView" : {
         "type" : "object",
         "properties" : {
@@ -4159,6 +4599,36 @@
           },
           "subledger" : {
             "type" : "string"
+          }
+        }
+      },
+      "TimesheetResponse" : {
+        "type" : "object",
+        "properties" : {
+          "employeeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "note" : {
+            "type" : "string"
+          },
+          "overtimeHours" : {
+            "type" : "string"
+          },
+          "regularHours" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "DRAFT", "SUBMITTED", "APPROVED" ]
+          },
+          "weekEnding" : {
+            "type" : "string",
+            "format" : "date"
           }
         }
       },
