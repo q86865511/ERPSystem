@@ -6,6 +6,7 @@ import com.erp.hr.api.LeaveType;
 import com.erp.hr.application.AttendanceService;
 import com.erp.hr.application.HrService;
 import com.erp.hr.application.LeaveService;
+import com.erp.hr.application.PayrollService;
 import com.erp.hr.application.TimesheetService;
 import com.erp.manufacturing.application.BomService;
 import com.erp.manufacturing.application.BomService.ComponentInput;
@@ -81,6 +82,7 @@ public class DataSeeder implements ApplicationRunner {
     private final AttendanceService attendanceService;
     private final LeaveService leaveService;
     private final TimesheetService timesheetService;
+    private final PayrollService payrollService;
     private final MasterDataService masterDataService;
     private final MasterDataQuery masterDataQuery;
     private final WarehouseRepository warehouseRepository;
@@ -103,11 +105,12 @@ public class DataSeeder implements ApplicationRunner {
                       SalesOrderService salesOrderService, DeliveryService deliveryService,
                       SalesInvoiceService salesInvoiceService, HrService hrService,
                       AttendanceService attendanceService, LeaveService leaveService,
-                      TimesheetService timesheetService) {
+                      TimesheetService timesheetService, PayrollService payrollService) {
         this.hrService = hrService;
         this.attendanceService = attendanceService;
         this.leaveService = leaveService;
         this.timesheetService = timesheetService;
+        this.payrollService = payrollService;
         this.masterDataService = masterDataService;
         this.masterDataQuery = masterDataQuery;
         this.warehouseRepository = warehouseRepository;
@@ -283,8 +286,18 @@ public class DataSeeder implements ApplicationRunner {
                     new BigDecimal("2"), null).getId());
             timesheetService.create(emp, weeks.get(0), new BigDecimal("38"), BigDecimal.ZERO, null);
         }
-        log.info("HR time seed complete: attendance, leave requests and timesheets for {} employees.",
-                employeeIds.size());
+
+        // Run and post last month's payroll: one balanced JE to the GL (Dr 6100 / Cr 2200+2210+2220).
+        // Only GL accounts are touched, so the reconciliation stays green. Fall back to the current month
+        // if the previous month falls outside FY2026's open periods.
+        LocalDate lastMonth = today.minusMonths(1);
+        int payYear = lastMonth.getYear() == 2026 ? lastMonth.getYear() : today.getYear();
+        int payMonth = lastMonth.getYear() == 2026 ? lastMonth.getMonthValue() : today.getMonthValue();
+        Long payrollId = payrollService.run(payYear, payMonth).getId();
+        payrollService.post(payrollId, today, ACTOR);
+
+        log.info("HR time seed complete: attendance, leave, timesheets and a posted payroll for {} "
+                + "employees.", employeeIds.size());
     }
 
     // =================================================================================================

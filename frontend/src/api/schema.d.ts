@@ -11,7 +11,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_3"];
+        get: operations["list_4"];
         put?: never;
         post?: never;
         delete?: never;
@@ -91,7 +91,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_2"];
+        get: operations["list_3"];
         put?: never;
         post: operations["record"];
         delete?: never;
@@ -171,7 +171,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_1"];
+        get: operations["list_2"];
         put?: never;
         post: operations["submit_1"];
         delete?: never;
@@ -206,6 +206,54 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/payroll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_1"];
+        put?: never;
+        post: operations["run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/payroll/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/payroll/{id}/post": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["post_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1873,6 +1921,35 @@ export interface components {
             postingDate?: string;
             status?: string;
         };
+        PayrollLineResponse: {
+            /** Format: int64 */
+            employeeId?: number;
+            gross?: string;
+            /** Format: int64 */
+            id?: number;
+            insurance?: string;
+            net?: string;
+            tax?: string;
+        };
+        PayrollResponse: {
+            grossTotal?: string;
+            /** Format: int64 */
+            id?: number;
+            insuranceTotal?: string;
+            /** Format: int64 */
+            journalEntryId?: number;
+            lines?: components["schemas"]["PayrollLineResponse"][];
+            netTotal?: string;
+            /** Format: int32 */
+            periodMonth?: number;
+            /** Format: int32 */
+            periodYear?: number;
+            /** Format: date */
+            postingDate?: string;
+            /** @enum {string} */
+            status?: "DRAFT" | "POSTED";
+            taxTotal?: string;
+        };
         PoLineView: {
             /** Format: int64 */
             id?: number;
@@ -1892,6 +1969,10 @@ export interface components {
             id?: number;
             standardSalary?: string;
             title?: string;
+        };
+        PostPayrollRequest: {
+            /** Format: date */
+            postingDate?: string;
         };
         PurchaseOrderResponse: {
             /** Format: int64 */
@@ -1938,6 +2019,12 @@ export interface components {
             memo?: string;
             /** Format: date */
             reversalDate?: string;
+        };
+        RunPayrollRequest: {
+            /** Format: int32 */
+            month?: number;
+            /** Format: int32 */
+            year?: number;
         };
         SalesInvoiceResponse: {
             amountReceived?: string;
@@ -2126,7 +2213,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    list_3: {
+    list_4: {
         parameters: {
             query: {
                 eventType?: string;
@@ -2234,7 +2321,7 @@ export interface operations {
             };
         };
     };
-    list_2: {
+    list_3: {
         parameters: {
             query?: {
                 employeeId?: number;
@@ -2415,7 +2502,7 @@ export interface operations {
             };
         };
     };
-    list_1: {
+    list_2: {
         parameters: {
             query?: {
                 employeeId?: number;
@@ -2502,6 +2589,98 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["LeaveRequestResponse"];
+                };
+            };
+        };
+    };
+    list_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PayrollResponse"][];
+                };
+            };
+        };
+    };
+    run: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunPayrollRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PayrollResponse"];
+                };
+            };
+        };
+    };
+    get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PayrollResponse"];
+                };
+            };
+        };
+    };
+    post_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PostPayrollRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PayrollResponse"];
                 };
             };
         };

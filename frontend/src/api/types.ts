@@ -78,6 +78,12 @@ export type TimesheetStatus = NonNullable<TimesheetResponse['status']>;
 export const ATTENDANCE_STATUSES: AttendanceStatus[] = ['PRESENT', 'ABSENT', 'LATE', 'LEAVE', 'REMOTE'];
 export const LEAVE_TYPES: LeaveType[] = ['ANNUAL', 'SICK', 'PERSONAL', 'UNPAID'];
 
+// --- HR payroll (B3) ---
+export type PayrollResponse = Schemas['PayrollResponse'];
+export type PayrollLineResponse = Schemas['PayrollLineResponse'];
+export type RunPayrollRequest = Schemas['RunPayrollRequest'];
+export type PayrollStatus = NonNullable<PayrollResponse['status']>;
+
 export const ITEM_TYPES: ItemType[] = ['RAW', 'WIP', 'FINISHED', 'SERVICE'];
 export const LOCATION_TYPES: LocationType[] = [
   'STOCK',

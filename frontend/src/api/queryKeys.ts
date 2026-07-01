@@ -61,5 +61,6 @@ export const qk = {
       ['hr', 'attendance', employeeId ?? 'all', month ?? 'all'] as const,
     leaveRequests: (status?: string) => ['hr', 'leave-requests', status ?? 'all'] as const,
     timesheets: (status?: string) => ['hr', 'timesheets', status ?? 'all'] as const,
+    payroll: () => ['hr', 'payroll'] as const,
   },
 };

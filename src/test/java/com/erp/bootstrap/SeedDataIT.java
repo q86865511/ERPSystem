@@ -3,7 +3,9 @@ package com.erp.bootstrap;
 import com.erp.TestcontainersConfiguration;
 import com.erp.inventory.application.ItemCostStateRepository;
 import com.erp.hr.api.LeaveStatus;
+import com.erp.hr.api.PayrollStatus;
 import com.erp.hr.application.LeaveService;
+import com.erp.hr.application.PayrollService;
 import com.erp.manufacturing.application.ReorderReportService;
 import com.erp.masterdata.api.MasterDataQuery;
 import com.erp.reporting.application.ReconciliationReport;
@@ -43,6 +45,8 @@ class SeedDataIT {
     private ReorderReportService reorderReportService;
     @Autowired
     private LeaveService leaveService;
+    @Autowired
+    private PayrollService payrollService;
 
     @Test
     void seedRunsTheWholeSliceAndReconciles() {
@@ -86,6 +90,9 @@ class SeedDataIT {
 
         // HR B2 time data seeded: a PENDING leave request exists for the approve/reject demo.
         assertThat(leaveService.list(null, LeaveStatus.PENDING)).isNotEmpty();
+
+        // HR B3: a payroll run was posted to the ledger (and the books above still reconcile).
+        assertThat(payrollService.list()).anyMatch(p -> p.getStatus() == PayrollStatus.POSTED);
     }
 
     private static SubledgerCheck subledger(ReconciliationReport report, String accountCode) {

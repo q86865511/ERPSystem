@@ -12,6 +12,7 @@ export const hrEn = {
     attendance: 'Attendance',
     leave: 'Leave',
     timesheets: 'Timesheets',
+    payroll: 'Payroll',
   },
   dash: {
     headcount: 'Active headcount',
@@ -102,6 +103,27 @@ export const hrEn = {
     th: { weekEnding: 'Week ending', regular: 'Regular', overtime: 'Overtime', total: 'Total' },
     form: { weekEnding: 'Week ending', regular: 'Regular hours', overtime: 'Overtime hours' },
   },
+  payroll: {
+    hint: 'Run a period, then post it to the ledger as one balanced entry.',
+    run: 'Run payroll',
+    ran: 'Payroll run created',
+    post: 'Post',
+    posted: 'Payroll posted to the ledger',
+    empty: 'No payroll runs yet.',
+    onlyDraft: 'Only a draft payroll can be posted',
+    viewLines: 'View payslips',
+    payslips: 'Payslips',
+    rateNote: 'Demo rates: tax 6%, insurance 5% (gross = tax + insurance + net).',
+    th: {
+      period: 'Period',
+      gross: 'Gross',
+      tax: 'Tax',
+      insurance: 'Insurance',
+      net: 'Net',
+      journal: 'Journal entry',
+    },
+    form: { year: 'Year', month: 'Month' },
+  },
 };
 
 export const hrZh: typeof hrEn = {
@@ -114,6 +136,7 @@ export const hrZh: typeof hrEn = {
     attendance: '出勤',
     leave: '請假',
     timesheets: '工時',
+    payroll: '薪資',
   },
   dash: {
     headcount: '在職人數',
@@ -203,5 +226,26 @@ export const hrZh: typeof hrEn = {
     onlySubmitted: '僅已提交的工時可核准',
     th: { weekEnding: '週結束日', regular: '正常', overtime: '加班', total: '合計' },
     form: { weekEnding: '週結束日', regular: '正常時數', overtime: '加班時數' },
+  },
+  payroll: {
+    hint: '跑一期薪資,再過一張平衡分錄到總帳。',
+    run: '跑薪資',
+    ran: '薪資已試算',
+    post: '過帳',
+    posted: '薪資已過帳到總帳',
+    empty: '尚無薪資批次。',
+    onlyDraft: '僅草稿薪資可過帳',
+    viewLines: '看薪資單',
+    payslips: '薪資單',
+    rateNote: 'demo 費率:稅 6%、保 5%(gross = 稅 + 保 + net)。',
+    th: {
+      period: '期間',
+      gross: '應發',
+      tax: '代扣稅',
+      insurance: '勞健保',
+      net: '實發',
+      journal: '分錄',
+    },
+    form: { year: '年', month: '月' },
   },
 };

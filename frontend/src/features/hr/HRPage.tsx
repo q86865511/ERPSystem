@@ -7,6 +7,7 @@ import { DepartmentsPanel } from './DepartmentsPanel';
 import { EmployeesPanel } from './EmployeesPanel';
 import { HrDashboardPanel } from './HrDashboardPanel';
 import { LeavePanel } from './LeavePanel';
+import { PayrollPanel } from './PayrollPanel';
 import { PositionsPanel } from './PositionsPanel';
 import { TimesheetPanel } from './TimesheetPanel';
 
@@ -25,6 +26,7 @@ export function HRPage() {
           <Tabs.Tab value="attendance">{t('hr.tabs.attendance')}</Tabs.Tab>
           <Tabs.Tab value="leave">{t('hr.tabs.leave')}</Tabs.Tab>
           <Tabs.Tab value="timesheets">{t('hr.tabs.timesheets')}</Tabs.Tab>
+          <Tabs.Tab value="payroll">{t('hr.tabs.payroll')}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="dashboard">
           <HrDashboardPanel />
@@ -46,6 +48,9 @@ export function HRPage() {
         </Tabs.Panel>
         <Tabs.Panel value="timesheets">
           <TimesheetPanel />
+        </Tabs.Panel>
+        <Tabs.Panel value="payroll">
+          <PayrollPanel />
         </Tabs.Panel>
       </Tabs>
     </>
