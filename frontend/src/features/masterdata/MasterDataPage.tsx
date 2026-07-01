@@ -10,7 +10,7 @@ export function MasterDataPage() {
   const { t } = useI18n();
   return (
     <>
-      <PageHeader title={t('nav.masterData')} subtitle={t('masterdata.subtitle')} />
+      <PageHeader title={t('nav.masterData')} subtitle={t('masterdata.subtitle')} onboardingId="module-masterdata" />
       <Tabs defaultValue="items" keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="items">{t('masterdata.tabs.items')}</Tabs.Tab>

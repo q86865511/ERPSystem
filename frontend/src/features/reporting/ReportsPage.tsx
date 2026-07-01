@@ -18,6 +18,7 @@ export function ReportsPage() {
       <PageHeader
         title={t('reporting.title')}
         subtitle={t('reporting.subtitle')}
+        onboardingId="module-reporting"
         actions={
           <DateInput
             label={t('field.asOf')}

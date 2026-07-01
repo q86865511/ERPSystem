@@ -9,7 +9,11 @@ export function ManufacturingPage() {
   const { t } = useI18n();
   return (
     <>
-      <PageHeader title={t('manufacturing.page.title')} subtitle={t('manufacturing.page.subtitle')} />
+      <PageHeader
+        title={t('manufacturing.page.title')}
+        subtitle={t('manufacturing.page.subtitle')}
+        onboardingId="module-manufacturing"
+      />
       <Tabs defaultValue="work-orders" keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="work-orders">{t('manufacturing.tabs.workOrders')}</Tabs.Tab>

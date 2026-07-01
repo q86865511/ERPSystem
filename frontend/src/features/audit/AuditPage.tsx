@@ -63,7 +63,9 @@ export function AuditPage() {
   return (
     <Stack>
       <div>
-        <Title order={2}>{t('audit.title')}</Title>
+        <Title order={2} data-onboarding="module-audit">
+          {t('audit.title')}
+        </Title>
         <Text c="dimmed" size="sm">
           {t('audit.subtitle')}
         </Text>

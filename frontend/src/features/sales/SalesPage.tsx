@@ -12,7 +12,7 @@ export function SalesPage() {
   const { t } = useI18n();
   return (
     <>
-      <PageHeader title={t('sales.title')} subtitle={t('sales.subtitle')} />
+      <PageHeader title={t('sales.title')} subtitle={t('sales.subtitle')} onboardingId="module-sales" />
       <Tabs defaultValue="orders" keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="orders">{t('sales.tabs.orders')}</Tabs.Tab>

@@ -11,7 +11,7 @@ export function PurchasingPage() {
   const { t } = useI18n();
   return (
     <>
-      <PageHeader title={t('purchasing.title')} subtitle={t('purchasing.subtitle')} />
+      <PageHeader title={t('purchasing.title')} subtitle={t('purchasing.subtitle')} onboardingId="module-purchasing" />
       <Tabs defaultValue="orders" keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="orders">{t('purchasing.tabs.orders')}</Tabs.Tab>

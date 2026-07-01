@@ -14,6 +14,12 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-01] 🖥️ Warm Terracotta 重設計 **PR 2.11:新手 tour 擴及每個模組首頁**(`build` + 82 測試 + types 綠;PR 2.10 之後、依使用者要求追加)
+  - **8 大模組首頁各加一步**(採購/庫存/製造/銷售/主檔/報表/總帳/稽核),銜接原第 4 步「nav-modules」提示的「Purchasing → Inventory → Manufacturing → Sales」流程排序,其餘模組接在後面,`header-toggles` 維持收尾。**5 步 → 13 步**。
+  - **零新元件、零新 i18n**:每步 `titleKey` 複用各模組既有 `nav.*` 標籤、`descriptionKey` 複用各模組既有 `subtitle` key(逐一核對:`purchasing.subtitle`/`sales.subtitle`/`manufacturing.page.subtitle`/`inventory.subtitle`/`masterdata.subtitle`/`reporting.subtitle`/`ledger.page.subtitle`/`audit.subtitle`)——沿用既有 route-aware 架構(`MutationObserver` 往前掃描 target)完全不用改,只加 `steps.ts` 條目 + 目標屬性。
+  - **共用元件層一次收斂**:`PageHeader` 加 `onboardingId?` prop(在 `Title` 而非整列 `Group` 上設 `data-onboarding` —— 見下),7 個用 `PageHeader` 的模組頁各加一行;`AuditPage`(唯一沒用 `PageHeader` 的模組)直接在其 `Title` 加屬性。
+  - **視覺自驗抓到並修正一處版位問題**:一開始把 `data-onboarding` 掛在 `PageHeader` 的整列 `Group`(滿版寬)+ `position:'bottom'`,Playwright 截圖顯示 callout 會蓋住正下方的 `Tabs.List`(前 2-3 個分頁)。改成掛在**較窄的 `Title` 文字本身** + `position:'right'`,callout 改浮在標題右側空白處,不再遮住分頁列(僅偶爾輕觸過長副標題尾端,可接受)。雙配色重新截圖確認。
+  - **測試不變**:既有 82 測試(含 `ONBOARDING_STEPS.length` 動態斷言)在 13 步下自動維持通過,無需修改。
 - [2026-07-01] 🖥️ Warm Terracotta 重設計 **PR 2.10:a11y sweep(收尾驗證)** —— 🎉 **Warm Terracotta Phase 2(PR 2.1–2.10)全數完成**
   - **全域 re-grep 結果:零殘留 offender**。逐一核對 `frontend/src` 全部 `ActionIcon`(5 處,皆有 `aria-label` 或非 icon-only)、`Button`(無 icon-only 無文字者)、作為狀態指示的 `ThemeIcon`(`ReconciliationHero` 的 `YesNo` + hero 盾牌,2.8 已補 `aria-label`+`role="img"`)、`Modal`/`Drawer`(grep `trapFocus={false}`/`returnFocus={false}` 零命中,全吃 Mantine v9 內建 focus-trap)、Nav/Menu/Tab(皆有文字 label)。spec §8.1 列的 4 個 offender 已在 2.4–2.6 折入(PurchaseOrders/SalesOrders/Boms/ManualEntry 刪除鈕)。
   - **axe-playwright(spec §8.5)決定不加**:需改 `.github/workflows`(`e2e.yml`),牴觸本重設計程式全程「不動 workflows」的約束,且 spec 本身已將其標為 **DEFER**(report-only、非阻斷)。因此本棒**純驗證、零程式碼變動**(文件 + 決策紀錄)。鍵盤走查(Tab/Enter/Esc/方向鍵)、深色對比留待 Oracle/Docker demo 實機驗證(沙箱無 dev server)。
