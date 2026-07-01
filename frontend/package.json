@@ -12,6 +12,8 @@
     "test:types": "tsc --noEmit -p tsconfig.vitest.json",
     "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
+    "capture:fixtures": "node scripts/capture-fixtures.mjs",
+    "shoot": "node scripts/shoot-screenshots.mjs",
     "gen:api": "openapi-typescript ./openapi/openapi.json -o ./src/api/schema.d.ts",
     "gen:api:check": "openapi-typescript ./openapi/openapi.json -o ./src/api/schema.d.ts && git diff --exit-code ./src/api/schema.d.ts"
   },
