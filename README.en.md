@@ -184,6 +184,7 @@ an nginx container that reverse-proxies to the backend on a single origin.
 | `manufacturing` | BOM, work orders, WIP issue/completion, reorder report | — |
 | `payments` | Customer/vendor payments + allocation (in/out) | — |
 | `reporting` | Read-side financial statements + reconciliation health-check | — |
+| `hr` | Employees, departments and positions (HR master data) | `HrQuery` |
 | `iam` | Authentication & role-based authorization | — |
 
 | Layer | Choice |
@@ -193,7 +194,7 @@ an nginx container that reverse-proxies to the backend on a single origin.
 | Persistence | Spring Data JPA / Hibernate + Flyway migrations |
 | Boundary enforcement | ArchUnit (CI-enforced) |
 | Money & quantity | `BigDecimal` value objects — `Money` (`NUMERIC(19,4)`) and `Quantity`/cost (`NUMERIC(19,6)`), never `float`; serialized as JSON **strings** |
-| Auth | Spring Security + **JWT** (access in memory + refresh httpOnly cookie), persisted bcrypt users, four roles (ADMIN / ACCOUNTANT / WAREHOUSE / SALES) + read-only guest |
+| Auth | Spring Security + **JWT** (access in memory + refresh httpOnly cookie), persisted bcrypt users, five roles (ADMIN / ACCOUNTANT / WAREHOUSE / SALES / HR) + read-only guest |
 | API docs | springdoc-openapi (OpenAPI 3.1) + Swagger UI (`/swagger-ui.html`) |
 | Testing | JUnit + Testcontainers (real Postgres) |
 | Frontend | React 19 + TypeScript + Mantine 9 + Vite 8 + TanStack Query + React Router |
