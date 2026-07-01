@@ -25,7 +25,7 @@
 > 一具帶硬性 `借=貸` 不變量的過帳引擎、一本對帳到 GL 控制科目的不可變庫存子帳,以及一條
 > 可逐行辯護的「文件 → 庫存 → 分錄」管線。擴充套裝 ERP 多半只能展示框架設定。
 
-**目前進度**:**Phase 0–7 全數完成 + 全端化**。後端模組化單體(複式總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / RBAC)`mvn verify` 全綠(單元 60 + 整合 97);React 前端覆蓋全部 8 個模組;一行 `docker compose -f compose.demo.yaml up --build` 即可把 **postgres + 自動 seed 的後端 + 前端**整套拉起。逐階段交付見 [PROGRESS.md](PROGRESS.md)。
+**目前進度**:**Phase 0–7 全數完成 + 全端化**。後端模組化單體(複式總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / RBAC)`mvn verify` 全綠(單元 60 + 整合 97);React 前端覆蓋全部 9 個模組;一行 `docker compose -f compose.demo.yaml up --build` 即可把 **postgres + 自動 seed 的後端 + 前端**整套拉起。逐階段交付見 [PROGRESS.md](PROGRESS.md)。
 
 ## 目錄
 
@@ -153,7 +153,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 `frontend/` 是獨立的 Vite 專案(不掛進 Maven build)。資料層用 **`openapi-typescript`**(從 spec 產生型別)+ **`openapi-fetch`**(型別安全 client,middleware 注入 JWT Bearer + 401 自動 refresh 重試、解析 RFC 9457 ProblemDetail)+ **TanStack Query**;路由用 React Router;UI 用 Mantine 9。RBAC 在前端鏡像後端的 POST 授權矩陣,僅作「隱藏/停用按鈕」的提示(真正強制在後端)。
 
-涵蓋全部 8 個模組:
+涵蓋全部 9 個模組:
 
 - **儀表板** —— KPI 磚(營收 / 淨利 / 訂單 / 應收 / 在庫值)+ 訂單漏斗 + 庫存甜甜圈 + 警示 + 對帳健康檢查 hero(子帳 vs GL、過渡科目歸零)
 - **報表** —— 試算表(點科目開總帳鑽取 Drawer)、損益表、資產負債表(共用 as-of 日期)
@@ -163,6 +163,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 - **製造** —— BOM 建單、工單狀態機(release/issue/complete/cancel 條件啟用)、再訂點
 - **庫存** —— 在庫查詢、子帳對帳、庫存調整
 - **總帳** —— 手動分錄(即時借貸平衡檢核)、會計期間關閉/重開、年度結帳(損益轉保留盈餘、鎖定年度)
+- **人力資源** —— 員工 / 部門 / 職位主檔 + HR 儀表板(在職人數、平均月薪、各部門人數甜甜圈)
 
 每張文件的詳情都把過帳結果攤開(關聯的 `journalEntryId`、`movementGroupId`、狀態流轉),呼應這個 ERP 的賣點:帳怎麼走,看得見。
 

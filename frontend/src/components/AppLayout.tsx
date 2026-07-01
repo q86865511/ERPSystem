@@ -30,6 +30,7 @@ import {
   IconShoppingCart,
   IconSun,
   IconTruckDelivery,
+  IconUsers,
 } from '@tabler/icons-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
@@ -131,6 +132,17 @@ const NAV: {
       { value: 'manual-entry', labelKey: 'ledger.tabs.manualEntry' },
       { value: 'reversal', labelKey: 'ledger.tabs.reversal' },
       { value: 'periods', labelKey: 'ledger.tabs.periods' },
+    ],
+  },
+  {
+    to: '/hr',
+    labelKey: 'nav.humanResources',
+    icon: IconUsers,
+    children: [
+      { value: 'dashboard', labelKey: 'hr.tabs.dashboard' },
+      { value: 'employees', labelKey: 'hr.tabs.employees' },
+      { value: 'departments', labelKey: 'hr.tabs.departments' },
+      { value: 'positions', labelKey: 'hr.tabs.positions' },
     ],
   },
   { to: '/audit', labelKey: 'nav.audit', icon: IconHistory, requiredRole: 'ADMIN' },

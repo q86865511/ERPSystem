@@ -5,6 +5,7 @@
  */
 import type { Messages } from '../types';
 import { auditZh } from './modules/audit';
+import { hrZh } from './modules/hr';
 import { inventoryZh } from './modules/inventory';
 import { ledgerZh } from './modules/ledger';
 import { manufacturingZh } from './modules/manufacturing';
@@ -85,6 +86,7 @@ export const zhTW: Messages = {
     inventory: '庫存',
     reporting: '報表',
     ledger: '總帳',
+    humanResources: '人力資源',
     audit: '審計軌跡',
   },
   login: {
@@ -179,6 +181,7 @@ export const zhTW: Messages = {
   inventory: inventoryZh,
   reporting: reportingZh,
   ledger: ledgerZh,
+  hr: hrZh,
   payments: paymentsZh,
   print: printZh,
   audit: auditZh,

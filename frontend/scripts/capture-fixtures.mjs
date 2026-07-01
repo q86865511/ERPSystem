@@ -38,6 +38,9 @@ const GET_PATHS = [
   '/api/masterdata/items',
   '/api/masterdata/partners',
   '/api/masterdata/warehouses',
+  '/api/hr/departments',
+  '/api/hr/positions',
+  '/api/hr/employees',
 ];
 
 const here = dirname(fileURLToPath(import.meta.url));

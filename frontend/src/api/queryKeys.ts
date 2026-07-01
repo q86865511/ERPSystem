@@ -53,4 +53,9 @@ export const qk = {
     list: (params: { eventType?: string; actor?: string; page: number; size: number }) =>
       ['audit', 'list', params] as const,
   },
+  hr: {
+    employees: (departmentId?: number) => ['hr', 'employees', departmentId ?? 'all'] as const,
+    departments: () => ['hr', 'departments'] as const,
+    positions: () => ['hr', 'positions'] as const,
+  },
 };

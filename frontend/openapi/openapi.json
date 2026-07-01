@@ -136,6 +136,237 @@
         "tags" : [ "auth-controller" ]
       }
     },
+    "/api/hr/departments" : {
+      "get" : {
+        "operationId" : "listDepartments",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DepartmentResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "hr-controller" ]
+      },
+      "post" : {
+        "operationId" : "createDepartment",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateDepartmentRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DepartmentResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "hr-controller" ]
+      }
+    },
+    "/api/hr/departments/{id}" : {
+      "get" : {
+        "operationId" : "getDepartment",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DepartmentResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "hr-controller" ]
+      }
+    },
+    "/api/hr/employees" : {
+      "get" : {
+        "operationId" : "listEmployees",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "departmentId",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/EmployeeResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "hr-controller" ]
+      },
+      "post" : {
+        "operationId" : "createEmployee",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateEmployeeRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EmployeeResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "hr-controller" ]
+      }
+    },
+    "/api/hr/employees/{id}" : {
+      "get" : {
+        "operationId" : "getEmployee",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/EmployeeResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "hr-controller" ]
+      }
+    },
+    "/api/hr/positions" : {
+      "get" : {
+        "operationId" : "listPositions",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PositionResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "hr-controller" ]
+      },
+      "post" : {
+        "operationId" : "createPosition",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreatePositionRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PositionResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "hr-controller" ]
+      }
+    },
+    "/api/hr/positions/{id}" : {
+      "get" : {
+        "operationId" : "getPosition",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PositionResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "hr-controller" ]
+      }
+    },
     "/api/inventory/adjustments" : {
       "post" : {
         "operationId" : "postAdjustment",
@@ -2376,6 +2607,53 @@
           }
         }
       },
+      "CreateDepartmentRequest" : {
+        "type" : "object",
+        "properties" : {
+          "budgetAccountCode" : {
+            "type" : "string"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreateEmployeeRequest" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string"
+          },
+          "departmentId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "hireDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "monthlySalary" : {
+            "type" : "string"
+          },
+          "positionId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "ON_LEAVE", "TERMINATED" ]
+          }
+        }
+      },
       "CreateGrnRequest" : {
         "type" : "object",
         "properties" : {
@@ -2528,6 +2806,20 @@
           "partnerId" : {
             "type" : "integer",
             "format" : "int64"
+          }
+        }
+      },
+      "CreatePositionRequest" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string"
+          },
+          "standardSalary" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
           }
         }
       },
@@ -2790,6 +3082,68 @@
           },
           "status" : {
             "type" : "string"
+          }
+        }
+      },
+      "DepartmentResponse" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "budgetAccountCode" : {
+            "type" : "string"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "EmployeeResponse" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string"
+          },
+          "departmentId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "hireDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "monthlySalary" : {
+            "type" : "string"
+          },
+          "positionId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "ON_LEAVE", "TERMINATED" ]
+          },
+          "terminationDate" : {
+            "type" : "string",
+            "format" : "date"
           }
         }
       },
@@ -3491,6 +3845,27 @@
             "type" : "string"
           },
           "unitPrice" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PositionResponse" : {
+        "type" : "object",
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "standardSalary" : {
+            "type" : "string"
+          },
+          "title" : {
             "type" : "string"
           }
         }

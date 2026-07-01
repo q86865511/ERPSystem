@@ -19,6 +19,7 @@ const InventoryPage = lazy(() => import('../features/inventory/InventoryPage').t
 const ReportsPage = lazy(() => import('../features/reporting/ReportsPage').then((m) => ({ default: m.ReportsPage })));
 const LedgerPage = lazy(() => import('../features/ledger/LedgerPage').then((m) => ({ default: m.LedgerPage })));
 const AuditPage = lazy(() => import('../features/audit/AuditPage').then((m) => ({ default: m.AuditPage })));
+const HRPage = lazy(() => import('../features/hr/HRPage').then((m) => ({ default: m.HRPage })));
 const SalesInvoicePrint = lazy(() => import('../features/print/SalesInvoicePrint').then((m) => ({ default: m.SalesInvoicePrint })));
 const PurchaseOrderPrint = lazy(() => import('../features/print/PurchaseOrderPrint').then((m) => ({ default: m.PurchaseOrderPrint })));
 const DeliveryPrint = lazy(() => import('../features/print/DeliveryPrint').then((m) => ({ default: m.DeliveryPrint })));
@@ -75,6 +76,7 @@ export const router = createBrowserRouter([
           { path: '/inventory', element: <InventoryPage /> },
           { path: '/reporting', element: <ReportsPage /> },
           { path: '/ledger', element: <LedgerPage /> },
+          { path: '/hr', element: <HRPage /> },
           {
             path: '/audit',
             element: (

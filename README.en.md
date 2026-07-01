@@ -33,7 +33,7 @@
 
 **Status**: **Phase 0–7 complete + full-stack**. The modular-monolith backend (double-entry GL,
 inventory, procure-to-pay, order-to-cash, manufacturing, reporting & period close, RBAC) is green on
-`mvn verify` (60 unit + 97 integration); the React frontend covers all 8 modules; and a single
+`mvn verify` (60 unit + 97 integration); the React frontend covers all 9 modules; and a single
 `docker compose -f compose.demo.yaml up --build` brings up **postgres + an auto-seeded backend +
 the frontend**. Stage-by-stage delivery is tracked in [PROGRESS.md](PROGRESS.md).
 
@@ -209,7 +209,7 @@ ProblemDetail) + **TanStack Query**; routing is React
 Router; UI is Mantine 9. RBAC mirrors the backend's POST authorization matrix as UI hints only
 (hide/disable buttons) — the backend still enforces.
 
-It covers all 8 modules:
+It covers all 9 modules:
 
 - **Dashboard** — KPI tiles (revenue / net income / orders / receivables / inventory value) + an order-pipeline funnel + an inventory donut + alerts + the reconciliation health-check hero (subledgers vs GL, clearing accounts at zero)
 - **Reports** — trial balance (click an account to drill into its ledger), income statement, balance sheet (shared as-of date)
@@ -219,6 +219,7 @@ It covers all 8 modules:
 - **Manufacturing** — BOM authoring, work-order state machine (release/issue/complete/cancel, conditionally enabled), reorder report
 - **Inventory** — on-hand lookup, subledger reconciliation, stock adjustments
 - **Ledger** — manual journal entry (live debit=credit check), fiscal-period close/reopen, year-end close (carry P&L to retained earnings, lock the year)
+- **Human Resources** — employees / departments / positions master data + an HR dashboard (headcount, average salary, headcount-by-department donut)
 
 Every document's detail surfaces its posting results (the linked `journalEntryId`, `movementGroupId`,
 status transitions) — making this ERP's selling point visible: you can see how the books move.
