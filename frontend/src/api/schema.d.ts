@@ -84,6 +84,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/hr/departments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listDepartments"];
+        put?: never;
+        post: operations["createDepartment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/departments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getDepartment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/employees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEmployees"];
+        put?: never;
+        post: operations["createEmployee"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/employees/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEmployee"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/positions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listPositions"];
+        put?: never;
+        post: operations["createPosition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/positions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPosition"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/inventory/adjustments": {
         parameters: {
             query?: never;
@@ -1126,6 +1222,25 @@ export interface components {
             /** Format: int64 */
             stockLocationId?: number;
         };
+        CreateDepartmentRequest: {
+            budgetAccountCode?: string;
+            code?: string;
+            name?: string;
+        };
+        CreateEmployeeRequest: {
+            code?: string;
+            /** Format: int64 */
+            departmentId?: number;
+            firstName?: string;
+            /** Format: date */
+            hireDate?: string;
+            lastName?: string;
+            monthlySalary?: string;
+            /** Format: int64 */
+            positionId?: number;
+            /** @enum {string} */
+            status?: "ACTIVE" | "ON_LEAVE" | "TERMINATED";
+        };
         CreateGrnRequest: {
             lines?: components["schemas"]["ReceiptLine"][];
             /** Format: date */
@@ -1184,6 +1299,11 @@ export interface components {
             orderDate?: string;
             /** Format: int64 */
             partnerId?: number;
+        };
+        CreatePositionRequest: {
+            code?: string;
+            standardSalary?: string;
+            title?: string;
         };
         CreateReturnRequest: {
             /** Format: date */
@@ -1291,6 +1411,32 @@ export interface components {
             /** Format: int64 */
             salesOrderId?: number;
             status?: string;
+        };
+        DepartmentResponse: {
+            active?: boolean;
+            budgetAccountCode?: string;
+            code?: string;
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+        };
+        EmployeeResponse: {
+            code?: string;
+            /** Format: int64 */
+            departmentId?: number;
+            firstName?: string;
+            /** Format: date */
+            hireDate?: string;
+            /** Format: int64 */
+            id?: number;
+            lastName?: string;
+            monthlySalary?: string;
+            /** Format: int64 */
+            positionId?: number;
+            /** @enum {string} */
+            status?: "ACTIVE" | "ON_LEAVE" | "TERMINATED";
+            /** Format: date */
+            terminationDate?: string;
         };
         FiscalPeriodResponse: {
             /** Format: date */
@@ -1564,6 +1710,14 @@ export interface components {
             qtyOrdered?: string;
             qtyReceived?: string;
             unitPrice?: string;
+        };
+        PositionResponse: {
+            active?: boolean;
+            code?: string;
+            /** Format: int64 */
+            id?: number;
+            standardSalary?: string;
+            title?: string;
         };
         PurchaseOrderResponse: {
             /** Format: int64 */
@@ -1889,6 +2043,206 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["TokenResponse"];
+                };
+            };
+        };
+    };
+    listDepartments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DepartmentResponse"][];
+                };
+            };
+        };
+    };
+    createDepartment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDepartmentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DepartmentResponse"];
+                };
+            };
+        };
+    };
+    getDepartment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DepartmentResponse"];
+                };
+            };
+        };
+    };
+    listEmployees: {
+        parameters: {
+            query?: {
+                departmentId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EmployeeResponse"][];
+                };
+            };
+        };
+    };
+    createEmployee: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateEmployeeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EmployeeResponse"];
+                };
+            };
+        };
+    };
+    getEmployee: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EmployeeResponse"];
+                };
+            };
+        };
+    };
+    listPositions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PositionResponse"][];
+                };
+            };
+        };
+    };
+    createPosition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePositionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PositionResponse"];
+                };
+            };
+        };
+    };
+    getPosition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PositionResponse"];
                 };
             };
         };

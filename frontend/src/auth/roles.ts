@@ -3,7 +3,7 @@
  * actions the backend would reject with 403 — the SINGLE SOURCE OF TRUTH is SecurityConfig (and RbacIT
  * guards it). Keep both in sync when roles change.
  */
-export const ROLES = ['ADMIN', 'ACCOUNTANT', 'WAREHOUSE', 'SALES'] as const;
+export const ROLES = ['ADMIN', 'ACCOUNTANT', 'WAREHOUSE', 'SALES', 'HR'] as const;
 export type Role = (typeof ROLES)[number];
 
 export type WriteAction =
@@ -17,7 +17,8 @@ export type WriteAction =
   | 'inventory.adjust'
   | 'manufacturing.write'
   | 'payments.create'
-  | 'ledger.post';
+  | 'ledger.post'
+  | 'hr.write';
 
 /** Which role each write action requires, mirroring the POST rules in SecurityConfig. */
 export const WRITE_ACTION_ROLE: Record<WriteAction, Role> = {
@@ -32,6 +33,7 @@ export const WRITE_ACTION_ROLE: Record<WriteAction, Role> = {
   'manufacturing.write': 'WAREHOUSE',
   'payments.create': 'ACCOUNTANT',
   'ledger.post': 'ACCOUNTANT', // manual entries + period close/reopen
+  'hr.write': 'HR', // departments / positions / employees (admin holds HR too)
 };
 
 export function hasRole(roles: readonly string[], role: Role): boolean {

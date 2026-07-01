@@ -12,6 +12,7 @@
  * below. Each fragment's `*Zh` is typed `: typeof *En`, so a module's zh/en mismatch fails to compile.
  */
 import { auditEn } from './modules/audit';
+import { hrEn } from './modules/hr';
 import { inventoryEn } from './modules/inventory';
 import { ledgerEn } from './modules/ledger';
 import { manufacturingEn } from './modules/manufacturing';
@@ -93,6 +94,7 @@ export const en = {
     inventory: 'Inventory',
     reporting: 'Reporting',
     ledger: 'Ledger',
+    humanResources: 'Human Resources',
     audit: 'Audit Trail',
   },
   login: {
@@ -187,6 +189,7 @@ export const en = {
   inventory: inventoryEn,
   reporting: reportingEn,
   ledger: ledgerEn,
+  hr: hrEn,
   payments: paymentsEn,
   print: printEn,
   audit: auditEn,

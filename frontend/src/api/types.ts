@@ -55,6 +55,15 @@ export type WorkOrderResponse = Schemas['WorkOrderResponse'];
 export type CreateWorkOrderRequest = Schemas['CreateWorkOrderRequest'];
 export type ReorderReport = Schemas['ReorderReport'];
 
+// --- HR (B1) ---
+export type EmployeeResponse = Schemas['EmployeeResponse'];
+export type CreateEmployeeRequest = Schemas['CreateEmployeeRequest'];
+export type DepartmentResponse = Schemas['DepartmentResponse'];
+export type CreateDepartmentRequest = Schemas['CreateDepartmentRequest'];
+export type PositionResponse = Schemas['PositionResponse'];
+export type CreatePositionRequest = Schemas['CreatePositionRequest'];
+export type EmploymentStatus = NonNullable<EmployeeResponse['status']>;
+
 export const ITEM_TYPES: ItemType[] = ['RAW', 'WIP', 'FINISHED', 'SERVICE'];
 export const LOCATION_TYPES: LocationType[] = [
   'STOCK',
