@@ -2,6 +2,7 @@ import { Alert, Badge, Button, Group, Stack, Table, Text, TextInput } from '@man
 import { DateInput } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { useState } from 'react';
+import { StateButton } from '../../components';
 import { MoneyText } from '../../components/Money';
 import { useAuth } from '../../auth/useAuth';
 import { useI18n } from '../../i18n';
@@ -133,9 +134,13 @@ export function ReversalPanel() {
               value={memo}
               onChange={(e) => setMemo(e.currentTarget.value)}
             />
-            <Button onClick={submit} loading={reverse.isPending} disabled={!reversible}>
-              {t('ledger.reversal.reverse')}
-            </Button>
+            <StateButton
+              label={t('ledger.reversal.reverse')}
+              onClick={submit}
+              loading={reverse.isPending}
+              disabled={!reversible}
+              disabledReason={t('ledger.reversal.notReversibleHint')}
+            />
           </Group>
         </Stack>
       )}

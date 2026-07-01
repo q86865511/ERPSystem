@@ -48,6 +48,9 @@ export const reportingEn = {
     subledger: 'Subledger',
     glControl: 'GL control',
     reconciled: 'Reconciled',
+    notReconciled: 'Not reconciled',
+    cleared: 'Cleared',
+    notCleared: 'Not cleared',
     clearingTitle: 'Clearing accounts (net to zero over a complete cycle)',
   },
 };
@@ -102,6 +105,9 @@ export const reportingZh: typeof reportingEn = {
     subledger: '子帳',
     glControl: '總帳控制',
     reconciled: '已對帳',
+    notReconciled: '未對帳',
+    cleared: '已歸零',
+    notCleared: '未歸零',
     clearingTitle: '過渡科目(完整週期後應歸零)',
   },
 };
