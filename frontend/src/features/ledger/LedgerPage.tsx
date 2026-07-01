@@ -9,7 +9,11 @@ export function LedgerPage() {
   const { t } = useI18n();
   return (
     <>
-      <PageHeader title={t('ledger.page.title')} subtitle={t('ledger.page.subtitle')} />
+      <PageHeader
+        title={t('ledger.page.title')}
+        subtitle={t('ledger.page.subtitle')}
+        onboardingId="module-ledger"
+      />
       <Tabs defaultValue="manual-entry" keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="manual-entry">{t('ledger.tabs.manualEntry')}</Tabs.Tab>

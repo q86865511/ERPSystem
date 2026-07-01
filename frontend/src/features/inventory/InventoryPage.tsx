@@ -73,7 +73,7 @@ export function InventoryPage() {
   const { t } = useI18n();
   return (
     <>
-      <PageHeader title={t('nav.inventory')} subtitle={t('inventory.subtitle')} />
+      <PageHeader title={t('nav.inventory')} subtitle={t('inventory.subtitle')} onboardingId="module-inventory" />
       <Tabs defaultValue="overview" keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="overview">{t('inventory.tabs.overview')}</Tabs.Tab>
