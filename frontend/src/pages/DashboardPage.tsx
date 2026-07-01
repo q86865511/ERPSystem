@@ -26,7 +26,9 @@ export function DashboardPage() {
         </Group>
       </Stack>
 
-      <ReconciliationHero />
+      <div data-onboarding="reconciliation-hero">
+        <ReconciliationHero />
+      </div>
 
       <SimpleGrid cols={{ base: 1, sm: 3 }}>
         <StatTile label={t('dashboard.totalAssets')} value={bs.data?.totalAssets} strong />

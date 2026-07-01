@@ -21,6 +21,7 @@ import {
   IconBuildingFactory2,
   IconDatabase,
   IconDeviceDesktop,
+  IconHelpCircle,
   IconHistory,
   IconLayoutDashboard,
   IconLogout,
@@ -35,16 +36,18 @@ import { useAuth } from '../auth/useAuth';
 import type { Role } from '../auth/roles';
 import { useI18n } from '../i18n';
 import type { Locale, TranslationKey } from '../i18n';
+import { useOnboardingTour } from '../onboarding/useOnboardingTour';
 
 const NAV: {
   to: string;
   labelKey: TranslationKey;
   icon: typeof IconLayoutDashboard;
   requiredRole?: Role;
+  onboardingId?: string;
 }[] = [
   { to: '/', labelKey: 'nav.dashboard', icon: IconLayoutDashboard },
   { to: '/masterdata', labelKey: 'nav.masterData', icon: IconDatabase },
-  { to: '/purchasing', labelKey: 'nav.purchasing', icon: IconShoppingCart },
+  { to: '/purchasing', labelKey: 'nav.purchasing', icon: IconShoppingCart, onboardingId: 'nav-purchasing' },
   { to: '/sales', labelKey: 'nav.sales', icon: IconTruckDelivery },
   { to: '/manufacturing', labelKey: 'nav.manufacturing', icon: IconBuildingFactory2 },
   { to: '/inventory', labelKey: 'nav.inventory', icon: IconBoxSeam },
@@ -59,6 +62,7 @@ export function AppLayout() {
   const { user, logout, hasRole } = useAuth();
   const { locale, setLocale, t } = useI18n();
   const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const { restart: restartTour } = useOnboardingTour();
 
   return (
     <AppShell
@@ -121,6 +125,7 @@ export function AppLayout() {
               aria-label={t('common.language')}
               value={locale}
               onChange={(v) => setLocale(v as Locale)}
+              data-onboarding="header-language"
               data={[
                 { label: '中', value: 'zh-TW' },
                 { label: 'EN', value: 'en' },
@@ -142,6 +147,10 @@ export function AppLayout() {
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Label>{user?.roles.join(', ') || t('common.noRoles')}</Menu.Label>
+                <Menu.Item leftSection={<IconHelpCircle size={16} />} onClick={restartTour}>
+                  {t('onboarding.restartTour')}
+                </Menu.Item>
+                <Menu.Divider />
                 <Menu.Item color="red" leftSection={<IconLogout size={16} />} onClick={logout}>
                   {t('common.signOut')}
                 </Menu.Item>
@@ -166,6 +175,7 @@ export function AppLayout() {
                 leftSection={<Icon size={18} />}
                 active={active}
                 onClick={close}
+                data-onboarding={item.onboardingId}
               />
             );
           })}
