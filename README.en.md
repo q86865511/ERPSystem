@@ -33,7 +33,7 @@
 
 **Status**: **Phase 0–7 complete + full-stack**. The modular-monolith backend (double-entry GL,
 inventory, procure-to-pay, order-to-cash, manufacturing, reporting & period close, RBAC) is green on
-`mvn verify` (56 unit + 69 integration); the React frontend covers all 8 modules; and a single
+`mvn verify` (60 unit + 97 integration); the React frontend covers all 8 modules; and a single
 `docker compose -f compose.demo.yaml up --build` brings up **postgres + an auto-seeded backend +
 the frontend**. Stage-by-stage delivery is tracked in [PROGRESS.md](PROGRESS.md).
 
@@ -296,7 +296,7 @@ erDiagram
 
 ```bash
 # Backend: unit tests (Surefire) + Testcontainers integration tests (Failsafe, real Postgres)
-./mvnw verify       # 56 unit + 69 integration; CI runs `./mvnw -B -ntp verify`
+./mvnw verify       # 60 unit + 97 integration; CI runs `./mvnw -B -ntp verify`
 
 # Frontend: type-check + bundle
 cd frontend && npm run build      # tsc -b && vite build
@@ -358,7 +358,7 @@ The senior-signal decisions, each written up under [docs/adr/](docs/adr/):
 |---|---|
 | [PROGRESS.md](PROGRESS.md) | Stage-by-stage progress, key decisions, environment notes |
 | [docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md](docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md) | The "Warm Terracotta" UI/UX redesign spec (palette, component layer, per-module polish, onboarding tour) |
-| [docs/adr/](docs/adr/) | Architecture decision records (ADR 0001–0009) |
+| [docs/adr/](docs/adr/) | Architecture decision records (ADR 0001–0010) |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Deployment: local one-command demo + cloud subdomain (Cloudflare Tunnel + Caddy) |
 | [compose.demo.yaml](compose.demo.yaml) | One-command demo (postgres + backend + frontend) |
 | [frontend/](frontend/) | React frontend (standalone Vite project) |

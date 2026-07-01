@@ -14,6 +14,9 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-01] 📝 **修正 README 既有文件落差(純文件、獨立小 PR)**:
+  - **ADR 索引**:兩份 README(`README.md:255`、`README.en.md:361`)的「文件索引」表格把 `docs/adr/` 寫成「ADR 0001–0009」,但實際列到 `0010-journal-entry-reversal`(分錄沖正)。改為「0001–0010」——即上一則 Phase 3 條目末尾記下、留待處理的既有小落差。
+  - **測試數字**:順手發現 README 內部自相矛盾——「目前進度」與「快速開始」段寫「單元 56 + 整合 69」,但「技術亮點/測試」段寫「97 個整合測試」。以 build 報告核實實際為 **單元 60(Surefire)+ 整合 97(Failsafe,35 個 `*IT`)**,故把兩處過時的「56 + 69」更正為「60 + 97」(README.md:28/213、README.en.md:36/299),與既有正確的「97」一致。
 - [2026-07-01] 📸 Warm Terracotta **Phase 3:文件 + 重拍截圖** —— 🎉 **Warm Terracotta 全程(Phase 2 + 3)完成**
   - **關鍵發現**:沙箱其實有對外網路存取(`ping erp.terrychou.com` 通),故不需使用者的瀏覽器連線 —— 直接用 headless Playwright 對**線上 live demo** 腳本化操作(登入 → 略過導覽 → 逐模組導覽 → 截圖),與原本 9 張截圖同款手法(README 本就註明「headless Playwright 對 live demo 自動截圖」)。
   - **重拍全部 9 張既有截圖**(01-dashboard ~ 09-new-item-modal,English 語系、light 模式,與原截圖慣例一致),換上 Warm Terracotta 新版外觀;**新增 2 張**:`10-dark-mode.png`(深色模式儀表板)、`11-onboarding-tour.png`(新手導覽 welcome 步驟,證實線上确實跑 13 步)。
