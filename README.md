@@ -25,7 +25,7 @@
 > 一具帶硬性 `借=貸` 不變量的過帳引擎、一本對帳到 GL 控制科目的不可變庫存子帳,以及一條
 > 可逐行辯護的「文件 → 庫存 → 分錄」管線。擴充套裝 ERP 多半只能展示框架設定。
 
-**目前進度**:**Phase 0–7 全數完成 + 全端化**。後端模組化單體(複式總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / RBAC)`mvn verify` 全綠(單元 56 + 整合 69);React 前端覆蓋全部 8 個模組;一行 `docker compose -f compose.demo.yaml up --build` 即可把 **postgres + 自動 seed 的後端 + 前端**整套拉起。逐階段交付見 [PROGRESS.md](PROGRESS.md)。
+**目前進度**:**Phase 0–7 全數完成 + 全端化**。後端模組化單體(複式總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / RBAC)`mvn verify` 全綠(單元 60 + 整合 97);React 前端覆蓋全部 8 個模組;一行 `docker compose -f compose.demo.yaml up --build` 即可把 **postgres + 自動 seed 的後端 + 前端**整套拉起。逐階段交付見 [PROGRESS.md](PROGRESS.md)。
 
 ## 目錄
 
@@ -210,7 +210,7 @@ erDiagram
 
 ```bash
 # 後端:單元測試(Surefire)+ Testcontainers 整合測試(Failsafe,起真 Postgres)
-./mvnw verify       # 單元 56 + 整合 69;CI 用 `./mvnw -B -ntp verify`
+./mvnw verify       # 單元 60 + 整合 97;CI 用 `./mvnw -B -ntp verify`
 
 # 前端:型別檢查 + 打包
 cd frontend && npm run build      # tsc -b && vite build
