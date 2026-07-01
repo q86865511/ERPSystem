@@ -1,6 +1,7 @@
 package com.erp.hr.web;
 
 import com.erp.hr.application.DuplicateCodeException;
+import com.erp.hr.application.HrConflictException;
 import com.erp.hr.application.HrException;
 import com.erp.hr.application.HrNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ public class HrExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(DuplicateCodeException.class)
+    @ExceptionHandler({DuplicateCodeException.class, HrConflictException.class})
     public ProblemDetail onConflict(HrException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
