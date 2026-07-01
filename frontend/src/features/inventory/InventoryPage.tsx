@@ -6,6 +6,7 @@ import { MoneyText } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { useI18n } from '../../i18n';
 import { AdjustmentsPanel } from './AdjustmentsPanel';
+import { InventoryDashboardPanel } from './InventoryDashboardPanel';
 import { useInventoryReconciliation, useItemOnHand } from './api';
 
 function OverviewPanel() {
@@ -74,11 +75,15 @@ export function InventoryPage() {
   return (
     <>
       <PageHeader title={t('nav.inventory')} subtitle={t('inventory.subtitle')} onboardingId="module-inventory" />
-      <Tabs defaultValue="overview" keepMounted={false}>
+      <Tabs defaultValue="dashboard" keepMounted={false}>
         <Tabs.List mb="md">
+          <Tabs.Tab value="dashboard">{t('inventory.tabs.dashboard')}</Tabs.Tab>
           <Tabs.Tab value="overview">{t('inventory.tabs.overview')}</Tabs.Tab>
           <Tabs.Tab value="adjustments">{t('inventory.tabs.adjustments')}</Tabs.Tab>
         </Tabs.List>
+        <Tabs.Panel value="dashboard">
+          <InventoryDashboardPanel />
+        </Tabs.Panel>
         <Tabs.Panel value="overview">
           <OverviewPanel />
         </Tabs.Panel>
