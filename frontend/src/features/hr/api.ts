@@ -9,6 +9,7 @@ import type {
   CreatePositionRequest,
   CreateTimesheetRequest,
   LeaveStatus,
+  RunPayrollRequest,
   TimesheetStatus,
 } from '../../api/types';
 
@@ -191,5 +192,43 @@ export function useAdvanceTimesheet(action: 'submit' | 'approve') {
       return data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['hr', 'timesheets'] }),
+  });
+}
+
+// --- Payroll (B3) --------------------------------------------------------------------------------
+export function usePayrolls() {
+  return useQuery({
+    queryKey: qk.hr.payroll(),
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/hr/payroll');
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useRunPayroll() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: RunPayrollRequest) => {
+      const { data, error } = await api.POST('/api/hr/payroll', { body });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['hr', 'payroll'] }),
+  });
+}
+
+export function usePostPayroll() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const { data, error } = await api.POST('/api/hr/payroll/{id}/post', {
+        params: { path: { id } },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['hr', 'payroll'] }),
   });
 }

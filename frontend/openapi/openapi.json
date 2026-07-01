@@ -15,7 +15,7 @@
   "paths" : {
     "/api/audit" : {
       "get" : {
-        "operationId" : "list_3",
+        "operationId" : "list_4",
         "parameters" : [ {
           "in" : "query",
           "name" : "eventType",
@@ -138,7 +138,7 @@
     },
     "/api/hr/attendance" : {
       "get" : {
-        "operationId" : "list_2",
+        "operationId" : "list_3",
         "parameters" : [ {
           "in" : "query",
           "name" : "employeeId",
@@ -358,7 +358,7 @@
     },
     "/api/hr/leave-requests" : {
       "get" : {
-        "operationId" : "list_1",
+        "operationId" : "list_2",
         "parameters" : [ {
           "in" : "query",
           "name" : "employeeId",
@@ -472,6 +472,116 @@
           }
         },
         "tags" : [ "leave-controller" ]
+      }
+    },
+    "/api/hr/payroll" : {
+      "get" : {
+        "operationId" : "list_1",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PayrollResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "payroll-controller" ]
+      },
+      "post" : {
+        "operationId" : "run",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RunPayrollRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PayrollResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "payroll-controller" ]
+      }
+    },
+    "/api/hr/payroll/{id}" : {
+      "get" : {
+        "operationId" : "get",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PayrollResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "payroll-controller" ]
+      }
+    },
+    "/api/hr/payroll/{id}/post" : {
+      "post" : {
+        "operationId" : "post_1",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostPayrollRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PayrollResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "payroll-controller" ]
       }
     },
     "/api/hr/positions" : {
@@ -4260,6 +4370,78 @@
           }
         }
       },
+      "PayrollLineResponse" : {
+        "type" : "object",
+        "properties" : {
+          "employeeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "gross" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "insurance" : {
+            "type" : "string"
+          },
+          "net" : {
+            "type" : "string"
+          },
+          "tax" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PayrollResponse" : {
+        "type" : "object",
+        "properties" : {
+          "grossTotal" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "insuranceTotal" : {
+            "type" : "string"
+          },
+          "journalEntryId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PayrollLineResponse"
+            }
+          },
+          "netTotal" : {
+            "type" : "string"
+          },
+          "periodMonth" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "periodYear" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "DRAFT", "POSTED" ]
+          },
+          "taxTotal" : {
+            "type" : "string"
+          }
+        }
+      },
       "PoLineView" : {
         "type" : "object",
         "properties" : {
@@ -4307,6 +4489,15 @@
           },
           "title" : {
             "type" : "string"
+          }
+        }
+      },
+      "PostPayrollRequest" : {
+        "type" : "object",
+        "properties" : {
+          "postingDate" : {
+            "type" : "string",
+            "format" : "date"
           }
         }
       },
@@ -4434,6 +4625,19 @@
           "reversalDate" : {
             "type" : "string",
             "format" : "date"
+          }
+        }
+      },
+      "RunPayrollRequest" : {
+        "type" : "object",
+        "properties" : {
+          "month" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "year" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         }
       },

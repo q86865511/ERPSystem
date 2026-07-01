@@ -146,6 +146,7 @@ const NAV: {
       { value: 'attendance', labelKey: 'hr.tabs.attendance' },
       { value: 'leave', labelKey: 'hr.tabs.leave' },
       { value: 'timesheets', labelKey: 'hr.tabs.timesheets' },
+      { value: 'payroll', labelKey: 'hr.tabs.payroll' },
     ],
   },
   { to: '/audit', labelKey: 'nav.audit', icon: IconHistory, requiredRole: 'ADMIN' },
