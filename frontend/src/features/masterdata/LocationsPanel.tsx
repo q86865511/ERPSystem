@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
-import { Button, Group, Modal, Select, Stack, Table, Text, TextInput } from '@mantine/core';
+import { Button, Group, Modal, Select, Stack, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus } from '@tabler/icons-react';
 import { LOCATION_TYPES, type CreateLocationRequest } from '../../api/types';
+import { DataTable } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { WarehouseSelect } from '../../components/EntitySelect';
 import { useAuth } from '../../auth/useAuth';
 import { useI18n } from '../../i18n';
@@ -54,6 +56,21 @@ export function LocationsPanel() {
     label: t(`locationType.${v}` as TranslationKey),
   }));
   const rows = data ?? [];
+
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'code', label: t('field.code') },
+    {
+      key: 'locationType',
+      label: t('field.type'),
+      render: (l) => t(`locationType.${l.locationType}` as TranslationKey),
+    },
+    {
+      key: 'warehouse',
+      label: t('field.warehouse'),
+      render: (l) => (l.warehouseId != null ? (warehouseCode.get(l.warehouseId) ?? l.warehouseId) : '—'),
+    },
+  ];
+
   return (
     <Stack>
       <Group justify="space-between">
@@ -72,29 +89,13 @@ export function LocationsPanel() {
         )}
       </Group>
 
-      <Table striped highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('field.code')}</Table.Th>
-            <Table.Th>{t('field.type')}</Table.Th>
-            <Table.Th>{t('field.warehouse')}</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((l) => (
-            <Table.Tr key={l.id}>
-              <Table.Td>{l.code}</Table.Td>
-              <Table.Td>{t(`locationType.${l.locationType}` as TranslationKey)}</Table.Td>
-              <Table.Td>{l.warehouseId != null ? (warehouseCode.get(l.warehouseId) ?? l.warehouseId) : '—'}</Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {!isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('masterdata.locations.empty')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(l) => l.id ?? l.code ?? ''}
+        isLoading={isLoading}
+        emptyMessage={t('masterdata.locations.empty')}
+      />
 
       <Modal opened={opened} onClose={close} title={t('masterdata.locations.new')}>
         <form onSubmit={submit}>

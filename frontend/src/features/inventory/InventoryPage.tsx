@@ -1,24 +1,12 @@
 import { useState } from 'react';
 import { Card, Group, Loader, SimpleGrid, Stack, Table, Tabs, Text } from '@mantine/core';
+import { StatTile } from '../../components';
 import { ItemSelect } from '../../components/EntitySelect';
 import { MoneyText } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { useI18n } from '../../i18n';
 import { AdjustmentsPanel } from './AdjustmentsPanel';
 import { useInventoryReconciliation, useItemOnHand } from './api';
-
-function Stat({ label, value, money }: { label: string; value?: string; money?: boolean }) {
-  return (
-    <Card withBorder radius="md" padding="sm">
-      <Text size="xs" c="dimmed">
-        {label}
-      </Text>
-      <Text fw={600} ff="monospace">
-        {money ? <MoneyText value={value} /> : (value ?? '—')}
-      </Text>
-    </Card>
-  );
-}
 
 function OverviewPanel() {
   const { t } = useI18n();
@@ -41,9 +29,9 @@ function OverviewPanel() {
         )}
         {onHand.data && (
           <SimpleGrid cols={{ base: 1, sm: 3 }} mt="md">
-            <Stat label={t('inventory.onHand')} value={onHand.data.onHandQty} />
-            <Stat label={t('inventory.avgUnitCost')} value={onHand.data.avgUnitCost} money />
-            <Stat label={t('inventory.totalValue')} value={onHand.data.totalValue} money />
+            <StatTile label={t('inventory.onHand')} value={onHand.data.onHandQty} money={false} />
+            <StatTile label={t('inventory.avgUnitCost')} value={onHand.data.avgUnitCost} />
+            <StatTile label={t('inventory.totalValue')} value={onHand.data.totalValue} />
           </SimpleGrid>
         )}
       </Card>

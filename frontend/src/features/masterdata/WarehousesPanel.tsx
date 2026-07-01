@@ -1,8 +1,10 @@
-import { Button, Group, Modal, Stack, Table, Text, TextInput } from '@mantine/core';
+import { Button, Group, Modal, Stack, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus } from '@tabler/icons-react';
 import { useAuth } from '../../auth/useAuth';
+import { DataTable } from '../../components';
+import type { DataTableColumn } from '../../components';
 import { useI18n } from '../../i18n';
 import { notifyError, notifySuccess } from '../../lib/notify';
 import { useCreateWarehouse, useWarehouses } from './api';
@@ -34,6 +36,12 @@ export function WarehousesPanel() {
   });
 
   const rows = data ?? [];
+
+  const columns: DataTableColumn<(typeof rows)[number]>[] = [
+    { key: 'code', label: t('field.code') },
+    { key: 'name', label: t('field.name') },
+  ];
+
   return (
     <Stack>
       {canDo('masterdata.create') && (
@@ -44,27 +52,13 @@ export function WarehousesPanel() {
         </Group>
       )}
 
-      <Table striped highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('field.code')}</Table.Th>
-            <Table.Th>{t('field.name')}</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((w) => (
-            <Table.Tr key={w.id}>
-              <Table.Td>{w.code}</Table.Td>
-              <Table.Td>{w.name}</Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {!isLoading && rows.length === 0 && (
-        <Text c="dimmed" ta="center" py="md">
-          {t('masterdata.warehouses.empty')}
-        </Text>
-      )}
+      <DataTable
+        columns={columns}
+        rows={rows}
+        rowKey={(w) => w.id ?? w.code ?? ''}
+        isLoading={isLoading}
+        emptyMessage={t('masterdata.warehouses.empty')}
+      />
 
       <Modal opened={opened} onClose={close} title={t('masterdata.warehouses.new')}>
         <form onSubmit={submit}>
