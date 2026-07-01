@@ -4,6 +4,7 @@ import { DateInput } from '@mantine/dates';
 import dayjs from 'dayjs';
 import { PageHeader } from '../../components/PageHeader';
 import { useI18n } from '../../i18n';
+import { useTabParam } from '../../hooks/useTabParam';
 import { BalanceSheetPanel } from './BalanceSheetPanel';
 import { FinanceOverviewPanel } from './FinanceOverviewPanel';
 import { IncomeStatementPanel } from './IncomeStatementPanel';
@@ -11,6 +12,7 @@ import { TrialBalancePanel } from './TrialBalancePanel';
 
 export function ReportsPage() {
   const { t } = useI18n();
+  const [tab, setTab] = useTabParam('overview');
   const [asOf, setAsOf] = useState<string | null>(dayjs().format('YYYY-MM-DD'));
   const value = asOf ?? undefined;
 
@@ -30,7 +32,7 @@ export function ReportsPage() {
           />
         }
       />
-      <Tabs defaultValue="overview" keepMounted={false}>
+      <Tabs value={tab} onChange={setTab} keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="overview">{t('reporting.overview.tab')}</Tabs.Tab>
           <Tabs.Tab value="trial-balance">{t('reporting.tabs.trialBalance')}</Tabs.Tab>

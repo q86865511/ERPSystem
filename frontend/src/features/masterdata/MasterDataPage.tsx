@@ -1,6 +1,7 @@
 import { Tabs } from '@mantine/core';
 import { PageHeader } from '../../components/PageHeader';
 import { useI18n } from '../../i18n';
+import { useTabParam } from '../../hooks/useTabParam';
 import { ItemsPanel } from './ItemsPanel';
 import { LocationsPanel } from './LocationsPanel';
 import { PartnersPanel } from './PartnersPanel';
@@ -8,10 +9,11 @@ import { WarehousesPanel } from './WarehousesPanel';
 
 export function MasterDataPage() {
   const { t } = useI18n();
+  const [tab, setTab] = useTabParam('items');
   return (
     <>
       <PageHeader title={t('nav.masterData')} subtitle={t('masterdata.subtitle')} onboardingId="module-masterdata" />
-      <Tabs defaultValue="items" keepMounted={false}>
+      <Tabs value={tab} onChange={setTab} keepMounted={false}>
         <Tabs.List mb="md">
           <Tabs.Tab value="items">{t('masterdata.tabs.items')}</Tabs.Tab>
           <Tabs.Tab value="partners">{t('masterdata.tabs.partners')}</Tabs.Tab>
