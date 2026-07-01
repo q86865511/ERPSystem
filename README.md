@@ -252,7 +252,7 @@ cd frontend && npm run build      # tsc -b && vite build
 |---|---|
 | [PROGRESS.md](PROGRESS.md) | 逐階段進度、重要決策紀錄、環境備忘 |
 | [docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md](docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md) | 「Warm Terracotta」UI/UX 重新設計 spec(調色盤、元件層、逐模組打磨、新手導覽) |
-| [docs/adr/](docs/adr/) | 架構決策紀錄(ADR 0001–0009) |
+| [docs/adr/](docs/adr/) | 架構決策紀錄(ADR 0001–0010) |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | 部署:本機一鍵 demo + 雲端子網域(Cloudflare Tunnel + Caddy) |
 | [compose.demo.yaml](compose.demo.yaml) | 一鍵 demo(postgres + 後端 + 前端) |
 | [frontend/](frontend/) | React 前端(獨立 Vite 專案) |

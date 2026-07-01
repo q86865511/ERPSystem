@@ -358,7 +358,7 @@ The senior-signal decisions, each written up under [docs/adr/](docs/adr/):
 |---|---|
 | [PROGRESS.md](PROGRESS.md) | Stage-by-stage progress, key decisions, environment notes |
 | [docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md](docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md) | The "Warm Terracotta" UI/UX redesign spec (palette, component layer, per-module polish, onboarding tour) |
-| [docs/adr/](docs/adr/) | Architecture decision records (ADR 0001–0009) |
+| [docs/adr/](docs/adr/) | Architecture decision records (ADR 0001–0010) |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Deployment: local one-command demo + cloud subdomain (Cloudflare Tunnel + Caddy) |
 | [compose.demo.yaml](compose.demo.yaml) | One-command demo (postgres + backend + frontend) |
 | [frontend/](frontend/) | React frontend (standalone Vite project) |
