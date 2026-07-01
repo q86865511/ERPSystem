@@ -77,6 +77,8 @@ public class SecurityConfig {
                                 "/api/auth/logout").permitAll()
                         // Master data setup is administrative.
                         .requestMatchers(HttpMethod.POST, "/api/masterdata/**").hasRole("ADMIN")
+                        // HR master data (departments, positions, employees) — HR staff and admin.
+                        .requestMatchers(HttpMethod.POST, "/api/hr/**").hasAnyRole("ADMIN", "HR")
                         // Financial postings (most specific purchasing/sales paths first).
                         .requestMatchers(HttpMethod.POST, "/api/purchasing/vendor-bills").hasRole("ACCOUNTANT")
                         .requestMatchers(HttpMethod.POST, "/api/sales/sales-invoices",

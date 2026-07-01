@@ -61,6 +61,8 @@ class RbacIT {
     // observed status reflects authorization rather than an unhandled controller NPE.
     private static final String EMPTY_LINES = "{\"lines\":[]}";
     private static final String SO_BODY = "{\"partnerId\":999999,\"lines\":[]}";
+    private static final String HR_DEPT_BODY =
+            "{\"code\":\"RBAC-HR\",\"name\":\"RBAC HR Dept\",\"budgetAccountCode\":\"6100\"}";
 
     @Test
     void wrongRoleIsForbidden() throws Exception {
@@ -84,6 +86,22 @@ class RbacIT {
         String admin = bearer(jwt, "admin", "ADMIN", "ACCOUNTANT", "WAREHOUSE", "SALES");
         assertThat(postStatus("/api/purchasing/goods-receipts", admin, EMPTY_LINES)).isNotIn(401, 403);
         assertThat(postStatus("/api/sales/sales-orders", admin, SO_BODY)).isNotIn(401, 403);
+    }
+
+    @Test
+    void hrWritesAreGatedToHrAndAdmin() throws Exception {
+        // HR staff and admin may create HR master data; other roles are forbidden.
+        assertThat(postStatus("/api/hr/departments", bearer(jwt, "hr", "HR"), HR_DEPT_BODY)).isNotIn(401, 403);
+        assertThat(postStatus("/api/hr/departments", bearer(jwt, "admin", "ADMIN", "HR"), HR_DEPT_BODY))
+                .isNotIn(401, 403);
+        mvc.perform(postBody("/api/hr/departments", bearer(jwt, "sales", "SALES"), HR_DEPT_BODY))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void hrReadsNeedOnlyAuthentication() throws Exception {
+        mvc.perform(get("/api/hr/departments").header("Authorization", bearer(jwt, "guest")))
+                .andExpect(status().isOk());
     }
 
     private static org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder postBody(

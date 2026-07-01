@@ -49,7 +49,7 @@ class AuthFlowIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken", not(blankOrNullString())))
                 .andExpect(jsonPath("$.username").value("admin"))
-                .andExpect(jsonPath("$.roles", containsInAnyOrder("ADMIN", "ACCOUNTANT", "WAREHOUSE", "SALES")))
+                .andExpect(jsonPath("$.roles", containsInAnyOrder("ADMIN", "ACCOUNTANT", "WAREHOUSE", "SALES", "HR")))
                 .andExpect(cookie().exists("refresh_token"))
                 .andExpect(cookie().httpOnly("refresh_token", true))
                 .andExpect(cookie().path("refresh_token", "/api/auth"))

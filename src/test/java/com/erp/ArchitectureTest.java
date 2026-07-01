@@ -52,6 +52,22 @@ class ArchitectureTest {
                             "..masterdata.web..");
 
     @ArchTest
+    static final ArchRule hr_api_is_self_contained =
+            noClasses().that().resideInAPackage("..hr.api..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..hr.domain..", "..hr.application..", "..hr.web..");
+
+    // hr is a master-data leaf now; when payroll (B3) lands it will reach ledger via ledger.api only, so
+    // this rule forbids ledger internals (not ledger.api) and every other module entirely.
+    @ArchTest
+    static final ArchRule hr_uses_only_published_ports =
+            noClasses().that().resideInAPackage("..hr..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
+                            "..masterdata..", "..inventory..", "..purchasing..", "..payments..",
+                            "..sales..", "..manufacturing..", "..reporting..");
+
+    @ArchTest
     static final ArchRule inventory_api_is_self_contained =
             noClasses().that().resideInAPackage("..inventory.api..")
                     .should().dependOnClassesThat()

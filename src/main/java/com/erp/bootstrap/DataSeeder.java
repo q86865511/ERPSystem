@@ -1,5 +1,7 @@
 package com.erp.bootstrap;
 
+import com.erp.hr.api.EmploymentStatus;
+import com.erp.hr.application.HrService;
 import com.erp.manufacturing.application.BomService;
 import com.erp.manufacturing.application.BomService.ComponentInput;
 import com.erp.manufacturing.application.WorkOrderService;
@@ -59,6 +61,7 @@ public class DataSeeder implements ApplicationRunner {
     private static final String ACTOR = "seed";
     private static final String VENDOR_CODE = "VEND-DEMO";
 
+    private final HrService hrService;
     private final MasterDataService masterDataService;
     private final MasterDataQuery masterDataQuery;
     private final WarehouseRepository warehouseRepository;
@@ -79,7 +82,8 @@ public class DataSeeder implements ApplicationRunner {
                       VendorBillService vendorBillService, PaymentService paymentService,
                       BomService bomService, WorkOrderService workOrderService,
                       SalesOrderService salesOrderService, DeliveryService deliveryService,
-                      SalesInvoiceService salesInvoiceService) {
+                      SalesInvoiceService salesInvoiceService, HrService hrService) {
+        this.hrService = hrService;
         this.masterDataService = masterDataService;
         this.masterDataQuery = masterDataQuery;
         this.warehouseRepository = warehouseRepository;
@@ -104,6 +108,8 @@ public class DataSeeder implements ApplicationRunner {
         LocalDate today = LocalDate.now();
         Long stock = stockLocationId();
         log.info("Seeding demo buy -> make -> sell slice...");
+
+        seedHumanResources();
 
         Long vendor = masterDataService.createPartner(VENDOR_CODE, "Demo Vendor", true, false, null, 30,
                 null, null).getId();
@@ -158,5 +164,33 @@ public class DataSeeder implements ApplicationRunner {
         Long warehouseId = warehouseRepository.findByCode("WH1").orElseThrow().getId();
         return locationRepository.findByWarehouseIdAndLocationType(warehouseId, LocationType.STOCK)
                 .orElseThrow().getId();
+    }
+
+    /** Seed a small org chart (3 departments, 4 positions, 8 employees) for the HR module demo. */
+    private void seedHumanResources() {
+        Long eng = hrService.createDepartment("ENG", "Engineering", "6100").getId();
+        Long ops = hrService.createDepartment("OPS", "Operations", "6100").getId();
+        Long adm = hrService.createDepartment("ADM", "Finance & Admin", "6100").getId();
+
+        Long engineer = hrService.createPosition("ENGINEER", "Engineer", new BigDecimal("70000")).getId();
+        Long manager = hrService.createPosition("MANAGER", "Manager", new BigDecimal("95000")).getId();
+        Long operator = hrService.createPosition("OPERATOR", "Operator", new BigDecimal("42000")).getId();
+        Long accountant = hrService.createPosition("ACCOUNTANT", "Accountant", new BigDecimal("60000")).getId();
+
+        record Emp(String code, String first, String last, Long dept, Long pos, String salary, int year) {}
+        List<Emp> roster = List.of(
+                new Emp("EMP-001", "Wei-Lun", "Chou", eng, manager, "98000", 2020),
+                new Emp("EMP-002", "Mei", "Lin", eng, engineer, "72000", 2021),
+                new Emp("EMP-003", "Cheng", "Wang", eng, engineer, "68000", 2022),
+                new Emp("EMP-004", "Ya-Ting", "Chen", ops, manager, "90000", 2019),
+                new Emp("EMP-005", "Jun", "Huang", ops, operator, "44000", 2022),
+                new Emp("EMP-006", "Hsin", "Liu", ops, operator, "41000", 2023),
+                new Emp("EMP-007", "Pei", "Yang", adm, accountant, "61000", 2021),
+                new Emp("EMP-008", "Kai", "Wu", adm, accountant, "58000", 2023));
+        for (Emp e : roster) {
+            hrService.createEmployee(e.code(), e.first(), e.last(), e.dept(), e.pos(),
+                    new BigDecimal(e.salary()), EmploymentStatus.ACTIVE, LocalDate.of(e.year(), 4, 1));
+        }
+        log.info("HR seed complete: 3 departments, 4 positions, {} employees.", roster.size());
     }
 }

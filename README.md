@@ -133,6 +133,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 | `manufacturing` | BOM、工單、WIP 領料/完工、再訂點 | — |
 | `payments` | 客戶/廠商收付款 + 配款(in/out) | — |
 | `reporting` | read-side 財務報表 + 對帳健康檢查 | — |
+| `hr` | 員工/部門/職位主檔(HR) | `HrQuery` |
 | `iam` | 認證與角色授權 | — |
 
 | 層面 | 選型 |
@@ -142,7 +143,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 | 持久化 | Spring Data JPA / Hibernate + Flyway migrations |
 | 邊界強制 | ArchUnit(CI 強制) |
 | 金額與數量 | `BigDecimal` value object —— `Money`(`NUMERIC(19,4)`)、`Quantity`/cost(`NUMERIC(19,6)`),絕不用 `float`;JSON 序列化為**字串** |
-| 認證 | Spring Security + **JWT**(access 記憶體 + refresh httpOnly cookie),持久化使用者(bcrypt),4 角色(ADMIN / ACCOUNTANT / WAREHOUSE / SALES)+ 唯讀 guest |
+| 認證 | Spring Security + **JWT**(access 記憶體 + refresh httpOnly cookie),持久化使用者(bcrypt),5 角色(ADMIN / ACCOUNTANT / WAREHOUSE / SALES / HR)+ 唯讀 guest |
 | API 文件 | springdoc-openapi(OpenAPI 3.1)+ Swagger UI(`/swagger-ui.html`) |
 | 測試 | JUnit + Testcontainers(真 Postgres) |
 | 前端 | React 19 + TypeScript + Mantine 9 + Vite 8 + TanStack Query + React Router |
