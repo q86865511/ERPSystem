@@ -41,6 +41,7 @@ public class UserSeeder implements ApplicationRunner {
         create("accountant", Set.of(Role.ACCOUNTANT));
         create("warehouse", Set.of(Role.WAREHOUSE));
         create("sales", Set.of(Role.SALES));
+        create("hr", Set.of(Role.HR));
         create("guest", Set.of()); // read-only: no role
     }
 

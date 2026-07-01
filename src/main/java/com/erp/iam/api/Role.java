@@ -9,5 +9,6 @@ public enum Role {
     ADMIN,
     ACCOUNTANT,
     WAREHOUSE,
-    SALES
+    SALES,
+    HR
 }
