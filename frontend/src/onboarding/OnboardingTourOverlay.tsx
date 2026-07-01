@@ -117,7 +117,7 @@ export function OnboardingTourOverlay() {
         height: rect.height + PAD * 2,
         borderRadius: 10,
         boxShadow: '0 0 0 9999px rgba(26, 20, 16, 0.55)',
-        border: '2px solid var(--mantine-color-terracotta-6)',
+        border: '2px solid var(--mantine-color-brand-6)',
         pointerEvents: 'none',
         zIndex: 1000,
         transition: 'top 150ms ease, left 150ms ease, width 150ms ease, height 150ms ease',
@@ -143,7 +143,7 @@ export function OnboardingTourOverlay() {
                 {t(step.descriptionKey)}
               </Text>
               {step.actionKey && (
-                <Text size="sm" fw={500} c="terracotta">
+                <Text size="sm" fw={500} c="brand">
                   {t(step.actionKey)}
                 </Text>
               )}

@@ -241,11 +241,20 @@ an append-only `audit_log` (domain events + an `AFTER_COMMIT` listener, so only 
 recorded; a DB trigger blocks update/delete). ADMIN users browse the "Audit Trail" page, filterable by event
 type and actor.
 
-**The "Warm Terracotta" design system**: a self-built Mantine theme — a warm terracotta primary color
-(`#C0532E`) + a warm-gray neutral scale (replacing the stock cool gray) + a self-hosted Plus Jakarta Sans;
+> 🔵 **"Blue Enterprise" redesign in progress**: the frontend is moving from Warm Terracotta to a blue
+> enterprise-SaaS look with data-viz-dense dashboards (`@mantine/charts`: KPI deltas / aging donuts /
+> trends / treemap / Gantt). The primary color is now blue (`#2563EB`) with a cool slate neutral scale;
+> the first end-to-end dashboard is the **finance overview** (real AR/AP aging donuts + KPIs + the
+> reconciliation hero). The design-system **architecture** described below (`theme.components` + the shared
+> component layer + light/dark + localStorage preference) is unchanged — only the **palette** turned blue.
+> Screenshots on this page are still Warm Terracotta; they'll be re-shot once all four dashboards land and
+> the app is deployed.
+
+**The design system (Blue Enterprise)**: a self-built Mantine theme — a blue enterprise primary color
+(`#2563EB`) + a cool slate neutral scale + a self-hosted Plus Jakarta Sans;
 light/dark mode toggles instantly from the top bar (defaults to the OS preference, persisted to
-localStorage). The component layer is a global `theme.components` override (warm tables, cards, inputs, …)
-plus 7 shared components (`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`AmountAllocationTable`/
+localStorage). The component layer is a global `theme.components` override (tables, cards, inputs, …)
+plus shared components (`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`KpiTile`/`DonutCard`/`AmountAllocationTable`/
 `EmptyState`/an enhanced `PageHeader`) — built as each module actually adopted them, not speculatively.
 
 **Onboarding tour (hand-rolled, no tour library)**: a ~2.5KB spotlight-and-callout overlay covering the

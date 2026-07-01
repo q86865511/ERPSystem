@@ -17,41 +17,41 @@ import {
   type MantineColorsTuple,
 } from '@mantine/core';
 
-// Warm Terracotta design system. The accent is a terracotta ramp; the neutral gray ramp is warm (not the
-// stock cool gray) so every surface, border, and dimmed text picks up the warmth. Both light and dark
+// Blue Enterprise design system. The accent is a corporate blue ramp; the neutral gray ramp is a cool
+// slate so every surface, border, and dimmed text reads crisp and business-like. Both light and dark
 // derive from these two ramps + the CSS-var surfaces in index.css — no second palette is authored.
-const terracotta: MantineColorsTuple = [
-  '#FDF8F5', // 0 / 50  lightest wash
-  '#F9F0EB', // 1 / 100
-  '#F0DFCC', // 2 / 200
-  '#E8C6A5', // 3 / 300
-  '#E0AD7E', // 4 / 400
-  '#D4935D', // 5 / 500  (dark-mode primary)
-  '#C0532E', // 6 / 600  primary accent (light)
-  '#A64729', // 7 / 700  hover
-  '#8C3C23', // 8 / 800
-  '#71301E', // 9 / 900
+const brand: MantineColorsTuple = [
+  '#ECF3FE', // 0 / 50  lightest wash
+  '#D6E6FD', // 1 / 100
+  '#ABC9FA', // 2 / 200
+  '#7CAAF5', // 3 / 300
+  '#558FEF', // 4 / 400
+  '#3B7EE8', // 5 / 500  (dark-mode primary)
+  '#2563EB', // 6 / 600  primary accent (light)
+  '#1D4FD0', // 7 / 700  hover
+  '#1A44B0', // 8 / 800
+  '#16357F', // 9 / 900
 ];
 
-const warmGray: MantineColorsTuple = [
-  '#FCFAF8', // 0
-  '#F5EDE8', // 1
-  '#E8DED7', // 2  light border
-  '#D9C8B8', // 3
-  '#9E8976', // 4  dimmed text
-  '#6B5E52', // 5
-  '#4A423A', // 6  primary text (light)
-  '#3A3430', // 7  dark border
-  '#2A2420', // 8  dark card
-  '#1A1410', // 9  dark page
+const coolGray: MantineColorsTuple = [
+  '#F8FAFC', // 0
+  '#F1F5F9', // 1
+  '#E2E8F0', // 2  light border
+  '#CBD5E1', // 3
+  '#94A3B8', // 4  dimmed text
+  '#64748B', // 5
+  '#334155', // 6  primary text (light)
+  '#293548', // 7  dark border
+  '#1B2436', // 8  dark card
+  '#0F172A', // 9  dark page
 ];
 
 export const theme = createTheme({
-  primaryColor: 'terracotta',
+  primaryColor: 'brand',
   primaryShade: { light: 6, dark: 5 },
   autoContrast: true,
 
-  colors: { terracotta, gray: warmGray },
+  colors: { brand, gray: coolGray },
 
   defaultRadius: 'md',
   radius: { xs: '4px', sm: '8px', md: '10px', lg: '14px', xl: '16px' },
@@ -87,7 +87,7 @@ export const theme = createTheme({
   //   1. We only set *safe defaults* and *inert visual tints* — inline props that panels already set
   //      (radius, padding, size, variant, color) win over defaultProps, so nothing is clobbered. Those
   //      panels get hand-polished in PRs 2.4–2.8.
-  //   2. Colors reference the terracotta ramp / warm-surface CSS vars (index.css) — no raw hex, so both
+  //   2. Colors reference the brand ramp / warm-surface CSS vars (index.css) — no raw hex, so both
   //      light and dark derive from the one source.
   components: {
     // White (light) / warm-dark (dark) card; warm hairline border; soft shadow; radius lg for new cards.
@@ -100,60 +100,60 @@ export const theme = createTheme({
       defaultProps: { shadow: 'xs' },
       styles: { root: { borderColor: 'var(--app-color-border)' } },
     }),
-    // Hairline warm borders + terracotta-tinted header + warm stripe/hover. We set only the *Color props
+    // Hairline warm borders + brand-tinted header + warm stripe/hover. We set only the *Color props
     // (inert unless `striped`/`highlightOnHover` are turned on inline), never the booleans — so detail /
     // modal tables that intentionally omit striping stay clean while list tables get the warm treatment.
     Table: Table.extend({
       defaultProps: {
         borderColor: 'var(--app-color-border)',
-        // Scheme-AWARE warm tints. `terracotta-light`/`-light-hover` resolve to soft terracotta beige in
-        // light and warm-dark tones in dark. (The earlier `terracotta-0`/`-1` were fixed-light ramp
+        // Scheme-AWARE warm tints. `brand-light`/`-light-hover` resolve to soft brand beige in
+        // light and warm-dark tones in dark. (The earlier `brand-0`/`-1` were fixed-light ramp
         // indices — near-white hex that was invisible on white in light and glaring white on dark.)
-        stripedColor: 'var(--mantine-color-terracotta-light)',
-        highlightOnHoverColor: 'var(--mantine-color-terracotta-light-hover)',
+        stripedColor: 'var(--mantine-color-brand-light)',
+        highlightOnHoverColor: 'var(--mantine-color-brand-light-hover)',
       },
       styles: {
         th: {
-          backgroundColor: 'var(--mantine-color-terracotta-light-hover)',
-          color: 'var(--mantine-color-terracotta-light-color)',
+          backgroundColor: 'var(--mantine-color-brand-light-hover)',
+          color: 'var(--mantine-color-brand-light-color)',
           fontWeight: 500,
         },
       },
     }),
-    // Active tab underline + label already follow the primary (terracotta); make it explicit.
+    // Active tab underline + label already follow the primary (brand); make it explicit.
     Tabs: Tabs.extend({
-      defaultProps: { color: 'terracotta' },
+      defaultProps: { color: 'brand' },
     }),
-    // Active nav item: 3px terracotta left bar via inset box-shadow (no layout shift). The warm wash bg +
-    // terracotta label come for free from the primary color on the default (light) variant.
+    // Active nav item: 3px brand left bar via inset box-shadow (no layout shift). The warm wash bg +
+    // brand label come for free from the primary color on the default (light) variant.
     NavLink: NavLink.extend({
       styles: (_theme, props) => ({
-        root: props.active ? { boxShadow: 'inset 3px 0 0 var(--mantine-color-terracotta-6)' } : {},
+        root: props.active ? { boxShadow: 'inset 3px 0 0 var(--mantine-color-brand-6)' } : {},
       }),
     }),
-    // Warm centered dialog, radius lg, terracotta close button. Inline `size` is preserved.
+    // Warm centered dialog, radius lg, brand close button. Inline `size` is preserved.
     Modal: Modal.extend({
       defaultProps: { centered: true, padding: 'lg', radius: 'lg' },
-      styles: { close: { color: 'var(--mantine-color-terracotta-6)' } },
+      styles: { close: { color: 'var(--mantine-color-brand-6)' } },
     }),
-    // Right-slide detail drawer, radius lg, terracotta close button.
+    // Right-slide detail drawer, radius lg, brand close button.
     Drawer: Drawer.extend({
       defaultProps: { position: 'right', padding: 'lg', radius: 'lg' },
-      styles: { close: { color: 'var(--mantine-color-terracotta-6)' } },
+      styles: { close: { color: 'var(--mantine-color-brand-6)' } },
     }),
     // One override skins every text/select/number/date input (they all render <Input> internally). Only
-    // the resting border is warmed here — the focus border already follows the primary (terracotta).
+    // the resting border is warmed here — the focus border already follows the primary (brand).
     // `--input-bd` isn't in the typed CSS-var union, so it goes through `styles.wrapper` (CSSProperties
     // allows custom properties), not the typed `vars` resolver.
     Input: Input.extend({
       styles: { wrapper: { '--input-bd': 'var(--app-color-border)' } },
     }),
-    // Filled buttons are already terracotta (primary). Anchor the radius; leave variant to each call site
+    // Filled buttons are already brand (primary). Anchor the radius; leave variant to each call site
     // (panels use subtle/default/light strategically).
     Button: Button.extend({
       defaultProps: { radius: 'md' },
     }),
-    // Tertiary by default; terracotta-on-hover comes from the primary. Inline variant/color (e.g. the
+    // Tertiary by default; brand-on-hover comes from the primary. Inline variant/color (e.g. the
     // red delete icons) still win.
     ActionIcon: ActionIcon.extend({
       defaultProps: { variant: 'subtle' },

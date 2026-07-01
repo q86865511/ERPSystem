@@ -82,11 +82,11 @@ export function AppLayout() {
                 alignItems: 'center',
                 gap: 8,
                 textDecoration: 'none',
-                // Scheme-aware terracotta: terracotta-6 in light, lighter terracotta-4 in dark.
-                color: 'var(--mantine-color-terracotta-text)',
+                // Scheme-aware brand: brand-6 in light, lighter brand-4 in dark.
+                color: 'var(--mantine-color-brand-text)',
               }}
             >
-              {/* Ledger-balance mark; `currentColor` inherits the terracotta link color above. */}
+              {/* Ledger-balance mark; `currentColor` inherits the brand link color above. */}
               <svg
                 width={28}
                 height={28}
@@ -137,7 +137,7 @@ export function AppLayout() {
                   variant="subtle"
                   color="gray"
                   leftSection={
-                    <Avatar size={26} radius="xl" color="terracotta">
+                    <Avatar size={26} radius="xl" color="brand">
                       {user?.username?.charAt(0).toUpperCase()}
                     </Avatar>
                   }
@@ -186,7 +186,7 @@ export function AppLayout() {
         <Suspense
           fallback={
             <Center py="xl">
-              <Loader color="terracotta" />
+              <Loader color="brand" />
             </Center>
           }
         >

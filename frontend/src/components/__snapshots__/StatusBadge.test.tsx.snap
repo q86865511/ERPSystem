@@ -32,7 +32,7 @@ exports[`StatusBadge > matches snapshot for CONFIRMED in dark 1`] = `
 <div
   class="m_347db0ec mantine-Badge-root"
   data-variant="light"
-  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-terracotta-light); --badge-color: var(--mantine-color-terracotta-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
+  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-brand-light); --badge-color: var(--mantine-color-brand-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
 >
   <span
     class="m_5add502a mantine-Badge-label"
@@ -46,7 +46,7 @@ exports[`StatusBadge > matches snapshot for CONFIRMED in light 1`] = `
 <div
   class="m_347db0ec mantine-Badge-root"
   data-variant="light"
-  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-terracotta-light); --badge-color: var(--mantine-color-terracotta-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
+  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-brand-light); --badge-color: var(--mantine-color-brand-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
 >
   <span
     class="m_5add502a mantine-Badge-label"
@@ -88,7 +88,7 @@ exports[`StatusBadge > matches snapshot for IN_PROGRESS in dark 1`] = `
 <div
   class="m_347db0ec mantine-Badge-root"
   data-variant="light"
-  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-terracotta-light); --badge-color: var(--mantine-color-terracotta-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
+  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-brand-light); --badge-color: var(--mantine-color-brand-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
 >
   <span
     class="m_5add502a mantine-Badge-label"
@@ -102,7 +102,7 @@ exports[`StatusBadge > matches snapshot for IN_PROGRESS in light 1`] = `
 <div
   class="m_347db0ec mantine-Badge-root"
   data-variant="light"
-  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-terracotta-light); --badge-color: var(--mantine-color-terracotta-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
+  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-brand-light); --badge-color: var(--mantine-color-brand-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
 >
   <span
     class="m_5add502a mantine-Badge-label"
@@ -116,7 +116,7 @@ exports[`StatusBadge > matches snapshot for RELEASED in dark 1`] = `
 <div
   class="m_347db0ec mantine-Badge-root"
   data-variant="light"
-  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-terracotta-light); --badge-color: var(--mantine-color-terracotta-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
+  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-brand-light); --badge-color: var(--mantine-color-brand-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
 >
   <span
     class="m_5add502a mantine-Badge-label"
@@ -130,7 +130,7 @@ exports[`StatusBadge > matches snapshot for RELEASED in light 1`] = `
 <div
   class="m_347db0ec mantine-Badge-root"
   data-variant="light"
-  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-terracotta-light); --badge-color: var(--mantine-color-terracotta-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
+  style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-brand-light); --badge-color: var(--mantine-color-brand-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
 >
   <span
     class="m_5add502a mantine-Badge-label"
