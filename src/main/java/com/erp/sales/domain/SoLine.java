@@ -81,6 +81,10 @@ public class SoLine {
         return qtyShipped.compareTo(qtyOrdered) >= 0;
     }
 
+    public boolean isFullyInvoiced() {
+        return qtyInvoiced.compareTo(qtyOrdered) >= 0;
+    }
+
     void ship(BigDecimal qty) {
         this.qtyShipped = qtyShipped.add(qty);
     }

@@ -115,9 +115,16 @@ public class SalesOrder {
                 : SalesOrderStatus.PARTIALLY_SHIPPED;
     }
 
-    /** Records invoiced quantity against a line (used when a customer invoice matches deliveries). */
+    /**
+     * Records invoiced quantity against a line (used when a customer invoice matches deliveries) and
+     * closes the order once every line is fully shipped and fully invoiced — its terminal state.
+     */
     public void applyInvoicing(Long soLineId, BigDecimal qty) {
         lineById(soLineId).invoice(qty);
+        if (lines.stream().allMatch(SoLine::isFullyShipped)
+                && lines.stream().allMatch(SoLine::isFullyInvoiced)) {
+            this.status = SalesOrderStatus.CLOSED;
+        }
     }
 
     public List<SoLine> getLines() {

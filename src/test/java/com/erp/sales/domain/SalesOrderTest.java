@@ -52,4 +52,17 @@ class SalesOrderTest {
         line.ship(new BigDecimal("6"));
         assertThat(line.isFullyShipped()).isTrue();
     }
+
+    @Test
+    void lineTracksInvoiceRollup() {
+        SalesOrder so = new SalesOrder("SO-5", 7L, TODAY);
+        SoLine line = so.addLine(1L, new BigDecimal("10"), new BigDecimal("2"));
+
+        line.invoice(new BigDecimal("4"));
+        assertThat(line.getQtyInvoiced()).isEqualByComparingTo("4");
+        assertThat(line.isFullyInvoiced()).isFalse();
+
+        line.invoice(new BigDecimal("6"));
+        assertThat(line.isFullyInvoiced()).isTrue();
+    }
 }

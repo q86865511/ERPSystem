@@ -12,6 +12,7 @@ import com.erp.sales.application.SalesInvoiceService.InvoiceLineInput;
 import com.erp.sales.application.SalesOrderService.SoLineInput;
 import com.erp.sales.domain.SalesInvoice;
 import com.erp.sales.domain.SalesOrder;
+import com.erp.sales.domain.SalesOrderStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -136,6 +137,35 @@ class SalesInvoicePostingIT {
                 second.getJournalEntryId())).isEqualByComparingTo("0");
         SalesOrder reloaded = salesOrderService.getOrder(so.getId());
         assertThat(reloaded.getLines().get(0).getQtyInvoiced()).isEqualByComparingTo("100");
+    }
+
+    @Test
+    void fullyShippedAndInvoicedOrderCloses() {
+        SalesOrder so = deliveredOrder("50", "10", "30", "20", "30");
+        Long soLineId = so.getLines().get(0).getId();
+        assertThat(so.getStatus()).isEqualTo(SalesOrderStatus.SHIPPED);
+
+        salesInvoiceService.postInvoice(so.getId(),
+                List.of(new InvoiceLineInput(soLineId, new BigDecimal("30"), new BigDecimal("20"))),
+                "STANDARD", JUNE, "tester");
+
+        SalesOrder reloaded = salesOrderService.getOrder(so.getId());
+        assertThat(reloaded.getStatus()).isEqualTo(SalesOrderStatus.CLOSED);
+    }
+
+    @Test
+    void partiallyShippedOrderStaysOpenWhenItsShippedPortionIsInvoiced() {
+        // Ordered 100, only 40 shipped: the SO is not fully shipped, so invoicing that 40 must not close it.
+        SalesOrder so = deliveredOrder("100", "5", "100", "8", "40");
+        Long soLineId = so.getLines().get(0).getId();
+        assertThat(so.getStatus()).isEqualTo(SalesOrderStatus.PARTIALLY_SHIPPED);
+
+        salesInvoiceService.postInvoice(so.getId(),
+                List.of(new InvoiceLineInput(soLineId, new BigDecimal("40"), new BigDecimal("8"))),
+                "STANDARD", JUNE, "tester");
+
+        SalesOrder reloaded = salesOrderService.getOrder(so.getId());
+        assertThat(reloaded.getStatus()).isEqualTo(SalesOrderStatus.PARTIALLY_SHIPPED);
     }
 
     @Test
