@@ -85,26 +85,28 @@ export function LoginPage() {
             </Stack>
           </form>
 
-          <Divider label={t('login.demoAccounts')} labelPosition="center" />
-          <Button variant="light" disabled={loading} onClick={() => submit('guest', 'guest')}>
-            {t('login.guestEntry')}
-          </Button>
-          <Group grow gap="xs">
-            {ROLE_USERS.map((name) => (
-              <Button
-                key={name}
-                size="xs"
-                variant="default"
-                disabled={loading}
-                onClick={() => submit(name, name)}
-              >
-                {name}
-              </Button>
-            ))}
-          </Group>
-          <Text size="xs" c="dimmed" ta="center">
-            {t('login.demoHint')}
-          </Text>
+          <Stack gap="md" data-onboarding="demo-accounts">
+            <Divider label={t('login.demoAccounts')} labelPosition="center" />
+            <Button variant="light" disabled={loading} onClick={() => submit('guest', 'guest')}>
+              {t('login.guestEntry')}
+            </Button>
+            <Group grow gap="xs">
+              {ROLE_USERS.map((name) => (
+                <Button
+                  key={name}
+                  size="xs"
+                  variant="default"
+                  disabled={loading}
+                  onClick={() => submit(name, name)}
+                >
+                  {name}
+                </Button>
+              ))}
+            </Group>
+            <Text size="xs" c="dimmed" ta="center">
+              {t('login.demoHint')}
+            </Text>
+          </Stack>
         </Stack>
       </Card>
     </Center>
