@@ -136,9 +136,11 @@ docker compose -f compose.demo.yaml up --build
 - Frontend: <http://localhost:8081>
 - Interactive API docs (Swagger UI): <http://localhost:8081/swagger-ui.html> (get an access token from `POST /api/auth/login`, then click **Authorize**)
 - Seeded users (JWT, password == username): `guest` (read-only, the login default), `admin` (all roles), `accountant`, `warehouse`, `sales`
-- On startup the app posts a full buy → make → sell slice through the **real services** (`DataSeeder`
-  is idempotent — it skips when the demo vendor already exists, so re-running `up` against the kept
-  volume is safe)
+- On startup the app posts a **multi-month, multi-item** buy → make → sell data set through the **real
+  services** (dozens of POs/SOs, several work orders, some left unpaid to fill the AR/AP aging buckets,
+  a few items below their reorder point) so the dashboards render with depth. `DataSeeder` is idempotent
+  — it skips when the demo vendor already exists, so re-running `up` against the kept volume is safe —
+  and the reconciliation hero stays green (subledgers == GL, clearing accounts at zero)
 
 > For a fresh dataset: `docker compose -f compose.demo.yaml down -v` to drop the volume, then `up`.
 

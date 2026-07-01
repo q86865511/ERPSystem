@@ -98,7 +98,7 @@ docker compose -f compose.demo.yaml up --build
 - 前端入口:<http://localhost:8081>
 - 互動式 API 文件(Swagger UI):<http://localhost:8081/swagger-ui.html>(`POST /api/auth/login` 取 access token,按 **Authorize** 貼上)
 - 內建帳號(JWT,密碼=帳號):`guest`(唯讀,登入頁預設)、`admin`(全角色)、`accountant`、`warehouse`、`sales`
-- 啟動時會經**真實過帳 service** 灌入完整 買→做→賣(`DataSeeder` 為冪等:demo 廠商已存在則跳過,故保留 volume 重跑 `up` 安全)
+- 啟動時會經**真實過帳 service** 灌入**跨數月、多品項/多夥伴**的 買→做→賣(數十筆 PO/SO、多張工單、部分未收/未付款以填滿 AR/AP 帳齡各桶、數個低於安全庫存的品項),讓儀表板有料;`DataSeeder` 為冪等(demo 廠商已存在則跳過,故保留 volume 重跑 `up` 安全),且對帳 hero 仍全綠(子帳==GL、過渡科目歸零)
 
 > 想要全新一份資料時:`docker compose -f compose.demo.yaml down -v` 清掉 volume 再 `up`。
 

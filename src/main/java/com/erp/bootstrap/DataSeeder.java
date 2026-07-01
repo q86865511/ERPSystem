@@ -42,6 +42,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,6 +50,14 @@ import java.util.List;
  * posting services — so the books land balanced exactly as they would in production — rather than bypassing
  * the invariants with raw SQL. After it runs, the reconciliation health-check is healthy: GR-IR, AP,
  * Deferred-COGS, AR and WIP have all netted to zero, and inventory/COGS/revenue are booked.
+ *
+ * <p>On top of the canonical single cycle (RM-DEMO/FG-DEMO), it seeds a richer, multi-month, multi-item
+ * data set so the dashboards render with real depth: a spread of purchase/sales orders across the past
+ * months of FY2026, several product families, work orders in mixed states, and — crucially — some
+ * invoiced-but-unpaid documents that fill the AR/AP aging buckets. Every document still flows through the
+ * real services, so the reconciliation stays green: any receive is billed, any issue is completed, any
+ * delivery is invoiced. Documents left "in progress" stop only at pre-posting states (DRAFT/CONFIRMED for
+ * orders, RELEASED for work orders), which touch no clearing account.
  *
  * <p>This is the application composition root wiring every module's services, so it lives outside the
  * per-module boundaries (it is not part of any business module).
@@ -60,6 +69,7 @@ public class DataSeeder implements ApplicationRunner {
     private static final Logger log = LoggerFactory.getLogger(DataSeeder.class);
     private static final String ACTOR = "seed";
     private static final String VENDOR_CODE = "VEND-DEMO";
+    private static final String TAX_CODE = "STANDARD";
 
     private final HrService hrService;
     private final MasterDataService masterDataService;
@@ -129,7 +139,7 @@ public class DataSeeder implements ApplicationRunner {
                 List.of(new ReceiptLineInput(poLine, new BigDecimal("100"))), today, ACTOR);
         VendorBill bill = vendorBillService.postBill(po.getId(),
                 List.of(new BillLineInput(poLine, new BigDecimal("100"), new BigDecimal("10"))),
-                "STANDARD", today, ACTOR);
+                TAX_CODE, today, ACTOR);
         paymentService.payOut(vendor, bill.getGrossAmount(), today,
                 List.of(new Allocation(bill.getId(), bill.getGrossAmount())), ACTOR);
 
@@ -151,13 +161,15 @@ public class DataSeeder implements ApplicationRunner {
                 List.of(new DeliveryLineInput(soLine, new BigDecimal("30"))), today, ACTOR);
         SalesInvoice invoice = salesInvoiceService.postInvoice(so.getId(),
                 List.of(new InvoiceLineInput(soLine, new BigDecimal("30"), new BigDecimal("20"))),
-                "STANDARD", today, ACTOR);
+                TAX_CODE, today, ACTOR);
         paymentService.payIn(customer, invoice.getGrossAmount(), today,
                 List.of(new ReceiptAllocation(invoice.getId(), invoice.getGrossAmount())), ACTOR);
 
-        log.info("Demo seed complete: PO {}, WO {}, delivery {}, invoice {} — books reconcile.",
+        log.info("Canonical seed complete: PO {}, WO {}, delivery {}, invoice {} — books reconcile.",
                 po.getPoNumber(), wo.getWoNumber(), delivery.getDeliveryNumber(),
                 invoice.getInvoiceNumber());
+
+        seedRichDemoData(stock, today);
     }
 
     private Long stockLocationId() {
@@ -192,5 +204,260 @@ public class DataSeeder implements ApplicationRunner {
                     new BigDecimal(e.salary()), EmploymentStatus.ACTIVE, LocalDate.of(e.year(), 4, 1));
         }
         log.info("HR seed complete: 3 departments, 4 positions, {} employees.", roster.size());
+    }
+
+    // =================================================================================================
+    // Rich demo enrichment — multi-month, multi-item buy → make → sell so the dashboards render with
+    // depth. Everything flows through the real services and obeys the reconciliation invariants:
+    //   • every receive is billed, every issue is completed, every delivery is invoiced (clearing → 0);
+    //   • "in progress" documents stop only at DRAFT/CONFIRMED (orders) or RELEASED (work orders);
+    //   • some invoiced-but-unpaid documents are left open, back-dated across the year, to populate the
+    //     AR/AP aging buckets (subledger still equals the GL control account, so the books reconcile).
+    // =================================================================================================
+
+    /** Finished good plus its (already created) bill of materials and demo sale price. */
+    private record Family(Long finished, Long bomId, String salePrice) {}
+
+    private void seedRichDemoData(Long stock, LocalDate today) {
+        // Posting dates spread over the past months of FY2026 (all twelve periods are seeded OPEN). The
+        // 15th of each earlier month, plus today, lets back-dated unpaid invoices land across every aging
+        // bucket. Falls back to just today outside 2026 so we never post into a missing/closed period.
+        List<LocalDate> months = new ArrayList<>();
+        if (today.getYear() == 2026) {
+            for (int m = 1; m < today.getMonthValue(); m++) {
+                months.add(LocalDate.of(2026, m, 15));
+            }
+        }
+        months.add(today);
+
+        // --- Master data -----------------------------------------------------------------------------
+        List<Long> vendors = List.of(
+                vendor("VEND-STEEL", "Formosa Steel Co."),
+                vendor("VEND-ALLOY", "Pacific Alloy Ltd."),
+                vendor("VEND-POLY", "Taipei Polymers Inc."),
+                vendor("VEND-ELEC", "Hsinchu Electronics"),
+                vendor("VEND-PKG", "Kaohsiung Packaging"));
+        List<Long> customers = List.of(
+                customer("CUST-NORTH", "Northern Machinery"),
+                customer("CUST-SOUTH", "Southern Industries"),
+                customer("CUST-EAST", "Eastern Automation"),
+                customer("CUST-WEST", "Western Robotics"),
+                customer("CUST-GLOBAL", "Global Distributors"));
+
+        // Production raw materials — bought generously so issues never exceed on-hand.
+        Long rSteel = rawItem("RM-STEEL", "Steel Sheet", "150", null, null);
+        Long rAlu = rawItem("RM-ALU", "Aluminium Bar", "120", null, null);
+        Long rPoly = rawItem("RM-POLY", "Polymer Resin", "80", null, null);
+        Long rRubber = rawItem("RM-RUBBER", "Rubber Seal", "15", null, null);
+        Long rPcb = rawItem("RM-PCB", "PCB Board", "200", null, null);
+        // Low-stock demo materials — a reorder point with a small on-hand, so they surface on the reorder
+        // report / low-stock alert. They must carry a small purchase (below) so an on-hand row exists: the
+        // reorder report is driven by inventory movements, so a never-received item would never appear.
+        Long rCopper = rawItem("RM-COPPER", "Copper Wire", "60", "100", "200");
+        Long rGlass = rawItem("RM-GLASS", "Glass Panel", "90", "50", "150");
+        Long rLube = rawItem("RM-LUBE", "Lubricant Oil", "30", "80", "120");
+
+        // Finished goods (their cost comes from the production roll-up, so standard cost is 0).
+        Long fPump = finishedItem("FG-PUMP", "Hydraulic Pump", null);
+        Long fValve = finishedItem("FG-VALVE", "Control Valve", null);
+        Long fMotor = finishedItem("FG-MOTOR", "Servo Motor", null);
+        Long fSensor = finishedItem("FG-SENSOR", "Pressure Sensor", null);
+        Long fPanel = finishedItem("FG-PANEL", "Control Panel", null);
+
+        // --- Purchasing: fully-received-and-paid raw, spread over months (no AP left open here) --------
+        buyAndPay(vendors.get(0), rSteel, "220", "150", monthAt(months, 0), stock);
+        buyAndPay(vendors.get(0), rSteel, "200", "156", monthAt(months, 2), stock);
+        buyAndPay(vendors.get(1), rAlu, "280", "120", monthAt(months, 0), stock);
+        buyAndPay(vendors.get(1), rAlu, "260", "124", monthAt(months, 3), stock);
+        buyAndPay(vendors.get(2), rPoly, "220", "80", monthAt(months, 1), stock);
+        buyAndPay(vendors.get(2), rPoly, "200", "83", monthAt(months, 3), stock);
+        buyAndPay(vendors.get(3), rPcb, "220", "200", monthAt(months, 1), stock);
+        buyAndPay(vendors.get(3), rPcb, "200", "205", monthAt(months, 4), stock);
+        buyAndPay(vendors.get(0), rRubber, "200", "15", monthAt(months, 2), stock);
+        // Small purchases for the low-stock demo materials — an on-hand row exists but stays below reorder.
+        buyAndPay(vendors.get(4), rGlass, "10", "90", monthAt(months, 1), stock);
+        buyAndPay(vendors.get(3), rCopper, "20", "60", monthAt(months, 2), stock);
+        buyAndPay(vendors.get(4), rLube, "15", "30", monthAt(months, 3), stock);
+
+        // --- Purchasing: received-and-billed but UNPAID, back-dated -> fills the AP aging buckets ------
+        Long[] apRaw = {rSteel, rAlu, rPoly, rPcb, rRubber, rSteel};
+        for (int i = 0; i < months.size(); i++) {
+            buyOnCredit(vendors.get(i % vendors.size()), apRaw[i % apRaw.length], "40", "160",
+                    months.get(i), stock);
+        }
+
+        // --- Purchasing: orders still open (no receipt) -> "purchasing in progress" has volume ---------
+        purchaseOrderService.confirm(draftPo(vendors.get(2), rPoly, "120", "82", today).getId(), ACTOR);
+        purchaseOrderService.confirm(draftPo(vendors.get(3), rPcb, "60", "203", today).getId(), ACTOR);
+        draftPo(vendors.get(1), rAlu, "90", "122", today); // stays DRAFT
+
+        // --- Bills of material (one per finished good, component qty <= 2) -----------------------------
+        List<Family> families = List.of(
+                new Family(fPump, bom(fPump, List.of(comp(rSteel, "2"), comp(rRubber, "1"))), "620"),
+                new Family(fValve, bom(fValve, List.of(comp(rSteel, "1"), comp(rAlu, "1"))), "430"),
+                new Family(fMotor, bom(fMotor, List.of(comp(rAlu, "2"), comp(rPcb, "1"))), "780"),
+                new Family(fSensor, bom(fSensor, List.of(comp(rPcb, "2"), comp(rPoly, "1"))), "560"),
+                new Family(fPanel, bom(fPanel, List.of(comp(rPoly, "2"), comp(rAlu, "1"))), "510"));
+
+        // --- Manufacturing: two completed work orders per family (produce finished goods) --------------
+        for (Family f : families) {
+            produce(f.finished(), f.bomId(), "50", stock, monthAt(months, 4));
+            produce(f.finished(), f.bomId(), "40", stock, monthAt(months, 5));
+        }
+        // Released work orders (not issued) -> WIP KPI, progress board and dispatch queue have data.
+        releaseWorkOrder(fPump, families.get(0).bomId(), "30");
+        releaseWorkOrder(fValve, families.get(1).bomId(), "25");
+        releaseWorkOrder(fMotor, families.get(2).bomId(), "45");
+        releaseWorkOrder(fSensor, families.get(3).bomId(), "20");
+        releaseWorkOrder(fPanel, families.get(4).bomId(), "35");
+        // Draft work orders (not released) -> more depth on the dispatch queue.
+        workOrderService.create(fPump, families.get(0).bomId(), new BigDecimal("15"), ACTOR);
+        workOrderService.create(fMotor, families.get(2).bomId(), new BigDecimal("10"), ACTOR);
+
+        // --- Sales: delivered-invoiced-and-paid, spread over recent months (revenue/COGS, no AR) -------
+        for (int i = 0; i < families.size(); i++) {
+            Family f = families.get(i);
+            sellAndCollect(customers.get(i % customers.size()), f.finished(), "20", f.salePrice(),
+                    monthAt(months, 4), stock);
+            sellAndCollect(customers.get((i + 1) % customers.size()), f.finished(), "15", f.salePrice(),
+                    monthAt(months, 5), stock);
+        }
+
+        // --- Sales: delivered-and-invoiced but UNPAID, back-dated -> fills the AR aging buckets --------
+        for (int i = 0; i < months.size(); i++) {
+            Family f = families.get(i % families.size());
+            sellOnCredit(customers.get(i % customers.size()), f.finished(), "8", f.salePrice(),
+                    months.get(i), stock);
+        }
+
+        // --- Sales: orders still open -> the order funnel has confirmed and draft stages ---------------
+        salesOrderService.confirm(draftSo(customers.get(0), fPump, "12", "620", today).getId(), ACTOR);
+        salesOrderService.confirm(draftSo(customers.get(1), fValve, "10", "430", today).getId(), ACTOR);
+        salesOrderService.confirm(draftSo(customers.get(2), fMotor, "6", "780", today).getId(), ACTOR);
+        salesOrderService.confirm(draftSo(customers.get(3), fPanel, "9", "510", today).getId(), ACTOR);
+        draftSo(customers.get(4), fSensor, "8", "560", today);   // stays DRAFT
+        draftSo(customers.get(0), fMotor, "5", "780", today);    // stays DRAFT
+
+        log.info("Rich demo seed complete: {} vendors, {} customers, {} product families across {} months.",
+                vendors.size(), customers.size(), families.size(), months.size());
+    }
+
+    // ---- Master-data helpers ------------------------------------------------------------------------
+
+    private Long vendor(String code, String name) {
+        return masterDataService.createPartner(code, name, true, false, null, 30, null, null).getId();
+    }
+
+    private Long customer(String code, String name) {
+        return masterDataService.createPartner(code, name, false, true, null, 30, null, null).getId();
+    }
+
+    private Long rawItem(String sku, String name, String standardCost, String reorderPoint,
+                         String reorderQty) {
+        return masterDataService.createItem(sku, name, ItemType.RAW, "EA", true,
+                new BigDecimal(standardCost),
+                reorderPoint == null ? null : new BigDecimal(reorderPoint),
+                reorderQty == null ? null : new BigDecimal(reorderQty)).getId();
+    }
+
+    private Long finishedItem(String sku, String name, String reorderPoint) {
+        return masterDataService.createItem(sku, name, ItemType.FINISHED, "EA", true, BigDecimal.ZERO,
+                reorderPoint == null ? null : new BigDecimal(reorderPoint), null).getId();
+    }
+
+    private ComponentInput comp(Long itemId, String qtyPer) {
+        return new ComponentInput(itemId, new BigDecimal(qtyPer), null);
+    }
+
+    private Long bom(Long finished, List<ComponentInput> components) {
+        return bomService.createBom(finished, BigDecimal.ONE, components, ACTOR).getId();
+    }
+
+    // ---- Purchasing helpers -------------------------------------------------------------------------
+
+    /** PO → confirm → receive → bill (+VAT) → pay in full. Adds inventory, leaves no AP open. */
+    private void buyAndPay(Long vendor, Long item, String qty, String price, LocalDate date, Long stock) {
+        VendorBill posted = receiveAndBill(vendor, item, qty, price, date, stock);
+        paymentService.payOut(vendor, posted.getGrossAmount(), date,
+                List.of(new Allocation(posted.getId(), posted.getGrossAmount())), ACTOR);
+    }
+
+    /** PO → confirm → receive → bill (+VAT), left unpaid. Adds inventory and an open AP balance. */
+    private void buyOnCredit(Long vendor, Long item, String qty, String price, LocalDate date, Long stock) {
+        receiveAndBill(vendor, item, qty, price, date, stock);
+    }
+
+    private VendorBill receiveAndBill(Long vendor, Long item, String qty, String price, LocalDate date,
+                                      Long stock) {
+        BigDecimal q = new BigDecimal(qty);
+        BigDecimal p = new BigDecimal(price);
+        PurchaseOrder po = purchaseOrderService.createOrder(vendor,
+                List.of(new PoLineInput(item, q, p)), date, ACTOR);
+        purchaseOrderService.confirm(po.getId(), ACTOR);
+        Long line = po.getLines().get(0).getId();
+        goodsReceiptService.receive(po.getId(), stock, List.of(new ReceiptLineInput(line, q)), date, ACTOR);
+        return vendorBillService.postBill(po.getId(), List.of(new BillLineInput(line, q, p)), TAX_CODE,
+                date, ACTOR);
+    }
+
+    private PurchaseOrder draftPo(Long vendor, Long item, String qty, String price, LocalDate date) {
+        return purchaseOrderService.createOrder(vendor,
+                List.of(new PoLineInput(item, new BigDecimal(qty), new BigDecimal(price))), date, ACTOR);
+    }
+
+    // ---- Manufacturing helpers ----------------------------------------------------------------------
+
+    /** WO → release → issue → complete the full quantity. WIP nets back to zero on completion. */
+    private void produce(Long finished, Long bomId, String qty, Long stock, LocalDate date) {
+        BigDecimal q = new BigDecimal(qty);
+        WorkOrder wo = workOrderService.create(finished, bomId, q, ACTOR);
+        workOrderService.release(wo.getId(), ACTOR);
+        workOrderService.issue(wo.getId(), stock, date, ACTOR);
+        workOrderService.complete(wo.getId(), q, stock, date, ACTOR);
+    }
+
+    /** WO → release only (never issued), so it stays RELEASED and touches no WIP account. */
+    private void releaseWorkOrder(Long finished, Long bomId, String qty) {
+        WorkOrder wo = workOrderService.create(finished, bomId, new BigDecimal(qty), ACTOR);
+        workOrderService.release(wo.getId(), ACTOR);
+    }
+
+    // ---- Sales helpers ------------------------------------------------------------------------------
+
+    /** SO → confirm → deliver → invoice (+VAT) → collect in full. Books revenue/COGS, leaves no AR. */
+    private void sellAndCollect(Long customer, Long item, String qty, String price, LocalDate date,
+                                Long stock) {
+        SalesInvoice posted = deliverAndInvoice(customer, item, qty, price, date, stock);
+        paymentService.payIn(customer, posted.getGrossAmount(), date,
+                List.of(new ReceiptAllocation(posted.getId(), posted.getGrossAmount())), ACTOR);
+    }
+
+    /** SO → confirm → deliver → invoice (+VAT), left unpaid. Books revenue/COGS and an open AR balance. */
+    private void sellOnCredit(Long customer, Long item, String qty, String price, LocalDate date,
+                              Long stock) {
+        deliverAndInvoice(customer, item, qty, price, date, stock);
+    }
+
+    private SalesInvoice deliverAndInvoice(Long customer, Long item, String qty, String price,
+                                           LocalDate date, Long stock) {
+        BigDecimal q = new BigDecimal(qty);
+        BigDecimal p = new BigDecimal(price);
+        SalesOrder so = salesOrderService.createOrder(customer,
+                List.of(new SoLineInput(item, q, p)), date, ACTOR);
+        salesOrderService.confirm(so.getId(), ACTOR);
+        Long line = so.getLines().get(0).getId();
+        deliveryService.deliver(so.getId(), stock, List.of(new DeliveryLineInput(line, q)), date, ACTOR);
+        return salesInvoiceService.postInvoice(so.getId(), List.of(new InvoiceLineInput(line, q, p)),
+                TAX_CODE, date, ACTOR);
+    }
+
+    private SalesOrder draftSo(Long customer, Long item, String qty, String price, LocalDate date) {
+        return salesOrderService.createOrder(customer,
+                List.of(new SoLineInput(item, new BigDecimal(qty), new BigDecimal(price))), date, ACTOR);
+    }
+
+    /** The i-th spread date, clamped to the last available month (today) when there are fewer months. */
+    private static LocalDate monthAt(List<LocalDate> months, int i) {
+        return months.get(Math.min(i, months.size() - 1));
     }
 }
