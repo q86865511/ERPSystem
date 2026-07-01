@@ -79,6 +79,12 @@ zero after a complete cycle. This one report is the project's hero artifact.
 |---|---|---|
 | <img src="docs/screenshots/03-purchasing.png" alt="Purchasing"> | <img src="docs/screenshots/05-manufacturing.png" alt="Manufacturing"> | <img src="docs/screenshots/07-reporting.png" alt="Reports"> |
 
+**The "Warm Terracotta" redesign** (warm terracotta palette + dark mode + a hand-rolled onboarding tour):
+
+| Dark mode | Onboarding tour (13 steps, one per module landing page) |
+|---|---|
+| <img src="docs/screenshots/10-dark-mode.png" alt="Dark mode"> | <img src="docs/screenshots/11-onboarding-tour.png" alt="Onboarding tour"> |
+
 > Captured by headless Playwright against the live demo; the same run verified login + all 8 pages
 > rendering + a form modal opening, with **zero console/runtime errors**.
 
@@ -235,6 +241,19 @@ an append-only `audit_log` (domain events + an `AFTER_COMMIT` listener, so only 
 recorded; a DB trigger blocks update/delete). ADMIN users browse the "Audit Trail" page, filterable by event
 type and actor.
 
+**The "Warm Terracotta" design system**: a self-built Mantine theme — a warm terracotta primary color
+(`#C0532E`) + a warm-gray neutral scale (replacing the stock cool gray) + a self-hosted Plus Jakarta Sans;
+light/dark mode toggles instantly from the top bar (defaults to the OS preference, persisted to
+localStorage). The component layer is a global `theme.components` override (warm tables, cards, inputs, …)
+plus 7 shared components (`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`AmountAllocationTable`/
+`EmptyState`/an enhanced `PageHeader`) — built as each module actually adopted them, not speculatively.
+
+**Onboarding tour (hand-rolled, no tour library)**: a ~2.5KB spotlight-and-callout overlay covering the
+login page's demo accounts, the reconciliation health-check, and **every module's landing page** (13 steps
+total). A `MutationObserver` detects which target element is present on the current page, so the tour
+continues naturally across navigation (login → dashboard → each module); progress persists to localStorage
+and can be restarted anytime from the user menu.
+
 **Observability**: Micrometer exposes metrics at `/actuator/prometheus` (reachable only on the internal
 network) — business counters derived from the same domain events (postings/logins/period changes) plus a
 reconciliation-health gauge, alongside free HTTP/JVM/pool metrics; structured (ECS) JSON logging and a
@@ -301,6 +320,13 @@ read-only list endpoints per module) + a React frontend (8 stages: skeleton → 
 dashboard/reports → purchasing → sales → manufacturing → advanced → containerization) + a one-command
 `docker compose` demo.
 
+**✅ The "Warm Terracotta" UI/UX redesign**: a site-wide theme + `theme.components` override layer (warm
+terracotta primary, warm-gray neutral scale, self-hosted font), 7 shared components built as adopted, an
+8-module page-by-page polish pass, a hand-rolled onboarding tour (13 steps covering every module's landing
+page), and an accessibility sweep (every icon-only control has an `aria-label`; Modals/Drawers rely
+throughout on Mantine's built-in focus-trap). Delivered as 12 PRs (`#62`–`#73`); design spec at
+[docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md](docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md).
+
 ## ⚠️ Consciously deferred (not gaps)
 
 Multi-currency/FX, multi-tenancy (never), FIFO/standard-cost variances, a tax engine beyond one VAT
@@ -331,6 +357,7 @@ The senior-signal decisions, each written up under [docs/adr/](docs/adr/):
 | Document | Contents |
 |---|---|
 | [PROGRESS.md](PROGRESS.md) | Stage-by-stage progress, key decisions, environment notes |
+| [docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md](docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md) | The "Warm Terracotta" UI/UX redesign spec (palette, component layer, per-module polish, onboarding tour) |
 | [docs/adr/](docs/adr/) | Architecture decision records (ADR 0001–0009) |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Deployment: local one-command demo + cloud subdomain (Cloudflare Tunnel + Caddy) |
 | [compose.demo.yaml](compose.demo.yaml) | One-command demo (postgres + backend + frontend) |

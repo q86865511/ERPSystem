@@ -64,6 +64,12 @@
 |---|---|---|
 | <img src="docs/screenshots/03-purchasing.png" alt="採購"> | <img src="docs/screenshots/05-manufacturing.png" alt="製造"> | <img src="docs/screenshots/07-reporting.png" alt="財報"> |
 
+**「Warm Terracotta」重新設計**(暖陶土主色 + 深色模式 + 手刻新手導覽):
+
+| 深色模式 | 新手導覽(13 步,涵蓋每個模組首頁) |
+|---|---|
+| <img src="docs/screenshots/10-dark-mode.png" alt="深色模式"> | <img src="docs/screenshots/11-onboarding-tour.png" alt="新手導覽"> |
+
 > 畫面由 headless Playwright 對 live demo 自動截圖;同一輪也驗證了登入 + 全部 8 頁渲染 + 表單開啟,**零 console/runtime 錯誤**。
 
 ## ✨ 技術亮點
@@ -167,6 +173,10 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 **審計軌跡(ADMIN-only)**:過帳、期間關閉/重開、登入成功/失敗都會寫入 append-only 的 `audit_log`(domain event + `AFTER_COMMIT` 監聽,只記真正 committed 的動作;DB trigger 擋改/刪)。ADMIN 角色可在「審計軌跡」頁依事件類型 / 操作者篩選檢視。
 
+**「Warm Terracotta」設計系統**:自建的 Mantine theme —— 暖陶土主色(`#C0532E`)+ 暖灰中性色階(取代常規冷灰)+ 自託管 Plus Jakarta Sans;深/淺色模式右上角即時切換(預設跟隨系統,偏好存 localStorage)。元件層採 `theme.components` 全域覆寫(暖色表格、卡片、輸入框等)加上 7 個共用元件(`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`AmountAllocationTable`/`EmptyState`/強化版 `PageHeader`)—— 隨模組實際採用而建,不預先造死碼。
+
+**新手導覽(手刻,無 tour 套件)**:~2.5KB 的 spotlight + callout 疊層,涵蓋登入頁示範帳號、對帳健康檢查、以及**每一個模組首頁**(共 13 步);以 `MutationObserver` 偵測目前頁面存在哪個目標元素,能跨頁自然接續(登入 → 儀表板 → 逐一模組),進度存 localStorage,可隨時從右上角使用者選單重新開始。
+
 **可觀測性**:Micrometer 在 `/actuator/prometheus`(僅內部網路可達)暴露指標 —— 複用同一套 domain event 發業務 counter(過帳/登入/期間)+ 對帳健康 gauge,外加免費的 HTTP/JVM/連線池指標;結構化(ECS)JSON 日誌 + 每筆請求的關聯 ID。可選 `docker compose -f compose.demo.yaml -f compose.observability.yaml up` 起 Prometheus + Grafana(預載儀表板)。詳見 [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md)。
 
 **測試**:後端 97 個 Testcontainers 整合測試 + ArchUnit 邊界 + 對帳/年結驗收(`mvn verify`);前端 Vitest + React Testing Library(金額 BigInt 數學、RBAC 矩陣、i18n、**單飛 401→refresh→replay** JWT 流程、`RequireRole` 守衛),CI 每次 build 後跑;Playwright chromium smoke 走非阻斷的 `e2e` workflow(對線上 demo)。
@@ -214,6 +224,8 @@ cd frontend && npm run build      # tsc -b && vite build
 
 **✅ Phase 7(全端化)**:後端 enablement(springdoc、`/api/auth/me`、BigDecimal-as-string、各模組唯讀列表端點)+ React 前端(8 階段:骨架 → 主檔 → 儀表板/財報 → 採購 → 銷售 → 製造 → 進階 → 容器化)+ 一鍵 `docker compose` demo。
 
+**✅「Warm Terracotta」UI/UX 重新設計**:全站 theme + `theme.components` 元件層覆寫(暖陶土主色、暖灰中性色階、自託管字體)、7 個隨採用而建的共用元件、8 大模組逐頁打磨、手刻新手導覽(13 步,涵蓋每個模組首頁)、a11y 折入(icon-only 控制皆有 `aria-label`,Modal/Drawer 全面延用 Mantine 內建 focus-trap)。分 12 個 PR 交付(`#62`–`#73`),設計 spec 見 [docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md](docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md)。
+
 ## ⚠️ 刻意切割(非缺漏)
 
 多幣別/FX、多租戶(永不)、FIFO/標準成本+變異、單一 VAT 以外的稅引擎、簽核流程、完整時間相位 MRP、批號/序號、工序/工作中心/人工製費、多倉調撥、多階 BOM。
@@ -239,6 +251,7 @@ cd frontend && npm run build      # tsc -b && vite build
 | 文件 | 內容 |
 |---|---|
 | [PROGRESS.md](PROGRESS.md) | 逐階段進度、重要決策紀錄、環境備忘 |
+| [docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md](docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md) | 「Warm Terracotta」UI/UX 重新設計 spec(調色盤、元件層、逐模組打磨、新手導覽) |
 | [docs/adr/](docs/adr/) | 架構決策紀錄(ADR 0001–0009) |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | 部署:本機一鍵 demo + 雲端子網域(Cloudflare Tunnel + Caddy) |
 | [compose.demo.yaml](compose.demo.yaml) | 一鍵 demo(postgres + 後端 + 前端) |
