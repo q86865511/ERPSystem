@@ -2,6 +2,8 @@ package com.erp.bootstrap;
 
 import com.erp.TestcontainersConfiguration;
 import com.erp.inventory.application.ItemCostStateRepository;
+import com.erp.hr.api.LeaveStatus;
+import com.erp.hr.application.LeaveService;
 import com.erp.manufacturing.application.ReorderReportService;
 import com.erp.masterdata.api.MasterDataQuery;
 import com.erp.reporting.application.ReconciliationReport;
@@ -39,6 +41,8 @@ class SeedDataIT {
     private ReconciliationService reconciliationService;
     @Autowired
     private ReorderReportService reorderReportService;
+    @Autowired
+    private LeaveService leaveService;
 
     @Test
     void seedRunsTheWholeSliceAndReconciles() {
@@ -79,6 +83,9 @@ class SeedDataIT {
         // The low-stock demo materials surface on the reorder report (they carry a small on-hand row
         // below their reorder point), so the reorder / low-stock widgets have data.
         assertThat(reorderReportService.reorderReport().items()).hasSizeGreaterThanOrEqualTo(3);
+
+        // HR B2 time data seeded: a PENDING leave request exists for the approve/reject demo.
+        assertThat(leaveService.list(null, LeaveStatus.PENDING)).isNotEmpty();
     }
 
     private static SubledgerCheck subledger(ReconciliationReport report, String accountCode) {

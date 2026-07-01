@@ -2,10 +2,13 @@ import { Tabs } from '@mantine/core';
 import { PageHeader } from '../../components/PageHeader';
 import { useI18n } from '../../i18n';
 import { useTabParam } from '../../hooks/useTabParam';
+import { AttendancePanel } from './AttendancePanel';
 import { DepartmentsPanel } from './DepartmentsPanel';
 import { EmployeesPanel } from './EmployeesPanel';
 import { HrDashboardPanel } from './HrDashboardPanel';
+import { LeavePanel } from './LeavePanel';
 import { PositionsPanel } from './PositionsPanel';
+import { TimesheetPanel } from './TimesheetPanel';
 
 export function HRPage() {
   const { t } = useI18n();
@@ -19,6 +22,9 @@ export function HRPage() {
           <Tabs.Tab value="employees">{t('hr.tabs.employees')}</Tabs.Tab>
           <Tabs.Tab value="departments">{t('hr.tabs.departments')}</Tabs.Tab>
           <Tabs.Tab value="positions">{t('hr.tabs.positions')}</Tabs.Tab>
+          <Tabs.Tab value="attendance">{t('hr.tabs.attendance')}</Tabs.Tab>
+          <Tabs.Tab value="leave">{t('hr.tabs.leave')}</Tabs.Tab>
+          <Tabs.Tab value="timesheets">{t('hr.tabs.timesheets')}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="dashboard">
           <HrDashboardPanel />
@@ -31,6 +37,15 @@ export function HRPage() {
         </Tabs.Panel>
         <Tabs.Panel value="positions">
           <PositionsPanel />
+        </Tabs.Panel>
+        <Tabs.Panel value="attendance">
+          <AttendancePanel />
+        </Tabs.Panel>
+        <Tabs.Panel value="leave">
+          <LeavePanel />
+        </Tabs.Panel>
+        <Tabs.Panel value="timesheets">
+          <TimesheetPanel />
         </Tabs.Panel>
       </Tabs>
     </>

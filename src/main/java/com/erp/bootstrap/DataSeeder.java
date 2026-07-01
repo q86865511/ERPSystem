@@ -1,7 +1,12 @@
 package com.erp.bootstrap;
 
+import com.erp.hr.api.AttendanceStatus;
 import com.erp.hr.api.EmploymentStatus;
+import com.erp.hr.api.LeaveType;
+import com.erp.hr.application.AttendanceService;
 import com.erp.hr.application.HrService;
+import com.erp.hr.application.LeaveService;
+import com.erp.hr.application.TimesheetService;
 import com.erp.manufacturing.application.BomService;
 import com.erp.manufacturing.application.BomService.ComponentInput;
 import com.erp.manufacturing.application.WorkOrderService;
@@ -41,6 +46,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +78,9 @@ public class DataSeeder implements ApplicationRunner {
     private static final String TAX_CODE = "STANDARD";
 
     private final HrService hrService;
+    private final AttendanceService attendanceService;
+    private final LeaveService leaveService;
+    private final TimesheetService timesheetService;
     private final MasterDataService masterDataService;
     private final MasterDataQuery masterDataQuery;
     private final WarehouseRepository warehouseRepository;
@@ -92,8 +101,13 @@ public class DataSeeder implements ApplicationRunner {
                       VendorBillService vendorBillService, PaymentService paymentService,
                       BomService bomService, WorkOrderService workOrderService,
                       SalesOrderService salesOrderService, DeliveryService deliveryService,
-                      SalesInvoiceService salesInvoiceService, HrService hrService) {
+                      SalesInvoiceService salesInvoiceService, HrService hrService,
+                      AttendanceService attendanceService, LeaveService leaveService,
+                      TimesheetService timesheetService) {
         this.hrService = hrService;
+        this.attendanceService = attendanceService;
+        this.leaveService = leaveService;
+        this.timesheetService = timesheetService;
         this.masterDataService = masterDataService;
         this.masterDataQuery = masterDataQuery;
         this.warehouseRepository = warehouseRepository;
@@ -119,7 +133,8 @@ public class DataSeeder implements ApplicationRunner {
         Long stock = stockLocationId();
         log.info("Seeding demo buy -> make -> sell slice...");
 
-        seedHumanResources();
+        List<Long> employeeIds = seedHumanResources();
+        seedHrTime(employeeIds, today);
 
         Long vendor = masterDataService.createPartner(VENDOR_CODE, "Demo Vendor", true, false, null, 30,
                 null, null).getId();
@@ -178,8 +193,8 @@ public class DataSeeder implements ApplicationRunner {
                 .orElseThrow().getId();
     }
 
-    /** Seed a small org chart (3 departments, 4 positions, 8 employees) for the HR module demo. */
-    private void seedHumanResources() {
+    /** Seed a small org chart (3 departments, 4 positions, 8 employees); returns the employee ids. */
+    private List<Long> seedHumanResources() {
         Long eng = hrService.createDepartment("ENG", "Engineering", "6100").getId();
         Long ops = hrService.createDepartment("OPS", "Operations", "6100").getId();
         Long adm = hrService.createDepartment("ADM", "Finance & Admin", "6100").getId();
@@ -199,11 +214,77 @@ public class DataSeeder implements ApplicationRunner {
                 new Emp("EMP-006", "Hsin", "Liu", ops, operator, "41000", 2023),
                 new Emp("EMP-007", "Pei", "Yang", adm, accountant, "61000", 2021),
                 new Emp("EMP-008", "Kai", "Wu", adm, accountant, "58000", 2023));
+        List<Long> employeeIds = new ArrayList<>();
         for (Emp e : roster) {
-            hrService.createEmployee(e.code(), e.first(), e.last(), e.dept(), e.pos(),
-                    new BigDecimal(e.salary()), EmploymentStatus.ACTIVE, LocalDate.of(e.year(), 4, 1));
+            employeeIds.add(hrService.createEmployee(e.code(), e.first(), e.last(), e.dept(), e.pos(),
+                    new BigDecimal(e.salary()), EmploymentStatus.ACTIVE,
+                    LocalDate.of(e.year(), 4, 1)).getId());
         }
         log.info("HR seed complete: 3 departments, 4 positions, {} employees.", roster.size());
+        return employeeIds;
+    }
+
+    /**
+     * Seed HR time data (B2) for the employees: a month of daily attendance, a spread of leave requests
+     * across the lifecycle (some left PENDING for the approve/reject demo), and weekly timesheets in mixed
+     * states. None of this posts to the ledger, so it never touches the reconciliation.
+     */
+    private void seedHrTime(List<Long> employeeIds, LocalDate today) {
+        // The most recent ~18 weekdays ending today (spans the last few weeks regardless of the date).
+        List<LocalDate> workdays = new ArrayList<>();
+        LocalDate day = today;
+        while (workdays.size() < 18) {
+            if (day.getDayOfWeek() != DayOfWeek.SATURDAY && day.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                workdays.add(day);
+            }
+            day = day.minusDays(1);
+        }
+        // Daily attendance: mostly present, with a deterministic sprinkle of late/remote/leave.
+        for (int e = 0; e < employeeIds.size(); e++) {
+            for (LocalDate d : workdays) {
+                int n = e * 31 + d.getDayOfMonth();
+                AttendanceStatus status = n % 19 == 0 ? AttendanceStatus.LEAVE
+                        : n % 11 == 0 ? AttendanceStatus.REMOTE
+                        : n % 7 == 0 ? AttendanceStatus.LATE
+                        : AttendanceStatus.PRESENT;
+                BigDecimal hours = status == AttendanceStatus.LEAVE ? BigDecimal.ZERO
+                        : status == AttendanceStatus.LATE ? new BigDecimal("7") : new BigDecimal("8");
+                attendanceService.record(employeeIds.get(e), d, status, hours, null);
+            }
+        }
+
+        // Leave requests across the lifecycle — a couple left PENDING for the approve/reject demo.
+        LocalDate leaveStart = today.plusDays(7);
+        leaveService.submit(employeeIds.get(1), LeaveType.ANNUAL, leaveStart, leaveStart.plusDays(2),
+                new BigDecimal("3"), "Family trip");                                    // PENDING
+        leaveService.submit(employeeIds.get(4), LeaveType.PERSONAL, leaveStart.plusDays(3),
+                leaveStart.plusDays(3), new BigDecimal("1"), "Personal errand");        // PENDING
+        leaveService.approve(leaveService.submit(employeeIds.get(2), LeaveType.SICK,
+                today.minusDays(3), today.minusDays(2), new BigDecimal("2"), "Flu").getId(), ACTOR);
+        leaveService.approve(leaveService.submit(employeeIds.get(0), LeaveType.ANNUAL,
+                today.minusDays(20), today.minusDays(16), new BigDecimal("5"), "Vacation").getId(), ACTOR);
+        leaveService.reject(leaveService.submit(employeeIds.get(5), LeaveType.UNPAID,
+                today.plusDays(30), today.plusDays(44), new BigDecimal("15"), "Sabbatical").getId(), ACTOR);
+
+        // Weekly timesheets in mixed states for a few employees over the last three weeks.
+        LocalDate friday = today;
+        while (friday.getDayOfWeek() != DayOfWeek.FRIDAY) {
+            friday = friday.minusDays(1);
+        }
+        List<LocalDate> weeks = List.of(friday, friday.minusWeeks(1), friday.minusWeeks(2));
+        for (int e = 0; e < 4 && e < employeeIds.size(); e++) {
+            Long emp = employeeIds.get(e);
+            // Oldest week approved, middle week submitted, current week left as a draft.
+            Long approved = timesheetService.create(emp, weeks.get(2), new BigDecimal("40"),
+                    new BigDecimal(e + 1), null).getId();
+            timesheetService.submit(approved);
+            timesheetService.approve(approved);
+            timesheetService.submit(timesheetService.create(emp, weeks.get(1), new BigDecimal("40"),
+                    new BigDecimal("2"), null).getId());
+            timesheetService.create(emp, weeks.get(0), new BigDecimal("38"), BigDecimal.ZERO, null);
+        }
+        log.info("HR time seed complete: attendance, leave requests and timesheets for {} employees.",
+                employeeIds.size());
     }
 
     // =================================================================================================

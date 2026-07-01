@@ -11,7 +11,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list"];
+        get: operations["list_3"];
         put?: never;
         post?: never;
         delete?: never;
@@ -84,6 +84,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/hr/attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_2"];
+        put?: never;
+        post: operations["record"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/hr/departments": {
         parameters: {
             query?: never;
@@ -148,6 +164,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/hr/leave-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_1"];
+        put?: never;
+        post: operations["submit_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/leave-requests/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["approve_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/leave-requests/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/hr/positions": {
         parameters: {
             query?: never;
@@ -174,6 +238,54 @@ export interface paths {
         get: operations["getPosition"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/timesheets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list"];
+        put?: never;
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/timesheets/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/hr/timesheets/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["submit"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1099,6 +1211,18 @@ export interface components {
             days90plus?: string;
             total?: string;
         };
+        AttendanceResponse: {
+            /** Format: int64 */
+            employeeId?: number;
+            /** Format: int64 */
+            id?: number;
+            note?: string;
+            /** @enum {string} */
+            status?: "PRESENT" | "ABSENT" | "LATE" | "LEAVE" | "REMOTE";
+            /** Format: date */
+            workDate?: string;
+            workedHours?: string;
+        };
         AuditLogResponse: {
             actor?: string;
             detail?: string;
@@ -1193,6 +1317,16 @@ export interface components {
             reason?: string;
             unitCost?: string;
         };
+        CreateAttendanceRequest: {
+            /** Format: int64 */
+            employeeId?: number;
+            note?: string;
+            /** @enum {string} */
+            status?: "PRESENT" | "ABSENT" | "LATE" | "LEAVE" | "REMOTE";
+            /** Format: date */
+            workDate?: string;
+            workedHours?: string;
+        };
         CreateBillRequest: {
             lines?: components["schemas"]["BillLine"][];
             /** Format: date */
@@ -1269,6 +1403,18 @@ export interface components {
             stocked?: boolean;
             uom?: string;
         };
+        CreateLeaveRequest: {
+            days?: string;
+            /** Format: int64 */
+            employeeId?: number;
+            /** Format: date */
+            endDate?: string;
+            /** @enum {string} */
+            leaveType?: "ANNUAL" | "SICK" | "PERSONAL" | "UNPAID";
+            reason?: string;
+            /** Format: date */
+            startDate?: string;
+        };
         CreateLocationRequest: {
             code?: string;
             /** @enum {string} */
@@ -1325,6 +1471,15 @@ export interface components {
             orderDate?: string;
             /** Format: int64 */
             partnerId?: number;
+        };
+        CreateTimesheetRequest: {
+            /** Format: int64 */
+            employeeId?: number;
+            note?: string;
+            overtimeHours?: string;
+            regularHours?: string;
+            /** Format: date */
+            weekEnding?: string;
         };
         CreateWarehouseRequest: {
             code?: string;
@@ -1588,6 +1743,25 @@ export interface components {
             totalCredit?: string;
             totalDebit?: string;
         };
+        LeaveRequestResponse: {
+            days?: string;
+            decidedBy?: string;
+            /** Format: date */
+            decidedOn?: string;
+            /** Format: int64 */
+            employeeId?: number;
+            /** Format: date */
+            endDate?: string;
+            /** Format: int64 */
+            id?: number;
+            /** @enum {string} */
+            leaveType?: "ANNUAL" | "SICK" | "PERSONAL" | "UNPAID";
+            reason?: string;
+            /** Format: date */
+            startDate?: string;
+            /** @enum {string} */
+            status?: "PENDING" | "APPROVED" | "REJECTED";
+        };
         LedgerLineView: {
             accountCode?: string;
             credit?: string;
@@ -1828,6 +2002,19 @@ export interface components {
             reconciled?: boolean;
             subledger?: string;
         };
+        TimesheetResponse: {
+            /** Format: int64 */
+            employeeId?: number;
+            /** Format: int64 */
+            id?: number;
+            note?: string;
+            overtimeHours?: string;
+            regularHours?: string;
+            /** @enum {string} */
+            status?: "DRAFT" | "SUBMITTED" | "APPROVED";
+            /** Format: date */
+            weekEnding?: string;
+        };
         TokenResponse: {
             accessToken?: string;
             roles?: string[];
@@ -1939,7 +2126,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    list: {
+    list_3: {
         parameters: {
             query: {
                 eventType?: string;
@@ -2043,6 +2230,53 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["TokenResponse"];
+                };
+            };
+        };
+    };
+    list_2: {
+        parameters: {
+            query?: {
+                employeeId?: number;
+                month?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AttendanceResponse"][];
+                };
+            };
+        };
+    };
+    record: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAttendanceRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AttendanceResponse"];
                 };
             };
         };
@@ -2181,6 +2415,97 @@ export interface operations {
             };
         };
     };
+    list_1: {
+        parameters: {
+            query?: {
+                employeeId?: number;
+                status?: "PENDING" | "APPROVED" | "REJECTED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LeaveRequestResponse"][];
+                };
+            };
+        };
+    };
+    submit_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateLeaveRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LeaveRequestResponse"];
+                };
+            };
+        };
+    };
+    approve_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LeaveRequestResponse"];
+                };
+            };
+        };
+    };
+    reject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LeaveRequestResponse"];
+                };
+            };
+        };
+    };
     listPositions: {
         parameters: {
             query?: never;
@@ -2243,6 +2568,97 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PositionResponse"];
+                };
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query?: {
+                employeeId?: number;
+                status?: "DRAFT" | "SUBMITTED" | "APPROVED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TimesheetResponse"][];
+                };
+            };
+        };
+    };
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTimesheetRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TimesheetResponse"];
+                };
+            };
+        };
+    };
+    approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TimesheetResponse"];
+                };
+            };
+        };
+    };
+    submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TimesheetResponse"];
                 };
             };
         };

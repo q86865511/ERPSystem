@@ -64,6 +64,20 @@ export type PositionResponse = Schemas['PositionResponse'];
 export type CreatePositionRequest = Schemas['CreatePositionRequest'];
 export type EmploymentStatus = NonNullable<EmployeeResponse['status']>;
 
+// --- HR time (B2) ---
+export type AttendanceResponse = Schemas['AttendanceResponse'];
+export type CreateAttendanceRequest = Schemas['CreateAttendanceRequest'];
+export type AttendanceStatus = NonNullable<AttendanceResponse['status']>;
+export type LeaveRequestResponse = Schemas['LeaveRequestResponse'];
+export type CreateLeaveRequest = Schemas['CreateLeaveRequest'];
+export type LeaveType = NonNullable<LeaveRequestResponse['leaveType']>;
+export type LeaveStatus = NonNullable<LeaveRequestResponse['status']>;
+export type TimesheetResponse = Schemas['TimesheetResponse'];
+export type CreateTimesheetRequest = Schemas['CreateTimesheetRequest'];
+export type TimesheetStatus = NonNullable<TimesheetResponse['status']>;
+export const ATTENDANCE_STATUSES: AttendanceStatus[] = ['PRESENT', 'ABSENT', 'LATE', 'LEAVE', 'REMOTE'];
+export const LEAVE_TYPES: LeaveType[] = ['ANNUAL', 'SICK', 'PERSONAL', 'UNPAID'];
+
 export const ITEM_TYPES: ItemType[] = ['RAW', 'WIP', 'FINISHED', 'SERVICE'];
 export const LOCATION_TYPES: LocationType[] = [
   'STOCK',
