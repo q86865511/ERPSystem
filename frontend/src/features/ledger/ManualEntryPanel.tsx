@@ -14,6 +14,7 @@ import { DateInput } from '@mantine/dates';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import type { JournalEntryRequest } from '../../api/types';
+import { StateButton } from '../../components';
 import { formatMoney, sumMoney } from '../../components/Money';
 import { useI18n } from '../../i18n';
 import { useTrialBalance } from '../reporting/api';
@@ -123,6 +124,7 @@ export function ManualEntryPanel() {
                 <ActionIcon
                   variant="subtle"
                   color="red"
+                  aria-label={t('common.removeLine')}
                   disabled={form.values.lines.length <= 2}
                   onClick={() => form.removeListItem('lines', i)}
                 >
@@ -153,9 +155,13 @@ export function ManualEntryPanel() {
       </Group>
 
       <Group justify="flex-end">
-        <Button onClick={submit} loading={create.isPending} disabled={!balanced}>
-          {t('ledger.manual.postEntry')}
-        </Button>
+        <StateButton
+          label={t('ledger.manual.postEntry')}
+          loading={create.isPending}
+          onClick={submit}
+          disabled={!balanced}
+          disabledReason={t('ledger.manual.notBalancedHint')}
+        />
       </Group>
     </Stack>
   );

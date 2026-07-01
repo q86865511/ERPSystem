@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Alert, Button, Divider, Group, NumberInput, Stack, Text, TextInput } from '@mantine/core';
+import { Alert, Divider, Group, NumberInput, Stack, Text, TextInput } from '@mantine/core';
 import dayjs from 'dayjs';
 import type { FiscalPeriodResponse, YearEndCloseResult } from '../../api/types';
-import { StatusBadge } from '../../components/StatusBadge';
-import { MoneyText } from '../../components/Money';
+import { MoneyText, StateButton, StatusBadge } from '../../components';
 import { useI18n } from '../../i18n';
 import { useAuth } from '../../auth/useAuth';
 import { notifyError, notifySuccess } from '../../lib/notify';
@@ -63,12 +62,22 @@ export function FiscalPeriodsPanel() {
         <NumberInput label={t('ledger.periods.periodMonth')} min={1} max={12} value={periodNo} onChange={setPeriodNo} />
       </Group>
       <Group>
-        <Button color="orange" loading={close.isPending} onClick={() => run('close')}>
-          {t('ledger.periods.closePeriod')}
-        </Button>
-        <Button variant="default" loading={reopen.isPending} onClick={() => run('reopen')}>
-          {t('ledger.periods.reopenPeriod')}
-        </Button>
+        <StateButton
+          label={t('ledger.periods.closePeriod')}
+          color="orange"
+          loading={close.isPending}
+          disabled={!yearCode.trim() || periodNo === ''}
+          disabledReason={t('ledger.periods.closeHint')}
+          onClick={() => run('close')}
+        />
+        <StateButton
+          label={t('ledger.periods.reopenPeriod')}
+          variant="default"
+          loading={reopen.isPending}
+          disabled={!yearCode.trim() || periodNo === ''}
+          disabledReason={t('ledger.periods.reopenHint')}
+          onClick={() => run('reopen')}
+        />
       </Group>
 
       {result && (
@@ -93,9 +102,14 @@ export function FiscalPeriodsPanel() {
         {t('ledger.periods.yearEndHint')}
       </Text>
       <Group>
-        <Button color="red" loading={closeYear.isPending} onClick={runCloseYear}>
-          {t('ledger.periods.closeYear', { yearCode })}
-        </Button>
+        <StateButton
+          label={t('ledger.periods.closeYear', { yearCode })}
+          color="red"
+          loading={closeYear.isPending}
+          disabled={!yearCode.trim()}
+          disabledReason={t('ledger.periods.closeYearHint')}
+          onClick={runCloseYear}
+        />
       </Group>
 
       {yearEnd && (

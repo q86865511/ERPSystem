@@ -14,13 +14,13 @@ import { MoneyText } from '../../components/Money';
 import { useI18n } from '../../i18n';
 import { useReconciliation } from './api';
 
-function YesNo({ ok }: { ok: boolean | undefined }) {
+function YesNo({ ok, label }: { ok: boolean | undefined; label: string }) {
   return ok ? (
-    <ThemeIcon color="teal" variant="light" size="sm" radius="xl">
+    <ThemeIcon color="teal" variant="light" size="sm" radius="xl" role="img" aria-label={label}>
       <IconCheck size={14} />
     </ThemeIcon>
   ) : (
-    <ThemeIcon color="red" variant="light" size="sm" radius="xl">
+    <ThemeIcon color="red" variant="light" size="sm" radius="xl" role="img" aria-label={label}>
       <IconX size={14} />
     </ThemeIcon>
   );
@@ -43,6 +43,8 @@ export function ReconciliationHero({ asOf }: { asOf?: string }) {
             radius="md"
             variant="light"
             color={isLoading || isError ? 'gray' : healthy ? 'teal' : 'red'}
+            role="img"
+            aria-label={healthy ? t('reporting.reconciliation.reconcile') : t('reporting.reconciliation.outOfBalance')}
           >
             {healthy ? <IconShieldCheck size={28} /> : <IconShieldX size={28} />}
           </ThemeIcon>
@@ -103,7 +105,14 @@ export function ReconciliationHero({ asOf }: { asOf?: string }) {
                     </Table.Td>
                     <Table.Td ta="center">
                       <Group justify="center">
-                        <YesNo ok={s.reconciled} />
+                        <YesNo
+                          ok={s.reconciled}
+                          label={
+                            s.reconciled
+                              ? t('reporting.reconciliation.reconciled')
+                              : t('reporting.reconciliation.notReconciled')
+                          }
+                        />
                       </Group>
                     </Table.Td>
                   </Table.Tr>
@@ -121,7 +130,10 @@ export function ReconciliationHero({ asOf }: { asOf?: string }) {
                 <Card key={c.accountCode} withBorder padding="sm" radius="md" miw={160}>
                   <Group justify="space-between" gap="xs">
                     <Text size="sm">{c.name ?? c.accountCode}</Text>
-                    <YesNo ok={c.cleared} />
+                    <YesNo
+                      ok={c.cleared}
+                      label={c.cleared ? t('reporting.reconciliation.cleared') : t('reporting.reconciliation.notCleared')}
+                    />
                   </Group>
                   <Text ff="monospace" fw={600}>
                     <MoneyText value={c.balance} />
