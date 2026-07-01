@@ -173,7 +173,9 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 **審計軌跡(ADMIN-only)**:過帳、期間關閉/重開、登入成功/失敗都會寫入 append-only 的 `audit_log`(domain event + `AFTER_COMMIT` 監聽,只記真正 committed 的動作;DB trigger 擋改/刪)。ADMIN 角色可在「審計軌跡」頁依事件類型 / 操作者篩選檢視。
 
-**「Warm Terracotta」設計系統**:自建的 Mantine theme —— 暖陶土主色(`#C0532E`)+ 暖灰中性色階(取代常規冷灰)+ 自託管 Plus Jakarta Sans;深/淺色模式右上角即時切換(預設跟隨系統,偏好存 localStorage)。元件層採 `theme.components` 全域覆寫(暖色表格、卡片、輸入框等)加上 7 個共用元件(`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`AmountAllocationTable`/`EmptyState`/強化版 `PageHeader`)—— 隨模組實際採用而建,不預先造死碼。
+> 🔵 **「Blue Enterprise」重設計進行中**:前端正由 Warm Terracotta 轉為藍色企業 SaaS 風 + 數據視覺化密集的儀表板(`@mantine/charts`:KPI 環比 / 帳齡甜甜圈 / 趨勢 / treemap / Gantt)。主色改藍(`#2563EB`)+ 冷 slate 中性色;第一張端到端儀表板為**財務總覽**(真實 AR/AP 帳齡甜甜圈 + KPI + 對帳 hero)。下方設計系統敘述的**架構**(`theme.components` + 共用元件層 + 深/淺色 + localStorage 偏好)不變,僅**色盤換藍**;本頁截圖仍為 Warm Terracotta 版,待四張儀表板落地、部署後統一重拍。
+
+**設計系統(Blue Enterprise)**:自建的 Mantine theme —— 藍色企業主色(`#2563EB`)+ 冷 slate 中性色階 + 自託管 Plus Jakarta Sans;深/淺色模式右上角即時切換(預設跟隨系統,偏好存 localStorage)。元件層採 `theme.components` 全域覆寫(表格、卡片、輸入框等)加上共用元件(`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`KpiTile`/`DonutCard`/`AmountAllocationTable`/`EmptyState`/強化版 `PageHeader`)—— 隨模組實際採用而建,不預先造死碼。
 
 **新手導覽(手刻,無 tour 套件)**:~2.5KB 的 spotlight + callout 疊層,涵蓋登入頁示範帳號、對帳健康檢查、以及**每一個模組首頁**(共 13 步);以 `MutationObserver` 偵測目前頁面存在哪個目標元素,能跨頁自然接續(登入 → 儀表板 → 逐一模組),進度存 localStorage,可隨時從右上角使用者選單重新開始。
 

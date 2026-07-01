@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { PageHeader } from '../../components/PageHeader';
 import { useI18n } from '../../i18n';
 import { BalanceSheetPanel } from './BalanceSheetPanel';
+import { FinanceOverviewPanel } from './FinanceOverviewPanel';
 import { IncomeStatementPanel } from './IncomeStatementPanel';
 import { TrialBalancePanel } from './TrialBalancePanel';
 
@@ -29,12 +30,16 @@ export function ReportsPage() {
           />
         }
       />
-      <Tabs defaultValue="trial-balance" keepMounted={false}>
+      <Tabs defaultValue="overview" keepMounted={false}>
         <Tabs.List mb="md">
+          <Tabs.Tab value="overview">{t('reporting.overview.tab')}</Tabs.Tab>
           <Tabs.Tab value="trial-balance">{t('reporting.tabs.trialBalance')}</Tabs.Tab>
           <Tabs.Tab value="income-statement">{t('reporting.tabs.incomeStatement')}</Tabs.Tab>
           <Tabs.Tab value="balance-sheet">{t('reporting.tabs.balanceSheet')}</Tabs.Tab>
         </Tabs.List>
+        <Tabs.Panel value="overview">
+          <FinanceOverviewPanel asOf={value} />
+        </Tabs.Panel>
         <Tabs.Panel value="trial-balance">
           <TrialBalancePanel asOf={value} />
         </Tabs.Panel>

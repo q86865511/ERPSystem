@@ -1,8 +1,19 @@
 export const inventoryEn = {
   subtitle: 'On-hand stock, reconciliation and adjustments',
   tabs: {
+    dashboard: 'Dashboard',
     overview: 'Overview',
     adjustments: 'Adjustments',
+  },
+  dash: {
+    inventoryValue: 'Inventory value',
+    reorderCount: 'Reorder suggestions',
+    category: 'Inventory by category',
+    reorderTitle: 'Reorder / low stock',
+    supplierPerf: 'Supplier performance',
+    heatmap: 'Inventory heat (by value)',
+    out: 'Out',
+    low: 'Low',
   },
   onHandLookup: 'On-hand lookup',
   pickItem: 'Pick an item',
@@ -30,8 +41,19 @@ export const inventoryEn = {
 export const inventoryZh: typeof inventoryEn = {
   subtitle: '在庫庫存、對帳與庫存調整',
   tabs: {
+    dashboard: '儀表板',
     overview: '在庫總覽',
     adjustments: '庫存調整',
+  },
+  dash: {
+    inventoryValue: '存貨總額',
+    reorderCount: '補貨建議',
+    category: '庫存分類',
+    reorderTitle: '補貨 / 低於安全庫存',
+    supplierPerf: '供應商績效',
+    heatmap: '庫存熱度(依金額)',
+    out: '缺貨',
+    low: '偏低',
   },
   onHandLookup: '在庫查詢',
   pickItem: '選擇商品',

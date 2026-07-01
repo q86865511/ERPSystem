@@ -8,9 +8,10 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
 import '@mantine/core/styles.css';
+import '@mantine/charts/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
-// After Mantine styles so the warm font + surface variables win the cascade.
+// After Mantine styles so the enterprise font + surface variables win the cascade.
 import './index.css';
 
 import { queryClient } from './app/queryClient';

@@ -12,9 +12,19 @@ export const manufacturingEn = {
     subtitle: 'Make: BOM → work order → issue → complete',
   },
   tabs: {
+    dashboard: 'Dashboard',
     workOrders: 'Work orders',
     boms: 'Bills of material',
     reorder: 'Reorder report',
+  },
+  dash: {
+    wip: 'Work in process',
+    achievement: 'Completion rate',
+    output: 'Total output',
+    progressBoard: 'Work order progress',
+    dispatchQueue: 'Dispatch queue',
+    gantt: 'Production schedule (Gantt)',
+    oee: 'OEE / utilization / defects',
   },
   // Bills of material
   bom: {
@@ -101,9 +111,19 @@ export const manufacturingZh: typeof manufacturingEn = {
     subtitle: '生產:BOM → 工單 → 領料 → 完工',
   },
   tabs: {
+    dashboard: '儀表板',
     workOrders: '工單',
     boms: '物料清單(BOM)',
     reorder: '再訂購報表',
+  },
+  dash: {
+    wip: '在製工單',
+    achievement: '工單達成率',
+    output: '總產出',
+    progressBoard: '工單進度看板',
+    dispatchQueue: '待派工清單',
+    gantt: '生產排程(Gantt)',
+    oee: 'OEE / 稼動 / 不良',
   },
   bom: {
     newBom: '新增 BOM',

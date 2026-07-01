@@ -8,19 +8,19 @@
   src: url('./assets/fonts/PlusJakartaSans-latin.woff2') format('woff2');
 }
 
-/* Warm page/card/border surfaces that Mantine doesn't derive from the gray ramp, pinned per scheme. The
-   page is warm off-white (not pure white) and cards are white for contrast; dark mode is warm-dark. */
+/* Cool enterprise page/card/border surfaces that Mantine doesn't derive from the gray ramp, pinned per
+   scheme. The page is a soft cool gray and cards are white for contrast; dark mode is deep slate. */
 :root,
 [data-mantine-color-scheme='light'] {
-  --mantine-color-body: #faf7f4;
+  --mantine-color-body: #f4f7fb;
   --app-color-card: #ffffff;
-  --app-color-border: #e8ded7;
+  --app-color-border: #e2e8f0;
 }
 
 [data-mantine-color-scheme='dark'] {
-  --mantine-color-body: #1a1410;
-  --app-color-card: #2a2420;
-  --app-color-border: #3a3430;
+  --mantine-color-body: #0f172a;
+  --app-color-card: #1b2436;
+  --app-color-border: #2a3650;
 }
 
 body {
