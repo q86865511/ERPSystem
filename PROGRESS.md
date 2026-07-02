@@ -14,6 +14,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-02] 💰 **修復批次四-c:demo 財務數據真實感 + KPI 環比口徑(ERP-010,後端)**。分支 `fix/erp-010-demo-financials`。
+  - **a) 損益比例**:DataSeeder 5 個產品族售價 ×10(6200/4300/7800/5600/5100,含 confirmed/draft SO 字面值),量不動(不連動生產/採購);4100 營收月預算 260k→500k 對齊(5100 COGS 由生產成本 roll-up、與售價無關,不動)。重種後 income-statement **淨利 +714,427**(revenue 1,331,600 vs expenses 617,172),不再是 -483k 慘賠公司。
+  - **b) KPI 口徑改 MTD**:`FinanceAnalyticsService.kpiSummary` 的 previous 從「上月整月」改「上月 1 日~上月同日(clamp 到月底)」(新增巢狀 `Period` record + `clampDayOfMonth`;current 窗經審查驗證與原行為數值嚴格等價);revenueTrend/cashFlow/budgetVariance 保留整月語意。DTO 欄位不變、openapi spec 無 diff。月初 deltaPct 不再恆 -90%(上月同期無過帳時 previous=0→deltaPct=0,正確語意)。
+  - **回歸測試**:SeedDataIT 加真實感 guard(2026-05 營收 > 532k 月薪基準;過早執行時退回 FY2026 年度比較);FinanceAnalyticsIT 加 MTD 語意(baseline-delta,免受既有 fixture 干擾)+ 短月 clamp 邊界(5/31→4 月整月)測試。
+  - **驗證**:`mvnw verify` 全綠(81 unit + **IT 137**,0 失敗);compose `down -v` 重種實測如上。雙審(Opus+Codex)無高嚴重度,3 項測試強化意見已修。**注意:merge 後 oracle 需重種才生效**(nightly 21:00 UTC cron 會自動 `down -v`,急的話手動)。**待 merge**(git 模式 c)。
 - [2026-07-02] 🔒 **修復批次四-b:nginx 安全 header + index.html 快取政策(ERP-016/007,infra PR)**。測試報告 §9 批次四 infra 部分。分支 `infra/erp-016-security-headers`。
   - **ERP-016**:新 `frontend/nginx/security-headers.conf`(HSTS 1y、`X-Content-Type-Options: nosniff`、`X-Frame-Options: DENY`、CSP `default-src 'self'` + `style-src 'unsafe-inline'`(Mantine/Swagger 需要)+ `img-src data:` + `object-src 'none'` + `base-uri/form-action 'self'` + `frame-ancestors 'none'`);因 nginx `add_header` 繼承規則(location 內有 add_header 即丟棄 server 層),server 層 + `/assets/` + `location = /index.html` 各 include 一次;Dockerfile 補 COPY。
   - **ERP-007**:`location = /index.html` 加 `Cache-Control: no-cache`(可快取但每次 revalidate,走 304);try_files 深層路由 fallback 同樣命中。assets 維持 immutable 1y。

@@ -252,7 +252,7 @@ public class DataSeeder implements ApplicationRunner {
     private void seedBudgets(int year) {
         record BudgetLine(String account, String amount) {}
         List<BudgetLine> budgets = List.of(
-                new BudgetLine("4100", "260000"),   // Sales revenue
+                new BudgetLine("4100", "500000"),   // Sales revenue (aligned to the 10x sale prices)
                 new BudgetLine("5100", "150000"),   // COGS
                 new BudgetLine("6100", "560000"));  // Salaries expense
         for (BudgetLine b : budgets) {
@@ -473,11 +473,11 @@ public class DataSeeder implements ApplicationRunner {
 
         // --- Bills of material (one per finished good, component qty <= 2) -----------------------------
         List<Family> families = List.of(
-                new Family(fPump, bom(fPump, List.of(comp(rSteel, "2"), comp(rRubber, "1"))), "620"),
-                new Family(fValve, bom(fValve, List.of(comp(rSteel, "1"), comp(rAlu, "1"))), "430"),
-                new Family(fMotor, bom(fMotor, List.of(comp(rAlu, "2"), comp(rPcb, "1"))), "780"),
-                new Family(fSensor, bom(fSensor, List.of(comp(rPcb, "2"), comp(rPoly, "1"))), "560"),
-                new Family(fPanel, bom(fPanel, List.of(comp(rPoly, "2"), comp(rAlu, "1"))), "510"));
+                new Family(fPump, bom(fPump, List.of(comp(rSteel, "2"), comp(rRubber, "1"))), "6200"),
+                new Family(fValve, bom(fValve, List.of(comp(rSteel, "1"), comp(rAlu, "1"))), "4300"),
+                new Family(fMotor, bom(fMotor, List.of(comp(rAlu, "2"), comp(rPcb, "1"))), "7800"),
+                new Family(fSensor, bom(fSensor, List.of(comp(rPcb, "2"), comp(rPoly, "1"))), "5600"),
+                new Family(fPanel, bom(fPanel, List.of(comp(rPoly, "2"), comp(rAlu, "1"))), "5100"));
 
         // --- Manufacturing: two completed work orders per family (produce finished goods) --------------
         for (Family f : families) {
@@ -513,12 +513,12 @@ public class DataSeeder implements ApplicationRunner {
         }
 
         // --- Sales: orders still open -> the order funnel has confirmed and draft stages ---------------
-        salesOrderService.confirm(draftSo(customers.get(0), fPump, "12", "620", today).getId(), ACTOR);
-        salesOrderService.confirm(draftSo(customers.get(1), fValve, "10", "430", today).getId(), ACTOR);
-        salesOrderService.confirm(draftSo(customers.get(2), fMotor, "6", "780", today).getId(), ACTOR);
-        salesOrderService.confirm(draftSo(customers.get(3), fPanel, "9", "510", today).getId(), ACTOR);
-        draftSo(customers.get(4), fSensor, "8", "560", today);   // stays DRAFT
-        draftSo(customers.get(0), fMotor, "5", "780", today);    // stays DRAFT
+        salesOrderService.confirm(draftSo(customers.get(0), fPump, "12", "6200", today).getId(), ACTOR);
+        salesOrderService.confirm(draftSo(customers.get(1), fValve, "10", "4300", today).getId(), ACTOR);
+        salesOrderService.confirm(draftSo(customers.get(2), fMotor, "6", "7800", today).getId(), ACTOR);
+        salesOrderService.confirm(draftSo(customers.get(3), fPanel, "9", "5100", today).getId(), ACTOR);
+        draftSo(customers.get(4), fSensor, "8", "5600", today);   // stays DRAFT
+        draftSo(customers.get(0), fMotor, "5", "7800", today);    // stays DRAFT
 
         log.info("Rich demo seed complete: {} vendors, {} customers, {} product families across {} months.",
                 vendors.size(), customers.size(), families.size(), months.size());
