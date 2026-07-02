@@ -14,6 +14,8 @@ export interface KpiTileProps {
   delta?: number;
   /** When true, a negative delta is "good" (e.g. receivables going down) → shown green. */
   invertDelta?: boolean;
+  /** Small dimmed caption next to the delta chip explaining its basis (e.g. "vs same period last month"). */
+  deltaLabel?: string;
   /** Small trend series (chart sizing only). */
   spark?: number[];
   /** Top-right slot (e.g. a live/planned badge). */
@@ -22,16 +24,25 @@ export interface KpiTileProps {
   valueColor?: string;
 }
 
+/** Parse a backend deltaPct string for the `delta` prop; null/blank/non-numeric → undefined (no chip). */
+export function parseDeltaPct(value: string | null | undefined): number | undefined {
+  if (value == null || value.trim() === '') return undefined;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 /**
  * KPI magnet for the dashboards: brand-chip icon, label, prominent money value, and an optional
- * period-over-period delta + sparkline. Deltas/sparklines are only shown when real data is supplied — no
- * fabricated trends.
+ * period-over-period delta pill (▲/▼ + %, semantic-token colored) + sparkline. `deltaLabel` is a small
+ * dimmed caption for the delta's basis (e.g. "vs same period last month"). Deltas/sparklines are only
+ * shown when real data is supplied — no fabricated trends.
  */
-export function KpiTile({ label, value, money = true, icon, delta, invertDelta, spark, status, valueColor }: KpiTileProps) {
-  const hasDelta = typeof delta === 'number';
+export function KpiTile({ label, value, money = true, icon, delta, invertDelta, deltaLabel, spark, status, valueColor }: KpiTileProps) {
+  const hasDelta = typeof delta === 'number' && Number.isFinite(delta);
   const up = hasDelta && delta >= 0;
   const good = hasDelta ? (invertDelta ? !up : up) : false;
-  const deltaColor = good ? 'var(--mantine-color-teal-7)' : 'var(--mantine-color-red-7)';
+  const deltaTextColor = good ? 'var(--erp-positive-text)' : 'var(--erp-negative-text)';
+  const deltaBg = good ? 'var(--erp-positive-bg)' : 'var(--erp-negative-bg)';
   const sparkColor = good ? 'teal.6' : 'red.6';
 
   return (
@@ -66,9 +77,27 @@ export function KpiTile({ label, value, money = true, icon, delta, invertDelta, 
       {(hasDelta || (spark && spark.length > 1)) && (
         <Group justify="space-between" mt={8} wrap="nowrap">
           {hasDelta ? (
-            <Group gap={2} wrap="nowrap" style={{ color: deltaColor, fontSize: 13 }}>
-              {up ? <IconArrowUpRight size={14} /> : <IconArrowDownRight size={14} />}
-              {Math.abs(delta).toFixed(1)}%
+            <Group gap={6} wrap="nowrap">
+              <Group
+                gap={2}
+                wrap="nowrap"
+                style={{
+                  color: deltaTextColor,
+                  background: deltaBg,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  borderRadius: 999,
+                  padding: '2px 8px',
+                }}
+              >
+                {up ? <IconArrowUpRight size={14} /> : <IconArrowDownRight size={14} />}
+                {Math.abs(delta).toFixed(1)}%
+              </Group>
+              {deltaLabel ? (
+                <Text size="xs" c="dimmed" truncate>
+                  {deltaLabel}
+                </Text>
+              ) : null}
             </Group>
           ) : (
             <span />

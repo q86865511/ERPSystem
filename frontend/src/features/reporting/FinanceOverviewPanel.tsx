@@ -8,7 +8,7 @@ import {
   IconScale,
   IconUsers,
 } from '@tabler/icons-react';
-import { KpiTile } from '../../components/charts/KpiTile';
+import { KpiTile, parseDeltaPct } from '../../components/charts/KpiTile';
 import { DonutCard, type DonutDatum } from '../../components/charts/DonutCard';
 import { agingColors, compactNumber, moneyToNumber } from '../../components/charts/palette';
 import { formatMoney } from '../../components/Money';
@@ -63,6 +63,8 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
     { name: t('sales.arAging.days90plus'), amount: d?.days90plus, color: agingColors[4] },
   ];
 
+  const netCashDelta = parseDeltaPct(kpi.data?.netCash?.deltaPct);
+
   const plData = [
     { metric: t('reporting.overview.plRevenue'), amount: moneyToNumber(is.data?.totalRevenue) },
     { metric: t('reporting.overview.plExpenses'), amount: moneyToNumber(is.data?.totalExpenses) },
@@ -93,7 +95,14 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
         <KpiTile label={t('reporting.overview.netIncome')} value={is.data?.netIncome} icon={<IconChartPie size={16} />} status={live} />
         <KpiTile label={t('reporting.overview.totalAssets')} value={bs.data?.totalAssets} icon={<IconBuildingBank size={16} />} status={live} />
         <KpiTile label={t('reporting.overview.totalEquity')} value={bs.data?.totalEquity} icon={<IconScale size={16} />} status={live} />
-        <KpiTile label={t('reporting.overview.cash')} value={kpi.data?.netCash?.current} icon={<IconCash size={16} />} status={live} />
+        <KpiTile
+          label={t('reporting.overview.cash')}
+          value={kpi.data?.netCash?.current}
+          icon={<IconCash size={16} />}
+          status={live}
+          delta={netCashDelta}
+          deltaLabel={t('dashboard.kpiBasis')}
+        />
       </SimpleGrid>
 
       <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }}>

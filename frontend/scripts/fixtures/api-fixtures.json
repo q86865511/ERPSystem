@@ -6029,19 +6029,19 @@
       "currentMonth": "2026-07",
       "previousMonth": "2026-06",
       "revenue": {
-        "current": "4040.0000",
-        "previous": "48460.0000",
-        "deltaPct": "-91.7"
+        "current": "40400.0000",
+        "previous": "35900.0000",
+        "deltaPct": "12.5"
       },
       "grossProfit": {
-        "current": "1514.7454",
-        "previous": "17820.7453",
-        "deltaPct": "-91.5"
+        "current": "15147.4540",
+        "previous": "13950.0000",
+        "deltaPct": "8.6"
       },
       "netCash": {
-        "current": "-420.0000",
+        "current": "42000.0000",
         "previous": "45675.0000",
-        "deltaPct": "-100.9"
+        "deltaPct": "-8.0"
       }
     },
     "/api/reporting/budget-variance": {
