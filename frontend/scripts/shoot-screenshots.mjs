@@ -92,7 +92,7 @@ async function main() {
   const browser = await chromium.launch();
   const unmatched = new Set();
 
-  async function shoot(name, { route, theme = 'light', locale = 'en', onboarding = 'done', prepare, waitMs = 1500 }) {
+  async function shoot(name, { route, theme = 'light', locale = 'en', onboarding = 'done', prepare, waitMs = 1500, fullPage = false }) {
     const context = await browser.newContext({
       viewport: VIEWPORT,
       deviceScaleFactor: 1,
@@ -129,7 +129,7 @@ async function main() {
     if (prepare) await prepare(page);
     await page.waitForTimeout(waitMs); // let recharts / Mantine transitions settle
     await mkdir(OUT, { recursive: true });
-    await page.screenshot({ path: join(OUT, `${name}.png`) });
+    await page.screenshot({ path: join(OUT, `${name}.png`), fullPage });
     console.log(`[shoot] ${name}.png (${theme})`);
     await context.close();
   }
@@ -146,7 +146,7 @@ async function main() {
   await shoot('02-masterdata', { route: '/masterdata' });
   await shoot('03-purchasing', { route: '/purchasing' });
   await shoot('04-sales', { route: '/sales' });
-  await shoot('05-manufacturing', { route: '/manufacturing?tab=dashboard' });
+  await shoot('05-manufacturing', { route: '/manufacturing?tab=dashboard', fullPage: true });
   await shoot('06-inventory', { route: '/inventory?tab=dashboard' });
   await shoot('07-reporting', { route: '/reporting?tab=overview' });
   await shoot('08-ledger', { route: '/ledger' });

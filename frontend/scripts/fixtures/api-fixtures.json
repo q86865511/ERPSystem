@@ -736,7 +736,7 @@
         "salesOrderId": 18,
         "postingDate": "2026-07-02",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:37.540169Z",
+        "postedAt": "2026-07-02T04:59:30.320260Z",
         "lines": [
           {
             "id": 18,
@@ -744,7 +744,7 @@
             "itemId": 12,
             "qtyShipped": "8.000000",
             "unitCost": "278.156819",
-            "movementGroupId": "bcb74d86-a5bf-4f13-8ac4-685615439a4a",
+            "movementGroupId": "19f5ae6d-a947-485d-a8f2-754075bda390",
             "journalEntryId": 150
           }
         ]
@@ -755,7 +755,7 @@
         "salesOrderId": 17,
         "postingDate": "2026-06-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:37.501134Z",
+        "postedAt": "2026-07-02T04:59:30.254946Z",
         "lines": [
           {
             "id": 17,
@@ -763,7 +763,7 @@
             "itemId": 11,
             "qtyShipped": "8.000000",
             "unitCost": "347.232242",
-            "movementGroupId": "443faf77-66dc-4bb5-89a8-6ff913e18e19",
+            "movementGroupId": "8cae4641-0e45-48db-8b13-19d0c26f6bd0",
             "journalEntryId": 148
           }
         ]
@@ -774,7 +774,7 @@
         "salesOrderId": 16,
         "postingDate": "2026-05-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:37.464728Z",
+        "postedAt": "2026-07-02T04:59:30.158055Z",
         "lines": [
           {
             "id": 16,
@@ -782,7 +782,7 @@
             "itemId": 15,
             "qtyShipped": "8.000000",
             "unitCost": "299.634236",
-            "movementGroupId": "931c3c3f-a3ad-4001-96d9-e9f45e27d8b2",
+            "movementGroupId": "dcb0b255-3a54-4023-b8fb-a05cfc5d9e08",
             "journalEntryId": 146
           }
         ]
@@ -793,7 +793,7 @@
         "salesOrderId": 15,
         "postingDate": "2026-04-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:37.428073Z",
+        "postedAt": "2026-07-02T04:59:30.118431Z",
         "lines": [
           {
             "id": 15,
@@ -801,7 +801,7 @@
             "itemId": 14,
             "qtyShipped": "8.000000",
             "unitCost": "485.355102",
-            "movementGroupId": "42e1ddfc-951f-40a5-9b29-573eddce0b86",
+            "movementGroupId": "a005caab-c5de-4bc3-a339-8ef25f3edba4",
             "journalEntryId": 144
           }
         ]
@@ -812,7 +812,7 @@
         "salesOrderId": 14,
         "postingDate": "2026-03-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:37.389912Z",
+        "postedAt": "2026-07-02T04:59:30.079834Z",
         "lines": [
           {
             "id": 14,
@@ -820,7 +820,7 @@
             "itemId": 13,
             "qtyShipped": "8.000000",
             "unitCost": "447.048062",
-            "movementGroupId": "e805ddc1-7c05-447c-96ee-d5619fae97e2",
+            "movementGroupId": "d00c60c2-983c-403b-aa84-bfd46e7f9e1f",
             "journalEntryId": 142
           }
         ]
@@ -831,7 +831,7 @@
         "salesOrderId": 13,
         "postingDate": "2026-02-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:37.351074Z",
+        "postedAt": "2026-07-02T04:59:30.040611Z",
         "lines": [
           {
             "id": 13,
@@ -839,7 +839,7 @@
             "itemId": 12,
             "qtyShipped": "8.000000",
             "unitCost": "278.156819",
-            "movementGroupId": "ef92fb76-a21d-4cb1-93d8-41e89b6cf47e",
+            "movementGroupId": "45945ee5-5408-4e60-992c-59806eea0a99",
             "journalEntryId": 140
           }
         ]
@@ -850,7 +850,7 @@
         "salesOrderId": 12,
         "postingDate": "2026-01-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:37.298951Z",
+        "postedAt": "2026-07-02T04:59:29.998974Z",
         "lines": [
           {
             "id": 12,
@@ -858,7 +858,7 @@
             "itemId": 11,
             "qtyShipped": "8.000000",
             "unitCost": "347.232242",
-            "movementGroupId": "890718cc-bb60-4c91-b7ad-350b06f07930",
+            "movementGroupId": "20a9315b-3318-49d8-994d-5fde79abc891",
             "journalEntryId": 138
           }
         ]
@@ -869,7 +869,7 @@
         "salesOrderId": 11,
         "postingDate": "2026-06-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:37.245567Z",
+        "postedAt": "2026-07-02T04:59:29.944768Z",
         "lines": [
           {
             "id": 11,
@@ -877,7 +877,7 @@
             "itemId": 15,
             "qtyShipped": "15.000000",
             "unitCost": "299.634236",
-            "movementGroupId": "32b0f7de-680e-4efb-82d5-5995aef93ad3",
+            "movementGroupId": "00045ff9-53dc-403c-8eff-63a4dd22a149",
             "journalEntryId": 135
           }
         ]
@@ -888,7 +888,7 @@
         "salesOrderId": 10,
         "postingDate": "2026-05-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:37.183094Z",
+        "postedAt": "2026-07-02T04:59:29.891448Z",
         "lines": [
           {
             "id": 10,
@@ -896,7 +896,7 @@
             "itemId": 15,
             "qtyShipped": "20.000000",
             "unitCost": "299.634236",
-            "movementGroupId": "3fdba587-0a8b-401f-830e-379a5c59c6e3",
+            "movementGroupId": "a175c740-f6c8-493c-a597-0b8541ad6b7e",
             "journalEntryId": 132
           }
         ]
@@ -907,7 +907,7 @@
         "salesOrderId": 9,
         "postingDate": "2026-06-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:37.096631Z",
+        "postedAt": "2026-07-02T04:59:29.831375Z",
         "lines": [
           {
             "id": 9,
@@ -915,7 +915,7 @@
             "itemId": 14,
             "qtyShipped": "15.000000",
             "unitCost": "485.355102",
-            "movementGroupId": "699d54ba-7111-4d4e-94af-2dfa4de20f2f",
+            "movementGroupId": "597911cd-c3b8-45d1-8e7f-d0e210015c62",
             "journalEntryId": 129
           }
         ]
@@ -926,7 +926,7 @@
         "salesOrderId": 8,
         "postingDate": "2026-05-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:37.035897Z",
+        "postedAt": "2026-07-02T04:59:29.772004Z",
         "lines": [
           {
             "id": 8,
@@ -934,7 +934,7 @@
             "itemId": 14,
             "qtyShipped": "20.000000",
             "unitCost": "485.355102",
-            "movementGroupId": "70af0e99-3fb3-4d10-91c5-45d43cb6f650",
+            "movementGroupId": "4daca1e6-65f7-4a12-b6b8-8012af0ba1d5",
             "journalEntryId": 126
           }
         ]
@@ -945,7 +945,7 @@
         "salesOrderId": 7,
         "postingDate": "2026-06-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:36.976747Z",
+        "postedAt": "2026-07-02T04:59:29.715568Z",
         "lines": [
           {
             "id": 7,
@@ -953,7 +953,7 @@
             "itemId": 13,
             "qtyShipped": "15.000000",
             "unitCost": "447.048062",
-            "movementGroupId": "2e5bdce2-ea9a-40dd-a2f5-4137c90c1810",
+            "movementGroupId": "32f5cbf9-1eae-4cb6-9c17-174a923415e2",
             "journalEntryId": 123
           }
         ]
@@ -964,7 +964,7 @@
         "salesOrderId": 6,
         "postingDate": "2026-05-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:36.925783Z",
+        "postedAt": "2026-07-02T04:59:29.648300Z",
         "lines": [
           {
             "id": 6,
@@ -972,7 +972,7 @@
             "itemId": 13,
             "qtyShipped": "20.000000",
             "unitCost": "447.048062",
-            "movementGroupId": "5e072fa4-4f6c-4062-9d0b-5ce67de08c9e",
+            "movementGroupId": "20ca053f-4f14-4533-860f-abf94f9251b0",
             "journalEntryId": 120
           }
         ]
@@ -983,7 +983,7 @@
         "salesOrderId": 5,
         "postingDate": "2026-06-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:36.872585Z",
+        "postedAt": "2026-07-02T04:59:29.581360Z",
         "lines": [
           {
             "id": 5,
@@ -991,7 +991,7 @@
             "itemId": 12,
             "qtyShipped": "15.000000",
             "unitCost": "278.156819",
-            "movementGroupId": "58d5c6f0-600c-433f-b483-2b7887ec3aa8",
+            "movementGroupId": "f98ccee2-a3b5-42b4-a6b0-66bba55455ac",
             "journalEntryId": 117
           }
         ]
@@ -1002,7 +1002,7 @@
         "salesOrderId": 4,
         "postingDate": "2026-05-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:36.819137Z",
+        "postedAt": "2026-07-02T04:59:29.510699Z",
         "lines": [
           {
             "id": 4,
@@ -1010,7 +1010,7 @@
             "itemId": 12,
             "qtyShipped": "20.000000",
             "unitCost": "278.156819",
-            "movementGroupId": "e1314d04-9111-4280-88cb-57152a7dce12",
+            "movementGroupId": "e1cf085d-9db6-4692-af11-935dec621204",
             "journalEntryId": 114
           }
         ]
@@ -1021,7 +1021,7 @@
         "salesOrderId": 3,
         "postingDate": "2026-06-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:36.766097Z",
+        "postedAt": "2026-07-02T04:59:29.452066Z",
         "lines": [
           {
             "id": 3,
@@ -1029,7 +1029,7 @@
             "itemId": 11,
             "qtyShipped": "15.000000",
             "unitCost": "347.232242",
-            "movementGroupId": "3682ced4-8ef0-40d3-b9c0-8a67d94a6fd0",
+            "movementGroupId": "086f8b5d-ed58-48ac-ba2d-4d042b5e1716",
             "journalEntryId": 111
           }
         ]
@@ -1040,7 +1040,7 @@
         "salesOrderId": 2,
         "postingDate": "2026-05-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:36.703759Z",
+        "postedAt": "2026-07-02T04:59:29.360429Z",
         "lines": [
           {
             "id": 2,
@@ -1048,7 +1048,7 @@
             "itemId": 11,
             "qtyShipped": "20.000000",
             "unitCost": "347.232242",
-            "movementGroupId": "bcdffe20-f033-4443-bec2-66a9a21e4de7",
+            "movementGroupId": "23e25cb2-da3d-42ae-ac9c-cee51aac18af",
             "journalEntryId": 108
           }
         ]
@@ -1059,7 +1059,7 @@
         "salesOrderId": 1,
         "postingDate": "2026-07-02",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:33.938109Z",
+        "postedAt": "2026-07-02T04:59:26.597381Z",
         "lines": [
           {
             "id": 1,
@@ -1067,7 +1067,7 @@
             "itemId": 2,
             "qtyShipped": "30.000000",
             "unitCost": "10.000000",
-            "movementGroupId": "5f76e1c1-8919-460a-94da-9588cdcc7d59",
+            "movementGroupId": "d752b948-b8c9-43f0-9f95-89c34d404d97",
             "journalEntryId": 7
           }
         ]
@@ -1088,7 +1088,7 @@
         "openBalance": "3612.0000",
         "status": "POSTED",
         "journalEntryId": 151,
-        "postedAt": "2026-07-02T04:13:37.567142Z",
+        "postedAt": "2026-07-02T04:59:30.363585Z",
         "lines": [
           {
             "id": 18,
@@ -1116,7 +1116,7 @@
         "openBalance": "5208.0000",
         "status": "POSTED",
         "journalEntryId": 149,
-        "postedAt": "2026-07-02T04:13:37.525618Z",
+        "postedAt": "2026-07-02T04:59:30.299683Z",
         "lines": [
           {
             "id": 17,
@@ -1144,7 +1144,7 @@
         "openBalance": "4284.0000",
         "status": "POSTED",
         "journalEntryId": 147,
-        "postedAt": "2026-07-02T04:13:37.489389Z",
+        "postedAt": "2026-07-02T04:59:30.229783Z",
         "lines": [
           {
             "id": 16,
@@ -1172,7 +1172,7 @@
         "openBalance": "4704.0000",
         "status": "POSTED",
         "journalEntryId": 145,
-        "postedAt": "2026-07-02T04:13:37.452569Z",
+        "postedAt": "2026-07-02T04:59:30.144301Z",
         "lines": [
           {
             "id": 15,
@@ -1200,7 +1200,7 @@
         "openBalance": "6552.0000",
         "status": "POSTED",
         "journalEntryId": 143,
-        "postedAt": "2026-07-02T04:13:37.415436Z",
+        "postedAt": "2026-07-02T04:59:30.105654Z",
         "lines": [
           {
             "id": 14,
@@ -1228,7 +1228,7 @@
         "openBalance": "3612.0000",
         "status": "POSTED",
         "journalEntryId": 141,
-        "postedAt": "2026-07-02T04:13:37.376984Z",
+        "postedAt": "2026-07-02T04:59:30.067389Z",
         "lines": [
           {
             "id": 13,
@@ -1256,7 +1256,7 @@
         "openBalance": "5208.0000",
         "status": "POSTED",
         "journalEntryId": 139,
-        "postedAt": "2026-07-02T04:13:37.336632Z",
+        "postedAt": "2026-07-02T04:59:30.027420Z",
         "lines": [
           {
             "id": 12,
@@ -1284,7 +1284,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 136,
-        "postedAt": "2026-07-02T04:13:37.272096Z",
+        "postedAt": "2026-07-02T04:59:29.975565Z",
         "lines": [
           {
             "id": 11,
@@ -1312,7 +1312,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 133,
-        "postedAt": "2026-07-02T04:13:37.218087Z",
+        "postedAt": "2026-07-02T04:59:29.918631Z",
         "lines": [
           {
             "id": 10,
@@ -1340,7 +1340,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 130,
-        "postedAt": "2026-07-02T04:13:37.139964Z",
+        "postedAt": "2026-07-02T04:59:29.861186Z",
         "lines": [
           {
             "id": 9,
@@ -1368,7 +1368,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 127,
-        "postedAt": "2026-07-02T04:13:37.068274Z",
+        "postedAt": "2026-07-02T04:59:29.802217Z",
         "lines": [
           {
             "id": 8,
@@ -1396,7 +1396,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 124,
-        "postedAt": "2026-07-02T04:13:37.007089Z",
+        "postedAt": "2026-07-02T04:59:29.747178Z",
         "lines": [
           {
             "id": 7,
@@ -1424,7 +1424,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 121,
-        "postedAt": "2026-07-02T04:13:36.953159Z",
+        "postedAt": "2026-07-02T04:59:29.686592Z",
         "lines": [
           {
             "id": 6,
@@ -1452,7 +1452,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 118,
-        "postedAt": "2026-07-02T04:13:36.900225Z",
+        "postedAt": "2026-07-02T04:59:29.614843Z",
         "lines": [
           {
             "id": 5,
@@ -1480,7 +1480,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 115,
-        "postedAt": "2026-07-02T04:13:36.847214Z",
+        "postedAt": "2026-07-02T04:59:29.547706Z",
         "lines": [
           {
             "id": 4,
@@ -1508,7 +1508,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 112,
-        "postedAt": "2026-07-02T04:13:36.794557Z",
+        "postedAt": "2026-07-02T04:59:29.481249Z",
         "lines": [
           {
             "id": 3,
@@ -1536,7 +1536,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 109,
-        "postedAt": "2026-07-02T04:13:36.739602Z",
+        "postedAt": "2026-07-02T04:59:29.416331Z",
         "lines": [
           {
             "id": 2,
@@ -1564,7 +1564,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 8,
-        "postedAt": "2026-07-02T04:13:34.002292Z",
+        "postedAt": "2026-07-02T04:59:26.655220Z",
         "lines": [
           {
             "id": 1,
@@ -2119,7 +2119,7 @@
         "purchaseOrderId": 26,
         "postingDate": "2026-07-02",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.891412Z",
+        "postedAt": "2026-07-02T04:59:28.585818Z",
         "lines": [
           {
             "id": 26,
@@ -2127,7 +2127,7 @@
             "itemId": 3,
             "qtyReceived": "40.000000",
             "unitCost": "160.000000",
-            "movementGroupId": "dd40a231-473f-4f3d-8557-3fb717ce3084",
+            "movementGroupId": "9c926c2d-d6f1-498a-aa32-50f40eb4da19",
             "journalEntryId": 76
           }
         ]
@@ -2138,7 +2138,7 @@
         "purchaseOrderId": 25,
         "postingDate": "2026-06-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.843289Z",
+        "postedAt": "2026-07-02T04:59:28.530463Z",
         "lines": [
           {
             "id": 25,
@@ -2146,7 +2146,7 @@
             "itemId": 3,
             "qtyReceived": "40.000000",
             "unitCost": "160.000000",
-            "movementGroupId": "dbbdeae3-f820-4e71-a5d1-8e139d794a0c",
+            "movementGroupId": "240bc353-a51c-4a84-9459-1f93e3ac807d",
             "journalEntryId": 74
           }
         ]
@@ -2157,7 +2157,7 @@
         "purchaseOrderId": 24,
         "postingDate": "2026-05-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.797447Z",
+        "postedAt": "2026-07-02T04:59:28.477068Z",
         "lines": [
           {
             "id": 24,
@@ -2165,7 +2165,7 @@
             "itemId": 6,
             "qtyReceived": "40.000000",
             "unitCost": "160.000000",
-            "movementGroupId": "23fe60ac-215d-4e98-bc06-c9e7bbaecdb7",
+            "movementGroupId": "fe8c3a07-ce41-47a2-9db6-0ba1187a3742",
             "journalEntryId": 72
           }
         ]
@@ -2176,7 +2176,7 @@
         "purchaseOrderId": 23,
         "postingDate": "2026-04-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.749733Z",
+        "postedAt": "2026-07-02T04:59:28.418876Z",
         "lines": [
           {
             "id": 23,
@@ -2184,7 +2184,7 @@
             "itemId": 7,
             "qtyReceived": "40.000000",
             "unitCost": "160.000000",
-            "movementGroupId": "9971e81c-455e-4471-bc74-fc3e02fd3fe0",
+            "movementGroupId": "45b06d72-036e-4d85-850f-dfae438e33e0",
             "journalEntryId": 70
           }
         ]
@@ -2195,7 +2195,7 @@
         "purchaseOrderId": 22,
         "postingDate": "2026-03-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.708818Z",
+        "postedAt": "2026-07-02T04:59:28.371546Z",
         "lines": [
           {
             "id": 22,
@@ -2203,7 +2203,7 @@
             "itemId": 5,
             "qtyReceived": "40.000000",
             "unitCost": "160.000000",
-            "movementGroupId": "d2f9410e-ab3f-4847-b94f-7e6fccbbf149",
+            "movementGroupId": "127d1526-5aa9-4317-b3f3-cbf64ebd5bcc",
             "journalEntryId": 68
           }
         ]
@@ -2214,7 +2214,7 @@
         "purchaseOrderId": 21,
         "postingDate": "2026-02-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.665973Z",
+        "postedAt": "2026-07-02T04:59:28.322403Z",
         "lines": [
           {
             "id": 21,
@@ -2222,7 +2222,7 @@
             "itemId": 4,
             "qtyReceived": "40.000000",
             "unitCost": "160.000000",
-            "movementGroupId": "ccd2eeb4-5a3f-47fd-ac57-2c6514d6fd2c",
+            "movementGroupId": "b1752877-0bc9-4eff-a4c6-c7456a705d1d",
             "journalEntryId": 66
           }
         ]
@@ -2233,7 +2233,7 @@
         "purchaseOrderId": 20,
         "postingDate": "2026-01-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.614307Z",
+        "postedAt": "2026-07-02T04:59:28.273461Z",
         "lines": [
           {
             "id": 20,
@@ -2241,7 +2241,7 @@
             "itemId": 3,
             "qtyReceived": "40.000000",
             "unitCost": "160.000000",
-            "movementGroupId": "3fb72433-5676-4ae3-b956-2b53a0ff6474",
+            "movementGroupId": "416828a5-b707-4064-beca-0e23be0e3578",
             "journalEntryId": 64
           }
         ]
@@ -2252,7 +2252,7 @@
         "purchaseOrderId": 19,
         "postingDate": "2026-01-18",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.548368Z",
+        "postedAt": "2026-07-02T04:59:28.207760Z",
         "lines": [
           {
             "id": 19,
@@ -2260,7 +2260,7 @@
             "itemId": 7,
             "qtyReceived": "40.000000",
             "unitCost": "200.000000",
-            "movementGroupId": "e2e1e26a-1b37-48c3-9c98-80ea502c794d",
+            "movementGroupId": "7b3ab727-b18e-46fd-8b80-e2eadac74a04",
             "journalEntryId": 61
           }
         ]
@@ -2271,7 +2271,7 @@
         "purchaseOrderId": 18,
         "postingDate": "2026-01-24",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.472701Z",
+        "postedAt": "2026-07-02T04:59:28.129169Z",
         "lines": [
           {
             "id": 18,
@@ -2279,7 +2279,7 @@
             "itemId": 5,
             "qtyReceived": "30.000000",
             "unitCost": "80.000000",
-            "movementGroupId": "23febc30-8290-4a32-bd43-06efc13f868c",
+            "movementGroupId": "1fabd24b-b84a-4759-a8f8-06341c0a247a",
             "journalEntryId": 58
           }
         ]
@@ -2290,7 +2290,7 @@
         "purchaseOrderId": 17,
         "postingDate": "2026-01-21",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.390306Z",
+        "postedAt": "2026-07-02T04:59:28.045402Z",
         "lines": [
           {
             "id": 17,
@@ -2298,7 +2298,7 @@
             "itemId": 4,
             "qtyReceived": "20.000000",
             "unitCost": "121.000000",
-            "movementGroupId": "845b5068-ce88-4c14-ac88-e74e9863d4cd",
+            "movementGroupId": "ce6f698e-08f4-43d5-a04d-c4619d8509b8",
             "journalEntryId": 55
           }
         ]
@@ -2309,7 +2309,7 @@
         "purchaseOrderId": 16,
         "postingDate": "2026-01-21",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.314507Z",
+        "postedAt": "2026-07-02T04:59:27.963258Z",
         "lines": [
           {
             "id": 16,
@@ -2317,7 +2317,7 @@
             "itemId": 4,
             "qtyReceived": "45.000000",
             "unitCost": "120.000000",
-            "movementGroupId": "3caa994c-d7ff-4d80-b761-4ebc0414f5f9",
+            "movementGroupId": "13bfac9b-ae71-439f-960b-a2e1a39f810d",
             "journalEntryId": 52
           }
         ]
@@ -2328,7 +2328,7 @@
         "purchaseOrderId": 15,
         "postingDate": "2026-01-27",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.251114Z",
+        "postedAt": "2026-07-02T04:59:27.884605Z",
         "lines": [
           {
             "id": 15,
@@ -2336,7 +2336,7 @@
             "itemId": 3,
             "qtyReceived": "30.000000",
             "unitCost": "152.000000",
-            "movementGroupId": "2b8612ca-92dc-430b-a046-1bae5f7bd537",
+            "movementGroupId": "04941a72-1f25-49d6-870a-4496c3e88d5e",
             "journalEntryId": 49
           }
         ]
@@ -2347,7 +2347,7 @@
         "purchaseOrderId": 14,
         "postingDate": "2026-01-20",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.160353Z",
+        "postedAt": "2026-07-02T04:59:27.798056Z",
         "lines": [
           {
             "id": 14,
@@ -2355,7 +2355,7 @@
             "itemId": 3,
             "qtyReceived": "40.000000",
             "unitCost": "150.000000",
-            "movementGroupId": "c4b727bd-149e-4f2c-b834-f577c2ed370e",
+            "movementGroupId": "e19773d5-dbb8-4772-849b-a5a162840f10",
             "journalEntryId": 46
           }
         ]
@@ -2366,7 +2366,7 @@
         "purchaseOrderId": 13,
         "postingDate": "2026-04-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.087783Z",
+        "postedAt": "2026-07-02T04:59:27.706739Z",
         "lines": [
           {
             "id": 13,
@@ -2374,7 +2374,7 @@
             "itemId": 10,
             "qtyReceived": "15.000000",
             "unitCost": "30.000000",
-            "movementGroupId": "09afeb05-c5e5-4039-bf5b-ce73a4f5626b",
+            "movementGroupId": "c463be9a-4180-4401-a84f-d29338b9b696",
             "journalEntryId": 43
           }
         ]
@@ -2385,7 +2385,7 @@
         "purchaseOrderId": 12,
         "postingDate": "2026-03-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:35.022605Z",
+        "postedAt": "2026-07-02T04:59:27.632263Z",
         "lines": [
           {
             "id": 12,
@@ -2393,7 +2393,7 @@
             "itemId": 8,
             "qtyReceived": "20.000000",
             "unitCost": "60.000000",
-            "movementGroupId": "4510bed5-a963-41de-ba22-516b53eb5d63",
+            "movementGroupId": "f56d2770-bd77-4cc4-9953-ce28b2704a45",
             "journalEntryId": 40
           }
         ]
@@ -2404,7 +2404,7 @@
         "purchaseOrderId": 11,
         "postingDate": "2026-02-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:34.944350Z",
+        "postedAt": "2026-07-02T04:59:27.563657Z",
         "lines": [
           {
             "id": 11,
@@ -2412,7 +2412,7 @@
             "itemId": 9,
             "qtyReceived": "10.000000",
             "unitCost": "90.000000",
-            "movementGroupId": "d91f027b-e82c-4ee5-b783-8d534e44e855",
+            "movementGroupId": "6b65c453-1cb6-4841-873c-e120fe93a90a",
             "journalEntryId": 37
           }
         ]
@@ -2423,7 +2423,7 @@
         "purchaseOrderId": 10,
         "postingDate": "2026-03-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:34.851687Z",
+        "postedAt": "2026-07-02T04:59:27.480612Z",
         "lines": [
           {
             "id": 10,
@@ -2431,7 +2431,7 @@
             "itemId": 6,
             "qtyReceived": "200.000000",
             "unitCost": "15.000000",
-            "movementGroupId": "64c7a066-0ac5-486e-8e94-cee3278fab6b",
+            "movementGroupId": "1a90ea6e-6d4f-4d64-ba54-8164aad4cd1a",
             "journalEntryId": 34
           }
         ]
@@ -2442,7 +2442,7 @@
         "purchaseOrderId": 9,
         "postingDate": "2026-05-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:34.762251Z",
+        "postedAt": "2026-07-02T04:59:27.409976Z",
         "lines": [
           {
             "id": 9,
@@ -2450,7 +2450,7 @@
             "itemId": 7,
             "qtyReceived": "200.000000",
             "unitCost": "205.000000",
-            "movementGroupId": "7649d62f-e624-4a3f-89f7-65c09b2a008b",
+            "movementGroupId": "4a4d6f73-4e05-484a-bec2-798ed3b4be4e",
             "journalEntryId": 31
           }
         ]
@@ -2461,7 +2461,7 @@
         "purchaseOrderId": 8,
         "postingDate": "2026-02-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:34.671953Z",
+        "postedAt": "2026-07-02T04:59:27.333912Z",
         "lines": [
           {
             "id": 8,
@@ -2469,7 +2469,7 @@
             "itemId": 7,
             "qtyReceived": "220.000000",
             "unitCost": "200.000000",
-            "movementGroupId": "7a4f7827-030e-4cff-b9ee-455fd0a664cb",
+            "movementGroupId": "8b83f6f8-1443-419e-963e-666f6ecdbabd",
             "journalEntryId": 28
           }
         ]
@@ -2480,7 +2480,7 @@
         "purchaseOrderId": 7,
         "postingDate": "2026-04-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:34.593403Z",
+        "postedAt": "2026-07-02T04:59:27.248047Z",
         "lines": [
           {
             "id": 7,
@@ -2488,7 +2488,7 @@
             "itemId": 5,
             "qtyReceived": "200.000000",
             "unitCost": "83.000000",
-            "movementGroupId": "13478739-4d8d-4ebb-a04c-d51f517b9ac8",
+            "movementGroupId": "4dc7aaea-37e9-412f-899c-9e13c0073f74",
             "journalEntryId": 25
           }
         ]
@@ -2499,7 +2499,7 @@
         "purchaseOrderId": 6,
         "postingDate": "2026-02-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:34.510944Z",
+        "postedAt": "2026-07-02T04:59:27.161561Z",
         "lines": [
           {
             "id": 6,
@@ -2507,7 +2507,7 @@
             "itemId": 5,
             "qtyReceived": "220.000000",
             "unitCost": "80.000000",
-            "movementGroupId": "c8531c95-84ee-4135-aa3d-c775ad799df6",
+            "movementGroupId": "0673eacb-dc37-4c48-9288-c31c5782d28a",
             "journalEntryId": 22
           }
         ]
@@ -2518,7 +2518,7 @@
         "purchaseOrderId": 5,
         "postingDate": "2026-04-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:34.432757Z",
+        "postedAt": "2026-07-02T04:59:27.089134Z",
         "lines": [
           {
             "id": 5,
@@ -2526,7 +2526,7 @@
             "itemId": 4,
             "qtyReceived": "260.000000",
             "unitCost": "124.000000",
-            "movementGroupId": "09a2ef47-2a22-4958-9079-bcfc3a9e7cf4",
+            "movementGroupId": "8bba9996-2feb-4c2d-9631-bd4c304aefb6",
             "journalEntryId": 19
           }
         ]
@@ -2537,7 +2537,7 @@
         "purchaseOrderId": 4,
         "postingDate": "2026-01-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:34.345422Z",
+        "postedAt": "2026-07-02T04:59:26.999801Z",
         "lines": [
           {
             "id": 4,
@@ -2545,7 +2545,7 @@
             "itemId": 4,
             "qtyReceived": "280.000000",
             "unitCost": "120.000000",
-            "movementGroupId": "fc7bfa3e-2b0b-4e05-a3f7-94d8b2939b8d",
+            "movementGroupId": "69d6cdfb-900e-453c-8b7f-71d0d70284f3",
             "journalEntryId": 16
           }
         ]
@@ -2556,7 +2556,7 @@
         "purchaseOrderId": 3,
         "postingDate": "2026-03-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:34.254165Z",
+        "postedAt": "2026-07-02T04:59:26.891351Z",
         "lines": [
           {
             "id": 3,
@@ -2564,7 +2564,7 @@
             "itemId": 3,
             "qtyReceived": "200.000000",
             "unitCost": "156.000000",
-            "movementGroupId": "3a5422ce-7a8e-4e99-ad71-bd228db9662e",
+            "movementGroupId": "bbd3081a-71db-44c7-947b-bdc14a99f951",
             "journalEntryId": 13
           }
         ]
@@ -2575,7 +2575,7 @@
         "purchaseOrderId": 2,
         "postingDate": "2026-01-15",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:34.142489Z",
+        "postedAt": "2026-07-02T04:59:26.774447Z",
         "lines": [
           {
             "id": 2,
@@ -2583,7 +2583,7 @@
             "itemId": 3,
             "qtyReceived": "220.000000",
             "unitCost": "150.000000",
-            "movementGroupId": "5323c9f2-b7f5-4d3a-9543-693d2834f9c2",
+            "movementGroupId": "823a579b-cdca-4233-90e6-4adf0961ab6e",
             "journalEntryId": 10
           }
         ]
@@ -2594,7 +2594,7 @@
         "purchaseOrderId": 1,
         "postingDate": "2026-07-02",
         "status": "POSTED",
-        "postedAt": "2026-07-02T04:13:33.595417Z",
+        "postedAt": "2026-07-02T04:59:26.277501Z",
         "lines": [
           {
             "id": 1,
@@ -2602,7 +2602,7 @@
             "itemId": 1,
             "qtyReceived": "100.000000",
             "unitCost": "10.000000",
-            "movementGroupId": "240d2e0e-b143-44fd-a115-6f464b7cdec1",
+            "movementGroupId": "78ed7fc5-ba81-4cb5-b48e-78483ace3d03",
             "journalEntryId": 2
           }
         ]
@@ -2622,7 +2622,7 @@
         "openBalance": "6720.0000",
         "status": "POSTED",
         "journalEntryId": 77,
-        "postedAt": "2026-07-02T04:13:35.930984Z",
+        "postedAt": "2026-07-02T04:59:28.615335Z",
         "lines": [
           {
             "id": 26,
@@ -2649,7 +2649,7 @@
         "openBalance": "6720.0000",
         "status": "POSTED",
         "journalEntryId": 75,
-        "postedAt": "2026-07-02T04:13:35.876138Z",
+        "postedAt": "2026-07-02T04:59:28.569302Z",
         "lines": [
           {
             "id": 25,
@@ -2676,7 +2676,7 @@
         "openBalance": "6720.0000",
         "status": "POSTED",
         "journalEntryId": 73,
-        "postedAt": "2026-07-02T04:13:35.829228Z",
+        "postedAt": "2026-07-02T04:59:28.509157Z",
         "lines": [
           {
             "id": 24,
@@ -2703,7 +2703,7 @@
         "openBalance": "6720.0000",
         "status": "POSTED",
         "journalEntryId": 71,
-        "postedAt": "2026-07-02T04:13:35.777432Z",
+        "postedAt": "2026-07-02T04:59:28.456742Z",
         "lines": [
           {
             "id": 23,
@@ -2730,7 +2730,7 @@
         "openBalance": "6720.0000",
         "status": "POSTED",
         "journalEntryId": 69,
-        "postedAt": "2026-07-02T04:13:35.736233Z",
+        "postedAt": "2026-07-02T04:59:28.401676Z",
         "lines": [
           {
             "id": 22,
@@ -2757,7 +2757,7 @@
         "openBalance": "6720.0000",
         "status": "POSTED",
         "journalEntryId": 67,
-        "postedAt": "2026-07-02T04:13:35.694653Z",
+        "postedAt": "2026-07-02T04:59:28.355565Z",
         "lines": [
           {
             "id": 21,
@@ -2784,7 +2784,7 @@
         "openBalance": "6720.0000",
         "status": "POSTED",
         "journalEntryId": 65,
-        "postedAt": "2026-07-02T04:13:35.651069Z",
+        "postedAt": "2026-07-02T04:59:28.305656Z",
         "lines": [
           {
             "id": 20,
@@ -2811,7 +2811,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 62,
-        "postedAt": "2026-07-02T04:13:35.578725Z",
+        "postedAt": "2026-07-02T04:59:28.245408Z",
         "lines": [
           {
             "id": 19,
@@ -2838,7 +2838,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 59,
-        "postedAt": "2026-07-02T04:13:35.506230Z",
+        "postedAt": "2026-07-02T04:59:28.166239Z",
         "lines": [
           {
             "id": 18,
@@ -2865,7 +2865,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 56,
-        "postedAt": "2026-07-02T04:13:35.438307Z",
+        "postedAt": "2026-07-02T04:59:28.094863Z",
         "lines": [
           {
             "id": 17,
@@ -2892,7 +2892,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 53,
-        "postedAt": "2026-07-02T04:13:35.345272Z",
+        "postedAt": "2026-07-02T04:59:27.997481Z",
         "lines": [
           {
             "id": 16,
@@ -2919,7 +2919,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 50,
-        "postedAt": "2026-07-02T04:13:35.280899Z",
+        "postedAt": "2026-07-02T04:59:27.929188Z",
         "lines": [
           {
             "id": 15,
@@ -2946,7 +2946,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 47,
-        "postedAt": "2026-07-02T04:13:35.222689Z",
+        "postedAt": "2026-07-02T04:59:27.840797Z",
         "lines": [
           {
             "id": 14,
@@ -2973,7 +2973,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 44,
-        "postedAt": "2026-07-02T04:13:35.124142Z",
+        "postedAt": "2026-07-02T04:59:27.756583Z",
         "lines": [
           {
             "id": 13,
@@ -3000,7 +3000,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 41,
-        "postedAt": "2026-07-02T04:13:35.053608Z",
+        "postedAt": "2026-07-02T04:59:27.672751Z",
         "lines": [
           {
             "id": 12,
@@ -3027,7 +3027,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 38,
-        "postedAt": "2026-07-02T04:13:34.987210Z",
+        "postedAt": "2026-07-02T04:59:27.600155Z",
         "lines": [
           {
             "id": 11,
@@ -3054,7 +3054,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 35,
-        "postedAt": "2026-07-02T04:13:34.898054Z",
+        "postedAt": "2026-07-02T04:59:27.523351Z",
         "lines": [
           {
             "id": 10,
@@ -3081,7 +3081,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 32,
-        "postedAt": "2026-07-02T04:13:34.803938Z",
+        "postedAt": "2026-07-02T04:59:27.442940Z",
         "lines": [
           {
             "id": 9,
@@ -3108,7 +3108,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 29,
-        "postedAt": "2026-07-02T04:13:34.721705Z",
+        "postedAt": "2026-07-02T04:59:27.370511Z",
         "lines": [
           {
             "id": 8,
@@ -3135,7 +3135,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 26,
-        "postedAt": "2026-07-02T04:13:34.635103Z",
+        "postedAt": "2026-07-02T04:59:27.300902Z",
         "lines": [
           {
             "id": 7,
@@ -3162,7 +3162,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 23,
-        "postedAt": "2026-07-02T04:13:34.550359Z",
+        "postedAt": "2026-07-02T04:59:27.207332Z",
         "lines": [
           {
             "id": 6,
@@ -3189,7 +3189,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 20,
-        "postedAt": "2026-07-02T04:13:34.473576Z",
+        "postedAt": "2026-07-02T04:59:27.125794Z",
         "lines": [
           {
             "id": 5,
@@ -3216,7 +3216,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 17,
-        "postedAt": "2026-07-02T04:13:34.393525Z",
+        "postedAt": "2026-07-02T04:59:27.050459Z",
         "lines": [
           {
             "id": 4,
@@ -3243,7 +3243,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 14,
-        "postedAt": "2026-07-02T04:13:34.306631Z",
+        "postedAt": "2026-07-02T04:59:26.956531Z",
         "lines": [
           {
             "id": 3,
@@ -3270,7 +3270,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 11,
-        "postedAt": "2026-07-02T04:13:34.201876Z",
+        "postedAt": "2026-07-02T04:59:26.826962Z",
         "lines": [
           {
             "id": 2,
@@ -3297,7 +3297,7 @@
         "openBalance": "0.0000",
         "status": "PAID",
         "journalEntryId": 3,
-        "postedAt": "2026-07-02T04:13:33.764785Z",
+        "postedAt": "2026-07-02T04:59:26.414218Z",
         "lines": [
           {
             "id": 1,
@@ -3687,7 +3687,7 @@
             "plannedQty": "80.000000",
             "consumedQty": "80.000000",
             "consumedValue": "7020.4082",
-            "movementGroupId": "898b62c5-e92f-4d47-ab9f-0fdc87947358",
+            "movementGroupId": "96399d60-1f1f-4178-8356-c6e1fddee39d",
             "journalEntryId": 105
           },
           {
@@ -3697,7 +3697,7 @@
             "plannedQty": "40.000000",
             "consumedQty": "40.000000",
             "consumedValue": "4964.9612",
-            "movementGroupId": "982cbbea-8adb-480e-8e31-1cf3a27f1e3a",
+            "movementGroupId": "7e9f1905-3ddf-4f84-be55-6a8ea946847b",
             "journalEntryId": 106
           }
         ]
@@ -3722,7 +3722,7 @@
             "plannedQty": "100.000000",
             "consumedQty": "100.000000",
             "consumedValue": "8775.5102",
-            "movementGroupId": "548f4327-2422-423f-b11e-e5f47ba8b805",
+            "movementGroupId": "40a94c1f-f00d-4968-8c23-d6c0c84bb8a4",
             "journalEntryId": 102
           },
           {
@@ -3732,7 +3732,7 @@
             "plannedQty": "50.000000",
             "consumedQty": "50.000000",
             "consumedValue": "6206.2016",
-            "movementGroupId": "564285f4-365d-4ab7-a05c-66e1610a68c5",
+            "movementGroupId": "725f219f-8bc7-4d7d-9657-dd84ea2b30f4",
             "journalEntryId": 103
           }
         ]
@@ -3757,7 +3757,7 @@
             "plannedQty": "80.000000",
             "consumedQty": "80.000000",
             "consumedValue": "15904.0000",
-            "movementGroupId": "8b20eaa8-4978-4392-b16b-02de7e737357",
+            "movementGroupId": "b4a8520d-e7c2-4423-96d5-8dc150378cf1",
             "journalEntryId": 99
           },
           {
@@ -3767,7 +3767,7 @@
             "plannedQty": "40.000000",
             "consumedQty": "40.000000",
             "consumedValue": "3510.2041",
-            "movementGroupId": "7d506542-c201-439d-b95c-a233dce37938",
+            "movementGroupId": "bde9dc19-7f89-4cfb-86ca-d46516dc565d",
             "journalEntryId": 100
           }
         ]
@@ -3792,7 +3792,7 @@
             "plannedQty": "100.000000",
             "consumedQty": "100.000000",
             "consumedValue": "19880.0000",
-            "movementGroupId": "a39f0a16-64d5-4b0c-821d-42f1fcd34b82",
+            "movementGroupId": "020a2f67-05b2-45ef-8e18-26f4eeb87d65",
             "journalEntryId": 96
           },
           {
@@ -3802,7 +3802,7 @@
             "plannedQty": "50.000000",
             "consumedQty": "50.000000",
             "consumedValue": "4387.7551",
-            "movementGroupId": "418873d2-9b55-4893-ae65-d5e1dbd8b9d5",
+            "movementGroupId": "f620a176-b0c7-46be-890b-86fb600cfc81",
             "journalEntryId": 97
           }
         ]
@@ -3827,7 +3827,7 @@
             "plannedQty": "80.000000",
             "consumedQty": "80.000000",
             "consumedValue": "9929.9225",
-            "movementGroupId": "c9d9af6b-b85f-4294-98d9-1c7ac3fcd306",
+            "movementGroupId": "ecc972a9-e792-4188-812c-2232af3d63e2",
             "journalEntryId": 93
           },
           {
@@ -3837,7 +3837,7 @@
             "plannedQty": "40.000000",
             "consumedQty": "40.000000",
             "consumedValue": "7952.0000",
-            "movementGroupId": "4e3ed3bc-719e-4dd1-b689-c92d9a0d5e7f",
+            "movementGroupId": "a12be944-cc5c-4098-b5e7-8724360cb3df",
             "journalEntryId": 94
           }
         ]
@@ -3862,7 +3862,7 @@
             "plannedQty": "100.000000",
             "consumedQty": "100.000000",
             "consumedValue": "12412.4031",
-            "movementGroupId": "bbf1f9ba-286b-4522-95fe-d90485d0f8c6",
+            "movementGroupId": "b30de9b6-de6f-4182-97eb-3b05310c7b93",
             "journalEntryId": 90
           },
           {
@@ -3872,7 +3872,7 @@
             "plannedQty": "50.000000",
             "consumedQty": "50.000000",
             "consumedValue": "9940.0000",
-            "movementGroupId": "4ff269cf-b521-4b5f-9a03-fc46ea683dcc",
+            "movementGroupId": "93ee5f6f-82c7-45d1-a284-775715a429f1",
             "journalEntryId": 91
           }
         ]
@@ -3897,7 +3897,7 @@
             "plannedQty": "40.000000",
             "consumedQty": "40.000000",
             "consumedValue": "6161.3115",
-            "movementGroupId": "032ffae5-a22e-4999-8af9-fd70fa41ae4c",
+            "movementGroupId": "412f39b4-a08f-4ef7-af76-fd6152655713",
             "journalEntryId": 87
           },
           {
@@ -3907,7 +3907,7 @@
             "plannedQty": "40.000000",
             "consumedQty": "40.000000",
             "consumedValue": "4964.9612",
-            "movementGroupId": "22ce3b16-1b88-4cae-afce-0066d496f204",
+            "movementGroupId": "4f43fba3-15d2-4373-90c2-f446a2ec8d06",
             "journalEntryId": 88
           }
         ]
@@ -3932,7 +3932,7 @@
             "plannedQty": "50.000000",
             "consumedQty": "50.000000",
             "consumedValue": "7701.6394",
-            "movementGroupId": "25e115a1-4b31-4ead-a4f0-d81f2df9072f",
+            "movementGroupId": "8db0664d-fbf5-4b43-a752-d5fdd8856357",
             "journalEntryId": 84
           },
           {
@@ -3942,7 +3942,7 @@
             "plannedQty": "50.000000",
             "consumedQty": "50.000000",
             "consumedValue": "6206.2016",
-            "movementGroupId": "6fa3fdb9-2beb-4fdf-af7b-8577389ef216",
+            "movementGroupId": "f0e5542a-5c5b-4ae2-8ee5-7234c4d44811",
             "journalEntryId": 85
           }
         ]
@@ -3967,7 +3967,7 @@
             "plannedQty": "80.000000",
             "consumedQty": "80.000000",
             "consumedValue": "12322.6230",
-            "movementGroupId": "43461b79-79be-4275-a660-8ca13875cac8",
+            "movementGroupId": "d0492c58-cc2c-4293-beeb-3895a5e0c149",
             "journalEntryId": 81
           },
           {
@@ -3977,7 +3977,7 @@
             "plannedQty": "40.000000",
             "consumedQty": "40.000000",
             "consumedValue": "1566.6667",
-            "movementGroupId": "631e0bf6-b1a0-427b-a90b-853782aeafef",
+            "movementGroupId": "9341123a-1203-4b69-bba1-27ff773799ee",
             "journalEntryId": 82
           }
         ]
@@ -4002,7 +4002,7 @@
             "plannedQty": "100.000000",
             "consumedQty": "100.000000",
             "consumedValue": "15403.2787",
-            "movementGroupId": "be67f1b5-6b5c-4f46-8f2d-0066d0744ea3",
+            "movementGroupId": "6c335fd8-dba1-4793-904d-b8a7640c03ab",
             "journalEntryId": 78
           },
           {
@@ -4012,7 +4012,7 @@
             "plannedQty": "50.000000",
             "consumedQty": "50.000000",
             "consumedValue": "1958.3334",
-            "movementGroupId": "ad506690-5c4e-4a9a-b26c-d6a8369d3d2c",
+            "movementGroupId": "a6b07dd5-722a-468f-91d7-58d2f5c33b83",
             "journalEntryId": 79
           }
         ]
@@ -4037,7 +4037,7 @@
             "plannedQty": "50.000000",
             "consumedQty": "50.000000",
             "consumedValue": "500.0000",
-            "movementGroupId": "f4cfd833-012d-4d80-b6f5-2ad045fb2a24",
+            "movementGroupId": "5b4bf1f8-cef1-4d77-b2dd-27ca98421777",
             "journalEntryId": 5
           }
         ]
@@ -6251,6 +6251,53 @@
         "totalReceipts": 1,
         "onTime": 0,
         "onTimePct": "0.0"
+      }
+    ],
+    "/api/manufacturing/oee": [
+      {
+        "equipmentId": 1,
+        "code": "EQ-CNC-1",
+        "name": "CNC Mill #1",
+        "availability": "91.7",
+        "performance": "88.7",
+        "quality": "94.5",
+        "oee": "76.9"
+      },
+      {
+        "equipmentId": 2,
+        "code": "EQ-LATHE-1",
+        "name": "CNC Lathe #1",
+        "availability": "91.7",
+        "performance": "88.6",
+        "quality": "94.5",
+        "oee": "76.8"
+      },
+      {
+        "equipmentId": 3,
+        "code": "EQ-PRESS-1",
+        "name": "Hydraulic Press #1",
+        "availability": "91.7",
+        "performance": "88.6",
+        "quality": "94.5",
+        "oee": "76.8"
+      }
+    ],
+    "/api/manufacturing/downtime": [
+      {
+        "reason": "Setup",
+        "minutes": 350
+      },
+      {
+        "reason": "Maintenance",
+        "minutes": 300
+      },
+      {
+        "reason": "Material shortage",
+        "minutes": 300
+      },
+      {
+        "reason": "Breakdown",
+        "minutes": 250
       }
     ]
   }
