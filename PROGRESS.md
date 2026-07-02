@@ -14,6 +14,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-02] 📋 **修復批次三-b:ERP-004 DataTable 搜尋/排序/分頁 + 去斑馬**。分支 `feat/ui-ux-batch3b`(基於已 merge 的 3a main)。
+  - 共用 `DataTable` 內建 client 端搜尋(`searchable`,含 `searchValue` 供 render-only 欄位如客戶/員工名)、欄位排序(`sortable`,三態 asc→desc→清除)、自動分頁(rows>pageSize 顯示 Mantine Pagination,預設 25)—— **呼叫端零改動即自動分頁**;去藍斑馬改 `highlightOnHover + withRowBorders`(白底細線)。
+  - 示範啟用:SalesOrders(soNumber/orderDate/status 可排序 + 搜尋含客戶名)、Attendance(搜尋含員工名/工時 + 144 列自動分頁)。i18n 加 `common.search/noResults/rowsTotal/showingRange`。
+  - **驗證**:前端 `build` + `test:types` + Vitest **89**(含新 sort/pagination/search 測試)+ nav e2e 5 綠;Sales/Attendance 截圖確認;對抗式 review 無 Critical(S1/S2 搜尋依衍生值已採 `searchValue` 修正)。**待 merge**(git 模式 c)。
+  - **批次三剩餘**:Dashboard 進階(KPI delta 環比、漏斗標籤)、暗色圖表色盤 CSS 變數化(ERP-003)、暗色 dimmed 對比。
 - [2026-07-02] 🎨 **修復批次三-a:UI/UX 視覺品質(ERP-015 對比 + ERP-005 skeleton)**。測試報告 §9 批次三第一部分。分支 `feat/ui-ux-batch3`。
   - **語意色 token**:`index.css` 加 positive/warning/negative CSS 變數(亮暗雙值,達 WCAG AA)。
   - **ERP-015 對比**:共用 `LiveBadge` 取代 Dashboard teal「實際資料」徽章(原 4.32:1);ReconciliationHero「試算表已平衡」徽章、Dashboard 提醒文字改語意色 → **亮色 Dashboard axe color-contrast 12→0(實測)**。KpiTile 加 `valueColor`,淨利為負顯示紅字。
