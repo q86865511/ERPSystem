@@ -52,10 +52,14 @@ export function AttendancePanel() {
   });
 
   const submit = form.onSubmit(async (v) => {
+    if (v.workDate == null) {
+      notifyError(t('masterdata.validation.required'));
+      return;
+    }
     try {
       const body: CreateAttendanceRequest = {
         employeeId: Number(v.employeeId),
-        workDate: v.workDate ?? undefined,
+        workDate: v.workDate,
         status: v.status as CreateAttendanceRequest['status'],
         workedHours: v.workedHours.trim() || undefined,
         note: v.note.trim() || undefined,

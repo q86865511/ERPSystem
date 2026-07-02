@@ -37,9 +37,13 @@ export function LocationsPanel() {
   });
 
   const submit = form.onSubmit(async (v) => {
+    if (v.warehouseId == null) {
+      notifyError(t('masterdata.validation.required'));
+      return;
+    }
     try {
       await create.mutateAsync({
-        warehouseId: v.warehouseId ?? undefined,
+        warehouseId: v.warehouseId,
         code: v.code,
         locationType: v.locationType as CreateLocationRequest['locationType'],
       });

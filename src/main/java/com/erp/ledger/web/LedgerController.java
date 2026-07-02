@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDate;
 
@@ -65,7 +66,7 @@ public class LedgerController {
 
     /** Posts a manual journal entry. */
     @PostMapping("/journal-entries")
-    public ResponseEntity<JournalEntryResponse> post(@RequestBody JournalEntryRequest request,
+    public ResponseEntity<JournalEntryResponse> post(@Valid @RequestBody JournalEntryRequest request,
                                                      Principal principal) {
         String actor = principal != null ? principal.getName() : "system";
         JournalEntry entry = postingService.post(request, actor);

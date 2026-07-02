@@ -43,19 +43,22 @@ export function PurchaseOrdersPanel() {
   });
 
   const submit = form.onSubmit(async (v) => {
-    const lines = v.lines.filter((l) => l.itemId != null && l.qtyOrdered && l.unitPrice);
+    const lines = v.lines.filter(
+      (l): l is { itemId: number; qtyOrdered: string; unitPrice: string } =>
+        l.itemId != null && l.qtyOrdered !== '' && l.unitPrice !== '',
+    );
     if (lines.length === 0) {
       notifyError(t('purchasing.po.lineRequired'));
       return;
     }
+    if (v.partnerId == null || v.orderDate == null) {
+      notifyError(t('purchasing.po.pickVendor'));
+      return;
+    }
     const body: CreatePoRequest = {
-      partnerId: v.partnerId ?? undefined,
-      orderDate: v.orderDate ?? undefined,
-      lines: lines.map((l) => ({
-        itemId: l.itemId ?? undefined,
-        qtyOrdered: l.qtyOrdered,
-        unitPrice: l.unitPrice,
-      })),
+      partnerId: v.partnerId,
+      orderDate: v.orderDate,
+      lines,
     };
     try {
       const po = await create.mutateAsync(body);

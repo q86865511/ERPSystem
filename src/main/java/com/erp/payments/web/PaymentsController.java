@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -30,22 +32,23 @@ public class PaymentsController {
         this.paymentService = paymentService;
     }
 
-    public record AllocationLine(Long billId, BigDecimal amount) {
+    public record AllocationLine(@NotNull Long billId, @NotNull BigDecimal amount) {
     }
 
-    public record PayOutRequest(Long partnerId, BigDecimal amount, LocalDate postingDate,
-                                List<AllocationLine> allocations) {
+    // allocations may be empty (an unallocated payment on account) but must not be null.
+    public record PayOutRequest(@NotNull Long partnerId, @NotNull BigDecimal amount, LocalDate postingDate,
+                                @NotNull @Valid List<AllocationLine> allocations) {
     }
 
-    public record ReceiptAllocationLine(Long invoiceId, BigDecimal amount) {
+    public record ReceiptAllocationLine(@NotNull Long invoiceId, @NotNull BigDecimal amount) {
     }
 
-    public record PayInRequest(Long partnerId, BigDecimal amount, LocalDate postingDate,
-                               List<ReceiptAllocationLine> allocations) {
+    public record PayInRequest(@NotNull Long partnerId, @NotNull BigDecimal amount, LocalDate postingDate,
+                               @NotNull @Valid List<ReceiptAllocationLine> allocations) {
     }
 
     @PostMapping("/out")
-    public ResponseEntity<PaymentResponse> payOut(@RequestBody PayOutRequest request,
+    public ResponseEntity<PaymentResponse> payOut(@Valid @RequestBody PayOutRequest request,
                                                   Principal principal) {
         String actor = principal != null ? principal.getName() : "system";
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
@@ -57,7 +60,7 @@ public class PaymentsController {
     }
 
     @PostMapping("/in")
-    public ResponseEntity<PaymentResponse> payIn(@RequestBody PayInRequest request,
+    public ResponseEntity<PaymentResponse> payIn(@Valid @RequestBody PayInRequest request,
                                                  Principal principal) {
         String actor = principal != null ? principal.getName() : "system";
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();

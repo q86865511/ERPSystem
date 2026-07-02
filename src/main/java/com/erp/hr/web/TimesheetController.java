@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -27,12 +29,13 @@ public class TimesheetController {
         this.timesheetService = timesheetService;
     }
 
-    public record CreateTimesheetRequest(Long employeeId, LocalDate weekEnding, BigDecimal regularHours,
-                                         BigDecimal overtimeHours, String note) {
+    public record CreateTimesheetRequest(@NotNull Long employeeId, @NotNull LocalDate weekEnding,
+                                         @NotNull BigDecimal regularHours, @NotNull BigDecimal overtimeHours,
+                                         String note) {
     }
 
     @PostMapping
-    public ResponseEntity<TimesheetResponse> create(@RequestBody CreateTimesheetRequest request) {
+    public ResponseEntity<TimesheetResponse> create(@Valid @RequestBody CreateTimesheetRequest request) {
         TimesheetResponse body = TimesheetResponse.from(timesheetService.create(request.employeeId(),
                 request.weekEnding(), request.regularHours(), request.overtimeHours(), request.note()));
         return ResponseEntity.status(HttpStatus.CREATED).body(body);

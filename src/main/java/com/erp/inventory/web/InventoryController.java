@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -33,12 +35,14 @@ public class InventoryController {
         this.inventoryReportService = inventoryReportService;
     }
 
-    public record CreateAdjustmentRequest(Long itemId, Long locationId, BigDecimal qtyDelta,
-                                          BigDecimal unitCost, String reason, LocalDate postingDate) {
+    // unitCost / reason are optional at the request layer; the domain still enforces reason (→ 400).
+    public record CreateAdjustmentRequest(@NotNull Long itemId, @NotNull Long locationId,
+                                          @NotNull BigDecimal qtyDelta, BigDecimal unitCost,
+                                          String reason, LocalDate postingDate) {
     }
 
     @PostMapping("/adjustments")
-    public ResponseEntity<AdjustmentResponse> postAdjustment(@RequestBody CreateAdjustmentRequest request,
+    public ResponseEntity<AdjustmentResponse> postAdjustment(@Valid @RequestBody CreateAdjustmentRequest request,
                                                              Principal principal) {
         String actor = principal != null ? principal.getName() : "system";
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();

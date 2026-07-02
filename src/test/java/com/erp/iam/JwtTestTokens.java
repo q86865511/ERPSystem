@@ -12,12 +12,13 @@ import java.util.List;
 /**
  * Mints real access tokens in tests using the app's {@link JwtEncoder} bean, so assertions exercise the
  * genuine resource-server filter + roles→authorities converter (rather than @WithMockUser shortcuts).
+ * Public so ITs in other packages (e.g. the cross-cutting error-contract IT) can reuse it.
  */
-final class JwtTestTokens {
+public final class JwtTestTokens {
 
     private JwtTestTokens() {}
 
-    static String access(JwtEncoder encoder, String username, String... roles) {
+    public static String access(JwtEncoder encoder, String username, String... roles) {
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(username)
@@ -29,7 +30,7 @@ final class JwtTestTokens {
         return encoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 
-    static String bearer(JwtEncoder encoder, String username, String... roles) {
+    public static String bearer(JwtEncoder encoder, String username, String... roles) {
         return "Bearer " + access(encoder, username, roles);
     }
 }

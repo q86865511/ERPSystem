@@ -48,16 +48,22 @@ export function TimesheetPanel() {
     validate: {
       employeeId: (v) => (v ? null : t('masterdata.validation.required')),
       weekEnding: (v) => (v ? null : t('masterdata.validation.required')),
+      regularHours: (v) => (v.trim() !== '' && Number(v) >= 0 ? null : t('masterdata.validation.required')),
+      overtimeHours: (v) => (v.trim() !== '' && Number(v) >= 0 ? null : t('masterdata.validation.required')),
     },
   });
 
   const submit = form.onSubmit(async (v) => {
+    if (v.weekEnding == null) {
+      notifyError(t('masterdata.validation.required'));
+      return;
+    }
     try {
       const body: CreateTimesheetRequest = {
         employeeId: Number(v.employeeId),
-        weekEnding: v.weekEnding ?? undefined,
-        regularHours: v.regularHours.trim() || undefined,
-        overtimeHours: v.overtimeHours.trim() || undefined,
+        weekEnding: v.weekEnding,
+        regularHours: v.regularHours,
+        overtimeHours: v.overtimeHours,
         note: v.note.trim() || undefined,
       };
       await create.mutateAsync(body);

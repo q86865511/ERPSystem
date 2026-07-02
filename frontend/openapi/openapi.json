@@ -2862,7 +2862,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "amount", "billId" ]
       },
       "AllocationView" : {
         "type" : "object",
@@ -3039,7 +3040,8 @@
           "unitPrice" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "poLineId", "qty", "unitPrice" ]
       },
       "BillLineView" : {
         "type" : "object",
@@ -3175,7 +3177,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "stockLocationId" ]
       },
       "CashFlowPoint" : {
         "type" : "object",
@@ -3225,7 +3228,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "qtyProduced", "stockLocationId" ]
       },
       "CreateAdjustmentRequest" : {
         "type" : "object",
@@ -3251,7 +3255,8 @@
           "unitCost" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "itemId", "locationId", "qtyDelta" ]
       },
       "CreateAttendanceRequest" : {
         "type" : "object",
@@ -3274,7 +3279,8 @@
           "workedHours" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "employeeId", "status", "workDate" ]
       },
       "CreateBillRequest" : {
         "type" : "object",
@@ -3283,7 +3289,8 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/BillLine"
-            }
+            },
+            "minItems" : 1
           },
           "postingDate" : {
             "type" : "string",
@@ -3296,7 +3303,8 @@
           "taxRateCode" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "lines", "purchaseOrderId" ]
       },
       "CreateBomComponent" : {
         "type" : "object",
@@ -3311,7 +3319,8 @@
           "scrapPct" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "componentItemId", "qtyPer" ]
       },
       "CreateBomRequest" : {
         "type" : "object",
@@ -3320,7 +3329,8 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/CreateBomComponent"
-            }
+            },
+            "minItems" : 1
           },
           "outputQty" : {
             "type" : "string"
@@ -3329,7 +3339,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "components", "outputQty", "parentItemId" ]
       },
       "CreateDeliveryRequest" : {
         "type" : "object",
@@ -3338,7 +3349,8 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/DeliveryLine"
-            }
+            },
+            "minItems" : 1
           },
           "postingDate" : {
             "type" : "string",
@@ -3352,7 +3364,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "lines", "salesOrderId", "stockLocationId" ]
       },
       "CreateDepartmentRequest" : {
         "type" : "object",
@@ -3361,32 +3374,38 @@
             "type" : "string"
           },
           "code" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "name" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
-        }
+        },
+        "required" : [ "code", "name" ]
       },
       "CreateEmployeeRequest" : {
         "type" : "object",
         "properties" : {
           "code" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "departmentId" : {
             "type" : "integer",
             "format" : "int64"
           },
           "firstName" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "hireDate" : {
             "type" : "string",
             "format" : "date"
           },
           "lastName" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "monthlySalary" : {
             "type" : "string"
@@ -3399,7 +3418,8 @@
             "type" : "string",
             "enum" : [ "ACTIVE", "ON_LEAVE", "TERMINATED" ]
           }
-        }
+        },
+        "required" : [ "code", "departmentId", "firstName", "hireDate", "lastName", "positionId" ]
       },
       "CreateGrnRequest" : {
         "type" : "object",
@@ -3408,7 +3428,8 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/ReceiptLine"
-            }
+            },
+            "minItems" : 1
           },
           "postingDate" : {
             "type" : "string",
@@ -3422,7 +3443,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "lines", "purchaseOrderId", "stockLocationId" ]
       },
       "CreateInvoiceRequest" : {
         "type" : "object",
@@ -3431,7 +3453,8 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/InvoiceLine"
-            }
+            },
+            "minItems" : 1
           },
           "postingDate" : {
             "type" : "string",
@@ -3444,7 +3467,8 @@
           "taxRateCode" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "lines", "salesOrderId" ]
       },
       "CreateItemRequest" : {
         "type" : "object",
@@ -3454,7 +3478,8 @@
             "enum" : [ "RAW", "WIP", "FINISHED", "SERVICE" ]
           },
           "name" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "reorderPoint" : {
             "type" : "string"
@@ -3463,7 +3488,8 @@
             "type" : "string"
           },
           "sku" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "standardCost" : {
             "type" : "string"
@@ -3472,9 +3498,11 @@
             "type" : "boolean"
           },
           "uom" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
-        }
+        },
+        "required" : [ "itemType", "name", "sku", "uom" ]
       },
       "CreateLeaveRequest" : {
         "type" : "object",
@@ -3501,13 +3529,15 @@
             "type" : "string",
             "format" : "date"
           }
-        }
+        },
+        "required" : [ "days", "employeeId", "endDate", "leaveType", "startDate" ]
       },
       "CreateLocationRequest" : {
         "type" : "object",
         "properties" : {
           "code" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "locationType" : {
             "type" : "string",
@@ -3517,7 +3547,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "code", "locationType", "warehouseId" ]
       },
       "CreatePartnerRequest" : {
         "type" : "object",
@@ -3529,13 +3560,15 @@
             "type" : "string"
           },
           "code" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "customer" : {
             "type" : "boolean"
           },
           "name" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "paymentTermsDays" : {
             "type" : "integer",
@@ -3547,7 +3580,8 @@
           "vendor" : {
             "type" : "boolean"
           }
-        }
+        },
+        "required" : [ "code", "name" ]
       },
       "CreatePoLine" : {
         "type" : "object",
@@ -3562,7 +3596,8 @@
           "unitPrice" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "itemId", "qtyOrdered", "unitPrice" ]
       },
       "CreatePoRequest" : {
         "type" : "object",
@@ -3571,7 +3606,8 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/CreatePoLine"
-            }
+            },
+            "minItems" : 1
           },
           "orderDate" : {
             "type" : "string",
@@ -3581,21 +3617,25 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "lines", "orderDate", "partnerId" ]
       },
       "CreatePositionRequest" : {
         "type" : "object",
         "properties" : {
           "code" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "standardSalary" : {
             "type" : "string"
           },
           "title" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
-        }
+        },
+        "required" : [ "code", "title" ]
       },
       "CreateReturnRequest" : {
         "type" : "object",
@@ -3612,7 +3652,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "salesInvoiceId", "stockLocationId" ]
       },
       "CreateSoLine" : {
         "type" : "object",
@@ -3627,7 +3668,8 @@
           "unitPrice" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "itemId", "qtyOrdered", "unitPrice" ]
       },
       "CreateSoRequest" : {
         "type" : "object",
@@ -3636,7 +3678,8 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/CreateSoLine"
-            }
+            },
+            "minItems" : 1
           },
           "orderDate" : {
             "type" : "string",
@@ -3646,7 +3689,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "lines", "orderDate", "partnerId" ]
       },
       "CreateTimesheetRequest" : {
         "type" : "object",
@@ -3668,18 +3712,22 @@
             "type" : "string",
             "format" : "date"
           }
-        }
+        },
+        "required" : [ "employeeId", "overtimeHours", "regularHours", "weekEnding" ]
       },
       "CreateWarehouseRequest" : {
         "type" : "object",
         "properties" : {
           "code" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "name" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
-        }
+        },
+        "required" : [ "code", "name" ]
       },
       "CreateWorkOrderRequest" : {
         "type" : "object",
@@ -3695,7 +3743,8 @@
           "qtyToProduce" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "bomId", "itemId", "qtyToProduce" ]
       },
       "CurrentUserResponse" : {
         "type" : "object",
@@ -3815,7 +3864,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "qty", "soLineId" ]
       },
       "DeliveryLineView" : {
         "type" : "object",
@@ -4112,7 +4162,8 @@
           "unitPrice" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "qty", "soLineId", "unitPrice" ]
       },
       "InvoiceLineView" : {
         "type" : "object",
@@ -4157,7 +4208,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "stockLocationId" ]
       },
       "ItemResponse" : {
         "type" : "object",
@@ -4321,7 +4373,8 @@
         "type" : "object",
         "properties" : {
           "accountCode" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "credit" : {
             "type" : "string"
@@ -4336,7 +4389,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "accountCode", "credit", "debit" ]
       },
       "JournalEntryRequest" : {
         "type" : "object",
@@ -4351,7 +4405,8 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/JournalEntryLine"
-            }
+            },
+            "minItems" : 1
           },
           "memo" : {
             "type" : "string"
@@ -4369,7 +4424,8 @@
           "sourceEvent" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "lines", "postingDate" ]
       },
       "JournalEntryResponse" : {
         "type" : "object",
@@ -4538,12 +4594,15 @@
         "type" : "object",
         "properties" : {
           "password" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           },
           "username" : {
-            "type" : "string"
+            "type" : "string",
+            "minLength" : 1
           }
-        }
+        },
+        "required" : [ "password", "username" ]
       },
       "PageAuditLogResponse" : {
         "type" : "object",
@@ -4695,7 +4754,8 @@
             "type" : "string",
             "format" : "date"
           }
-        }
+        },
+        "required" : [ "allocations", "amount", "partnerId" ]
       },
       "PayOutRequest" : {
         "type" : "object",
@@ -4717,7 +4777,8 @@
             "type" : "string",
             "format" : "date"
           }
-        }
+        },
+        "required" : [ "allocations", "amount", "partnerId" ]
       },
       "PaymentResponse" : {
         "type" : "object",
@@ -4932,7 +4993,8 @@
             "type" : "integer",
             "format" : "int64"
           }
-        }
+        },
+        "required" : [ "amount", "invoiceId" ]
       },
       "ReceiptLine" : {
         "type" : "object",
@@ -4944,7 +5006,8 @@
           "qty" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "poLineId", "qty" ]
       },
       "ReconciliationReport" : {
         "type" : "object",

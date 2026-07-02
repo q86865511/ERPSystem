@@ -60,16 +60,20 @@ export function ManualEntryPanel() {
       .filter((l) => l.accountCode && (l.debit || l.credit))
       .map((l) => ({
         accountCode: l.accountCode,
-        debit: l.debit.trim() || undefined,
-        credit: l.credit.trim() || undefined,
+        debit: l.debit.trim() || '0',
+        credit: l.credit.trim() || '0',
         memo: l.memo.trim() || undefined,
       }));
     if (!balanced || lines.length < 2) {
       notifyError(t('ledger.manual.mustBalance'));
       return;
     }
+    if (form.values.postingDate == null) {
+      notifyError(t('masterdata.validation.required'));
+      return;
+    }
     const body: JournalEntryRequest = {
-      postingDate: form.values.postingDate ?? undefined,
+      postingDate: form.values.postingDate,
       memo: form.values.memo.trim() || undefined,
       lines,
     };

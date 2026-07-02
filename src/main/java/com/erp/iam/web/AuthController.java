@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -56,7 +58,7 @@ public class AuthController {
     /** Caller's name and roles (roles without Spring's {@code ROLE_} prefix). */
     public record CurrentUserResponse(String username, List<String> roles) {}
 
-    public record LoginRequest(String username, String password) {}
+    public record LoginRequest(@NotBlank String username, @NotBlank String password) {}
 
     /** Access token (Bearer) plus the caller's identity; the refresh token rides in an httpOnly cookie. */
     public record TokenResponse(String accessToken, String username, List<String> roles) {}
@@ -68,7 +70,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
         Authentication auth;
         try {
             auth = authenticationManager.authenticate(

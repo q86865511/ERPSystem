@@ -34,19 +34,24 @@ export function BomsPanel() {
   });
 
   const submit = form.onSubmit(async (v) => {
-    const components = v.components.filter((c) => c.componentItemId != null && c.qtyPer);
+    const components = v.components
+      .filter(
+        (c): c is { componentItemId: number; qtyPer: string; scrapPct: string } =>
+          c.componentItemId != null && c.qtyPer !== '',
+      )
+      .map((c) => ({ componentItemId: c.componentItemId, qtyPer: c.qtyPer, scrapPct: c.scrapPct || '0' }));
     if (components.length === 0) {
       notifyError(t('manufacturing.bom.addAtLeastOneComponent'));
       return;
     }
+    if (v.parentItemId == null) {
+      notifyError(t('manufacturing.bom.pickFinishedItem'));
+      return;
+    }
     const body: CreateBomRequest = {
-      parentItemId: v.parentItemId ?? undefined,
+      parentItemId: v.parentItemId,
       outputQty: v.outputQty,
-      components: components.map((c) => ({
-        componentItemId: c.componentItemId ?? undefined,
-        qtyPer: c.qtyPer,
-        scrapPct: c.scrapPct || '0',
-      })),
+      components,
     };
     try {
       const bom = await create.mutateAsync(body);

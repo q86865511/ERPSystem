@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -45,31 +48,34 @@ public class SalesController {
         this.customerReturnService = customerReturnService;
     }
 
-    public record CreateSoLine(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice) {
+    public record CreateSoLine(@NotNull Long itemId, @NotNull BigDecimal qtyOrdered,
+                               @NotNull BigDecimal unitPrice) {
     }
 
-    public record CreateSoRequest(Long partnerId, LocalDate orderDate, List<CreateSoLine> lines) {
+    public record CreateSoRequest(@NotNull Long partnerId, @NotNull LocalDate orderDate,
+                                  @NotEmpty @Valid List<CreateSoLine> lines) {
     }
 
-    public record DeliveryLine(Long soLineId, BigDecimal qty) {
+    public record DeliveryLine(@NotNull Long soLineId, @NotNull BigDecimal qty) {
     }
 
-    public record CreateDeliveryRequest(Long salesOrderId, Long stockLocationId, LocalDate postingDate,
-                                        List<DeliveryLine> lines) {
+    public record CreateDeliveryRequest(@NotNull Long salesOrderId, @NotNull Long stockLocationId,
+                                        LocalDate postingDate, @NotEmpty @Valid List<DeliveryLine> lines) {
     }
 
-    public record InvoiceLine(Long soLineId, BigDecimal qty, BigDecimal unitPrice) {
+    public record InvoiceLine(@NotNull Long soLineId, @NotNull BigDecimal qty, @NotNull BigDecimal unitPrice) {
     }
 
-    public record CreateInvoiceRequest(Long salesOrderId, String taxRateCode, LocalDate postingDate,
-                                       List<InvoiceLine> lines) {
+    public record CreateInvoiceRequest(@NotNull Long salesOrderId, String taxRateCode, LocalDate postingDate,
+                                       @NotEmpty @Valid List<InvoiceLine> lines) {
     }
 
-    public record CreateReturnRequest(Long salesInvoiceId, Long stockLocationId, LocalDate postingDate) {
+    public record CreateReturnRequest(@NotNull Long salesInvoiceId, @NotNull Long stockLocationId,
+                                      LocalDate postingDate) {
     }
 
     @PostMapping("/sales-orders")
-    public ResponseEntity<SalesOrderResponse> createOrder(@RequestBody CreateSoRequest request,
+    public ResponseEntity<SalesOrderResponse> createOrder(@Valid @RequestBody CreateSoRequest request,
                                                           Principal principal) {
         String actor = actor(principal);
         List<SoLineInput> lines = request.lines().stream()
@@ -95,7 +101,7 @@ public class SalesController {
     }
 
     @PostMapping("/deliveries")
-    public ResponseEntity<DeliveryResponse> deliver(@RequestBody CreateDeliveryRequest request,
+    public ResponseEntity<DeliveryResponse> deliver(@Valid @RequestBody CreateDeliveryRequest request,
                                                     Principal principal) {
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
         List<DeliveryLineInput> lines = request.lines().stream()
@@ -117,7 +123,7 @@ public class SalesController {
     }
 
     @PostMapping("/sales-invoices")
-    public ResponseEntity<SalesInvoiceResponse> postInvoice(@RequestBody CreateInvoiceRequest request,
+    public ResponseEntity<SalesInvoiceResponse> postInvoice(@Valid @RequestBody CreateInvoiceRequest request,
                                                             Principal principal) {
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
         String taxRateCode = request.taxRateCode() != null ? request.taxRateCode() : "STANDARD";
@@ -139,7 +145,7 @@ public class SalesController {
     }
 
     @PostMapping("/customer-returns")
-    public ResponseEntity<CustomerReturnResponse> postReturn(@RequestBody CreateReturnRequest request,
+    public ResponseEntity<CustomerReturnResponse> postReturn(@Valid @RequestBody CreateReturnRequest request,
                                                              Principal principal) {
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
         CustomerReturnResponse body = CustomerReturnResponse.from(customerReturnService.postReturn(

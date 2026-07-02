@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -27,24 +30,25 @@ public class MasterDataController {
         this.masterDataService = masterDataService;
     }
 
-    public record CreateItemRequest(String sku, String name, ItemType itemType, String uom,
-                                    Boolean stocked, BigDecimal standardCost,
+    public record CreateItemRequest(@NotBlank String sku, @NotBlank String name, @NotNull ItemType itemType,
+                                    @NotBlank String uom, Boolean stocked, BigDecimal standardCost,
                                     BigDecimal reorderPoint, BigDecimal reorderQty) {
     }
 
-    public record CreateWarehouseRequest(String code, String name) {
+    public record CreateWarehouseRequest(@NotBlank String code, @NotBlank String name) {
     }
 
-    public record CreateLocationRequest(Long warehouseId, String code, LocationType locationType) {
+    public record CreateLocationRequest(@NotNull Long warehouseId, @NotBlank String code,
+                                        @NotNull LocationType locationType) {
     }
 
-    public record CreatePartnerRequest(String code, String name, Boolean vendor, Boolean customer,
-                                       String taxId, Integer paymentTermsDays, String apAccountCode,
-                                       String arAccountCode) {
+    public record CreatePartnerRequest(@NotBlank String code, @NotBlank String name, Boolean vendor,
+                                       Boolean customer, String taxId, Integer paymentTermsDays,
+                                       String apAccountCode, String arAccountCode) {
     }
 
     @PostMapping("/items")
-    public ResponseEntity<ItemResponse> createItem(@RequestBody CreateItemRequest request) {
+    public ResponseEntity<ItemResponse> createItem(@Valid @RequestBody CreateItemRequest request) {
         boolean stocked = request.stocked() == null || request.stocked();
         ItemResponse body = ItemResponse.from(masterDataService.createItem(
                 request.sku(), request.name(), request.itemType(), request.uom(), stocked,
@@ -70,7 +74,7 @@ public class MasterDataController {
     }
 
     @PostMapping("/warehouses")
-    public ResponseEntity<WarehouseResponse> createWarehouse(@RequestBody CreateWarehouseRequest request) {
+    public ResponseEntity<WarehouseResponse> createWarehouse(@Valid @RequestBody CreateWarehouseRequest request) {
         WarehouseResponse body = WarehouseResponse.from(
                 masterDataService.createWarehouse(request.code(), request.name()));
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
@@ -82,7 +86,7 @@ public class MasterDataController {
     }
 
     @PostMapping("/locations")
-    public ResponseEntity<LocationResponse> createLocation(@RequestBody CreateLocationRequest request) {
+    public ResponseEntity<LocationResponse> createLocation(@Valid @RequestBody CreateLocationRequest request) {
         LocationResponse body = LocationResponse.from(masterDataService.createLocation(
                 request.warehouseId(), request.code(), request.locationType()));
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
@@ -99,7 +103,7 @@ public class MasterDataController {
     }
 
     @PostMapping("/partners")
-    public ResponseEntity<PartnerResponse> createPartner(@RequestBody CreatePartnerRequest request) {
+    public ResponseEntity<PartnerResponse> createPartner(@Valid @RequestBody CreatePartnerRequest request) {
         boolean vendor = request.vendor() != null && request.vendor();
         boolean customer = request.customer() != null && request.customer();
         int terms = request.paymentTermsDays() != null ? request.paymentTermsDays() : 30;
