@@ -14,7 +14,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
-- [2026-07-02] ✨ **修復批次四-a:品牌與登入/導覽打磨(ERP-009/011/017)**。測試報告 §9 批次四前端部分。分支 `feat/hardening-batch4`。
+- [2026-07-02] 🔒 **修復批次四-b:nginx 安全 header + index.html 快取政策(ERP-016/007,infra PR)**。測試報告 §9 批次四 infra 部分。分支 `infra/erp-016-security-headers`。
+  - **ERP-016**:新 `frontend/nginx/security-headers.conf`(HSTS 1y、`X-Content-Type-Options: nosniff`、`X-Frame-Options: DENY`、CSP `default-src 'self'` + `style-src 'unsafe-inline'`(Mantine/Swagger 需要)+ `img-src data:` + `object-src 'none'` + `base-uri/form-action 'self'` + `frame-ancestors 'none'`);因 nginx `add_header` 繼承規則(location 內有 add_header 即丟棄 server 層),server 層 + `/assets/` + `location = /index.html` 各 include 一次;Dockerfile 補 COPY。
+  - **ERP-007**:`location = /index.html` 加 `Cache-Control: no-cache`(可快取但每次 revalidate,走 304);try_files 深層路由 fallback 同樣命中。assets 維持 immutable 1y。
+  - **CSP 連動修正(雙審抓到的高風險)**:#93 加入的 index.html inline 防閃爍 script 會被 `script-src 'self'` 擋掉 → 抽成 `frontend/public/color-scheme.js` 外部檔。
+  - **驗證**:本機 compose 實跑 —— curl 確認 `/`、`/assets/*.js`(immutable 保留)、`/swagger-ui`、`/api`(401 但 header 繼承)全帶安全 header;index.html 無 inline script;Playwright 真瀏覽器:color-scheme 屬性正常設定、深層路由、Swagger UI 渲染,**零 CSP 違規**。已知:`/api` 與 Spring Security 同名 header 重複(值相同,無害,留待後端統一)。HSTS 一年黏性已註記於 DEPLOY.md。**待 merge**(git 模式 c)。測試報告 §9 批次四前端部分。分支 `feat/hardening-batch4`。
   - **ERP-009**:`index.html` theme-color 改藍(亮 #2563eb / 暗 #1b2436,media 分色);`favicon.svg` 由 terracotta 改藍(亮 #2563EB / 暗 #3B7EE8 + 冷色底)—— 修掉線上仍為舊橘紅的殘留。
   - **ERP-011**:登入頁 demo 快速鍵補 `hr`(原缺,HR 模組寫入無快速入口)。
   - **ERP-017**:`OnboardingTourProvider` 由 main.tsx 全域移入 router 的**已認證 AppLayout** 內 → 首訪導覽不再遮蔽登入頁;登入後儀表板首訪 tour 仍正常。

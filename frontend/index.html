@@ -8,16 +8,8 @@
     <!-- Single self-adapting SVG favicon (internal prefers-color-scheme media query). -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Manufacturing ERP</title>
-    <!-- Set the color scheme before first paint (Mantine's localStorage key) to avoid a light/dark flash. -->
-    <script>
-      (function () {
-        try {
-          var s = localStorage.getItem('mantine-color-scheme-value');
-          var dark = s === 'dark' || (s !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-          document.documentElement.setAttribute('data-mantine-color-scheme', dark ? 'dark' : 'light');
-        } catch (e) {}
-      })();
-    </script>
+    <!-- Set the color scheme before first paint; external file so the CSP allows it without a hash. -->
+    <script src="/color-scheme.js"></script>
   </head>
   <body>
     <div id="root"></div>

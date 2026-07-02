@@ -38,6 +38,7 @@ live demo 跑在一台 Oracle Cloud(ARM64)主機上,與作品集主站及其他�
 - **Caddy**(`http_port 8080`、`auto_https off`、`bind 127.0.0.1`)依 Host 把各子網域路由到對應後端 / 靜態目錄。
 - **ERP** 採「整包容器」變體:Caddy 反代到前端容器(`127.0.0.1:8081`),容器內 nginx 再服務 SPA 並反代 `/api` 到後端容器 —— 與 `compose.demo.yaml` 同一套,部署即「clone + compose up」。
 - **可觀測性端點不公開**:nginx 只反代 `/api`、`/swagger-ui`、`/v3/api-docs`,**不反代 `/actuator`** → `/actuator/prometheus` 在公網不可達,只有同一 docker 網路內的 Prometheus 容器能抓。要在源站看 Prometheus/Grafana 用 `-f compose.observability.yaml` overlay(見 [OBSERVABILITY.md](OBSERVABILITY.md)),其埠不經 Caddy/cloudflared 對外。
+- **安全 header**:容器內 nginx 統一送出 HSTS、`X-Content-Type-Options`、`X-Frame-Options`、CSP(`frontend/nginx/security-headers.conf`,server 層與含 `add_header` 的 location 各 include 一次)。注意 **HSTS 有一年黏性**:瀏覽器一旦經 HTTPS 收到它,就會對該域名鎖 HTTPS 一年,之後該域名若想改走純 HTTP 會連不上;本機 `http://localhost:8081` 走 HTTP,瀏覽器會忽略 HSTS,無影響。
 
 ### 上一個新子網域(以 erp 為例)
 
