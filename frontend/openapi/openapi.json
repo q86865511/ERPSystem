@@ -804,6 +804,27 @@
         "tags" : [ "inventory-controller" ]
       }
     },
+    "/api/inventory/items-status" : {
+      "get" : {
+        "operationId" : "itemsStatus",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ItemStatus"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "inventory-controller" ]
+      }
+    },
     "/api/inventory/items/{itemId}/on-hand" : {
       "get" : {
         "operationId" : "onHand",
@@ -4066,6 +4087,37 @@
             "type" : "boolean"
           },
           "uom" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ItemStatus" : {
+        "type" : "object",
+        "properties" : {
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemType" : {
+            "type" : "string",
+            "enum" : [ "RAW", "WIP", "FINISHED", "SERVICE" ]
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "onHandQty" : {
+            "type" : "string"
+          },
+          "reorderPoint" : {
+            "type" : "string"
+          },
+          "sku" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "value" : {
             "type" : "string"
           }
         }

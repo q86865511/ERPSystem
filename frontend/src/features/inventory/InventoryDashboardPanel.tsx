@@ -2,10 +2,11 @@ import { Badge, Card, Group, Progress, SimpleGrid, Stack, Text } from '@mantine/
 import { IconAlertTriangle, IconBox, IconReportAnalytics } from '@tabler/icons-react';
 import { KpiTile } from '../../components/charts/KpiTile';
 import { DonutCard, type DonutDatum } from '../../components/charts/DonutCard';
+import { ItemsTreemap } from '../../components/charts/ItemsTreemap';
 import { categoryColors, moneyToNumber } from '../../components/charts/palette';
 import { formatMoney, sumMoney } from '../../components/Money';
 import { useI18n } from '../../i18n';
-import { useInventoryReconciliation } from './api';
+import { useInventoryReconciliation, useItemsStatus } from './api';
 import { useReorderReport } from '../manufacturing/api';
 
 function PlannedCard({ title, note }: { title: string; note: string }) {
@@ -29,6 +30,7 @@ export function InventoryDashboardPanel() {
   const { t } = useI18n();
   const recon = useInventoryReconciliation();
   const reorder = useReorderReport();
+  const itemsStatus = useItemsStatus();
 
   const live = (
     <Badge color="teal" variant="light" size="sm">
@@ -46,6 +48,9 @@ export function InventoryDashboardPanel() {
   const invTotal = sumMoney((recon.data ?? []).map((a) => a.subledgerValue));
 
   const items = reorder.data?.items ?? [];
+  const treemapData = (itemsStatus.data ?? [])
+    .filter((s) => moneyToNumber(s.value) > 0)
+    .map((s) => ({ name: s.sku ?? '', value: moneyToNumber(s.value), status: s.status ?? 'OK' }));
 
   return (
     <Stack gap="md">
@@ -100,7 +105,19 @@ export function InventoryDashboardPanel() {
       </SimpleGrid>
 
       <SimpleGrid cols={{ base: 1, md: 2 }}>
-        <PlannedCard title={t('inventory.dash.heatmap')} note={t('reporting.overview.plannedNote')} />
+        <Card withBorder padding="md">
+          <Group justify="space-between" mb="sm" wrap="nowrap">
+            <Text fw={500}>{t('inventory.dash.heatmap')}</Text>
+            {live}
+          </Group>
+          {treemapData.length === 0 ? (
+            <Text c="dimmed" size="sm" py="lg" ta="center">
+              —
+            </Text>
+          ) : (
+            <ItemsTreemap data={treemapData} />
+          )}
+        </Card>
         <PlannedCard title={t('inventory.dash.supplierPerf')} note={t('reporting.overview.plannedNote')} />
       </SimpleGrid>
     </Stack>

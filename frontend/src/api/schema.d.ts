@@ -356,6 +356,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/inventory/items-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["itemsStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/inventory/items/{itemId}/on-hand": {
         parameters: {
             query?: never;
@@ -1809,6 +1825,18 @@ export interface components {
             stocked?: boolean;
             uom?: string;
         };
+        ItemStatus: {
+            /** Format: int64 */
+            itemId?: number;
+            /** @enum {string} */
+            itemType?: "RAW" | "WIP" | "FINISHED" | "SERVICE";
+            name?: string;
+            onHandQty?: string;
+            reorderPoint?: string;
+            sku?: string;
+            status?: string;
+            value?: string;
+        };
         ItemStock: {
             avgUnitCost?: string;
             /** Format: int64 */
@@ -2964,6 +2992,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AdjustmentResponse"];
+                };
+            };
+        };
+    };
+    itemsStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ItemStatus"][];
                 };
             };
         };

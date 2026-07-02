@@ -29,6 +29,7 @@ export const qk = {
   inventory: {
     reconciliation: () => ['inventory', 'reconciliation'] as const,
     onHand: (itemId: number) => ['inventory', 'on-hand', itemId] as const,
+    itemsStatus: () => ['inventory', 'items-status'] as const,
   },
   purchasing: {
     orders: () => ['purchasing', 'orders'] as const,
