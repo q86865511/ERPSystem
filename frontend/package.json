@@ -37,6 +37,7 @@
     "recharts": "^3.9.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.61.1",
     "@tanstack/react-query-devtools": "^5.101.1",
     "@testing-library/dom": "^10.4.1",

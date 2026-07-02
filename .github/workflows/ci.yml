@@ -72,6 +72,12 @@ jobs:
         run: npm ci
         working-directory: frontend
 
+      # Guards against committed OpenAPI-generated types drifting from openapi/openapi.json (regenerates
+      # schema.d.ts, then fails the build if that produces an uncommitted diff).
+      - name: Check generated API types are up to date
+        run: npm run gen:api:check
+        working-directory: frontend
+
       # Type-check (tsc -b) + production bundle (vite build) against the committed OpenAPI types.
       - name: Type-check & build
         run: npm run build

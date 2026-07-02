@@ -39,14 +39,22 @@ const COLOR: Record<string, string> = {
   REMOTE: 'brand',
 };
 
+/** Teal ("done/positive") statuses reuse the ERP-015 semantic tokens, same fix as LiveBadge — the stock
+    teal light variant measures 4.32:1 (below AA); the other color families already clear the axe gate. */
+const POSITIVE_STYLES = {
+  root: { backgroundColor: 'var(--erp-positive-bg)' },
+  label: { color: 'var(--erp-positive-text)' },
+};
+
 export function StatusBadge({ status }: { status: string | undefined }) {
   const { t } = useI18n();
   if (!status) return null;
   // status.* mirrors the backend enum codes; fall back to the prettified code for any unmapped token.
   const key = `status.${status}` as TranslationKey;
   const label = t(key);
+  const color = COLOR[status] ?? 'gray';
   return (
-    <Badge color={COLOR[status] ?? 'gray'} variant="light">
+    <Badge color={color} variant="light" styles={color === 'teal' ? POSITIVE_STYLES : undefined}>
       {label === key ? status.replaceAll('_', ' ') : label}
     </Badge>
   );
