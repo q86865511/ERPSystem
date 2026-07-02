@@ -14,6 +14,20 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-02] 🧭 **修復批次一:ERP-001 導覽父選單點擊無反應(P0)+ 導覽回歸測試(掛 CI)**。依測試報告 §9 批次一,採**方案 B**(mockup 規格)。分支 `fix/erp-001-nav-click`。
+  - **根因**:`frontend/src/components/AppLayout.tsx` 父選單用 Mantine 9 `NavLink`(有 children 時點擊 `preventDefault()`)+ `component={Link}` + 受控 `opened={active}` → 點擊被吃掉、8/10 主選單無法導航(桌面/行動/鍵盤皆中)。
+  - **修復(方案 B)**:父列拆兩個獨立 hit-area —「文字/圖示」是真 `<Link>`(點擊導航 + 展開該區 + 關閉行動抽屜、Enter 原生可用),右側獨立 `ActionIcon` chevron 只 `preventDefault+stopPropagation` 切換展開(不導航、不關抽屜、旋轉 90°);子項移入 `<Collapse>`。新 `AppLayout.module.css`(active 3px 品牌 rail + 淺藍底 + 縮排 + chevron 旋轉)、i18n 加 `nav.toggleSection`、`src/css-modules.d.ts`(CSS module 型別)。展開狀態 `openSections` 局部 state,預設跟隨路由、chevron 可手動覆寫。
+  - **回歸測試(兩層,防 ERP-006 重演)**:① `src/components/AppLayout.test.tsx`(Vitest 互動,4 例:點父項導航、Enter 導航、chevron 展開不導航、active 預設展開;完成紅→綠循環)② `e2e/nav.spec.ts`(Playwright 真瀏覽器,5 例:10 選單導航矩陣 + 子選單自動展開、鍵盤、chevron 展開不導航、行動版標籤導航+關抽屜、行動版 chevron 展開不關抽屜)。新 `scripts/serve-dist.mjs`(plain node http serve dist)供 Playwright `webServer`;`playwright.config.ts` 分 `local`(mock /api、離線、掛進 CI blocking gate)/`live`(smoke 對線上,nightly)兩 project。
+  - **CI**:`.github/workflows/ci.yml` frontend job build 後裝 chromium + 跑 `e2e:local`;`e2e.yml` nightly 改跑 `e2e:live`。
+  - **驗證**:Vitest **87**(83+4)綠、`test:types` 綠、`build` 綠、Playwright local **5** 綠;亮/暗雙模式 navbar 截圖比對 mockup 一致(active rail/chevron/縮排)。純前端 + CI,後端零改動。**待 merge**(git 模式 c:自動 commit+PR,merge 待確認)。
+- [2026-07-02] 🔍 **全系統測試戰役 → `docs/TEST_REPORT_2026-07-02.md`(只測不修;修復由後續 Opus session 依報告執行)**。
+  線上(erp.terrychou.com,唯讀)+ 本機 compose(寫入類)+ `mvnw verify` 三線並測。
+  **17 個編號問題**(P0×1、P1×3、P2×5、P3×8)+ 1 誤報排除 + 8 項健康證明。
+  - **P0 ERP-001(根因已釘死)**:側欄 8/10 父選單點擊完全無反應 — Mantine 9 `NavLink` withChildren 點擊 `preventDefault()` × `component={Link}`(RR 見 defaultPrevented 放棄導航)× 受控 `opened={active}`(不展開)三重疊加;桌面/行動/鍵盤皆中,console 無聲(`AppLayout.tsx:283-307`)。E2E 只有 smoke 所以 CI 沒抓到(ERP-006)。
+  - **P1 群(錯誤契約)**:全後端 0 個 `@Valid`(空 body → 10/12 寫入端點 500,ERP-013)、狀態機違規丟裸 `IllegalStateException` 無 advice 接(→500,ERP-014);合併 401 非 RFC9457(ERP-008)+ 403 空 body(ERP-012)建議打包成「錯誤契約統一」工作包。
+  - **健康證明**:契約零漂移(103=103 ops)、RBAC 矩陣 78/78 全吻合、O2C 寫入流程全綠 + SO 轉 CLOSED + 寫後對帳全平、212 測試綠(81 unit+131 IT,jacoco 72%/60%)、guest gating 佳、i18n 乾淨、actuator 未曝露。
+  - **UI/UX 完整設計提案**(使用者指定):3 組現況 vs 提案對比圖 + 3 個自足 HTML mockup(`docs/test-evidence/2026-07-02/mockups/`)+ design token 規劃(語意色雙層 .0/.9、圖表色盤 CSS 變數化、tabular-nums、Toolbar/分頁元件慣例);axe 抓到 Dashboard 12 個 serious 對比違規(ERP-15)。
+  - 證據 19 檔 + 2 JSON 於 `docs/test-evidence/2026-07-02/`;拋棄式測試腳本說明見報告附錄 B。依本 session git 模式(a):**僅寫檔、未 commit**。
 - [2026-07-02] ⚙️🎉 **Phase 3 PLANNED widget C5 — OEE / 設備(全端)→ PLANNED 佔位全清**。最後一個深後端 widget:設備稼動/停機/不良。
   - **後端** `manufacturing`:新 domain `Equipment`(設備主檔 + `idealUnitsPerHour`)+ `ProductionLog`(每設備每日:計畫/停機分鐘 + 停機原因 + 產出/良品,UNIQUE 設備×日)。`OeeService` 聚合每設備 **OEE = 稼動率 × 表現 × 良率**(皆百分比:稼動=runtime/planned、表現=實際產出/理想產出、良率=良品/產出),`downtime()` 依原因彙總停機分鐘。`GET /api/manufacturing/{oee,downtime}`。Flyway `V23`(equipment + production_log)。DataSeeder 播 3 設備 × 近 10 工作日日誌(OEE ~75–85%、停機原因分佈)。純營運資料、不過帳。`OeeIT`(A/P/Q/OEE 計算恆等 + 停機彙總)。
   - **前端**:`ManufacturingDashboardPanel` OEE PLANNED → 各設備 `RingProgress`(OEE% + A/P/Q 分解、色依水準)+ 停機原因甜甜圈(`DonutCard`);移除 `PlannedCard`。i18n(en/zh)。`gen:api`。
