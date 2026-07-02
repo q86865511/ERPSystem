@@ -1,4 +1,4 @@
-import { ActionIcon, Center, Loader, Table } from '@mantine/core';
+import { ActionIcon, Skeleton, Table } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { useI18n } from '../i18n';
 import { EmptyState } from './EmptyState';
@@ -42,11 +42,34 @@ export function DataTable<T>({
   const { t } = useI18n();
 
   if (isLoading) {
-    return (
-      <Center py="xl">
-        <Loader />
-      </Center>
+    // Column-shaped skeleton (header + 5 rows) so the layout doesn't jump when data arrives (ERP-005).
+    const skeleton = (
+      <Table>
+        <Table.Thead>
+          <Table.Tr>
+            {columns.map((col) => (
+              <Table.Th key={col.key} ta={col.align} w={col.width}>
+                <Skeleton height={12} width="60%" />
+              </Table.Th>
+            ))}
+            {onRowClick && <Table.Th w={48} aria-hidden />}
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {Array.from({ length: 5 }).map((_, r) => (
+            <Table.Tr key={r}>
+              {columns.map((col) => (
+                <Table.Td key={col.key} ta={col.align}>
+                  <Skeleton height={14} />
+                </Table.Td>
+              ))}
+              {onRowClick && <Table.Td w={48} aria-hidden />}
+            </Table.Tr>
+          ))}
+        </Table.Tbody>
+      </Table>
     );
+    return minWidth ? <Table.ScrollContainer minWidth={minWidth}>{skeleton}</Table.ScrollContainer> : skeleton;
   }
   if (isEmpty || rows.length === 0) {
     return <EmptyState message={emptyMessage} />;

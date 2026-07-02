@@ -9,11 +9,11 @@ interface Row {
 const columns: DataTableColumn<Row>[] = [{ key: 'name', label: 'Name' }];
 
 describe('DataTable', () => {
-  it('shows a loader while loading', () => {
+  it('shows a skeleton while loading', () => {
     const { container } = renderWithProviders(
       <DataTable<Row> columns={columns} rows={[]} rowKey={(r) => r.id} isLoading emptyMessage="none" />,
     );
-    expect(container.querySelector('.mantine-Loader-root')).toBeInTheDocument();
+    expect(container.querySelector('.mantine-Skeleton-root')).toBeInTheDocument();
   });
 
   it('shows the empty message when there are no rows', () => {
