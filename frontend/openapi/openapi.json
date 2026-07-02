@@ -13,6 +13,60 @@
     "bearerAuth" : [ ]
   } ],
   "paths" : {
+    "/api/assistant/chat" : {
+      "post" : {
+        "description" : "Streams the assistant's reply as Server-Sent Events (text_delta*, then done or error). See the class doc for the event protocol.",
+        "operationId" : "chat",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "text/event-stream" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "OK"
+          },
+          "503" : {
+            "content" : {
+              "application/problem+json" : { }
+            },
+            "description" : "Assistant disabled or its executor is at capacity"
+          }
+        },
+        "summary" : "Stream a chat turn",
+        "tags" : [ "assistant-controller" ]
+      }
+    },
+    "/api/assistant/status" : {
+      "get" : {
+        "operationId" : "status",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AssistantStatus"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "assistant-controller" ]
+      }
+    },
     "/api/audit" : {
       "get" : {
         "operationId" : "list_4",
@@ -2927,6 +2981,14 @@
           }
         }
       },
+      "AssistantStatus" : {
+        "type" : "object",
+        "properties" : {
+          "enabled" : {
+            "type" : "boolean"
+          }
+        }
+      },
       "AttendanceResponse" : {
         "type" : "object",
         "properties" : {
@@ -3197,6 +3259,19 @@
           }
         }
       },
+      "ChatRequest" : {
+        "type" : "object",
+        "properties" : {
+          "messages" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Message"
+            },
+            "minItems" : 1
+          }
+        },
+        "required" : [ "messages" ]
+      },
       "ClearingBalance" : {
         "type" : "object",
         "properties" : {
@@ -3230,6 +3305,20 @@
           }
         },
         "required" : [ "qtyProduced", "stockLocationId" ]
+      },
+      "ContentBlock" : {
+        "type" : "object",
+        "properties" : {
+          "text" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "type" : {
+            "type" : "string",
+            "pattern" : "text"
+          }
+        },
+        "required" : [ "text" ]
       },
       "CreateAdjustmentRequest" : {
         "type" : "object",
@@ -4603,6 +4692,23 @@
           }
         },
         "required" : [ "password", "username" ]
+      },
+      "Message" : {
+        "type" : "object",
+        "properties" : {
+          "content" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ContentBlock"
+            },
+            "minItems" : 1
+          },
+          "role" : {
+            "type" : "string",
+            "pattern" : "user|assistant"
+          }
+        },
+        "required" : [ "content" ]
       },
       "PageAuditLogResponse" : {
         "type" : "object",

@@ -191,6 +191,24 @@ class ArchitectureTest {
                             "..payments..", "..iam..")
                     .should().dependOnClassesThat().resideInAPackage("..audit..");
 
+    // The assistant module (ERP Copilot) is a leaf: it wraps the Anthropic SDK and exposes a chat endpoint.
+    // In PR1 it depends on no other ERP module at all (PR2 will reach the read side via published api ports).
+    @ArchTest
+    static final ArchRule assistant_uses_only_published_ports =
+            noClasses().that().resideInAPackage("..assistant..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..ledger..", "..masterdata..", "..inventory..", "..purchasing..",
+                            "..payments..", "..sales..", "..manufacturing..", "..reporting..", "..hr..",
+                            "..iam..", "..audit..", "..observation..");
+
+    // Nothing depends on the assistant module; it is a leaf that other modules never reference.
+    @ArchTest
+    static final ArchRule no_module_depends_on_assistant =
+            noClasses().that().resideInAnyPackage("..ledger..", "..masterdata..", "..inventory..",
+                            "..purchasing..", "..sales..", "..manufacturing..", "..reporting..",
+                            "..payments..", "..iam..", "..audit..", "..observation..", "..hr..")
+                    .should().dependOnClassesThat().resideInAPackage("..assistant..");
+
     // The observation module (metrics listener) is, like audit, a cross-cutting event consumer: it touches
     // other modules' published events/api only, never their internals.
     @ArchTest

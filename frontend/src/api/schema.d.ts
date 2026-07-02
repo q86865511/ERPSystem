@@ -4,6 +4,42 @@
  */
 
 export interface paths {
+    "/api/assistant/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stream a chat turn
+         * @description Streams the assistant's reply as Server-Sent Events (text_delta*, then done or error). See the class doc for the event protocol.
+         */
+        post: operations["chat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assistant/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/audit": {
         parameters: {
             query?: never;
@@ -1387,6 +1423,9 @@ export interface components {
             days90plus?: string;
             total?: string;
         };
+        AssistantStatus: {
+            enabled?: boolean;
+        };
         AttendanceResponse: {
             /** Format: int64 */
             employeeId?: number;
@@ -1489,6 +1528,9 @@ export interface components {
             net?: string;
             outflow?: string;
         };
+        ChatRequest: {
+            messages: components["schemas"]["Message"][];
+        };
         ClearingBalance: {
             accountCode?: string;
             balance?: string;
@@ -1501,6 +1543,10 @@ export interface components {
             qtyProduced: string;
             /** Format: int64 */
             stockLocationId: number;
+        };
+        ContentBlock: {
+            text: string;
+            type?: string;
         };
         CreateAdjustmentRequest: {
             /** Format: int64 */
@@ -2025,6 +2071,10 @@ export interface components {
             password: string;
             username: string;
         };
+        Message: {
+            content: components["schemas"]["ContentBlock"][];
+            role?: string;
+        };
         PageAuditLogResponse: {
             content?: components["schemas"]["AuditLogResponse"][];
             empty?: boolean;
@@ -2420,6 +2470,59 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChatRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": string;
+                };
+            };
+            /** @description Assistant disabled or its executor is at capacity */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                };
+            };
+        };
+    };
+    status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AssistantStatus"];
+                };
+            };
+        };
+    };
     list_4: {
         parameters: {
             query: {

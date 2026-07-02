@@ -96,6 +96,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/manufacturing/**").hasRole("WAREHOUSE")
                         // The audit trail is admin-only (the one GET that is role-restricted).
                         .requestMatchers(HttpMethod.GET, "/api/audit/**").hasRole("ADMIN")
+                        // ERP Copilot (assistant): any authenticated user, including the read-only guest.
+                        // The status flag and the SSE chat are login-gated but not role-gated.
+                        .requestMatchers("/api/assistant/**").authenticated()
                         // Everything else (reads, reports, /api/auth/me) just needs an authenticated user.
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
