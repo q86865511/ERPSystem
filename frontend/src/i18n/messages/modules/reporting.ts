@@ -72,6 +72,13 @@ export const reportingEn = {
     plExpenses: 'Expenses',
     cashFlowTitle: 'Cash flow',
     plannedNote: 'Needs new backend — shown as placeholder',
+    revenueTrendTitle: 'Revenue trend',
+    seriesRevenue: 'Revenue',
+    seriesGrossMargin: 'Gross margin',
+    seriesInflow: 'Inflow',
+    seriesOutflow: 'Outflow',
+    seriesBudget: 'Budget',
+    seriesActual: 'Actual',
   },
 };
 
@@ -149,5 +156,12 @@ export const reportingZh: typeof reportingEn = {
     plExpenses: '費用',
     cashFlowTitle: '現金流',
     plannedNote: '需新後端 — 目前為佔位示意',
+    revenueTrendTitle: '營收趨勢',
+    seriesRevenue: '營收',
+    seriesGrossMargin: '毛利',
+    seriesInflow: '流入',
+    seriesOutflow: '流出',
+    seriesBudget: '預算',
+    seriesActual: '實際',
   },
 };

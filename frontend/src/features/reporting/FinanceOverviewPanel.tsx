@@ -1,5 +1,5 @@
 import { Badge, Card, Group, SimpleGrid, Stack, Text } from '@mantine/core';
-import { BarChart } from '@mantine/charts';
+import { BarChart, LineChart } from '@mantine/charts';
 import {
   IconBuildingBank,
   IconCash,
@@ -16,7 +16,14 @@ import { useI18n } from '../../i18n';
 import { useApAging } from '../purchasing/api';
 import { useArAging } from '../sales/api';
 import { ReconciliationHero } from './ReconciliationHero';
-import { useBalanceSheet, useIncomeStatement } from './api';
+import {
+  useBalanceSheet,
+  useBudgetVariance,
+  useCashFlow,
+  useIncomeStatement,
+  useKpiSummary,
+  useRevenueTrend,
+} from './api';
 
 type AgingReport = {
   current?: string;
@@ -38,18 +45,16 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
   const ap = useApAging(asOf);
   const is = useIncomeStatement(asOf);
   const bs = useBalanceSheet(asOf);
+  const kpi = useKpiSummary(asOf);
+  const revenueTrend = useRevenueTrend(6, asOf);
+  const cashFlow = useCashFlow(6, asOf);
+  const budget = useBudgetVariance(asOf);
 
   const live = (
     <Badge color="teal" variant="light" size="sm">
       {t('reporting.overview.liveData')}
     </Badge>
   );
-  const planned = (
-    <Badge color="gray" variant="light" size="sm">
-      {t('reporting.overview.planned')}
-    </Badge>
-  );
-
   const agingData = (d: AgingReport | undefined): DonutDatum[] => [
     { name: t('sales.arAging.current'), amount: d?.current, color: agingColors[0] },
     { name: t('sales.arAging.days1to30'), amount: d?.days1to30, color: agingColors[1] },
@@ -64,6 +69,22 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
     { metric: t('reporting.incomeStatement.netIncome'), amount: moneyToNumber(is.data?.netIncome) },
   ];
 
+  const revTrendData = (revenueTrend.data ?? []).map((p) => ({
+    month: p.month,
+    revenue: moneyToNumber(p.revenue),
+    grossMargin: moneyToNumber(p.grossMargin),
+  }));
+  const cashFlowData = (cashFlow.data ?? []).map((p) => ({
+    month: p.month,
+    inflow: moneyToNumber(p.inflow),
+    outflow: moneyToNumber(p.outflow),
+  }));
+  const budgetData = (budget.data?.lines ?? []).map((l) => ({
+    name: l.name ?? '',
+    budget: moneyToNumber(l.budget),
+    actual: moneyToNumber(l.actual),
+  }));
+
   return (
     <Stack gap="md">
       <SimpleGrid cols={{ base: 1, xs: 2, md: 3, lg: 6 }}>
@@ -72,7 +93,7 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
         <KpiTile label={t('reporting.overview.netIncome')} value={is.data?.netIncome} icon={<IconChartPie size={16} />} status={live} />
         <KpiTile label={t('reporting.overview.totalAssets')} value={bs.data?.totalAssets} icon={<IconBuildingBank size={16} />} status={live} />
         <KpiTile label={t('reporting.overview.totalEquity')} value={bs.data?.totalEquity} icon={<IconScale size={16} />} status={live} />
-        <KpiTile label={t('reporting.overview.cash')} value={undefined} icon={<IconCash size={16} />} status={planned} />
+        <KpiTile label={t('reporting.overview.cash')} value={kpi.data?.netCash?.current} icon={<IconCash size={16} />} status={live} />
       </SimpleGrid>
 
       <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }}>
@@ -96,11 +117,67 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
         </Card>
       </SimpleGrid>
 
-      <ReconciliationHero asOf={asOf} />
+      <SimpleGrid cols={{ base: 1, lg: 3 }}>
+        <Card withBorder padding="md">
+          <Group justify="space-between" mb="sm" wrap="nowrap">
+            <Text fw={500}>{t('reporting.overview.revenueTrendTitle')}</Text>
+            {live}
+          </Group>
+          <LineChart
+            h={190}
+            data={revTrendData}
+            dataKey="month"
+            curveType="monotone"
+            withLegend
+            series={[
+              { name: 'revenue', label: t('reporting.overview.seriesRevenue'), color: 'brand.6' },
+              { name: 'grossMargin', label: t('reporting.overview.seriesGrossMargin'), color: 'teal.6' },
+            ]}
+            valueFormatter={(v) => formatMoney(v)}
+            yAxisProps={{ width: 52, tickFormatter: (v) => compactNumber(Number(v)) }}
+          />
+        </Card>
+        <Card withBorder padding="md">
+          <Group justify="space-between" mb="sm" wrap="nowrap">
+            <Text fw={500}>{t('reporting.overview.cashFlowTitle')}</Text>
+            {live}
+          </Group>
+          <BarChart
+            h={190}
+            data={cashFlowData}
+            dataKey="month"
+            withLegend
+            series={[
+              { name: 'inflow', label: t('reporting.overview.seriesInflow'), color: 'teal.6' },
+              { name: 'outflow', label: t('reporting.overview.seriesOutflow'), color: 'red.6' },
+            ]}
+            valueFormatter={(v) => formatMoney(v)}
+            yAxisProps={{ width: 52, tickFormatter: (v) => compactNumber(Number(v)) }}
+            barProps={{ radius: 3 }}
+          />
+        </Card>
+        <Card withBorder padding="md">
+          <Group justify="space-between" mb="sm" wrap="nowrap">
+            <Text fw={500}>{t('reporting.overview.budgetVariance')}</Text>
+            {live}
+          </Group>
+          <BarChart
+            h={190}
+            data={budgetData}
+            dataKey="name"
+            withLegend
+            series={[
+              { name: 'budget', label: t('reporting.overview.seriesBudget'), color: 'gray.5' },
+              { name: 'actual', label: t('reporting.overview.seriesActual'), color: 'brand.6' },
+            ]}
+            valueFormatter={(v) => formatMoney(v)}
+            yAxisProps={{ width: 52, tickFormatter: (v) => compactNumber(Number(v)) }}
+            barProps={{ radius: 3 }}
+          />
+        </Card>
+      </SimpleGrid>
 
-      <Text size="xs" c="dimmed">
-        {t('reporting.overview.plTitle')} · {t('reporting.overview.cashFlowTitle')} · {t('reporting.overview.budgetVariance')} — {t('reporting.overview.plannedNote')}
-      </Text>
+      <ReconciliationHero asOf={asOf} />
     </Stack>
   );
 }

@@ -980,6 +980,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/reporting/budget-variance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["budgetVariance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reporting/cash-flow": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["cashFlow"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/reporting/general-ledger/{accountCode}": {
         parameters: {
             query?: never;
@@ -1012,6 +1044,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/reporting/kpi-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["kpiSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/reporting/reconciliation": {
         parameters: {
             query?: never;
@@ -1020,6 +1068,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["reconciliation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reporting/revenue-trend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["revenueTrend"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1335,11 +1399,31 @@ export interface components {
             /** Format: int32 */
             version?: number;
         };
+        BudgetVarianceLine: {
+            accountCode?: string;
+            actual?: string;
+            budget?: string;
+            name?: string;
+            variance?: string;
+        };
+        BudgetVarianceReport: {
+            lines?: components["schemas"]["BudgetVarianceLine"][];
+            /** Format: int32 */
+            month?: number;
+            /** Format: int32 */
+            year?: number;
+        };
         CancelRequest: {
             /** Format: date */
             postingDate?: string;
             /** Format: int64 */
             stockLocationId?: number;
+        };
+        CashFlowPoint: {
+            inflow?: string;
+            month?: string;
+            net?: string;
+            outflow?: string;
         };
         ClearingBalance: {
             accountCode?: string;
@@ -1791,6 +1875,18 @@ export interface components {
             totalCredit?: string;
             totalDebit?: string;
         };
+        KpiMetric: {
+            current?: string;
+            deltaPct?: string;
+            previous?: string;
+        };
+        KpiSummary: {
+            currentMonth?: string;
+            grossProfit?: components["schemas"]["KpiMetric"];
+            netCash?: components["schemas"]["KpiMetric"];
+            previousMonth?: string;
+            revenue?: components["schemas"]["KpiMetric"];
+        };
         LeaveRequestResponse: {
             days?: string;
             decidedBy?: string;
@@ -2014,6 +2110,12 @@ export interface components {
         };
         ReorderReport: {
             items?: components["schemas"]["ReorderItem"][];
+        };
+        RevenuePoint: {
+            cogs?: string;
+            grossMargin?: string;
+            month?: string;
+            revenue?: string;
         };
         ReverseEntryRequest: {
             memo?: string;
@@ -3945,6 +4047,53 @@ export interface operations {
             };
         };
     };
+    budgetVariance: {
+        parameters: {
+            query?: {
+                year?: number;
+                month?: number;
+                asOf?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BudgetVarianceReport"];
+                };
+            };
+        };
+    };
+    cashFlow: {
+        parameters: {
+            query?: {
+                months?: number;
+                asOf?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CashFlowPoint"][];
+                };
+            };
+        };
+    };
     generalLedger: {
         parameters: {
             query?: {
@@ -3991,6 +4140,28 @@ export interface operations {
             };
         };
     };
+    kpiSummary: {
+        parameters: {
+            query?: {
+                asOf?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["KpiSummary"];
+                };
+            };
+        };
+    };
     reconciliation: {
         parameters: {
             query?: {
@@ -4009,6 +4180,29 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ReconciliationReport"];
+                };
+            };
+        };
+    };
+    revenueTrend: {
+        parameters: {
+            query?: {
+                months?: number;
+                asOf?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RevenuePoint"][];
                 };
             };
         };

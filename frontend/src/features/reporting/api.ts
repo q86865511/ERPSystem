@@ -54,6 +54,58 @@ export function useBalanceSheet(asOf?: string) {
   });
 }
 
+export function useRevenueTrend(months = 6, asOf?: string) {
+  return useQuery({
+    queryKey: qk.reporting.revenueTrend(months, asOf),
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/reporting/revenue-trend', {
+        params: { query: { months, asOf } },
+      });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useCashFlow(months = 6, asOf?: string) {
+  return useQuery({
+    queryKey: qk.reporting.cashFlow(months, asOf),
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/reporting/cash-flow', {
+        params: { query: { months, asOf } },
+      });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useKpiSummary(asOf?: string) {
+  return useQuery({
+    queryKey: qk.reporting.kpiSummary(asOf),
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/reporting/kpi-summary', {
+        params: { query: { asOf } },
+      });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useBudgetVariance(asOf?: string) {
+  return useQuery({
+    queryKey: qk.reporting.budgetVariance(asOf),
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/reporting/budget-variance', {
+        params: { query: { asOf } },
+      });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
 export function useGeneralLedger(accountCode: string | null, asOf?: string) {
   return useQuery({
     queryKey: qk.reporting.generalLedger(accountCode ?? '', asOf),
