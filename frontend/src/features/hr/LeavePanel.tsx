@@ -55,13 +55,17 @@ export function LeavePanel() {
   });
 
   const submit = form.onSubmit(async (v) => {
+    if (v.startDate == null || v.endDate == null) {
+      notifyError(t('masterdata.validation.required'));
+      return;
+    }
     try {
       const body: CreateLeaveRequest = {
         employeeId: Number(v.employeeId),
         leaveType: v.leaveType as CreateLeaveRequest['leaveType'],
-        startDate: v.startDate ?? undefined,
-        endDate: v.endDate ?? undefined,
-        days: v.days.trim() || undefined,
+        startDate: v.startDate,
+        endDate: v.endDate,
+        days: v.days,
         reason: v.reason.trim() || undefined,
       };
       await submitLeave.mutateAsync(body);

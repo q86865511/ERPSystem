@@ -1360,9 +1360,9 @@ export interface components {
             unitCost?: string;
         };
         AllocationLine: {
-            amount?: string;
+            amount: string;
             /** Format: int64 */
-            billId?: number;
+            billId: number;
         };
         AllocationView: {
             amount?: string;
@@ -1425,9 +1425,9 @@ export interface components {
         };
         BillLine: {
             /** Format: int64 */
-            poLineId?: number;
-            qty?: string;
-            unitPrice?: string;
+            poLineId: number;
+            qty: string;
+            unitPrice: string;
         };
         BillLineView: {
             /** Format: int64 */
@@ -1481,7 +1481,7 @@ export interface components {
             /** Format: date */
             postingDate?: string;
             /** Format: int64 */
-            stockLocationId?: number;
+            stockLocationId: number;
         };
         CashFlowPoint: {
             inflow?: string;
@@ -1498,132 +1498,132 @@ export interface components {
         CompleteRequest: {
             /** Format: date */
             postingDate?: string;
-            qtyProduced?: string;
+            qtyProduced: string;
             /** Format: int64 */
-            stockLocationId?: number;
+            stockLocationId: number;
         };
         CreateAdjustmentRequest: {
             /** Format: int64 */
-            itemId?: number;
+            itemId: number;
             /** Format: int64 */
-            locationId?: number;
+            locationId: number;
             /** Format: date */
             postingDate?: string;
-            qtyDelta?: string;
+            qtyDelta: string;
             reason?: string;
             unitCost?: string;
         };
         CreateAttendanceRequest: {
             /** Format: int64 */
-            employeeId?: number;
+            employeeId: number;
             note?: string;
             /** @enum {string} */
-            status?: "PRESENT" | "ABSENT" | "LATE" | "LEAVE" | "REMOTE";
+            status: "PRESENT" | "ABSENT" | "LATE" | "LEAVE" | "REMOTE";
             /** Format: date */
-            workDate?: string;
+            workDate: string;
             workedHours?: string;
         };
         CreateBillRequest: {
-            lines?: components["schemas"]["BillLine"][];
+            lines: components["schemas"]["BillLine"][];
             /** Format: date */
             postingDate?: string;
             /** Format: int64 */
-            purchaseOrderId?: number;
+            purchaseOrderId: number;
             taxRateCode?: string;
         };
         CreateBomComponent: {
             /** Format: int64 */
-            componentItemId?: number;
-            qtyPer?: string;
+            componentItemId: number;
+            qtyPer: string;
             scrapPct?: string;
         };
         CreateBomRequest: {
-            components?: components["schemas"]["CreateBomComponent"][];
-            outputQty?: string;
+            components: components["schemas"]["CreateBomComponent"][];
+            outputQty: string;
             /** Format: int64 */
-            parentItemId?: number;
+            parentItemId: number;
         };
         CreateDeliveryRequest: {
-            lines?: components["schemas"]["DeliveryLine"][];
+            lines: components["schemas"]["DeliveryLine"][];
             /** Format: date */
             postingDate?: string;
             /** Format: int64 */
-            salesOrderId?: number;
+            salesOrderId: number;
             /** Format: int64 */
-            stockLocationId?: number;
+            stockLocationId: number;
         };
         CreateDepartmentRequest: {
             budgetAccountCode?: string;
-            code?: string;
-            name?: string;
+            code: string;
+            name: string;
         };
         CreateEmployeeRequest: {
-            code?: string;
+            code: string;
             /** Format: int64 */
-            departmentId?: number;
-            firstName?: string;
+            departmentId: number;
+            firstName: string;
             /** Format: date */
-            hireDate?: string;
-            lastName?: string;
+            hireDate: string;
+            lastName: string;
             monthlySalary?: string;
             /** Format: int64 */
-            positionId?: number;
+            positionId: number;
             /** @enum {string} */
             status?: "ACTIVE" | "ON_LEAVE" | "TERMINATED";
         };
         CreateGrnRequest: {
-            lines?: components["schemas"]["ReceiptLine"][];
+            lines: components["schemas"]["ReceiptLine"][];
             /** Format: date */
             postingDate?: string;
             /** Format: int64 */
-            purchaseOrderId?: number;
+            purchaseOrderId: number;
             /** Format: int64 */
-            stockLocationId?: number;
+            stockLocationId: number;
         };
         CreateInvoiceRequest: {
-            lines?: components["schemas"]["InvoiceLine"][];
+            lines: components["schemas"]["InvoiceLine"][];
             /** Format: date */
             postingDate?: string;
             /** Format: int64 */
-            salesOrderId?: number;
+            salesOrderId: number;
             taxRateCode?: string;
         };
         CreateItemRequest: {
             /** @enum {string} */
-            itemType?: "RAW" | "WIP" | "FINISHED" | "SERVICE";
-            name?: string;
+            itemType: "RAW" | "WIP" | "FINISHED" | "SERVICE";
+            name: string;
             reorderPoint?: string;
             reorderQty?: string;
-            sku?: string;
+            sku: string;
             standardCost?: string;
             stocked?: boolean;
-            uom?: string;
+            uom: string;
         };
         CreateLeaveRequest: {
-            days?: string;
+            days: string;
             /** Format: int64 */
-            employeeId?: number;
+            employeeId: number;
             /** Format: date */
-            endDate?: string;
+            endDate: string;
             /** @enum {string} */
-            leaveType?: "ANNUAL" | "SICK" | "PERSONAL" | "UNPAID";
+            leaveType: "ANNUAL" | "SICK" | "PERSONAL" | "UNPAID";
             reason?: string;
             /** Format: date */
-            startDate?: string;
+            startDate: string;
         };
         CreateLocationRequest: {
-            code?: string;
+            code: string;
             /** @enum {string} */
-            locationType?: "STOCK" | "RECEIVING" | "SHIPPING" | "PRODUCTION_WIP" | "SCRAP" | "VENDOR" | "CUSTOMER" | "INVENTORY_LOSS";
+            locationType: "STOCK" | "RECEIVING" | "SHIPPING" | "PRODUCTION_WIP" | "SCRAP" | "VENDOR" | "CUSTOMER" | "INVENTORY_LOSS";
             /** Format: int64 */
-            warehouseId?: number;
+            warehouseId: number;
         };
         CreatePartnerRequest: {
             apAccountCode?: string;
             arAccountCode?: string;
-            code?: string;
+            code: string;
             customer?: boolean;
-            name?: string;
+            name: string;
             /** Format: int32 */
             paymentTermsDays?: number;
             taxId?: string;
@@ -1631,62 +1631,62 @@ export interface components {
         };
         CreatePoLine: {
             /** Format: int64 */
-            itemId?: number;
-            qtyOrdered?: string;
-            unitPrice?: string;
+            itemId: number;
+            qtyOrdered: string;
+            unitPrice: string;
         };
         CreatePoRequest: {
-            lines?: components["schemas"]["CreatePoLine"][];
+            lines: components["schemas"]["CreatePoLine"][];
             /** Format: date */
-            orderDate?: string;
+            orderDate: string;
             /** Format: int64 */
-            partnerId?: number;
+            partnerId: number;
         };
         CreatePositionRequest: {
-            code?: string;
+            code: string;
             standardSalary?: string;
-            title?: string;
+            title: string;
         };
         CreateReturnRequest: {
             /** Format: date */
             postingDate?: string;
             /** Format: int64 */
-            salesInvoiceId?: number;
+            salesInvoiceId: number;
             /** Format: int64 */
-            stockLocationId?: number;
+            stockLocationId: number;
         };
         CreateSoLine: {
             /** Format: int64 */
-            itemId?: number;
-            qtyOrdered?: string;
-            unitPrice?: string;
+            itemId: number;
+            qtyOrdered: string;
+            unitPrice: string;
         };
         CreateSoRequest: {
-            lines?: components["schemas"]["CreateSoLine"][];
+            lines: components["schemas"]["CreateSoLine"][];
             /** Format: date */
-            orderDate?: string;
+            orderDate: string;
             /** Format: int64 */
-            partnerId?: number;
+            partnerId: number;
         };
         CreateTimesheetRequest: {
             /** Format: int64 */
-            employeeId?: number;
+            employeeId: number;
             note?: string;
-            overtimeHours?: string;
-            regularHours?: string;
+            overtimeHours: string;
+            regularHours: string;
             /** Format: date */
-            weekEnding?: string;
+            weekEnding: string;
         };
         CreateWarehouseRequest: {
-            code?: string;
-            name?: string;
+            code: string;
+            name: string;
         };
         CreateWorkOrderRequest: {
             /** Format: int64 */
-            bomId?: number;
+            bomId: number;
             /** Format: int64 */
-            itemId?: number;
-            qtyToProduce?: string;
+            itemId: number;
+            qtyToProduce: string;
         };
         CurrentUserResponse: {
             roles?: string[];
@@ -1732,9 +1732,9 @@ export interface components {
             vatAmount?: string;
         };
         DeliveryLine: {
-            qty?: string;
+            qty: string;
             /** Format: int64 */
-            soLineId?: number;
+            soLineId: number;
         };
         DeliveryLineView: {
             /** Format: int64 */
@@ -1851,10 +1851,10 @@ export interface components {
             totalRevenue?: string;
         };
         InvoiceLine: {
-            qty?: string;
+            qty: string;
             /** Format: int64 */
-            soLineId?: number;
-            unitPrice?: string;
+            soLineId: number;
+            unitPrice: string;
         };
         InvoiceLineView: {
             /** Format: int64 */
@@ -1873,7 +1873,7 @@ export interface components {
             /** Format: date */
             postingDate?: string;
             /** Format: int64 */
-            stockLocationId?: number;
+            stockLocationId: number;
         };
         ItemResponse: {
             /** Format: int64 */
@@ -1936,9 +1936,9 @@ export interface components {
             partnerId?: number;
         };
         JournalEntryLine: {
-            accountCode?: string;
-            credit?: string;
-            debit?: string;
+            accountCode: string;
+            credit: string;
+            debit: string;
             memo?: string;
             /** Format: int64 */
             partnerId?: number;
@@ -1946,10 +1946,10 @@ export interface components {
         JournalEntryRequest: {
             currencyCode?: string;
             journalCode?: string;
-            lines?: components["schemas"]["JournalEntryLine"][];
+            lines: components["schemas"]["JournalEntryLine"][];
             memo?: string;
             /** Format: date */
-            postingDate?: string;
+            postingDate: string;
             sourceDocId?: string;
             sourceDocType?: string;
             sourceEvent?: string;
@@ -2022,8 +2022,8 @@ export interface components {
             warehouseId?: number;
         };
         LoginRequest: {
-            password?: string;
-            username?: string;
+            password: string;
+            username: string;
         };
         PageAuditLogResponse: {
             content?: components["schemas"]["AuditLogResponse"][];
@@ -2076,18 +2076,18 @@ export interface components {
             vendor?: boolean;
         };
         PayInRequest: {
-            allocations?: components["schemas"]["ReceiptAllocationLine"][];
-            amount?: string;
+            allocations: components["schemas"]["ReceiptAllocationLine"][];
+            amount: string;
             /** Format: int64 */
-            partnerId?: number;
+            partnerId: number;
             /** Format: date */
             postingDate?: string;
         };
         PayOutRequest: {
-            allocations?: components["schemas"]["AllocationLine"][];
-            amount?: string;
+            allocations: components["schemas"]["AllocationLine"][];
+            amount: string;
             /** Format: int64 */
-            partnerId?: number;
+            partnerId: number;
             /** Format: date */
             postingDate?: string;
         };
@@ -2173,14 +2173,14 @@ export interface components {
             status?: string;
         };
         ReceiptAllocationLine: {
-            amount?: string;
+            amount: string;
             /** Format: int64 */
-            invoiceId?: number;
+            invoiceId: number;
         };
         ReceiptLine: {
             /** Format: int64 */
-            poLineId?: number;
-            qty?: string;
+            poLineId: number;
+            qty: string;
         };
         ReconciliationReport: {
             /** Format: date */

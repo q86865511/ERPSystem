@@ -54,6 +54,10 @@ export function EmployeesPanel() {
   });
 
   const submit = form.onSubmit(async (v) => {
+    if (v.hireDate == null) {
+      notifyError(t('masterdata.validation.required'));
+      return;
+    }
     try {
       const body: CreateEmployeeRequest = {
         code: v.code,
@@ -63,7 +67,7 @@ export function EmployeesPanel() {
         positionId: Number(v.positionId),
         monthlySalary: v.monthlySalary.trim() || undefined,
         status: v.status as CreateEmployeeRequest['status'],
-        hireDate: v.hireDate ?? undefined,
+        hireDate: v.hireDate,
       };
       await create.mutateAsync(body);
       notifySuccess(t('hr.employees.created', { code: v.code }));

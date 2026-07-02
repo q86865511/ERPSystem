@@ -48,9 +48,13 @@ export function AdjustmentsPanel() {
   }
 
   const submit = form.onSubmit(async (v) => {
+    if (v.itemId == null || v.locationId == null) {
+      notifyError(t('inventory.errPickItem'));
+      return;
+    }
     const body: CreateAdjustmentRequest = {
-      itemId: v.itemId ?? undefined,
-      locationId: v.locationId ?? undefined,
+      itemId: v.itemId,
+      locationId: v.locationId,
       qtyDelta: v.qtyDelta,
       unitCost: v.unitCost.trim() || undefined,
       reason: v.reason.trim() || undefined,
