@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<title>設計提案 — Dashboard(KPI 趨勢、語意色、版面平衡)</title>
+<style>
+  :root{
+    --brand-6:#2563eb; --brand-0:#eff6ff;
+    --gray-0:#f8fafc; --gray-1:#f1f5f9; --gray-2:#e2e8f0; --gray-5:#64748b; --gray-7:#334155; --gray-9:#0f172a;
+    --pos-bg:#e6fcf5; --pos-tx:#066649;      /* teal.9 級,對白底 ≥7:1 */
+    --neg-bg:#fff5f5; --neg-tx:#c92a2a;      /* red.9 */
+    --warn-bg:#fff9db; --warn-tx:#e8590c;    /* orange.8 用於 icon;文字用 .9 */
+    --radius:12px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px;
+    --num-font:"Segoe UI","Noto Sans TC",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI","Noto Sans TC",system-ui,sans-serif;background:var(--gray-0);color:var(--gray-9);padding:24px;max-width:1180px}
+  .pagehead{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+  .pagehead h1{font-size:24px}
+  .chip{font-size:11px;font-weight:600;padding:2px 10px;border-radius:10px;background:var(--pos-bg);color:var(--pos-tx);border:1px solid #b7ebdb}
+  .asof{font-size:12px;color:var(--gray-5);margin-left:auto}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--sp-4);margin-bottom:var(--sp-4)}
+  .card{background:#fff;border:1px solid var(--gray-2);border-radius:var(--radius);padding:var(--sp-4)}
+  .kpi .t{font-size:13px;color:var(--gray-5);display:flex;align-items:center;gap:6px}
+  .kpi .v{font-size:22px;font-weight:700;margin:6px 0 8px;font-variant-numeric:tabular-nums}
+  .kpi .v.neg{color:var(--neg-tx)}
+  .delta{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:600;border-radius:8px;padding:1px 8px}
+  .delta.up{background:var(--pos-bg);color:var(--pos-tx)} .delta.down{background:var(--neg-bg);color:var(--neg-tx)}
+  .delta .cmp{font-weight:400;color:var(--gray-5);margin-left:2px}
+  .row{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:var(--sp-4)}
+  .card h2{font-size:15px;margin-bottom:var(--sp-3)}
+  .stage{display:grid;grid-template-columns:64px 1fr 34px;align-items:center;gap:10px;margin:9px 0;font-size:13px;color:var(--gray-7)}
+  .bar{height:22px;border-radius:6px;min-width:8px}
+  .stage .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--gray-9);font-weight:600}
+  .donut{width:130px;height:130px;border-radius:50%;background:conic-gradient(#2563eb 0 66%, #14b8a6 66% 100%);
+         display:grid;place-items:center;margin:6px auto}
+  .donut::after{content:"244,198";background:#fff;width:86px;height:86px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums}
+  .legend{font-size:12px;color:var(--gray-7);display:flex;gap:14px;justify-content:center}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+  .alert{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;margin-bottom:8px;font-size:13px}
+  .alert .cnt{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;border-radius:8px;padding:0 8px}
+  .alert.warn{background:var(--warn-bg);color:#7a3e00}.alert.warn .cnt{background:#ffe8cc;color:#7a3e00}
+  .alert.crit{background:var(--neg-bg);color:var(--neg-tx)}.alert.crit .cnt{background:#ffd8d8}
+  .alert.ok{background:var(--gray-1);color:var(--gray-5)}
+  .alert a{margin-left:8px;font-size:12px;color:var(--brand-6)}
+  .fn{margin-top:16px;font-size:12px;color:var(--gray-5);line-height:1.8;border-top:1px dashed var(--gray-2);padding-top:10px}
+  .fn b{color:var(--brand-6)}
+</style>
+</head>
+<body>
+  <div class="pagehead">
+    <h1>儀表板</h1>
+    <span class="chip">實際資料</span>
+    <span class="asof">截至 2026-07-02 13:40 · 每晚 05:00 重置</span>
+  </div>
+
+  <div class="kpis">
+    <div class="card kpi"><div class="t">營業收入</div><div class="v">133,700.00</div>
+      <span class="delta up">▲ 12.3%<span class="cmp">vs 上月同期</span></span></div>
+    <div class="card kpi"><div class="t">淨利</div><div class="v neg">-483,472.45</div>
+      <span class="delta down">▼ 薪資佔 86%<span class="cmp">點擊查看組成</span></span></div>
+    <div class="card kpi"><div class="t">訂單數</div><div class="v">24</div>
+      <span class="delta up">▲ 4<span class="cmp">vs 上月同期</span></span></div>
+    <div class="card kpi"><div class="t">應收帳款</div><div class="v">33,180.00</div>
+      <span class="delta down">▼ 8.1%<span class="cmp">vs 上月同期</span></span></div>
+    <div class="card kpi"><div class="t">存貨總額</div><div class="v">244,197.54</div>
+      <span class="delta up">▲ 2.0%<span class="cmp">vs 上月同期</span></span></div>
+  </div>
+
+  <div class="row">
+    <div class="card">
+      <h2>訂單管道</h2>
+      <div class="stage"><span>草稿</span><div class="bar" style="width:9%;background:#94a3b8"></div><span class="n">2</span></div>
+      <div class="stage"><span>已確認</span><div class="bar" style="width:92%;background:#2563eb"></div><span class="n">22</span></div>
+      <div class="stage"><span>已出貨</span><div class="bar" style="width:75%;background:#0ea5e9"></div><span class="n">18</span></div>
+      <div class="stage"><span>已結案</span><div class="bar" style="width:75%;background:#14b8a6"></div><span class="n">18</span></div>
+    </div>
+    <div class="card">
+      <h2>庫存狀態</h2>
+      <div class="donut"></div>
+      <div class="legend"><span><span class="dot" style="background:#2563eb"></span>原材料 161,702</span>
+        <span><span class="dot" style="background:#14b8a6"></span>成品 82,496</span></div>
+    </div>
+    <div class="card">
+      <h2>提醒</h2>
+      <div class="alert warn">⚠ 庫存不足品項 <a href="#">查看清單 →</a><span class="cnt">3</span></div>
+      <div class="alert crit">⏰ 逾期應收(90 天以上)<a href="#" style="color:inherit">帳齡表 →</a><span class="cnt">8,820</span></div>
+      <div class="alert ok">✓ 過渡科目全數歸零 · 試算表已平衡</div>
+    </div>
+  </div>
+
+  <div class="fn">
+    設計重點:<b>①</b> KPI 卡加趨勢 delta(API 已回 deltaPct;口徑改「vs 上月同期(MTD)」)
+    <b>②</b> 淨利負值紅字(red.9,對比 7:1)+ 說明 chip 取代冷冰數字
+    <b>③</b> 「實際資料」徽章整頁一枚(移到頁首),個別卡片不重複
+    <b>④</b> 漏斗改水平階段條 + 階段標籤,數字右對齊 tabular-nums
+    <b>⑤</b> 提醒卡壓縮高度、每列附行動連結,與左側卡片等高平衡。
+  </div>
+</body>
+</html>
