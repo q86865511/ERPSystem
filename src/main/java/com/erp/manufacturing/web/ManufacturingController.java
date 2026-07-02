@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -52,27 +55,31 @@ public class ManufacturingController {
         return oeeService.downtime();
     }
 
-    public record CreateBomComponent(Long componentItemId, BigDecimal qtyPer, BigDecimal scrapPct) {
+    // scrapPct is optional — the domain defaults null to zero (a reserved allowance column).
+    public record CreateBomComponent(@NotNull Long componentItemId, @NotNull BigDecimal qtyPer,
+                                     BigDecimal scrapPct) {
     }
 
-    public record CreateBomRequest(Long parentItemId, BigDecimal outputQty,
-                                   List<CreateBomComponent> components) {
+    public record CreateBomRequest(@NotNull Long parentItemId, @NotNull BigDecimal outputQty,
+                                   @NotEmpty @Valid List<CreateBomComponent> components) {
     }
 
-    public record CreateWorkOrderRequest(Long itemId, Long bomId, BigDecimal qtyToProduce) {
+    public record CreateWorkOrderRequest(@NotNull Long itemId, @NotNull Long bomId,
+                                         @NotNull BigDecimal qtyToProduce) {
     }
 
-    public record IssueRequest(Long stockLocationId, LocalDate postingDate) {
+    public record IssueRequest(@NotNull Long stockLocationId, LocalDate postingDate) {
     }
 
-    public record CompleteRequest(BigDecimal qtyProduced, Long stockLocationId, LocalDate postingDate) {
+    public record CompleteRequest(@NotNull BigDecimal qtyProduced, @NotNull Long stockLocationId,
+                                  LocalDate postingDate) {
     }
 
-    public record CancelRequest(Long stockLocationId, LocalDate postingDate) {
+    public record CancelRequest(@NotNull Long stockLocationId, LocalDate postingDate) {
     }
 
     @PostMapping("/boms")
-    public ResponseEntity<BomResponse> createBom(@RequestBody CreateBomRequest request,
+    public ResponseEntity<BomResponse> createBom(@Valid @RequestBody CreateBomRequest request,
                                                  Principal principal) {
         List<ComponentInput> components = request.components().stream()
                 .map(c -> new ComponentInput(c.componentItemId(), c.qtyPer(), c.scrapPct())).toList();
@@ -92,7 +99,7 @@ public class ManufacturingController {
     }
 
     @PostMapping("/work-orders")
-    public ResponseEntity<WorkOrderResponse> createWorkOrder(@RequestBody CreateWorkOrderRequest request,
+    public ResponseEntity<WorkOrderResponse> createWorkOrder(@Valid @RequestBody CreateWorkOrderRequest request,
                                                              Principal principal) {
         WorkOrderResponse body = WorkOrderResponse.from(workOrderService.create(request.itemId(),
                 request.bomId(), request.qtyToProduce(), actor(principal)));
@@ -105,7 +112,7 @@ public class ManufacturingController {
     }
 
     @PostMapping("/work-orders/{id}/issue")
-    public WorkOrderResponse issue(@PathVariable Long id, @RequestBody IssueRequest request,
+    public WorkOrderResponse issue(@PathVariable Long id, @Valid @RequestBody IssueRequest request,
                                    Principal principal) {
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
         return WorkOrderResponse.from(workOrderService.issue(id, request.stockLocationId(), postingDate,
@@ -113,7 +120,7 @@ public class ManufacturingController {
     }
 
     @PostMapping("/work-orders/{id}/complete")
-    public WorkOrderResponse complete(@PathVariable Long id, @RequestBody CompleteRequest request,
+    public WorkOrderResponse complete(@PathVariable Long id, @Valid @RequestBody CompleteRequest request,
                                       Principal principal) {
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
         return WorkOrderResponse.from(workOrderService.complete(id, request.qtyProduced(),
@@ -121,7 +128,7 @@ public class ManufacturingController {
     }
 
     @PostMapping("/work-orders/{id}/cancel")
-    public WorkOrderResponse cancel(@PathVariable Long id, @RequestBody CancelRequest request,
+    public WorkOrderResponse cancel(@PathVariable Long id, @Valid @RequestBody CancelRequest request,
                                     Principal principal) {
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
         return WorkOrderResponse.from(workOrderService.cancel(id, request.stockLocationId(), postingDate,

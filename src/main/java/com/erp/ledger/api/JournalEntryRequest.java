@@ -1,6 +1,10 @@
 package com.erp.ledger.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,13 +19,13 @@ import java.util.List;
  */
 public record JournalEntryRequest(
         String journalCode,
-        LocalDate postingDate,
+        @NotNull LocalDate postingDate,
         String memo,
         String currencyCode,
         String sourceDocType,
         String sourceDocId,
         String sourceEvent,
-        List<Line> lines) {
+        @NotEmpty @Valid List<Line> lines) {
 
     /**
      * One leg. {@code partnerId} is an optional analytic dimension (the vendor/customer the line
@@ -29,8 +33,8 @@ public record JournalEntryRequest(
      * callers are unaffected.
      */
     @Schema(name = "JournalEntryLine")
-    public record Line(String accountCode, BigDecimal debit, BigDecimal credit, String memo,
-                       Long partnerId) {
+    public record Line(@NotBlank String accountCode, @NotNull BigDecimal debit, @NotNull BigDecimal credit,
+                       String memo, Long partnerId) {
 
         public Line(String accountCode, BigDecimal debit, BigDecimal credit, String memo) {
             this(accountCode, debit, credit, memo, null);

@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -53,28 +56,30 @@ public class PurchasingController {
         return supplierPerformanceService.performance();
     }
 
-    public record CreatePoLine(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice) {
+    public record CreatePoLine(@NotNull Long itemId, @NotNull BigDecimal qtyOrdered,
+                               @NotNull BigDecimal unitPrice) {
     }
 
-    public record CreatePoRequest(Long partnerId, LocalDate orderDate, List<CreatePoLine> lines) {
+    public record CreatePoRequest(@NotNull Long partnerId, @NotNull LocalDate orderDate,
+                                  @NotEmpty @Valid List<CreatePoLine> lines) {
     }
 
-    public record ReceiptLine(Long poLineId, BigDecimal qty) {
+    public record ReceiptLine(@NotNull Long poLineId, @NotNull BigDecimal qty) {
     }
 
-    public record CreateGrnRequest(Long purchaseOrderId, Long stockLocationId, LocalDate postingDate,
-                                   List<ReceiptLine> lines) {
+    public record CreateGrnRequest(@NotNull Long purchaseOrderId, @NotNull Long stockLocationId,
+                                   LocalDate postingDate, @NotEmpty @Valid List<ReceiptLine> lines) {
     }
 
-    public record BillLine(Long poLineId, BigDecimal qty, BigDecimal unitPrice) {
+    public record BillLine(@NotNull Long poLineId, @NotNull BigDecimal qty, @NotNull BigDecimal unitPrice) {
     }
 
-    public record CreateBillRequest(Long purchaseOrderId, String taxRateCode, LocalDate postingDate,
-                                    List<BillLine> lines) {
+    public record CreateBillRequest(@NotNull Long purchaseOrderId, String taxRateCode, LocalDate postingDate,
+                                    @NotEmpty @Valid List<BillLine> lines) {
     }
 
     @PostMapping("/purchase-orders")
-    public ResponseEntity<PurchaseOrderResponse> createOrder(@RequestBody CreatePoRequest request,
+    public ResponseEntity<PurchaseOrderResponse> createOrder(@Valid @RequestBody CreatePoRequest request,
                                                              Principal principal) {
         String actor = actor(principal);
         List<PoLineInput> lines = request.lines().stream()
@@ -100,7 +105,7 @@ public class PurchasingController {
     }
 
     @PostMapping("/goods-receipts")
-    public ResponseEntity<GoodsReceiptResponse> receive(@RequestBody CreateGrnRequest request,
+    public ResponseEntity<GoodsReceiptResponse> receive(@Valid @RequestBody CreateGrnRequest request,
                                                         Principal principal) {
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
         List<ReceiptLineInput> lines = request.lines().stream()
@@ -122,7 +127,7 @@ public class PurchasingController {
     }
 
     @PostMapping("/vendor-bills")
-    public ResponseEntity<VendorBillResponse> postBill(@RequestBody CreateBillRequest request,
+    public ResponseEntity<VendorBillResponse> postBill(@Valid @RequestBody CreateBillRequest request,
                                                        Principal principal) {
         LocalDate postingDate = request.postingDate() != null ? request.postingDate() : LocalDate.now();
         String taxRateCode = request.taxRateCode() != null ? request.taxRateCode() : "STANDARD";

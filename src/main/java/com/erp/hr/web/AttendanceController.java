@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -28,12 +30,13 @@ public class AttendanceController {
         this.attendanceService = attendanceService;
     }
 
-    public record CreateAttendanceRequest(Long employeeId, LocalDate workDate, AttendanceStatus status,
-                                          BigDecimal workedHours, String note) {
+    public record CreateAttendanceRequest(@NotNull Long employeeId, @NotNull LocalDate workDate,
+                                          @NotNull AttendanceStatus status, BigDecimal workedHours,
+                                          String note) {
     }
 
     @PostMapping
-    public ResponseEntity<AttendanceResponse> record(@RequestBody CreateAttendanceRequest request) {
+    public ResponseEntity<AttendanceResponse> record(@Valid @RequestBody CreateAttendanceRequest request) {
         AttendanceResponse body = AttendanceResponse.from(attendanceService.record(request.employeeId(),
                 request.workDate(), request.status(), request.workedHours(), request.note()));
         return ResponseEntity.status(HttpStatus.CREATED).body(body);

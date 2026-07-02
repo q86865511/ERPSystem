@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -29,12 +31,13 @@ public class LeaveController {
         this.leaveService = leaveService;
     }
 
-    public record CreateLeaveRequest(Long employeeId, LeaveType leaveType, LocalDate startDate,
-                                     LocalDate endDate, BigDecimal days, String reason) {
+    public record CreateLeaveRequest(@NotNull Long employeeId, @NotNull LeaveType leaveType,
+                                     @NotNull LocalDate startDate, @NotNull LocalDate endDate,
+                                     @NotNull BigDecimal days, String reason) {
     }
 
     @PostMapping
-    public ResponseEntity<LeaveRequestResponse> submit(@RequestBody CreateLeaveRequest request) {
+    public ResponseEntity<LeaveRequestResponse> submit(@Valid @RequestBody CreateLeaveRequest request) {
         LeaveRequestResponse body = LeaveRequestResponse.from(leaveService.submit(request.employeeId(),
                 request.leaveType(), request.startDate(), request.endDate(), request.days(),
                 request.reason()));

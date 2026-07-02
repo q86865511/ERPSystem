@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,19 +31,23 @@ public class HrController {
         this.hrService = hrService;
     }
 
-    public record CreateDepartmentRequest(String code, String name, String budgetAccountCode) {
+    // budgetAccountCode / standardSalary / monthlySalary / status are optional at the domain boundary.
+    public record CreateDepartmentRequest(@NotBlank String code, @NotBlank String name,
+                                          String budgetAccountCode) {
     }
 
-    public record CreatePositionRequest(String code, String title, BigDecimal standardSalary) {
+    public record CreatePositionRequest(@NotBlank String code, @NotBlank String title,
+                                        BigDecimal standardSalary) {
     }
 
-    public record CreateEmployeeRequest(String code, String firstName, String lastName, Long departmentId,
-                                        Long positionId, BigDecimal monthlySalary, EmploymentStatus status,
-                                        LocalDate hireDate) {
+    public record CreateEmployeeRequest(@NotBlank String code, @NotBlank String firstName,
+                                        @NotBlank String lastName, @NotNull Long departmentId,
+                                        @NotNull Long positionId, BigDecimal monthlySalary,
+                                        EmploymentStatus status, @NotNull LocalDate hireDate) {
     }
 
     @PostMapping("/departments")
-    public ResponseEntity<DepartmentResponse> createDepartment(@RequestBody CreateDepartmentRequest request) {
+    public ResponseEntity<DepartmentResponse> createDepartment(@Valid @RequestBody CreateDepartmentRequest request) {
         DepartmentResponse body = DepartmentResponse.from(
                 hrService.createDepartment(request.code(), request.name(), request.budgetAccountCode()));
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
@@ -57,7 +64,7 @@ public class HrController {
     }
 
     @PostMapping("/positions")
-    public ResponseEntity<PositionResponse> createPosition(@RequestBody CreatePositionRequest request) {
+    public ResponseEntity<PositionResponse> createPosition(@Valid @RequestBody CreatePositionRequest request) {
         PositionResponse body = PositionResponse.from(
                 hrService.createPosition(request.code(), request.title(), request.standardSalary()));
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
@@ -74,7 +81,7 @@ public class HrController {
     }
 
     @PostMapping("/employees")
-    public ResponseEntity<EmployeeResponse> createEmployee(@RequestBody CreateEmployeeRequest request) {
+    public ResponseEntity<EmployeeResponse> createEmployee(@Valid @RequestBody CreateEmployeeRequest request) {
         EmployeeResponse body = EmployeeResponse.from(hrService.createEmployee(
                 request.code(), request.firstName(), request.lastName(), request.departmentId(),
                 request.positionId(), request.monthlySalary(), request.status(), request.hireDate()));
