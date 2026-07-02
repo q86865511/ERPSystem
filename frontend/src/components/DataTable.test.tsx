@@ -23,6 +23,20 @@ describe('DataTable', () => {
     expect(screen.getByText('Nothing here')).toBeInTheDocument();
   });
 
+  it('renders the emptyCta alongside the empty message when there are no rows', () => {
+    renderWithProviders(
+      <DataTable<Row>
+        columns={columns}
+        rows={[]}
+        rowKey={(r) => r.id}
+        emptyMessage="Nothing here"
+        emptyCta={<button>Add the first one</button>}
+      />,
+    );
+    expect(screen.getByText('Nothing here')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add the first one' })).toBeInTheDocument();
+  });
+
   it('renders a semantic table and the row cells', () => {
     renderWithProviders(
       <DataTable<Row> columns={columns} rows={[{ id: 1, name: 'Acme' }]} rowKey={(r) => r.id} emptyMessage="none" />,

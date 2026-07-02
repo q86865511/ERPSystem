@@ -1,4 +1,4 @@
-import { Badge, Card, Group, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Card, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { BarChart, LineChart } from '@mantine/charts';
 import {
   IconBuildingBank,
@@ -8,6 +8,7 @@ import {
   IconScale,
   IconUsers,
 } from '@tabler/icons-react';
+import { LiveBadge } from '../../components/LiveBadge';
 import { KpiTile, parseDeltaPct } from '../../components/charts/KpiTile';
 import { DonutCard, type DonutDatum } from '../../components/charts/DonutCard';
 import { agingColors, compactNumber, moneyToNumber } from '../../components/charts/palette';
@@ -50,11 +51,6 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
   const cashFlow = useCashFlow(6, asOf);
   const budget = useBudgetVariance(asOf);
 
-  const live = (
-    <Badge color="teal" variant="light" size="sm">
-      {t('reporting.overview.liveData')}
-    </Badge>
-  );
   const agingData = (d: AgingReport | undefined): DonutDatum[] => [
     { name: t('sales.arAging.current'), amount: d?.current, color: agingColors[0] },
     { name: t('sales.arAging.days1to30'), amount: d?.days1to30, color: agingColors[1] },
@@ -89,30 +85,32 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
 
   return (
     <Stack gap="md">
+      <Group justify="flex-end">
+        <LiveBadge />
+      </Group>
+
       <SimpleGrid cols={{ base: 1, xs: 2, md: 3, lg: 6 }}>
-        <KpiTile label={t('reporting.overview.totalReceivables')} value={ar.data?.total} icon={<IconUsers size={16} />} status={live} />
-        <KpiTile label={t('reporting.overview.totalPayables')} value={ap.data?.total} icon={<IconFileInvoice size={16} />} status={live} />
-        <KpiTile label={t('reporting.overview.netIncome')} value={is.data?.netIncome} icon={<IconChartPie size={16} />} status={live} />
-        <KpiTile label={t('reporting.overview.totalAssets')} value={bs.data?.totalAssets} icon={<IconBuildingBank size={16} />} status={live} />
-        <KpiTile label={t('reporting.overview.totalEquity')} value={bs.data?.totalEquity} icon={<IconScale size={16} />} status={live} />
+        <KpiTile label={t('reporting.overview.totalReceivables')} value={ar.data?.total} icon={<IconUsers size={16} />} />
+        <KpiTile label={t('reporting.overview.totalPayables')} value={ap.data?.total} icon={<IconFileInvoice size={16} />} />
+        <KpiTile label={t('reporting.overview.netIncome')} value={is.data?.netIncome} icon={<IconChartPie size={16} />} />
+        <KpiTile label={t('reporting.overview.totalAssets')} value={bs.data?.totalAssets} icon={<IconBuildingBank size={16} />} />
+        <KpiTile label={t('reporting.overview.totalEquity')} value={bs.data?.totalEquity} icon={<IconScale size={16} />} />
         <KpiTile
           label={t('reporting.overview.cash')}
           value={kpi.data?.netCash?.current}
           icon={<IconCash size={16} />}
-          status={live}
           delta={netCashDelta}
           deltaLabel={t('dashboard.kpiBasis')}
         />
       </SimpleGrid>
 
       <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }}>
-        <DonutCard title={t('reporting.overview.arAgingTitle')} badge={live} data={agingData(ar.data)} centerLabel={formatMoney(ar.data?.total)} />
-        <DonutCard title={t('reporting.overview.apAgingTitle')} badge={live} data={agingData(ap.data)} centerLabel={formatMoney(ap.data?.total)} />
+        <DonutCard title={t('reporting.overview.arAgingTitle')} data={agingData(ar.data)} centerLabel={formatMoney(ar.data?.total)} />
+        <DonutCard title={t('reporting.overview.apAgingTitle')} data={agingData(ap.data)} centerLabel={formatMoney(ap.data?.total)} />
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('reporting.overview.plTitle')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('reporting.overview.plTitle')}
+          </Text>
           <BarChart
             h={190}
             data={plData}
@@ -128,10 +126,9 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
 
       <SimpleGrid cols={{ base: 1, lg: 3 }}>
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('reporting.overview.revenueTrendTitle')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('reporting.overview.revenueTrendTitle')}
+          </Text>
           <LineChart
             h={190}
             data={revTrendData}
@@ -147,10 +144,9 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
           />
         </Card>
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('reporting.overview.cashFlowTitle')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('reporting.overview.cashFlowTitle')}
+          </Text>
           <BarChart
             h={190}
             data={cashFlowData}
@@ -166,10 +162,9 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
           />
         </Card>
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('reporting.overview.budgetVariance')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('reporting.overview.budgetVariance')}
+          </Text>
           <BarChart
             h={190}
             data={budgetData}

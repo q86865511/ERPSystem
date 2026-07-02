@@ -1,5 +1,6 @@
 import { Badge, Card, Group, Progress, SimpleGrid, Stack, Text } from '@mantine/core';
 import { IconAlertTriangle, IconBox, IconReportAnalytics } from '@tabler/icons-react';
+import { LiveBadge } from '../../components/LiveBadge';
 import { KpiTile } from '../../components/charts/KpiTile';
 import { DonutCard, type DonutDatum } from '../../components/charts/DonutCard';
 import { ItemsTreemap } from '../../components/charts/ItemsTreemap';
@@ -16,12 +17,6 @@ export function InventoryDashboardPanel() {
   const reorder = useReorderReport();
   const itemsStatus = useItemsStatus();
   const supplierPerf = useSupplierPerformance();
-
-  const live = (
-    <Badge color="teal" variant="light" size="sm">
-      {t('reporting.overview.liveData')}
-    </Badge>
-  );
 
   const invLabel = (code?: string) =>
     code === '1310' ? t('dashboard.overview.raw') : code === '1320' ? t('dashboard.overview.wip') : code === '1330' ? t('dashboard.overview.finished') : (code ?? '—');
@@ -44,20 +39,23 @@ export function InventoryDashboardPanel() {
 
   return (
     <Stack gap="md">
+      <Group justify="flex-end">
+        <LiveBadge />
+      </Group>
+
       <SimpleGrid cols={{ base: 1, xs: 3 }}>
-        <KpiTile label={t('inventory.dash.inventoryValue')} value={invTotal} icon={<IconBox size={16} />} status={live} />
-        <KpiTile label={t('inventory.dash.reorderCount')} value={String(items.length)} money={false} icon={<IconAlertTriangle size={16} />} status={live} />
-        <KpiTile label={t('inventory.dash.supplierPerf')} value={overallOnTime} money={false} icon={<IconReportAnalytics size={16} />} status={live} />
+        <KpiTile label={t('inventory.dash.inventoryValue')} value={invTotal} icon={<IconBox size={16} />} />
+        <KpiTile label={t('inventory.dash.reorderCount')} value={String(items.length)} money={false} icon={<IconAlertTriangle size={16} />} />
+        <KpiTile label={t('inventory.dash.supplierPerf')} value={overallOnTime} money={false} icon={<IconReportAnalytics size={16} />} />
       </SimpleGrid>
 
       <SimpleGrid cols={{ base: 1, md: 2 }}>
-        <DonutCard title={t('inventory.dash.category')} badge={live} data={invData} centerLabel={formatMoney(invTotal)} />
+        <DonutCard title={t('inventory.dash.category')} data={invData} centerLabel={formatMoney(invTotal)} />
 
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('inventory.dash.reorderTitle')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('inventory.dash.reorderTitle')}
+          </Text>
           {items.length === 0 ? (
             <Text c="dimmed" size="sm" py="lg" ta="center">
               —
@@ -96,10 +94,9 @@ export function InventoryDashboardPanel() {
 
       <SimpleGrid cols={{ base: 1, md: 2 }}>
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('inventory.dash.heatmap')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('inventory.dash.heatmap')}
+          </Text>
           {treemapData.length === 0 ? (
             <Text c="dimmed" size="sm" py="lg" ta="center">
               —
@@ -109,10 +106,9 @@ export function InventoryDashboardPanel() {
           )}
         </Card>
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('inventory.dash.supplierPerf')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('inventory.dash.supplierPerf')}
+          </Text>
           {suppliers.length === 0 ? (
             <Text c="dimmed" size="sm" py="lg" ta="center">
               —

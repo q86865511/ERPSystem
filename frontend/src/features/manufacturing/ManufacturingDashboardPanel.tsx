@@ -1,5 +1,6 @@
-import { Badge, Card, Group, Progress, RingProgress, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Card, Group, Progress, RingProgress, SimpleGrid, Stack, Text } from '@mantine/core';
 import { IconChecklist, IconClipboardList, IconProgressCheck } from '@tabler/icons-react';
+import { LiveBadge } from '../../components/LiveBadge';
 import { KpiTile } from '../../components/charts/KpiTile';
 import { GanttBoard } from '../../components/charts/GanttBoard';
 import { DonutCard, type DonutDatum } from '../../components/charts/DonutCard';
@@ -20,12 +21,6 @@ export function ManufacturingDashboardPanel() {
   const wos = wo.data ?? [];
   const oee = useOee();
   const downtime = useDowntime();
-
-  const live = (
-    <Badge color="teal" variant="light" size="sm">
-      {t('reporting.overview.liveData')}
-    </Badge>
-  );
 
   const wip = wos.filter((w) => WIP_STATES.has(w.status ?? '')).length;
   const totalTo = wos.reduce((s, w) => s + moneyToNumber(w.qtyToProduce), 0);
@@ -60,18 +55,21 @@ export function ManufacturingDashboardPanel() {
 
   return (
     <Stack gap="md">
+      <Group justify="flex-end">
+        <LiveBadge />
+      </Group>
+
       <SimpleGrid cols={{ base: 1, xs: 3 }}>
-        <KpiTile label={t('manufacturing.dash.wip')} value={String(wip)} money={false} icon={<IconProgressCheck size={16} />} status={live} />
-        <KpiTile label={t('manufacturing.dash.achievement')} value={achievement} money={false} icon={<IconChecklist size={16} />} status={live} />
-        <KpiTile label={t('manufacturing.dash.output')} value={String(Math.round(totalDone))} money={false} icon={<IconClipboardList size={16} />} status={live} />
+        <KpiTile label={t('manufacturing.dash.wip')} value={String(wip)} money={false} icon={<IconProgressCheck size={16} />} />
+        <KpiTile label={t('manufacturing.dash.achievement')} value={achievement} money={false} icon={<IconChecklist size={16} />} />
+        <KpiTile label={t('manufacturing.dash.output')} value={String(Math.round(totalDone))} money={false} icon={<IconClipboardList size={16} />} />
       </SimpleGrid>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }}>
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('manufacturing.dash.progressBoard')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('manufacturing.dash.progressBoard')}
+          </Text>
           {active.length === 0 ? (
             <Text c="dimmed" size="sm" py="lg" ta="center">
               —
@@ -104,10 +102,9 @@ export function ManufacturingDashboardPanel() {
         </Card>
 
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('manufacturing.dash.dispatchQueue')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('manufacturing.dash.dispatchQueue')}
+          </Text>
           {dispatch.length === 0 ? (
             <Text c="dimmed" size="sm" py="lg" ta="center">
               —
@@ -133,10 +130,9 @@ export function ManufacturingDashboardPanel() {
       </SimpleGrid>
 
       <Card withBorder padding="md">
-        <Group justify="space-between" mb="sm" wrap="nowrap">
-          <Text fw={500}>{t('manufacturing.dash.gantt')}</Text>
-          {live}
-        </Group>
+        <Text fw={500} mb="sm">
+          {t('manufacturing.dash.gantt')}
+        </Text>
         {scheduled.length === 0 ? (
           <Text c="dimmed" size="sm" py="lg" ta="center">
             —
@@ -148,10 +144,9 @@ export function ManufacturingDashboardPanel() {
 
       <SimpleGrid cols={{ base: 1, md: 2 }}>
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('manufacturing.dash.oee')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('manufacturing.dash.oee')}
+          </Text>
           {machines.length === 0 ? (
             <Text c="dimmed" size="sm" py="lg" ta="center">
               —
@@ -184,7 +179,6 @@ export function ManufacturingDashboardPanel() {
 
         <DonutCard
           title={t('manufacturing.dash.downtime')}
-          badge={live}
           data={downtimeData}
           centerLabel={`${totalDowntime}m`}
         />

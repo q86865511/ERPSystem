@@ -173,6 +173,10 @@ export function AppLayout() {
       navbar={{ width: 260, breakpoint: 'sm', collapsed: { mobile: !opened } }}
       padding="md"
     >
+      <a href="#main-content" className={classes.skipLink}>
+        {t('app.skipToContent')}
+      </a>
+
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between">
           <Group gap="sm">
@@ -345,7 +349,7 @@ export function AppLayout() {
         </ScrollArea>
       </AppShell.Navbar>
 
-      <AppShell.Main>
+      <AppShell.Main id="main-content" tabIndex={-1}>
         <Suspense
           fallback={
             <Center py="xl">

@@ -130,3 +130,17 @@ describe('AppLayout navigation (ERP-001)', () => {
     expect(screen.getByRole('button', { name: /sales/i })).toHaveAttribute('aria-expanded', 'false');
   });
 });
+
+describe('AppLayout skip link (a11y)', () => {
+  beforeEach(() => {
+    localStorage.setItem('erp.locale', 'en');
+  });
+
+  it('renders a skip-to-content link targeting the main landmark', () => {
+    renderApp('/');
+    const link = screen.getByRole('link', { name: 'Skip to main content' });
+    expect(link).toHaveAttribute('href', '#main-content');
+    // AppShell.Main carries the id the link points at, so activating it moves focus into content.
+    expect(document.getElementById('main-content')).not.toBeNull();
+  });
+});

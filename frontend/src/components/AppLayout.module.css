@@ -1,3 +1,23 @@
+/* "Skip to main content" link: offscreen until keyboard-focused, then it drops into view above the
+   header so keyboard/screen-reader users can bypass the sidebar nav (a11y, §6.4 #13). */
+.skipLink {
+  position: absolute;
+  top: -60px;
+  left: 8px;
+  z-index: 1000;
+  padding: 10px 16px;
+  border-radius: var(--mantine-radius-sm);
+  background-color: var(--mantine-color-brand-6);
+  color: var(--mantine-color-white);
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 100ms ease;
+}
+
+.skipLink:focus-visible {
+  top: 8px;
+}
+
 /* Sidebar parent row: a navigating label (flex-filled link) + an independent expand/collapse chevron.
    Splitting the two hit-areas is the ERP-001 fix — Mantine's collapsible NavLink swallows the click. */
 .parentRow {
