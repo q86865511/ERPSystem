@@ -4,13 +4,13 @@ import { IconAlertTriangle, IconBox, IconChartPie, IconClockExclamation, IconCoi
 import { useAuth } from '../auth/useAuth';
 import { useI18n } from '../i18n';
 import { LiveBadge } from '../components/LiveBadge';
-import { KpiTile } from '../components/charts/KpiTile';
+import { KpiTile, parseDeltaPct } from '../components/charts/KpiTile';
 import { DonutCard, type DonutDatum } from '../components/charts/DonutCard';
 import { categoryColors, chartSeries } from '../components/charts/palette';
 import { formatMoney, sumMoney } from '../components/Money';
 import { ReconciliationHero } from '../features/reporting/ReconciliationHero';
 import { compactNumber, moneyToNumber } from '../components/charts/palette';
-import { useIncomeStatement, useRevenueTrend } from '../features/reporting/api';
+import { useIncomeStatement, useKpiSummary, useRevenueTrend } from '../features/reporting/api';
 import { useArAging, useOrders as useSalesOrders } from '../features/sales/api';
 import { useInventoryReconciliation } from '../features/inventory/api';
 import { useReorderReport } from '../features/manufacturing/api';
@@ -26,11 +26,13 @@ export function DashboardPage() {
   const inv = useInventoryReconciliation();
   const reorder = useReorderReport();
   const revenueTrend = useRevenueTrend(6);
+  const kpi = useKpiSummary();
 
   const live = <LiveBadge />;
 
   const kpisLoading = is.isLoading || ar.isLoading || so.isLoading || inv.isLoading;
   const netIncomeNegative = Number(is.data?.netIncome ?? 0) < 0;
+  const revenueDelta = parseDeltaPct(kpi.data?.revenue?.deltaPct);
 
   const orders = so.data ?? [];
   const created = orders.length;
@@ -80,7 +82,14 @@ export function DashboardPage() {
           ))
         ) : (
           <>
-            <KpiTile label={t('dashboard.overview.revenue')} value={is.data?.totalRevenue} icon={<IconCoin size={16} />} status={live} />
+            <KpiTile
+              label={t('dashboard.overview.revenue')}
+              value={is.data?.totalRevenue}
+              icon={<IconCoin size={16} />}
+              status={live}
+              delta={revenueDelta}
+              deltaLabel={t('dashboard.kpiBasis')}
+            />
             <KpiTile label={t('dashboard.netIncome')} value={is.data?.netIncome} icon={<IconChartPie size={16} />} status={live} valueColor={netIncomeNegative ? 'var(--erp-negative-text)' : undefined} />
             <KpiTile label={t('dashboard.overview.orders')} value={String(created)} money={false} icon={<IconFileInvoice size={16} />} status={live} />
             <KpiTile label={t('dashboard.overview.receivables')} value={ar.data?.total} icon={<IconUsers size={16} />} status={live} />

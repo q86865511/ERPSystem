@@ -109,6 +109,7 @@ export const zhTW: Messages = {
     totalAssets: '總資產',
     totalLiabilities: '總負債',
     netIncome: '淨利',
+    kpiBasis: 'vs 上月同期',
     overview: {
       revenue: '營業收入',
       orders: '訂單數',

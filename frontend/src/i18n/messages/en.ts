@@ -117,6 +117,7 @@ export const en = {
     totalAssets: 'Total assets',
     totalLiabilities: 'Total liabilities',
     netIncome: 'Net income',
+    kpiBasis: 'vs same period last month',
     overview: {
       revenue: 'Revenue',
       orders: 'Orders',
