@@ -30,6 +30,8 @@ import com.erp.purchasing.application.VendorBillService;
 import com.erp.purchasing.application.VendorBillService.BillLineInput;
 import com.erp.purchasing.domain.PurchaseOrder;
 import com.erp.purchasing.domain.VendorBill;
+import com.erp.reporting.application.BudgetRepository;
+import com.erp.reporting.domain.Budget;
 import com.erp.sales.application.DeliveryService;
 import com.erp.sales.application.DeliveryService.DeliveryLineInput;
 import com.erp.sales.application.SalesInvoiceService;
@@ -83,6 +85,7 @@ public class DataSeeder implements ApplicationRunner {
     private final LeaveService leaveService;
     private final TimesheetService timesheetService;
     private final PayrollService payrollService;
+    private final BudgetRepository budgetRepository;
     private final MasterDataService masterDataService;
     private final MasterDataQuery masterDataQuery;
     private final WarehouseRepository warehouseRepository;
@@ -105,12 +108,14 @@ public class DataSeeder implements ApplicationRunner {
                       SalesOrderService salesOrderService, DeliveryService deliveryService,
                       SalesInvoiceService salesInvoiceService, HrService hrService,
                       AttendanceService attendanceService, LeaveService leaveService,
-                      TimesheetService timesheetService, PayrollService payrollService) {
+                      TimesheetService timesheetService, PayrollService payrollService,
+                      BudgetRepository budgetRepository) {
         this.hrService = hrService;
         this.attendanceService = attendanceService;
         this.leaveService = leaveService;
         this.timesheetService = timesheetService;
         this.payrollService = payrollService;
+        this.budgetRepository = budgetRepository;
         this.masterDataService = masterDataService;
         this.masterDataQuery = masterDataQuery;
         this.warehouseRepository = warehouseRepository;
@@ -188,6 +193,20 @@ public class DataSeeder implements ApplicationRunner {
                 invoice.getInvoiceNumber());
 
         seedRichDemoData(stock, today);
+        seedBudgets(today.getYear());
+    }
+
+    /** Seed a monthly budget for the key P&L accounts so the budget-variance report has targets. */
+    private void seedBudgets(int year) {
+        record BudgetLine(String account, String amount) {}
+        List<BudgetLine> budgets = List.of(
+                new BudgetLine("4100", "260000"),   // Sales revenue
+                new BudgetLine("5100", "150000"),   // COGS
+                new BudgetLine("6100", "560000"));  // Salaries expense
+        for (BudgetLine b : budgets) {
+            budgetRepository.save(new Budget(year, b.account(), new BigDecimal(b.amount())));
+        }
+        log.info("Budget seed complete: {} account budgets for {}.", budgets.size(), year);
     }
 
     private Long stockLocationId() {
