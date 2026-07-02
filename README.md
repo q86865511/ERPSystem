@@ -60,9 +60,15 @@
 
 <p align="center"><img src="docs/screenshots/01-dashboard.png" alt="儀表板 — 對帳 hero" width="100%"></p>
 
-| 採購 P2P | 製造(工單狀態機) | 財務報表 |
+| 採購 P2P | 製造(工單狀態機 + 排程 Gantt) | 財務報表 + 財會分析 |
 |---|---|---|
 | <img src="docs/screenshots/03-purchasing.png" alt="採購"> | <img src="docs/screenshots/05-manufacturing.png" alt="製造"> | <img src="docs/screenshots/07-reporting.png" alt="財報"> |
+
+**人力資源模組(員工 / 考勤 / 請假 / 工時 / 薪資過帳)+ 深後端分析 widget**(財會分析 / 庫存熱度 treemap / 供應商準時率):
+
+| 人資儀表板 | 薪資 → 總帳 | 庫存熱度 + 供應商準時率 |
+|---|---|---|
+| <img src="docs/screenshots/12-hr-dashboard.png" alt="人資儀表板"> | <img src="docs/screenshots/13-hr-payroll.png" alt="薪資過帳"> | <img src="docs/screenshots/06-inventory.png" alt="庫存分析"> |
 
 **「Blue Enterprise」重設計**(藍色企業主色 + 深色模式 + 手刻新手導覽):
 

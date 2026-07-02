@@ -5,48 +5,54 @@
     "roles": [
       "ACCOUNTANT",
       "ADMIN",
+      "HR",
       "SALES",
       "WAREHOUSE"
     ]
   },
   "get": {
     "/api/reporting/income-statement": {
-      "asOf": "2026-07-01",
+      "asOf": "2026-07-02",
       "revenue": [
         {
           "code": "4100",
           "name": "Sales Revenue",
-          "amount": "600.0000"
+          "amount": "133700.0000"
         }
       ],
       "expenses": [
         {
           "code": "5100",
           "name": "COGS",
-          "amount": "300.0000"
+          "amount": "85172.4501"
+        },
+        {
+          "code": "6100",
+          "name": "Salaries Expense",
+          "amount": "532000.0000"
         }
       ],
-      "totalRevenue": "600.0000",
-      "totalExpenses": "300.0000",
-      "netIncome": "300.0000"
+      "totalRevenue": "133700.0000",
+      "totalExpenses": "617172.4501",
+      "netIncome": "-483472.4501"
     },
     "/api/reporting/balance-sheet": {
-      "asOf": "2026-07-01",
+      "asOf": "2026-07-02",
       "assets": [
         {
           "code": "1010",
           "name": "Cash / Bank",
-          "amount": "-420.0000"
+          "amount": "-191593.5000"
         },
         {
           "code": "1200",
           "name": "Accounts Receivable",
-          "amount": "0.0000"
+          "amount": "33180.0000"
         },
         {
           "code": "1310",
           "name": "Inventory - Raw Materials",
-          "amount": "500.0000"
+          "amount": "161701.6185"
         },
         {
           "code": "1320",
@@ -56,7 +62,7 @@
         {
           "code": "1330",
           "name": "Inventory - Finished Goods",
-          "amount": "200.0000"
+          "amount": "82495.9314"
         },
         {
           "code": "1340",
@@ -66,14 +72,14 @@
         {
           "code": "1450",
           "name": "Input VAT",
-          "amount": "50.0000"
+          "amount": "16468.5000"
         }
       ],
       "liabilities": [
         {
           "code": "2100",
           "name": "Accounts Payable",
-          "amount": "0.0000"
+          "amount": "47040.0000"
         },
         {
           "code": "2150",
@@ -81,147 +87,190 @@
           "amount": "0.0000"
         },
         {
+          "code": "2200",
+          "name": "Net Pay Payable",
+          "amount": "473480.0000"
+        },
+        {
+          "code": "2210",
+          "name": "Employee Tax Withheld",
+          "amount": "31920.0000"
+        },
+        {
+          "code": "2220",
+          "name": "Insurance Payable",
+          "amount": "26600.0000"
+        },
+        {
           "code": "2400",
           "name": "Output VAT Payable",
-          "amount": "30.0000"
+          "amount": "6685.0000"
         }
       ],
       "equity": [
         {
           "code": "RE",
           "name": "Current-period earnings",
-          "amount": "300.0000"
+          "amount": "-483472.4501"
         }
       ],
-      "totalAssets": "330.0000",
-      "totalLiabilities": "30.0000",
-      "totalEquity": "300.0000",
-      "netIncome": "300.0000",
+      "totalAssets": "102252.5499",
+      "totalLiabilities": "585725.0000",
+      "totalEquity": "-483472.4501",
+      "netIncome": "-483472.4501",
       "balanced": true
     },
     "/api/reporting/trial-balance": {
-      "asOf": "2026-07-01",
+      "asOf": "2026-07-02",
       "lines": [
         {
           "code": "1010",
           "name": "Cash / Bank",
           "accountClass": "ASSET",
-          "debit": "630.0000",
-          "credit": "1050.0000"
+          "debit": "107205.0000",
+          "credit": "298798.5000"
         },
         {
           "code": "1200",
           "name": "Accounts Receivable",
           "accountClass": "ASSET",
-          "debit": "630.0000",
-          "credit": "630.0000"
+          "debit": "140385.0000",
+          "credit": "107205.0000"
         },
         {
           "code": "1310",
           "name": "Inventory - Raw Materials",
           "accountClass": "ASSET",
-          "debit": "1000.0000",
-          "credit": "500.0000"
+          "debit": "329370.0000",
+          "credit": "167668.3815"
         },
         {
           "code": "1320",
           "name": "Work-In-Process (WIP)",
           "accountClass": "ASSET",
-          "debit": "500.0000",
-          "credit": "500.0000"
+          "debit": "167668.3815",
+          "credit": "167668.3815"
         },
         {
           "code": "1330",
           "name": "Inventory - Finished Goods",
           "accountClass": "ASSET",
-          "debit": "500.0000",
-          "credit": "300.0000"
+          "debit": "167668.3815",
+          "credit": "85172.4501"
         },
         {
           "code": "1340",
           "name": "Deferred COGS (Shipped Not Invoiced)",
           "accountClass": "ASSET",
-          "debit": "300.0000",
-          "credit": "300.0000"
+          "debit": "85172.4501",
+          "credit": "85172.4501"
         },
         {
           "code": "1450",
           "name": "Input VAT",
           "accountClass": "ASSET",
-          "debit": "50.0000",
+          "debit": "16468.5000",
           "credit": "0.0000"
         },
         {
           "code": "2100",
           "name": "Accounts Payable",
           "accountClass": "LIABILITY",
-          "debit": "1050.0000",
-          "credit": "1050.0000"
+          "debit": "298798.5000",
+          "credit": "345838.5000"
         },
         {
           "code": "2150",
           "name": "GR-IR Clearing",
           "accountClass": "LIABILITY",
-          "debit": "1000.0000",
-          "credit": "1000.0000"
+          "debit": "329370.0000",
+          "credit": "329370.0000"
+        },
+        {
+          "code": "2200",
+          "name": "Net Pay Payable",
+          "accountClass": "LIABILITY",
+          "debit": "0.0000",
+          "credit": "473480.0000"
+        },
+        {
+          "code": "2210",
+          "name": "Employee Tax Withheld",
+          "accountClass": "LIABILITY",
+          "debit": "0.0000",
+          "credit": "31920.0000"
+        },
+        {
+          "code": "2220",
+          "name": "Insurance Payable",
+          "accountClass": "LIABILITY",
+          "debit": "0.0000",
+          "credit": "26600.0000"
         },
         {
           "code": "2400",
           "name": "Output VAT Payable",
           "accountClass": "LIABILITY",
           "debit": "0.0000",
-          "credit": "30.0000"
+          "credit": "6685.0000"
         },
         {
           "code": "4100",
           "name": "Sales Revenue",
           "accountClass": "REVENUE",
           "debit": "0.0000",
-          "credit": "600.0000"
+          "credit": "133700.0000"
         },
         {
           "code": "5100",
           "name": "COGS",
           "accountClass": "EXPENSE",
-          "debit": "300.0000",
+          "debit": "85172.4501",
+          "credit": "0.0000"
+        },
+        {
+          "code": "6100",
+          "name": "Salaries Expense",
+          "accountClass": "EXPENSE",
+          "debit": "532000.0000",
           "credit": "0.0000"
         }
       ],
-      "totalDebit": "5960.0000",
-      "totalCredit": "5960.0000",
+      "totalDebit": "2259278.6632",
+      "totalCredit": "2259278.6632",
       "balanced": true
     },
     "/api/reporting/reconciliation": {
-      "asOf": "2026-07-01",
+      "asOf": "2026-07-02",
       "healthy": true,
       "trialBalanceBalanced": true,
       "subledgerChecks": [
         {
           "label": "Inventory",
           "accountCode": "1310",
-          "subledger": "500.0000",
-          "glControl": "500.0000",
+          "subledger": "161701.6185",
+          "glControl": "161701.6185",
           "reconciled": true
         },
         {
           "label": "Inventory",
           "accountCode": "1330",
-          "subledger": "200.0000",
-          "glControl": "200.0000",
+          "subledger": "82495.9314",
+          "glControl": "82495.9314",
           "reconciled": true
         },
         {
           "label": "Accounts Payable",
           "accountCode": "2100",
-          "subledger": "0",
-          "glControl": "0.0000",
+          "subledger": "47040.0000",
+          "glControl": "47040.0000",
           "reconciled": true
         },
         {
           "label": "Accounts Receivable",
           "accountCode": "1200",
-          "subledger": "0",
-          "glControl": "0.0000",
+          "subledger": "33180.0000",
+          "glControl": "33180.0000",
           "reconciled": true
         }
       ],
@@ -248,11 +297,425 @@
     },
     "/api/sales/sales-orders": [
       {
+        "id": 24,
+        "soNumber": "SO-000024",
+        "partnerId": 8,
+        "orderDate": "2026-07-02",
+        "status": "DRAFT",
+        "lines": [
+          {
+            "id": 24,
+            "lineNo": 1,
+            "itemId": 13,
+            "qtyOrdered": "5.000000",
+            "qtyShipped": "0.000000",
+            "qtyInvoiced": "0.000000",
+            "unitPrice": "780.000000"
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "soNumber": "SO-000023",
+        "partnerId": 12,
+        "orderDate": "2026-07-02",
+        "status": "DRAFT",
+        "lines": [
+          {
+            "id": 23,
+            "lineNo": 1,
+            "itemId": 14,
+            "qtyOrdered": "8.000000",
+            "qtyShipped": "0.000000",
+            "qtyInvoiced": "0.000000",
+            "unitPrice": "560.000000"
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "soNumber": "SO-000022",
+        "partnerId": 11,
+        "orderDate": "2026-07-02",
+        "status": "CONFIRMED",
+        "lines": [
+          {
+            "id": 22,
+            "lineNo": 1,
+            "itemId": 15,
+            "qtyOrdered": "9.000000",
+            "qtyShipped": "0.000000",
+            "qtyInvoiced": "0.000000",
+            "unitPrice": "510.000000"
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "soNumber": "SO-000021",
+        "partnerId": 10,
+        "orderDate": "2026-07-02",
+        "status": "CONFIRMED",
+        "lines": [
+          {
+            "id": 21,
+            "lineNo": 1,
+            "itemId": 13,
+            "qtyOrdered": "6.000000",
+            "qtyShipped": "0.000000",
+            "qtyInvoiced": "0.000000",
+            "unitPrice": "780.000000"
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "soNumber": "SO-000020",
+        "partnerId": 9,
+        "orderDate": "2026-07-02",
+        "status": "CONFIRMED",
+        "lines": [
+          {
+            "id": 20,
+            "lineNo": 1,
+            "itemId": 12,
+            "qtyOrdered": "10.000000",
+            "qtyShipped": "0.000000",
+            "qtyInvoiced": "0.000000",
+            "unitPrice": "430.000000"
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "soNumber": "SO-000019",
+        "partnerId": 8,
+        "orderDate": "2026-07-02",
+        "status": "CONFIRMED",
+        "lines": [
+          {
+            "id": 19,
+            "lineNo": 1,
+            "itemId": 11,
+            "qtyOrdered": "12.000000",
+            "qtyShipped": "0.000000",
+            "qtyInvoiced": "0.000000",
+            "unitPrice": "620.000000"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "soNumber": "SO-000018",
+        "partnerId": 9,
+        "orderDate": "2026-07-02",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 18,
+            "lineNo": 1,
+            "itemId": 12,
+            "qtyOrdered": "8.000000",
+            "qtyShipped": "8.000000",
+            "qtyInvoiced": "8.000000",
+            "unitPrice": "430.000000"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "soNumber": "SO-000017",
+        "partnerId": 8,
+        "orderDate": "2026-06-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 17,
+            "lineNo": 1,
+            "itemId": 11,
+            "qtyOrdered": "8.000000",
+            "qtyShipped": "8.000000",
+            "qtyInvoiced": "8.000000",
+            "unitPrice": "620.000000"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "soNumber": "SO-000016",
+        "partnerId": 12,
+        "orderDate": "2026-05-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 16,
+            "lineNo": 1,
+            "itemId": 15,
+            "qtyOrdered": "8.000000",
+            "qtyShipped": "8.000000",
+            "qtyInvoiced": "8.000000",
+            "unitPrice": "510.000000"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "soNumber": "SO-000015",
+        "partnerId": 11,
+        "orderDate": "2026-04-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 15,
+            "lineNo": 1,
+            "itemId": 14,
+            "qtyOrdered": "8.000000",
+            "qtyShipped": "8.000000",
+            "qtyInvoiced": "8.000000",
+            "unitPrice": "560.000000"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "soNumber": "SO-000014",
+        "partnerId": 10,
+        "orderDate": "2026-03-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 14,
+            "lineNo": 1,
+            "itemId": 13,
+            "qtyOrdered": "8.000000",
+            "qtyShipped": "8.000000",
+            "qtyInvoiced": "8.000000",
+            "unitPrice": "780.000000"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "soNumber": "SO-000013",
+        "partnerId": 9,
+        "orderDate": "2026-02-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 13,
+            "lineNo": 1,
+            "itemId": 12,
+            "qtyOrdered": "8.000000",
+            "qtyShipped": "8.000000",
+            "qtyInvoiced": "8.000000",
+            "unitPrice": "430.000000"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "soNumber": "SO-000012",
+        "partnerId": 8,
+        "orderDate": "2026-01-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 12,
+            "lineNo": 1,
+            "itemId": 11,
+            "qtyOrdered": "8.000000",
+            "qtyShipped": "8.000000",
+            "qtyInvoiced": "8.000000",
+            "unitPrice": "620.000000"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "soNumber": "SO-000011",
+        "partnerId": 8,
+        "orderDate": "2026-06-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 11,
+            "lineNo": 1,
+            "itemId": 15,
+            "qtyOrdered": "15.000000",
+            "qtyShipped": "15.000000",
+            "qtyInvoiced": "15.000000",
+            "unitPrice": "510.000000"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "soNumber": "SO-000010",
+        "partnerId": 12,
+        "orderDate": "2026-05-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 10,
+            "lineNo": 1,
+            "itemId": 15,
+            "qtyOrdered": "20.000000",
+            "qtyShipped": "20.000000",
+            "qtyInvoiced": "20.000000",
+            "unitPrice": "510.000000"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "soNumber": "SO-000009",
+        "partnerId": 12,
+        "orderDate": "2026-06-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 9,
+            "lineNo": 1,
+            "itemId": 14,
+            "qtyOrdered": "15.000000",
+            "qtyShipped": "15.000000",
+            "qtyInvoiced": "15.000000",
+            "unitPrice": "560.000000"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "soNumber": "SO-000008",
+        "partnerId": 11,
+        "orderDate": "2026-05-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 8,
+            "lineNo": 1,
+            "itemId": 14,
+            "qtyOrdered": "20.000000",
+            "qtyShipped": "20.000000",
+            "qtyInvoiced": "20.000000",
+            "unitPrice": "560.000000"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "soNumber": "SO-000007",
+        "partnerId": 11,
+        "orderDate": "2026-06-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 7,
+            "lineNo": 1,
+            "itemId": 13,
+            "qtyOrdered": "15.000000",
+            "qtyShipped": "15.000000",
+            "qtyInvoiced": "15.000000",
+            "unitPrice": "780.000000"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "soNumber": "SO-000006",
+        "partnerId": 10,
+        "orderDate": "2026-05-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 6,
+            "lineNo": 1,
+            "itemId": 13,
+            "qtyOrdered": "20.000000",
+            "qtyShipped": "20.000000",
+            "qtyInvoiced": "20.000000",
+            "unitPrice": "780.000000"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "soNumber": "SO-000005",
+        "partnerId": 10,
+        "orderDate": "2026-06-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 5,
+            "lineNo": 1,
+            "itemId": 12,
+            "qtyOrdered": "15.000000",
+            "qtyShipped": "15.000000",
+            "qtyInvoiced": "15.000000",
+            "unitPrice": "430.000000"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "soNumber": "SO-000004",
+        "partnerId": 9,
+        "orderDate": "2026-05-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 4,
+            "lineNo": 1,
+            "itemId": 12,
+            "qtyOrdered": "20.000000",
+            "qtyShipped": "20.000000",
+            "qtyInvoiced": "20.000000",
+            "unitPrice": "430.000000"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "soNumber": "SO-000003",
+        "partnerId": 9,
+        "orderDate": "2026-06-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 3,
+            "lineNo": 1,
+            "itemId": 11,
+            "qtyOrdered": "15.000000",
+            "qtyShipped": "15.000000",
+            "qtyInvoiced": "15.000000",
+            "unitPrice": "620.000000"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "soNumber": "SO-000002",
+        "partnerId": 8,
+        "orderDate": "2026-05-15",
+        "status": "CLOSED",
+        "lines": [
+          {
+            "id": 2,
+            "lineNo": 1,
+            "itemId": 11,
+            "qtyOrdered": "20.000000",
+            "qtyShipped": "20.000000",
+            "qtyInvoiced": "20.000000",
+            "unitPrice": "620.000000"
+          }
+        ]
+      },
+      {
         "id": 1,
         "soNumber": "SO-000001",
         "partnerId": 2,
-        "orderDate": "2026-06-30",
-        "status": "SHIPPED",
+        "orderDate": "2026-07-02",
+        "status": "CLOSED",
         "lines": [
           {
             "id": 1,
@@ -268,12 +731,335 @@
     ],
     "/api/sales/deliveries": [
       {
+        "id": 18,
+        "deliveryNumber": "DLV-000018",
+        "salesOrderId": 18,
+        "postingDate": "2026-07-02",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:37.540169Z",
+        "lines": [
+          {
+            "id": 18,
+            "soLineId": 18,
+            "itemId": 12,
+            "qtyShipped": "8.000000",
+            "unitCost": "278.156819",
+            "movementGroupId": "bcb74d86-a5bf-4f13-8ac4-685615439a4a",
+            "journalEntryId": 150
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "deliveryNumber": "DLV-000017",
+        "salesOrderId": 17,
+        "postingDate": "2026-06-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:37.501134Z",
+        "lines": [
+          {
+            "id": 17,
+            "soLineId": 17,
+            "itemId": 11,
+            "qtyShipped": "8.000000",
+            "unitCost": "347.232242",
+            "movementGroupId": "443faf77-66dc-4bb5-89a8-6ff913e18e19",
+            "journalEntryId": 148
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "deliveryNumber": "DLV-000016",
+        "salesOrderId": 16,
+        "postingDate": "2026-05-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:37.464728Z",
+        "lines": [
+          {
+            "id": 16,
+            "soLineId": 16,
+            "itemId": 15,
+            "qtyShipped": "8.000000",
+            "unitCost": "299.634236",
+            "movementGroupId": "931c3c3f-a3ad-4001-96d9-e9f45e27d8b2",
+            "journalEntryId": 146
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "deliveryNumber": "DLV-000015",
+        "salesOrderId": 15,
+        "postingDate": "2026-04-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:37.428073Z",
+        "lines": [
+          {
+            "id": 15,
+            "soLineId": 15,
+            "itemId": 14,
+            "qtyShipped": "8.000000",
+            "unitCost": "485.355102",
+            "movementGroupId": "42e1ddfc-951f-40a5-9b29-573eddce0b86",
+            "journalEntryId": 144
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "deliveryNumber": "DLV-000014",
+        "salesOrderId": 14,
+        "postingDate": "2026-03-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:37.389912Z",
+        "lines": [
+          {
+            "id": 14,
+            "soLineId": 14,
+            "itemId": 13,
+            "qtyShipped": "8.000000",
+            "unitCost": "447.048062",
+            "movementGroupId": "e805ddc1-7c05-447c-96ee-d5619fae97e2",
+            "journalEntryId": 142
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "deliveryNumber": "DLV-000013",
+        "salesOrderId": 13,
+        "postingDate": "2026-02-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:37.351074Z",
+        "lines": [
+          {
+            "id": 13,
+            "soLineId": 13,
+            "itemId": 12,
+            "qtyShipped": "8.000000",
+            "unitCost": "278.156819",
+            "movementGroupId": "ef92fb76-a21d-4cb1-93d8-41e89b6cf47e",
+            "journalEntryId": 140
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "deliveryNumber": "DLV-000012",
+        "salesOrderId": 12,
+        "postingDate": "2026-01-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:37.298951Z",
+        "lines": [
+          {
+            "id": 12,
+            "soLineId": 12,
+            "itemId": 11,
+            "qtyShipped": "8.000000",
+            "unitCost": "347.232242",
+            "movementGroupId": "890718cc-bb60-4c91-b7ad-350b06f07930",
+            "journalEntryId": 138
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "deliveryNumber": "DLV-000011",
+        "salesOrderId": 11,
+        "postingDate": "2026-06-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:37.245567Z",
+        "lines": [
+          {
+            "id": 11,
+            "soLineId": 11,
+            "itemId": 15,
+            "qtyShipped": "15.000000",
+            "unitCost": "299.634236",
+            "movementGroupId": "32b0f7de-680e-4efb-82d5-5995aef93ad3",
+            "journalEntryId": 135
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "deliveryNumber": "DLV-000010",
+        "salesOrderId": 10,
+        "postingDate": "2026-05-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:37.183094Z",
+        "lines": [
+          {
+            "id": 10,
+            "soLineId": 10,
+            "itemId": 15,
+            "qtyShipped": "20.000000",
+            "unitCost": "299.634236",
+            "movementGroupId": "3fdba587-0a8b-401f-830e-379a5c59c6e3",
+            "journalEntryId": 132
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "deliveryNumber": "DLV-000009",
+        "salesOrderId": 9,
+        "postingDate": "2026-06-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:37.096631Z",
+        "lines": [
+          {
+            "id": 9,
+            "soLineId": 9,
+            "itemId": 14,
+            "qtyShipped": "15.000000",
+            "unitCost": "485.355102",
+            "movementGroupId": "699d54ba-7111-4d4e-94af-2dfa4de20f2f",
+            "journalEntryId": 129
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "deliveryNumber": "DLV-000008",
+        "salesOrderId": 8,
+        "postingDate": "2026-05-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:37.035897Z",
+        "lines": [
+          {
+            "id": 8,
+            "soLineId": 8,
+            "itemId": 14,
+            "qtyShipped": "20.000000",
+            "unitCost": "485.355102",
+            "movementGroupId": "70af0e99-3fb3-4d10-91c5-45d43cb6f650",
+            "journalEntryId": 126
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "deliveryNumber": "DLV-000007",
+        "salesOrderId": 7,
+        "postingDate": "2026-06-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:36.976747Z",
+        "lines": [
+          {
+            "id": 7,
+            "soLineId": 7,
+            "itemId": 13,
+            "qtyShipped": "15.000000",
+            "unitCost": "447.048062",
+            "movementGroupId": "2e5bdce2-ea9a-40dd-a2f5-4137c90c1810",
+            "journalEntryId": 123
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "deliveryNumber": "DLV-000006",
+        "salesOrderId": 6,
+        "postingDate": "2026-05-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:36.925783Z",
+        "lines": [
+          {
+            "id": 6,
+            "soLineId": 6,
+            "itemId": 13,
+            "qtyShipped": "20.000000",
+            "unitCost": "447.048062",
+            "movementGroupId": "5e072fa4-4f6c-4062-9d0b-5ce67de08c9e",
+            "journalEntryId": 120
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "deliveryNumber": "DLV-000005",
+        "salesOrderId": 5,
+        "postingDate": "2026-06-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:36.872585Z",
+        "lines": [
+          {
+            "id": 5,
+            "soLineId": 5,
+            "itemId": 12,
+            "qtyShipped": "15.000000",
+            "unitCost": "278.156819",
+            "movementGroupId": "58d5c6f0-600c-433f-b483-2b7887ec3aa8",
+            "journalEntryId": 117
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "deliveryNumber": "DLV-000004",
+        "salesOrderId": 4,
+        "postingDate": "2026-05-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:36.819137Z",
+        "lines": [
+          {
+            "id": 4,
+            "soLineId": 4,
+            "itemId": 12,
+            "qtyShipped": "20.000000",
+            "unitCost": "278.156819",
+            "movementGroupId": "e1314d04-9111-4280-88cb-57152a7dce12",
+            "journalEntryId": 114
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "deliveryNumber": "DLV-000003",
+        "salesOrderId": 3,
+        "postingDate": "2026-06-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:36.766097Z",
+        "lines": [
+          {
+            "id": 3,
+            "soLineId": 3,
+            "itemId": 11,
+            "qtyShipped": "15.000000",
+            "unitCost": "347.232242",
+            "movementGroupId": "3682ced4-8ef0-40d3-b9c0-8a67d94a6fd0",
+            "journalEntryId": 111
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "deliveryNumber": "DLV-000002",
+        "salesOrderId": 2,
+        "postingDate": "2026-05-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:36.703759Z",
+        "lines": [
+          {
+            "id": 2,
+            "soLineId": 2,
+            "itemId": 11,
+            "qtyShipped": "20.000000",
+            "unitCost": "347.232242",
+            "movementGroupId": "bcdffe20-f033-4443-bec2-66a9a21e4de7",
+            "journalEntryId": 108
+          }
+        ]
+      },
+      {
         "id": 1,
         "deliveryNumber": "DLV-000001",
         "salesOrderId": 1,
-        "postingDate": "2026-06-30",
+        "postingDate": "2026-07-02",
         "status": "POSTED",
-        "postedAt": "2026-06-30T21:00:23.246872Z",
+        "postedAt": "2026-07-02T04:13:33.938109Z",
         "lines": [
           {
             "id": 1,
@@ -281,19 +1067,495 @@
             "itemId": 2,
             "qtyShipped": "30.000000",
             "unitCost": "10.000000",
-            "movementGroupId": "177b9ee8-a436-4fae-99b8-c8530c9925a5",
-            "journalEntryId": 6
+            "movementGroupId": "5f76e1c1-8919-460a-94da-9588cdcc7d59",
+            "journalEntryId": 7
           }
         ]
       }
     ],
     "/api/sales/sales-invoices": [
       {
+        "id": 18,
+        "invoiceNumber": "INV-000018",
+        "salesOrderId": 18,
+        "partnerId": 9,
+        "postingDate": "2026-07-02",
+        "goodsAmount": "3440.0000",
+        "vatAmount": "172.0000",
+        "cogsAmount": "2225.2546",
+        "grossAmount": "3612.0000",
+        "amountReceived": "0.0000",
+        "openBalance": "3612.0000",
+        "status": "POSTED",
+        "journalEntryId": 151,
+        "postedAt": "2026-07-02T04:13:37.567142Z",
+        "lines": [
+          {
+            "id": 18,
+            "soLineId": 18,
+            "itemId": 12,
+            "qty": "8.000000",
+            "unitPrice": "430.000000",
+            "lineNet": "3440.0000",
+            "lineVat": "172.0000",
+            "lineCogs": "2225.2546"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "invoiceNumber": "INV-000017",
+        "salesOrderId": 17,
+        "partnerId": 8,
+        "postingDate": "2026-06-15",
+        "goodsAmount": "4960.0000",
+        "vatAmount": "248.0000",
+        "cogsAmount": "2777.8579",
+        "grossAmount": "5208.0000",
+        "amountReceived": "0.0000",
+        "openBalance": "5208.0000",
+        "status": "POSTED",
+        "journalEntryId": 149,
+        "postedAt": "2026-07-02T04:13:37.525618Z",
+        "lines": [
+          {
+            "id": 17,
+            "soLineId": 17,
+            "itemId": 11,
+            "qty": "8.000000",
+            "unitPrice": "620.000000",
+            "lineNet": "4960.0000",
+            "lineVat": "248.0000",
+            "lineCogs": "2777.8579"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "invoiceNumber": "INV-000016",
+        "salesOrderId": 16,
+        "partnerId": 12,
+        "postingDate": "2026-05-15",
+        "goodsAmount": "4080.0000",
+        "vatAmount": "204.0000",
+        "cogsAmount": "2397.0739",
+        "grossAmount": "4284.0000",
+        "amountReceived": "0.0000",
+        "openBalance": "4284.0000",
+        "status": "POSTED",
+        "journalEntryId": 147,
+        "postedAt": "2026-07-02T04:13:37.489389Z",
+        "lines": [
+          {
+            "id": 16,
+            "soLineId": 16,
+            "itemId": 15,
+            "qty": "8.000000",
+            "unitPrice": "510.000000",
+            "lineNet": "4080.0000",
+            "lineVat": "204.0000",
+            "lineCogs": "2397.0739"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "invoiceNumber": "INV-000015",
+        "salesOrderId": 15,
+        "partnerId": 11,
+        "postingDate": "2026-04-15",
+        "goodsAmount": "4480.0000",
+        "vatAmount": "224.0000",
+        "cogsAmount": "3882.8408",
+        "grossAmount": "4704.0000",
+        "amountReceived": "0.0000",
+        "openBalance": "4704.0000",
+        "status": "POSTED",
+        "journalEntryId": 145,
+        "postedAt": "2026-07-02T04:13:37.452569Z",
+        "lines": [
+          {
+            "id": 15,
+            "soLineId": 15,
+            "itemId": 14,
+            "qty": "8.000000",
+            "unitPrice": "560.000000",
+            "lineNet": "4480.0000",
+            "lineVat": "224.0000",
+            "lineCogs": "3882.8408"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "invoiceNumber": "INV-000014",
+        "salesOrderId": 14,
+        "partnerId": 10,
+        "postingDate": "2026-03-15",
+        "goodsAmount": "6240.0000",
+        "vatAmount": "312.0000",
+        "cogsAmount": "3576.3845",
+        "grossAmount": "6552.0000",
+        "amountReceived": "0.0000",
+        "openBalance": "6552.0000",
+        "status": "POSTED",
+        "journalEntryId": 143,
+        "postedAt": "2026-07-02T04:13:37.415436Z",
+        "lines": [
+          {
+            "id": 14,
+            "soLineId": 14,
+            "itemId": 13,
+            "qty": "8.000000",
+            "unitPrice": "780.000000",
+            "lineNet": "6240.0000",
+            "lineVat": "312.0000",
+            "lineCogs": "3576.3845"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "invoiceNumber": "INV-000013",
+        "salesOrderId": 13,
+        "partnerId": 9,
+        "postingDate": "2026-02-15",
+        "goodsAmount": "3440.0000",
+        "vatAmount": "172.0000",
+        "cogsAmount": "2225.2546",
+        "grossAmount": "3612.0000",
+        "amountReceived": "0.0000",
+        "openBalance": "3612.0000",
+        "status": "POSTED",
+        "journalEntryId": 141,
+        "postedAt": "2026-07-02T04:13:37.376984Z",
+        "lines": [
+          {
+            "id": 13,
+            "soLineId": 13,
+            "itemId": 12,
+            "qty": "8.000000",
+            "unitPrice": "430.000000",
+            "lineNet": "3440.0000",
+            "lineVat": "172.0000",
+            "lineCogs": "2225.2546"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "invoiceNumber": "INV-000012",
+        "salesOrderId": 12,
+        "partnerId": 8,
+        "postingDate": "2026-01-15",
+        "goodsAmount": "4960.0000",
+        "vatAmount": "248.0000",
+        "cogsAmount": "2777.8579",
+        "grossAmount": "5208.0000",
+        "amountReceived": "0.0000",
+        "openBalance": "5208.0000",
+        "status": "POSTED",
+        "journalEntryId": 139,
+        "postedAt": "2026-07-02T04:13:37.336632Z",
+        "lines": [
+          {
+            "id": 12,
+            "soLineId": 12,
+            "itemId": 11,
+            "qty": "8.000000",
+            "unitPrice": "620.000000",
+            "lineNet": "4960.0000",
+            "lineVat": "248.0000",
+            "lineCogs": "2777.8579"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "invoiceNumber": "INV-000011",
+        "salesOrderId": 11,
+        "partnerId": 8,
+        "postingDate": "2026-06-15",
+        "goodsAmount": "7650.0000",
+        "vatAmount": "382.5000",
+        "cogsAmount": "4494.5135",
+        "grossAmount": "8032.5000",
+        "amountReceived": "8032.5000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 136,
+        "postedAt": "2026-07-02T04:13:37.272096Z",
+        "lines": [
+          {
+            "id": 11,
+            "soLineId": 11,
+            "itemId": 15,
+            "qty": "15.000000",
+            "unitPrice": "510.000000",
+            "lineNet": "7650.0000",
+            "lineVat": "382.5000",
+            "lineCogs": "4494.5135"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "invoiceNumber": "INV-000010",
+        "salesOrderId": 10,
+        "partnerId": 12,
+        "postingDate": "2026-05-15",
+        "goodsAmount": "10200.0000",
+        "vatAmount": "510.0000",
+        "cogsAmount": "5992.6847",
+        "grossAmount": "10710.0000",
+        "amountReceived": "10710.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 133,
+        "postedAt": "2026-07-02T04:13:37.218087Z",
+        "lines": [
+          {
+            "id": 10,
+            "soLineId": 10,
+            "itemId": 15,
+            "qty": "20.000000",
+            "unitPrice": "510.000000",
+            "lineNet": "10200.0000",
+            "lineVat": "510.0000",
+            "lineCogs": "5992.6847"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "invoiceNumber": "INV-000009",
+        "salesOrderId": 9,
+        "partnerId": 12,
+        "postingDate": "2026-06-15",
+        "goodsAmount": "8400.0000",
+        "vatAmount": "420.0000",
+        "cogsAmount": "7280.3265",
+        "grossAmount": "8820.0000",
+        "amountReceived": "8820.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 130,
+        "postedAt": "2026-07-02T04:13:37.139964Z",
+        "lines": [
+          {
+            "id": 9,
+            "soLineId": 9,
+            "itemId": 14,
+            "qty": "15.000000",
+            "unitPrice": "560.000000",
+            "lineNet": "8400.0000",
+            "lineVat": "420.0000",
+            "lineCogs": "7280.3265"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "invoiceNumber": "INV-000008",
+        "salesOrderId": 8,
+        "partnerId": 11,
+        "postingDate": "2026-05-15",
+        "goodsAmount": "11200.0000",
+        "vatAmount": "560.0000",
+        "cogsAmount": "9707.1020",
+        "grossAmount": "11760.0000",
+        "amountReceived": "11760.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 127,
+        "postedAt": "2026-07-02T04:13:37.068274Z",
+        "lines": [
+          {
+            "id": 8,
+            "soLineId": 8,
+            "itemId": 14,
+            "qty": "20.000000",
+            "unitPrice": "560.000000",
+            "lineNet": "11200.0000",
+            "lineVat": "560.0000",
+            "lineCogs": "9707.1020"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "invoiceNumber": "INV-000007",
+        "salesOrderId": 7,
+        "partnerId": 11,
+        "postingDate": "2026-06-15",
+        "goodsAmount": "11700.0000",
+        "vatAmount": "585.0000",
+        "cogsAmount": "6705.7209",
+        "grossAmount": "12285.0000",
+        "amountReceived": "12285.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 124,
+        "postedAt": "2026-07-02T04:13:37.007089Z",
+        "lines": [
+          {
+            "id": 7,
+            "soLineId": 7,
+            "itemId": 13,
+            "qty": "15.000000",
+            "unitPrice": "780.000000",
+            "lineNet": "11700.0000",
+            "lineVat": "585.0000",
+            "lineCogs": "6705.7209"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "invoiceNumber": "INV-000006",
+        "salesOrderId": 6,
+        "partnerId": 10,
+        "postingDate": "2026-05-15",
+        "goodsAmount": "15600.0000",
+        "vatAmount": "780.0000",
+        "cogsAmount": "8940.9612",
+        "grossAmount": "16380.0000",
+        "amountReceived": "16380.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 121,
+        "postedAt": "2026-07-02T04:13:36.953159Z",
+        "lines": [
+          {
+            "id": 6,
+            "soLineId": 6,
+            "itemId": 13,
+            "qty": "20.000000",
+            "unitPrice": "780.000000",
+            "lineNet": "15600.0000",
+            "lineVat": "780.0000",
+            "lineCogs": "8940.9612"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "invoiceNumber": "INV-000005",
+        "salesOrderId": 5,
+        "partnerId": 10,
+        "postingDate": "2026-06-15",
+        "goodsAmount": "6450.0000",
+        "vatAmount": "322.5000",
+        "cogsAmount": "4172.3523",
+        "grossAmount": "6772.5000",
+        "amountReceived": "6772.5000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 118,
+        "postedAt": "2026-07-02T04:13:36.900225Z",
+        "lines": [
+          {
+            "id": 5,
+            "soLineId": 5,
+            "itemId": 12,
+            "qty": "15.000000",
+            "unitPrice": "430.000000",
+            "lineNet": "6450.0000",
+            "lineVat": "322.5000",
+            "lineCogs": "4172.3523"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "invoiceNumber": "INV-000004",
+        "salesOrderId": 4,
+        "partnerId": 9,
+        "postingDate": "2026-05-15",
+        "goodsAmount": "8600.0000",
+        "vatAmount": "430.0000",
+        "cogsAmount": "5563.1364",
+        "grossAmount": "9030.0000",
+        "amountReceived": "9030.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 115,
+        "postedAt": "2026-07-02T04:13:36.847214Z",
+        "lines": [
+          {
+            "id": 4,
+            "soLineId": 4,
+            "itemId": 12,
+            "qty": "20.000000",
+            "unitPrice": "430.000000",
+            "lineNet": "8600.0000",
+            "lineVat": "430.0000",
+            "lineCogs": "5563.1364"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "invoiceNumber": "INV-000003",
+        "salesOrderId": 3,
+        "partnerId": 9,
+        "postingDate": "2026-06-15",
+        "goodsAmount": "9300.0000",
+        "vatAmount": "465.0000",
+        "cogsAmount": "5208.4836",
+        "grossAmount": "9765.0000",
+        "amountReceived": "9765.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 112,
+        "postedAt": "2026-07-02T04:13:36.794557Z",
+        "lines": [
+          {
+            "id": 3,
+            "soLineId": 3,
+            "itemId": 11,
+            "qty": "15.000000",
+            "unitPrice": "620.000000",
+            "lineNet": "9300.0000",
+            "lineVat": "465.0000",
+            "lineCogs": "5208.4836"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "invoiceNumber": "INV-000002",
+        "salesOrderId": 2,
+        "partnerId": 8,
+        "postingDate": "2026-05-15",
+        "goodsAmount": "12400.0000",
+        "vatAmount": "620.0000",
+        "cogsAmount": "6944.6448",
+        "grossAmount": "13020.0000",
+        "amountReceived": "13020.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 109,
+        "postedAt": "2026-07-02T04:13:36.739602Z",
+        "lines": [
+          {
+            "id": 2,
+            "soLineId": 2,
+            "itemId": 11,
+            "qty": "20.000000",
+            "unitPrice": "620.000000",
+            "lineNet": "12400.0000",
+            "lineVat": "620.0000",
+            "lineCogs": "6944.6448"
+          }
+        ]
+      },
+      {
         "id": 1,
         "invoiceNumber": "INV-000001",
         "salesOrderId": 1,
         "partnerId": 2,
-        "postingDate": "2026-06-30",
+        "postingDate": "2026-07-02",
         "goodsAmount": "600.0000",
         "vatAmount": "30.0000",
         "cogsAmount": "300.0000",
@@ -301,8 +1563,8 @@
         "amountReceived": "630.0000",
         "openBalance": "0.0000",
         "status": "PAID",
-        "journalEntryId": 7,
-        "postedAt": "2026-06-30T21:00:23.310085Z",
+        "journalEntryId": 8,
+        "postedAt": "2026-07-02T04:13:34.002292Z",
         "lines": [
           {
             "id": 1,
@@ -319,19 +1581,523 @@
     ],
     "/api/sales/customer-returns": [],
     "/api/sales/ar-aging": {
-      "current": "0",
-      "days1to30": "0",
-      "days31to60": "0",
-      "days61to90": "0",
-      "days90plus": "0",
-      "total": "0"
+      "current": "8820.0000",
+      "days1to30": "4284.0000",
+      "days31to60": "4704.0000",
+      "days61to90": "6552.0000",
+      "days90plus": "8820.0000",
+      "total": "33180.0000"
     },
     "/api/purchasing/purchase-orders": [
+      {
+        "id": 29,
+        "poNumber": "PO-000029",
+        "partnerId": 4,
+        "orderDate": "2026-07-02",
+        "status": "DRAFT",
+        "lines": [
+          {
+            "id": 29,
+            "lineNo": 1,
+            "itemId": 4,
+            "qtyOrdered": "90.000000",
+            "qtyReceived": "0.000000",
+            "qtyBilled": "0.000000",
+            "unitPrice": "122.000000"
+          }
+        ]
+      },
+      {
+        "id": 28,
+        "poNumber": "PO-000028",
+        "partnerId": 6,
+        "orderDate": "2026-07-02",
+        "status": "CONFIRMED",
+        "lines": [
+          {
+            "id": 28,
+            "lineNo": 1,
+            "itemId": 7,
+            "qtyOrdered": "60.000000",
+            "qtyReceived": "0.000000",
+            "qtyBilled": "0.000000",
+            "unitPrice": "203.000000"
+          }
+        ]
+      },
+      {
+        "id": 27,
+        "poNumber": "PO-000027",
+        "partnerId": 5,
+        "orderDate": "2026-07-02",
+        "status": "CONFIRMED",
+        "lines": [
+          {
+            "id": 27,
+            "lineNo": 1,
+            "itemId": 5,
+            "qtyOrdered": "120.000000",
+            "qtyReceived": "0.000000",
+            "qtyBilled": "0.000000",
+            "unitPrice": "82.000000"
+          }
+        ]
+      },
+      {
+        "id": 26,
+        "poNumber": "PO-000026",
+        "partnerId": 4,
+        "orderDate": "2026-07-02",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 26,
+            "lineNo": 1,
+            "itemId": 3,
+            "qtyOrdered": "40.000000",
+            "qtyReceived": "40.000000",
+            "qtyBilled": "40.000000",
+            "unitPrice": "160.000000"
+          }
+        ]
+      },
+      {
+        "id": 25,
+        "poNumber": "PO-000025",
+        "partnerId": 3,
+        "orderDate": "2026-06-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 25,
+            "lineNo": 1,
+            "itemId": 3,
+            "qtyOrdered": "40.000000",
+            "qtyReceived": "40.000000",
+            "qtyBilled": "40.000000",
+            "unitPrice": "160.000000"
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "poNumber": "PO-000024",
+        "partnerId": 7,
+        "orderDate": "2026-05-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 24,
+            "lineNo": 1,
+            "itemId": 6,
+            "qtyOrdered": "40.000000",
+            "qtyReceived": "40.000000",
+            "qtyBilled": "40.000000",
+            "unitPrice": "160.000000"
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "poNumber": "PO-000023",
+        "partnerId": 6,
+        "orderDate": "2026-04-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 23,
+            "lineNo": 1,
+            "itemId": 7,
+            "qtyOrdered": "40.000000",
+            "qtyReceived": "40.000000",
+            "qtyBilled": "40.000000",
+            "unitPrice": "160.000000"
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "poNumber": "PO-000022",
+        "partnerId": 5,
+        "orderDate": "2026-03-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 22,
+            "lineNo": 1,
+            "itemId": 5,
+            "qtyOrdered": "40.000000",
+            "qtyReceived": "40.000000",
+            "qtyBilled": "40.000000",
+            "unitPrice": "160.000000"
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "poNumber": "PO-000021",
+        "partnerId": 4,
+        "orderDate": "2026-02-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 21,
+            "lineNo": 1,
+            "itemId": 4,
+            "qtyOrdered": "40.000000",
+            "qtyReceived": "40.000000",
+            "qtyBilled": "40.000000",
+            "unitPrice": "160.000000"
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "poNumber": "PO-000020",
+        "partnerId": 3,
+        "orderDate": "2026-01-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 20,
+            "lineNo": 1,
+            "itemId": 3,
+            "qtyOrdered": "40.000000",
+            "qtyReceived": "40.000000",
+            "qtyBilled": "40.000000",
+            "unitPrice": "160.000000"
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "poNumber": "PO-000019",
+        "partnerId": 6,
+        "orderDate": "2026-01-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 19,
+            "lineNo": 1,
+            "itemId": 7,
+            "qtyOrdered": "40.000000",
+            "qtyReceived": "40.000000",
+            "qtyBilled": "40.000000",
+            "unitPrice": "200.000000"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "poNumber": "PO-000018",
+        "partnerId": 5,
+        "orderDate": "2026-01-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 18,
+            "lineNo": 1,
+            "itemId": 5,
+            "qtyOrdered": "30.000000",
+            "qtyReceived": "30.000000",
+            "qtyBilled": "30.000000",
+            "unitPrice": "80.000000"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "poNumber": "PO-000017",
+        "partnerId": 4,
+        "orderDate": "2026-01-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 17,
+            "lineNo": 1,
+            "itemId": 4,
+            "qtyOrdered": "20.000000",
+            "qtyReceived": "20.000000",
+            "qtyBilled": "20.000000",
+            "unitPrice": "121.000000"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "poNumber": "PO-000016",
+        "partnerId": 4,
+        "orderDate": "2026-01-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 16,
+            "lineNo": 1,
+            "itemId": 4,
+            "qtyOrdered": "45.000000",
+            "qtyReceived": "45.000000",
+            "qtyBilled": "45.000000",
+            "unitPrice": "120.000000"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "poNumber": "PO-000015",
+        "partnerId": 3,
+        "orderDate": "2026-01-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 15,
+            "lineNo": 1,
+            "itemId": 3,
+            "qtyOrdered": "30.000000",
+            "qtyReceived": "30.000000",
+            "qtyBilled": "30.000000",
+            "unitPrice": "152.000000"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "poNumber": "PO-000014",
+        "partnerId": 3,
+        "orderDate": "2026-01-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 14,
+            "lineNo": 1,
+            "itemId": 3,
+            "qtyOrdered": "40.000000",
+            "qtyReceived": "40.000000",
+            "qtyBilled": "40.000000",
+            "unitPrice": "150.000000"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "poNumber": "PO-000013",
+        "partnerId": 7,
+        "orderDate": "2026-04-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 13,
+            "lineNo": 1,
+            "itemId": 10,
+            "qtyOrdered": "15.000000",
+            "qtyReceived": "15.000000",
+            "qtyBilled": "15.000000",
+            "unitPrice": "30.000000"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "poNumber": "PO-000012",
+        "partnerId": 6,
+        "orderDate": "2026-03-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 12,
+            "lineNo": 1,
+            "itemId": 8,
+            "qtyOrdered": "20.000000",
+            "qtyReceived": "20.000000",
+            "qtyBilled": "20.000000",
+            "unitPrice": "60.000000"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "poNumber": "PO-000011",
+        "partnerId": 7,
+        "orderDate": "2026-02-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 11,
+            "lineNo": 1,
+            "itemId": 9,
+            "qtyOrdered": "10.000000",
+            "qtyReceived": "10.000000",
+            "qtyBilled": "10.000000",
+            "unitPrice": "90.000000"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "poNumber": "PO-000010",
+        "partnerId": 3,
+        "orderDate": "2026-03-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 10,
+            "lineNo": 1,
+            "itemId": 6,
+            "qtyOrdered": "200.000000",
+            "qtyReceived": "200.000000",
+            "qtyBilled": "200.000000",
+            "unitPrice": "15.000000"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "poNumber": "PO-000009",
+        "partnerId": 6,
+        "orderDate": "2026-05-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 9,
+            "lineNo": 1,
+            "itemId": 7,
+            "qtyOrdered": "200.000000",
+            "qtyReceived": "200.000000",
+            "qtyBilled": "200.000000",
+            "unitPrice": "205.000000"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "poNumber": "PO-000008",
+        "partnerId": 6,
+        "orderDate": "2026-02-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 8,
+            "lineNo": 1,
+            "itemId": 7,
+            "qtyOrdered": "220.000000",
+            "qtyReceived": "220.000000",
+            "qtyBilled": "220.000000",
+            "unitPrice": "200.000000"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "poNumber": "PO-000007",
+        "partnerId": 5,
+        "orderDate": "2026-04-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 7,
+            "lineNo": 1,
+            "itemId": 5,
+            "qtyOrdered": "200.000000",
+            "qtyReceived": "200.000000",
+            "qtyBilled": "200.000000",
+            "unitPrice": "83.000000"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "poNumber": "PO-000006",
+        "partnerId": 5,
+        "orderDate": "2026-02-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 6,
+            "lineNo": 1,
+            "itemId": 5,
+            "qtyOrdered": "220.000000",
+            "qtyReceived": "220.000000",
+            "qtyBilled": "220.000000",
+            "unitPrice": "80.000000"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "poNumber": "PO-000005",
+        "partnerId": 4,
+        "orderDate": "2026-04-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 5,
+            "lineNo": 1,
+            "itemId": 4,
+            "qtyOrdered": "260.000000",
+            "qtyReceived": "260.000000",
+            "qtyBilled": "260.000000",
+            "unitPrice": "124.000000"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "poNumber": "PO-000004",
+        "partnerId": 4,
+        "orderDate": "2026-01-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 4,
+            "lineNo": 1,
+            "itemId": 4,
+            "qtyOrdered": "280.000000",
+            "qtyReceived": "280.000000",
+            "qtyBilled": "280.000000",
+            "unitPrice": "120.000000"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "poNumber": "PO-000003",
+        "partnerId": 3,
+        "orderDate": "2026-03-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 3,
+            "lineNo": 1,
+            "itemId": 3,
+            "qtyOrdered": "200.000000",
+            "qtyReceived": "200.000000",
+            "qtyBilled": "200.000000",
+            "unitPrice": "156.000000"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "poNumber": "PO-000002",
+        "partnerId": 3,
+        "orderDate": "2026-01-15",
+        "status": "RECEIVED",
+        "lines": [
+          {
+            "id": 2,
+            "lineNo": 1,
+            "itemId": 3,
+            "qtyOrdered": "220.000000",
+            "qtyReceived": "220.000000",
+            "qtyBilled": "220.000000",
+            "unitPrice": "150.000000"
+          }
+        ]
+      },
       {
         "id": 1,
         "poNumber": "PO-000001",
         "partnerId": 1,
-        "orderDate": "2026-06-30",
+        "orderDate": "2026-07-02",
         "status": "RECEIVED",
         "lines": [
           {
@@ -348,12 +2114,487 @@
     ],
     "/api/purchasing/goods-receipts": [
       {
+        "id": 26,
+        "grnNumber": "GRN-000026",
+        "purchaseOrderId": 26,
+        "postingDate": "2026-07-02",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.891412Z",
+        "lines": [
+          {
+            "id": 26,
+            "poLineId": 26,
+            "itemId": 3,
+            "qtyReceived": "40.000000",
+            "unitCost": "160.000000",
+            "movementGroupId": "dd40a231-473f-4f3d-8557-3fb717ce3084",
+            "journalEntryId": 76
+          }
+        ]
+      },
+      {
+        "id": 25,
+        "grnNumber": "GRN-000025",
+        "purchaseOrderId": 25,
+        "postingDate": "2026-06-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.843289Z",
+        "lines": [
+          {
+            "id": 25,
+            "poLineId": 25,
+            "itemId": 3,
+            "qtyReceived": "40.000000",
+            "unitCost": "160.000000",
+            "movementGroupId": "dbbdeae3-f820-4e71-a5d1-8e139d794a0c",
+            "journalEntryId": 74
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "grnNumber": "GRN-000024",
+        "purchaseOrderId": 24,
+        "postingDate": "2026-05-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.797447Z",
+        "lines": [
+          {
+            "id": 24,
+            "poLineId": 24,
+            "itemId": 6,
+            "qtyReceived": "40.000000",
+            "unitCost": "160.000000",
+            "movementGroupId": "23fe60ac-215d-4e98-bc06-c9e7bbaecdb7",
+            "journalEntryId": 72
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "grnNumber": "GRN-000023",
+        "purchaseOrderId": 23,
+        "postingDate": "2026-04-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.749733Z",
+        "lines": [
+          {
+            "id": 23,
+            "poLineId": 23,
+            "itemId": 7,
+            "qtyReceived": "40.000000",
+            "unitCost": "160.000000",
+            "movementGroupId": "9971e81c-455e-4471-bc74-fc3e02fd3fe0",
+            "journalEntryId": 70
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "grnNumber": "GRN-000022",
+        "purchaseOrderId": 22,
+        "postingDate": "2026-03-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.708818Z",
+        "lines": [
+          {
+            "id": 22,
+            "poLineId": 22,
+            "itemId": 5,
+            "qtyReceived": "40.000000",
+            "unitCost": "160.000000",
+            "movementGroupId": "d2f9410e-ab3f-4847-b94f-7e6fccbbf149",
+            "journalEntryId": 68
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "grnNumber": "GRN-000021",
+        "purchaseOrderId": 21,
+        "postingDate": "2026-02-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.665973Z",
+        "lines": [
+          {
+            "id": 21,
+            "poLineId": 21,
+            "itemId": 4,
+            "qtyReceived": "40.000000",
+            "unitCost": "160.000000",
+            "movementGroupId": "ccd2eeb4-5a3f-47fd-ac57-2c6514d6fd2c",
+            "journalEntryId": 66
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "grnNumber": "GRN-000020",
+        "purchaseOrderId": 20,
+        "postingDate": "2026-01-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.614307Z",
+        "lines": [
+          {
+            "id": 20,
+            "poLineId": 20,
+            "itemId": 3,
+            "qtyReceived": "40.000000",
+            "unitCost": "160.000000",
+            "movementGroupId": "3fb72433-5676-4ae3-b956-2b53a0ff6474",
+            "journalEntryId": 64
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "grnNumber": "GRN-000019",
+        "purchaseOrderId": 19,
+        "postingDate": "2026-01-18",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.548368Z",
+        "lines": [
+          {
+            "id": 19,
+            "poLineId": 19,
+            "itemId": 7,
+            "qtyReceived": "40.000000",
+            "unitCost": "200.000000",
+            "movementGroupId": "e2e1e26a-1b37-48c3-9c98-80ea502c794d",
+            "journalEntryId": 61
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "grnNumber": "GRN-000018",
+        "purchaseOrderId": 18,
+        "postingDate": "2026-01-24",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.472701Z",
+        "lines": [
+          {
+            "id": 18,
+            "poLineId": 18,
+            "itemId": 5,
+            "qtyReceived": "30.000000",
+            "unitCost": "80.000000",
+            "movementGroupId": "23febc30-8290-4a32-bd43-06efc13f868c",
+            "journalEntryId": 58
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "grnNumber": "GRN-000017",
+        "purchaseOrderId": 17,
+        "postingDate": "2026-01-21",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.390306Z",
+        "lines": [
+          {
+            "id": 17,
+            "poLineId": 17,
+            "itemId": 4,
+            "qtyReceived": "20.000000",
+            "unitCost": "121.000000",
+            "movementGroupId": "845b5068-ce88-4c14-ac88-e74e9863d4cd",
+            "journalEntryId": 55
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "grnNumber": "GRN-000016",
+        "purchaseOrderId": 16,
+        "postingDate": "2026-01-21",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.314507Z",
+        "lines": [
+          {
+            "id": 16,
+            "poLineId": 16,
+            "itemId": 4,
+            "qtyReceived": "45.000000",
+            "unitCost": "120.000000",
+            "movementGroupId": "3caa994c-d7ff-4d80-b761-4ebc0414f5f9",
+            "journalEntryId": 52
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "grnNumber": "GRN-000015",
+        "purchaseOrderId": 15,
+        "postingDate": "2026-01-27",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.251114Z",
+        "lines": [
+          {
+            "id": 15,
+            "poLineId": 15,
+            "itemId": 3,
+            "qtyReceived": "30.000000",
+            "unitCost": "152.000000",
+            "movementGroupId": "2b8612ca-92dc-430b-a046-1bae5f7bd537",
+            "journalEntryId": 49
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "grnNumber": "GRN-000014",
+        "purchaseOrderId": 14,
+        "postingDate": "2026-01-20",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.160353Z",
+        "lines": [
+          {
+            "id": 14,
+            "poLineId": 14,
+            "itemId": 3,
+            "qtyReceived": "40.000000",
+            "unitCost": "150.000000",
+            "movementGroupId": "c4b727bd-149e-4f2c-b834-f577c2ed370e",
+            "journalEntryId": 46
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "grnNumber": "GRN-000013",
+        "purchaseOrderId": 13,
+        "postingDate": "2026-04-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.087783Z",
+        "lines": [
+          {
+            "id": 13,
+            "poLineId": 13,
+            "itemId": 10,
+            "qtyReceived": "15.000000",
+            "unitCost": "30.000000",
+            "movementGroupId": "09afeb05-c5e5-4039-bf5b-ce73a4f5626b",
+            "journalEntryId": 43
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "grnNumber": "GRN-000012",
+        "purchaseOrderId": 12,
+        "postingDate": "2026-03-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:35.022605Z",
+        "lines": [
+          {
+            "id": 12,
+            "poLineId": 12,
+            "itemId": 8,
+            "qtyReceived": "20.000000",
+            "unitCost": "60.000000",
+            "movementGroupId": "4510bed5-a963-41de-ba22-516b53eb5d63",
+            "journalEntryId": 40
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "grnNumber": "GRN-000011",
+        "purchaseOrderId": 11,
+        "postingDate": "2026-02-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:34.944350Z",
+        "lines": [
+          {
+            "id": 11,
+            "poLineId": 11,
+            "itemId": 9,
+            "qtyReceived": "10.000000",
+            "unitCost": "90.000000",
+            "movementGroupId": "d91f027b-e82c-4ee5-b783-8d534e44e855",
+            "journalEntryId": 37
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "grnNumber": "GRN-000010",
+        "purchaseOrderId": 10,
+        "postingDate": "2026-03-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:34.851687Z",
+        "lines": [
+          {
+            "id": 10,
+            "poLineId": 10,
+            "itemId": 6,
+            "qtyReceived": "200.000000",
+            "unitCost": "15.000000",
+            "movementGroupId": "64c7a066-0ac5-486e-8e94-cee3278fab6b",
+            "journalEntryId": 34
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "grnNumber": "GRN-000009",
+        "purchaseOrderId": 9,
+        "postingDate": "2026-05-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:34.762251Z",
+        "lines": [
+          {
+            "id": 9,
+            "poLineId": 9,
+            "itemId": 7,
+            "qtyReceived": "200.000000",
+            "unitCost": "205.000000",
+            "movementGroupId": "7649d62f-e624-4a3f-89f7-65c09b2a008b",
+            "journalEntryId": 31
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "grnNumber": "GRN-000008",
+        "purchaseOrderId": 8,
+        "postingDate": "2026-02-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:34.671953Z",
+        "lines": [
+          {
+            "id": 8,
+            "poLineId": 8,
+            "itemId": 7,
+            "qtyReceived": "220.000000",
+            "unitCost": "200.000000",
+            "movementGroupId": "7a4f7827-030e-4cff-b9ee-455fd0a664cb",
+            "journalEntryId": 28
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "grnNumber": "GRN-000007",
+        "purchaseOrderId": 7,
+        "postingDate": "2026-04-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:34.593403Z",
+        "lines": [
+          {
+            "id": 7,
+            "poLineId": 7,
+            "itemId": 5,
+            "qtyReceived": "200.000000",
+            "unitCost": "83.000000",
+            "movementGroupId": "13478739-4d8d-4ebb-a04c-d51f517b9ac8",
+            "journalEntryId": 25
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "grnNumber": "GRN-000006",
+        "purchaseOrderId": 6,
+        "postingDate": "2026-02-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:34.510944Z",
+        "lines": [
+          {
+            "id": 6,
+            "poLineId": 6,
+            "itemId": 5,
+            "qtyReceived": "220.000000",
+            "unitCost": "80.000000",
+            "movementGroupId": "c8531c95-84ee-4135-aa3d-c775ad799df6",
+            "journalEntryId": 22
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "grnNumber": "GRN-000005",
+        "purchaseOrderId": 5,
+        "postingDate": "2026-04-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:34.432757Z",
+        "lines": [
+          {
+            "id": 5,
+            "poLineId": 5,
+            "itemId": 4,
+            "qtyReceived": "260.000000",
+            "unitCost": "124.000000",
+            "movementGroupId": "09a2ef47-2a22-4958-9079-bcfc3a9e7cf4",
+            "journalEntryId": 19
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "grnNumber": "GRN-000004",
+        "purchaseOrderId": 4,
+        "postingDate": "2026-01-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:34.345422Z",
+        "lines": [
+          {
+            "id": 4,
+            "poLineId": 4,
+            "itemId": 4,
+            "qtyReceived": "280.000000",
+            "unitCost": "120.000000",
+            "movementGroupId": "fc7bfa3e-2b0b-4e05-a3f7-94d8b2939b8d",
+            "journalEntryId": 16
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "grnNumber": "GRN-000003",
+        "purchaseOrderId": 3,
+        "postingDate": "2026-03-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:34.254165Z",
+        "lines": [
+          {
+            "id": 3,
+            "poLineId": 3,
+            "itemId": 3,
+            "qtyReceived": "200.000000",
+            "unitCost": "156.000000",
+            "movementGroupId": "3a5422ce-7a8e-4e99-ad71-bd228db9662e",
+            "journalEntryId": 13
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "grnNumber": "GRN-000002",
+        "purchaseOrderId": 2,
+        "postingDate": "2026-01-15",
+        "status": "POSTED",
+        "postedAt": "2026-07-02T04:13:34.142489Z",
+        "lines": [
+          {
+            "id": 2,
+            "poLineId": 2,
+            "itemId": 3,
+            "qtyReceived": "220.000000",
+            "unitCost": "150.000000",
+            "movementGroupId": "5323c9f2-b7f5-4d3a-9543-693d2834f9c2",
+            "journalEntryId": 10
+          }
+        ]
+      },
+      {
         "id": 1,
         "grnNumber": "GRN-000001",
         "purchaseOrderId": 1,
-        "postingDate": "2026-06-30",
+        "postingDate": "2026-07-02",
         "status": "POSTED",
-        "postedAt": "2026-06-30T21:00:22.835230Z",
+        "postedAt": "2026-07-02T04:13:33.595417Z",
         "lines": [
           {
             "id": 1,
@@ -361,27 +2602,702 @@
             "itemId": 1,
             "qtyReceived": "100.000000",
             "unitCost": "10.000000",
-            "movementGroupId": "646d1251-ca20-4dc9-b054-354e145e975f",
-            "journalEntryId": 1
+            "movementGroupId": "240d2e0e-b143-44fd-a115-6f464b7cdec1",
+            "journalEntryId": 2
           }
         ]
       }
     ],
     "/api/purchasing/vendor-bills": [
       {
+        "id": 26,
+        "billNumber": "BILL-000026",
+        "purchaseOrderId": 26,
+        "partnerId": 4,
+        "postingDate": "2026-07-02",
+        "goodsAmount": "6400.0000",
+        "vatAmount": "320.0000",
+        "grossAmount": "6720.0000",
+        "amountPaid": "0.0000",
+        "openBalance": "6720.0000",
+        "status": "POSTED",
+        "journalEntryId": 77,
+        "postedAt": "2026-07-02T04:13:35.930984Z",
+        "lines": [
+          {
+            "id": 26,
+            "poLineId": 26,
+            "itemId": 3,
+            "qty": "40.000000",
+            "unitPrice": "160.000000",
+            "lineNet": "6400.0000",
+            "lineVat": "320.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 25,
+        "billNumber": "BILL-000025",
+        "purchaseOrderId": 25,
+        "partnerId": 3,
+        "postingDate": "2026-06-15",
+        "goodsAmount": "6400.0000",
+        "vatAmount": "320.0000",
+        "grossAmount": "6720.0000",
+        "amountPaid": "0.0000",
+        "openBalance": "6720.0000",
+        "status": "POSTED",
+        "journalEntryId": 75,
+        "postedAt": "2026-07-02T04:13:35.876138Z",
+        "lines": [
+          {
+            "id": 25,
+            "poLineId": 25,
+            "itemId": 3,
+            "qty": "40.000000",
+            "unitPrice": "160.000000",
+            "lineNet": "6400.0000",
+            "lineVat": "320.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "billNumber": "BILL-000024",
+        "purchaseOrderId": 24,
+        "partnerId": 7,
+        "postingDate": "2026-05-15",
+        "goodsAmount": "6400.0000",
+        "vatAmount": "320.0000",
+        "grossAmount": "6720.0000",
+        "amountPaid": "0.0000",
+        "openBalance": "6720.0000",
+        "status": "POSTED",
+        "journalEntryId": 73,
+        "postedAt": "2026-07-02T04:13:35.829228Z",
+        "lines": [
+          {
+            "id": 24,
+            "poLineId": 24,
+            "itemId": 6,
+            "qty": "40.000000",
+            "unitPrice": "160.000000",
+            "lineNet": "6400.0000",
+            "lineVat": "320.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "billNumber": "BILL-000023",
+        "purchaseOrderId": 23,
+        "partnerId": 6,
+        "postingDate": "2026-04-15",
+        "goodsAmount": "6400.0000",
+        "vatAmount": "320.0000",
+        "grossAmount": "6720.0000",
+        "amountPaid": "0.0000",
+        "openBalance": "6720.0000",
+        "status": "POSTED",
+        "journalEntryId": 71,
+        "postedAt": "2026-07-02T04:13:35.777432Z",
+        "lines": [
+          {
+            "id": 23,
+            "poLineId": 23,
+            "itemId": 7,
+            "qty": "40.000000",
+            "unitPrice": "160.000000",
+            "lineNet": "6400.0000",
+            "lineVat": "320.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "billNumber": "BILL-000022",
+        "purchaseOrderId": 22,
+        "partnerId": 5,
+        "postingDate": "2026-03-15",
+        "goodsAmount": "6400.0000",
+        "vatAmount": "320.0000",
+        "grossAmount": "6720.0000",
+        "amountPaid": "0.0000",
+        "openBalance": "6720.0000",
+        "status": "POSTED",
+        "journalEntryId": 69,
+        "postedAt": "2026-07-02T04:13:35.736233Z",
+        "lines": [
+          {
+            "id": 22,
+            "poLineId": 22,
+            "itemId": 5,
+            "qty": "40.000000",
+            "unitPrice": "160.000000",
+            "lineNet": "6400.0000",
+            "lineVat": "320.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "billNumber": "BILL-000021",
+        "purchaseOrderId": 21,
+        "partnerId": 4,
+        "postingDate": "2026-02-15",
+        "goodsAmount": "6400.0000",
+        "vatAmount": "320.0000",
+        "grossAmount": "6720.0000",
+        "amountPaid": "0.0000",
+        "openBalance": "6720.0000",
+        "status": "POSTED",
+        "journalEntryId": 67,
+        "postedAt": "2026-07-02T04:13:35.694653Z",
+        "lines": [
+          {
+            "id": 21,
+            "poLineId": 21,
+            "itemId": 4,
+            "qty": "40.000000",
+            "unitPrice": "160.000000",
+            "lineNet": "6400.0000",
+            "lineVat": "320.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "billNumber": "BILL-000020",
+        "purchaseOrderId": 20,
+        "partnerId": 3,
+        "postingDate": "2026-01-15",
+        "goodsAmount": "6400.0000",
+        "vatAmount": "320.0000",
+        "grossAmount": "6720.0000",
+        "amountPaid": "0.0000",
+        "openBalance": "6720.0000",
+        "status": "POSTED",
+        "journalEntryId": 65,
+        "postedAt": "2026-07-02T04:13:35.651069Z",
+        "lines": [
+          {
+            "id": 20,
+            "poLineId": 20,
+            "itemId": 3,
+            "qty": "40.000000",
+            "unitPrice": "160.000000",
+            "lineNet": "6400.0000",
+            "lineVat": "320.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "billNumber": "BILL-000019",
+        "purchaseOrderId": 19,
+        "partnerId": 6,
+        "postingDate": "2026-01-18",
+        "goodsAmount": "8000.0000",
+        "vatAmount": "400.0000",
+        "grossAmount": "8400.0000",
+        "amountPaid": "8400.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 62,
+        "postedAt": "2026-07-02T04:13:35.578725Z",
+        "lines": [
+          {
+            "id": 19,
+            "poLineId": 19,
+            "itemId": 7,
+            "qty": "40.000000",
+            "unitPrice": "200.000000",
+            "lineNet": "8000.0000",
+            "lineVat": "400.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "billNumber": "BILL-000018",
+        "purchaseOrderId": 18,
+        "partnerId": 5,
+        "postingDate": "2026-01-24",
+        "goodsAmount": "2400.0000",
+        "vatAmount": "120.0000",
+        "grossAmount": "2520.0000",
+        "amountPaid": "2520.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 59,
+        "postedAt": "2026-07-02T04:13:35.506230Z",
+        "lines": [
+          {
+            "id": 18,
+            "poLineId": 18,
+            "itemId": 5,
+            "qty": "30.000000",
+            "unitPrice": "80.000000",
+            "lineNet": "2400.0000",
+            "lineVat": "120.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "billNumber": "BILL-000017",
+        "purchaseOrderId": 17,
+        "partnerId": 4,
+        "postingDate": "2026-01-21",
+        "goodsAmount": "2420.0000",
+        "vatAmount": "121.0000",
+        "grossAmount": "2541.0000",
+        "amountPaid": "2541.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 56,
+        "postedAt": "2026-07-02T04:13:35.438307Z",
+        "lines": [
+          {
+            "id": 17,
+            "poLineId": 17,
+            "itemId": 4,
+            "qty": "20.000000",
+            "unitPrice": "121.000000",
+            "lineNet": "2420.0000",
+            "lineVat": "121.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "billNumber": "BILL-000016",
+        "purchaseOrderId": 16,
+        "partnerId": 4,
+        "postingDate": "2026-01-21",
+        "goodsAmount": "5400.0000",
+        "vatAmount": "270.0000",
+        "grossAmount": "5670.0000",
+        "amountPaid": "5670.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 53,
+        "postedAt": "2026-07-02T04:13:35.345272Z",
+        "lines": [
+          {
+            "id": 16,
+            "poLineId": 16,
+            "itemId": 4,
+            "qty": "45.000000",
+            "unitPrice": "120.000000",
+            "lineNet": "5400.0000",
+            "lineVat": "270.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "billNumber": "BILL-000015",
+        "purchaseOrderId": 15,
+        "partnerId": 3,
+        "postingDate": "2026-01-27",
+        "goodsAmount": "4560.0000",
+        "vatAmount": "228.0000",
+        "grossAmount": "4788.0000",
+        "amountPaid": "4788.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 50,
+        "postedAt": "2026-07-02T04:13:35.280899Z",
+        "lines": [
+          {
+            "id": 15,
+            "poLineId": 15,
+            "itemId": 3,
+            "qty": "30.000000",
+            "unitPrice": "152.000000",
+            "lineNet": "4560.0000",
+            "lineVat": "228.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "billNumber": "BILL-000014",
+        "purchaseOrderId": 14,
+        "partnerId": 3,
+        "postingDate": "2026-01-20",
+        "goodsAmount": "6000.0000",
+        "vatAmount": "300.0000",
+        "grossAmount": "6300.0000",
+        "amountPaid": "6300.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 47,
+        "postedAt": "2026-07-02T04:13:35.222689Z",
+        "lines": [
+          {
+            "id": 14,
+            "poLineId": 14,
+            "itemId": 3,
+            "qty": "40.000000",
+            "unitPrice": "150.000000",
+            "lineNet": "6000.0000",
+            "lineVat": "300.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "billNumber": "BILL-000013",
+        "purchaseOrderId": 13,
+        "partnerId": 7,
+        "postingDate": "2026-04-15",
+        "goodsAmount": "450.0000",
+        "vatAmount": "22.5000",
+        "grossAmount": "472.5000",
+        "amountPaid": "472.5000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 44,
+        "postedAt": "2026-07-02T04:13:35.124142Z",
+        "lines": [
+          {
+            "id": 13,
+            "poLineId": 13,
+            "itemId": 10,
+            "qty": "15.000000",
+            "unitPrice": "30.000000",
+            "lineNet": "450.0000",
+            "lineVat": "22.5000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "billNumber": "BILL-000012",
+        "purchaseOrderId": 12,
+        "partnerId": 6,
+        "postingDate": "2026-03-15",
+        "goodsAmount": "1200.0000",
+        "vatAmount": "60.0000",
+        "grossAmount": "1260.0000",
+        "amountPaid": "1260.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 41,
+        "postedAt": "2026-07-02T04:13:35.053608Z",
+        "lines": [
+          {
+            "id": 12,
+            "poLineId": 12,
+            "itemId": 8,
+            "qty": "20.000000",
+            "unitPrice": "60.000000",
+            "lineNet": "1200.0000",
+            "lineVat": "60.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "billNumber": "BILL-000011",
+        "purchaseOrderId": 11,
+        "partnerId": 7,
+        "postingDate": "2026-02-15",
+        "goodsAmount": "900.0000",
+        "vatAmount": "45.0000",
+        "grossAmount": "945.0000",
+        "amountPaid": "945.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 38,
+        "postedAt": "2026-07-02T04:13:34.987210Z",
+        "lines": [
+          {
+            "id": 11,
+            "poLineId": 11,
+            "itemId": 9,
+            "qty": "10.000000",
+            "unitPrice": "90.000000",
+            "lineNet": "900.0000",
+            "lineVat": "45.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "billNumber": "BILL-000010",
+        "purchaseOrderId": 10,
+        "partnerId": 3,
+        "postingDate": "2026-03-15",
+        "goodsAmount": "3000.0000",
+        "vatAmount": "150.0000",
+        "grossAmount": "3150.0000",
+        "amountPaid": "3150.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 35,
+        "postedAt": "2026-07-02T04:13:34.898054Z",
+        "lines": [
+          {
+            "id": 10,
+            "poLineId": 10,
+            "itemId": 6,
+            "qty": "200.000000",
+            "unitPrice": "15.000000",
+            "lineNet": "3000.0000",
+            "lineVat": "150.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "billNumber": "BILL-000009",
+        "purchaseOrderId": 9,
+        "partnerId": 6,
+        "postingDate": "2026-05-15",
+        "goodsAmount": "41000.0000",
+        "vatAmount": "2050.0000",
+        "grossAmount": "43050.0000",
+        "amountPaid": "43050.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 32,
+        "postedAt": "2026-07-02T04:13:34.803938Z",
+        "lines": [
+          {
+            "id": 9,
+            "poLineId": 9,
+            "itemId": 7,
+            "qty": "200.000000",
+            "unitPrice": "205.000000",
+            "lineNet": "41000.0000",
+            "lineVat": "2050.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "billNumber": "BILL-000008",
+        "purchaseOrderId": 8,
+        "partnerId": 6,
+        "postingDate": "2026-02-15",
+        "goodsAmount": "44000.0000",
+        "vatAmount": "2200.0000",
+        "grossAmount": "46200.0000",
+        "amountPaid": "46200.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 29,
+        "postedAt": "2026-07-02T04:13:34.721705Z",
+        "lines": [
+          {
+            "id": 8,
+            "poLineId": 8,
+            "itemId": 7,
+            "qty": "220.000000",
+            "unitPrice": "200.000000",
+            "lineNet": "44000.0000",
+            "lineVat": "2200.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "billNumber": "BILL-000007",
+        "purchaseOrderId": 7,
+        "partnerId": 5,
+        "postingDate": "2026-04-15",
+        "goodsAmount": "16600.0000",
+        "vatAmount": "830.0000",
+        "grossAmount": "17430.0000",
+        "amountPaid": "17430.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 26,
+        "postedAt": "2026-07-02T04:13:34.635103Z",
+        "lines": [
+          {
+            "id": 7,
+            "poLineId": 7,
+            "itemId": 5,
+            "qty": "200.000000",
+            "unitPrice": "83.000000",
+            "lineNet": "16600.0000",
+            "lineVat": "830.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "billNumber": "BILL-000006",
+        "purchaseOrderId": 6,
+        "partnerId": 5,
+        "postingDate": "2026-02-15",
+        "goodsAmount": "17600.0000",
+        "vatAmount": "880.0000",
+        "grossAmount": "18480.0000",
+        "amountPaid": "18480.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 23,
+        "postedAt": "2026-07-02T04:13:34.550359Z",
+        "lines": [
+          {
+            "id": 6,
+            "poLineId": 6,
+            "itemId": 5,
+            "qty": "220.000000",
+            "unitPrice": "80.000000",
+            "lineNet": "17600.0000",
+            "lineVat": "880.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "billNumber": "BILL-000005",
+        "purchaseOrderId": 5,
+        "partnerId": 4,
+        "postingDate": "2026-04-15",
+        "goodsAmount": "32240.0000",
+        "vatAmount": "1612.0000",
+        "grossAmount": "33852.0000",
+        "amountPaid": "33852.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 20,
+        "postedAt": "2026-07-02T04:13:34.473576Z",
+        "lines": [
+          {
+            "id": 5,
+            "poLineId": 5,
+            "itemId": 4,
+            "qty": "260.000000",
+            "unitPrice": "124.000000",
+            "lineNet": "32240.0000",
+            "lineVat": "1612.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "billNumber": "BILL-000004",
+        "purchaseOrderId": 4,
+        "partnerId": 4,
+        "postingDate": "2026-01-15",
+        "goodsAmount": "33600.0000",
+        "vatAmount": "1680.0000",
+        "grossAmount": "35280.0000",
+        "amountPaid": "35280.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 17,
+        "postedAt": "2026-07-02T04:13:34.393525Z",
+        "lines": [
+          {
+            "id": 4,
+            "poLineId": 4,
+            "itemId": 4,
+            "qty": "280.000000",
+            "unitPrice": "120.000000",
+            "lineNet": "33600.0000",
+            "lineVat": "1680.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "billNumber": "BILL-000003",
+        "purchaseOrderId": 3,
+        "partnerId": 3,
+        "postingDate": "2026-03-15",
+        "goodsAmount": "31200.0000",
+        "vatAmount": "1560.0000",
+        "grossAmount": "32760.0000",
+        "amountPaid": "32760.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 14,
+        "postedAt": "2026-07-02T04:13:34.306631Z",
+        "lines": [
+          {
+            "id": 3,
+            "poLineId": 3,
+            "itemId": 3,
+            "qty": "200.000000",
+            "unitPrice": "156.000000",
+            "lineNet": "31200.0000",
+            "lineVat": "1560.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "billNumber": "BILL-000002",
+        "purchaseOrderId": 2,
+        "partnerId": 3,
+        "postingDate": "2026-01-15",
+        "goodsAmount": "33000.0000",
+        "vatAmount": "1650.0000",
+        "grossAmount": "34650.0000",
+        "amountPaid": "34650.0000",
+        "openBalance": "0.0000",
+        "status": "PAID",
+        "journalEntryId": 11,
+        "postedAt": "2026-07-02T04:13:34.201876Z",
+        "lines": [
+          {
+            "id": 2,
+            "poLineId": 2,
+            "itemId": 3,
+            "qty": "220.000000",
+            "unitPrice": "150.000000",
+            "lineNet": "33000.0000",
+            "lineVat": "1650.0000",
+            "matchStatus": "MATCHED"
+          }
+        ]
+      },
+      {
         "id": 1,
         "billNumber": "BILL-000001",
         "purchaseOrderId": 1,
         "partnerId": 1,
-        "postingDate": "2026-06-30",
+        "postingDate": "2026-07-02",
         "goodsAmount": "1000.0000",
         "vatAmount": "50.0000",
         "grossAmount": "1050.0000",
         "amountPaid": "1050.0000",
         "openBalance": "0.0000",
         "status": "PAID",
-        "journalEntryId": 2,
-        "postedAt": "2026-06-30T21:00:23.039034Z",
+        "journalEntryId": 3,
+        "postedAt": "2026-07-02T04:13:33.764785Z",
         "lines": [
           {
             "id": 1,
@@ -397,24 +3313,139 @@
       }
     ],
     "/api/purchasing/ap-aging": {
-      "current": "0",
-      "days1to30": "0",
-      "days31to60": "0",
-      "days61to90": "0",
-      "days90plus": "0",
-      "total": "0"
+      "current": "13440.0000",
+      "days1to30": "6720.0000",
+      "days31to60": "6720.0000",
+      "days61to90": "6720.0000",
+      "days90plus": "13440.0000",
+      "total": "47040.0000"
     },
     "/api/inventory/reconciliation": [
       {
         "accountCode": "1310",
-        "subledgerValue": "500.0000"
+        "subledgerValue": "161701.6185"
       },
       {
         "accountCode": "1330",
-        "subledgerValue": "200.0000"
+        "subledgerValue": "82495.9314"
       }
     ],
     "/api/manufacturing/boms": [
+      {
+        "id": 6,
+        "parentItemId": 15,
+        "version": 1,
+        "outputQty": "1.000000",
+        "status": "ACTIVE",
+        "components": [
+          {
+            "id": 10,
+            "lineNo": 1,
+            "componentItemId": 5,
+            "qtyPer": "2.000000",
+            "scrapPct": "0.000000"
+          },
+          {
+            "id": 11,
+            "lineNo": 2,
+            "componentItemId": 4,
+            "qtyPer": "1.000000",
+            "scrapPct": "0.000000"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "parentItemId": 14,
+        "version": 1,
+        "outputQty": "1.000000",
+        "status": "ACTIVE",
+        "components": [
+          {
+            "id": 8,
+            "lineNo": 1,
+            "componentItemId": 7,
+            "qtyPer": "2.000000",
+            "scrapPct": "0.000000"
+          },
+          {
+            "id": 9,
+            "lineNo": 2,
+            "componentItemId": 5,
+            "qtyPer": "1.000000",
+            "scrapPct": "0.000000"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "parentItemId": 13,
+        "version": 1,
+        "outputQty": "1.000000",
+        "status": "ACTIVE",
+        "components": [
+          {
+            "id": 6,
+            "lineNo": 1,
+            "componentItemId": 4,
+            "qtyPer": "2.000000",
+            "scrapPct": "0.000000"
+          },
+          {
+            "id": 7,
+            "lineNo": 2,
+            "componentItemId": 7,
+            "qtyPer": "1.000000",
+            "scrapPct": "0.000000"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "parentItemId": 12,
+        "version": 1,
+        "outputQty": "1.000000",
+        "status": "ACTIVE",
+        "components": [
+          {
+            "id": 4,
+            "lineNo": 1,
+            "componentItemId": 3,
+            "qtyPer": "1.000000",
+            "scrapPct": "0.000000"
+          },
+          {
+            "id": 5,
+            "lineNo": 2,
+            "componentItemId": 4,
+            "qtyPer": "1.000000",
+            "scrapPct": "0.000000"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "parentItemId": 11,
+        "version": 1,
+        "outputQty": "1.000000",
+        "status": "ACTIVE",
+        "components": [
+          {
+            "id": 2,
+            "lineNo": 1,
+            "componentItemId": 3,
+            "qtyPer": "2.000000",
+            "scrapPct": "0.000000"
+          },
+          {
+            "id": 3,
+            "lineNo": 2,
+            "componentItemId": 6,
+            "qtyPer": "1.000000",
+            "scrapPct": "0.000000"
+          }
+        ]
+      },
       {
         "id": 1,
         "parentItemId": 2,
@@ -434,6 +3465,559 @@
     ],
     "/api/manufacturing/work-orders": [
       {
+        "id": 18,
+        "woNumber": "WO-000018",
+        "itemId": 13,
+        "bomId": 4,
+        "qtyToProduce": "10.000000",
+        "qtyProduced": "0.000000",
+        "wipLocationId": null,
+        "totalComponentCost": "0.0000",
+        "status": "DRAFT",
+        "plannedStart": "2026-07-16",
+        "plannedEnd": "2026-07-24",
+        "components": []
+      },
+      {
+        "id": 17,
+        "woNumber": "WO-000017",
+        "itemId": 11,
+        "bomId": 2,
+        "qtyToProduce": "15.000000",
+        "qtyProduced": "0.000000",
+        "wipLocationId": null,
+        "totalComponentCost": "0.0000",
+        "status": "DRAFT",
+        "plannedStart": "2026-07-14",
+        "plannedEnd": "2026-07-21",
+        "components": []
+      },
+      {
+        "id": 16,
+        "woNumber": "WO-000016",
+        "itemId": 15,
+        "bomId": 6,
+        "qtyToProduce": "35.000000",
+        "qtyProduced": "0.000000",
+        "wipLocationId": null,
+        "totalComponentCost": "0.0000",
+        "status": "RELEASED",
+        "plannedStart": "2026-07-10",
+        "plannedEnd": "2026-07-18",
+        "components": [
+          {
+            "id": 30,
+            "lineNo": 1,
+            "componentItemId": 5,
+            "plannedQty": "70.000000",
+            "consumedQty": "0.000000",
+            "consumedValue": "0.0000",
+            "movementGroupId": null,
+            "journalEntryId": null
+          },
+          {
+            "id": 31,
+            "lineNo": 2,
+            "componentItemId": 4,
+            "plannedQty": "35.000000",
+            "consumedQty": "0.000000",
+            "consumedValue": "0.0000",
+            "movementGroupId": null,
+            "journalEntryId": null
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "woNumber": "WO-000015",
+        "itemId": 14,
+        "bomId": 5,
+        "qtyToProduce": "20.000000",
+        "qtyProduced": "0.000000",
+        "wipLocationId": null,
+        "totalComponentCost": "0.0000",
+        "status": "RELEASED",
+        "plannedStart": "2026-07-08",
+        "plannedEnd": "2026-07-14",
+        "components": [
+          {
+            "id": 28,
+            "lineNo": 1,
+            "componentItemId": 7,
+            "plannedQty": "40.000000",
+            "consumedQty": "0.000000",
+            "consumedValue": "0.0000",
+            "movementGroupId": null,
+            "journalEntryId": null
+          },
+          {
+            "id": 29,
+            "lineNo": 2,
+            "componentItemId": 5,
+            "plannedQty": "20.000000",
+            "consumedQty": "0.000000",
+            "consumedValue": "0.0000",
+            "movementGroupId": null,
+            "journalEntryId": null
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "woNumber": "WO-000014",
+        "itemId": 13,
+        "bomId": 4,
+        "qtyToProduce": "45.000000",
+        "qtyProduced": "0.000000",
+        "wipLocationId": null,
+        "totalComponentCost": "0.0000",
+        "status": "RELEASED",
+        "plannedStart": "2026-07-05",
+        "plannedEnd": "2026-07-13",
+        "components": [
+          {
+            "id": 26,
+            "lineNo": 1,
+            "componentItemId": 4,
+            "plannedQty": "90.000000",
+            "consumedQty": "0.000000",
+            "consumedValue": "0.0000",
+            "movementGroupId": null,
+            "journalEntryId": null
+          },
+          {
+            "id": 27,
+            "lineNo": 2,
+            "componentItemId": 7,
+            "plannedQty": "45.000000",
+            "consumedQty": "0.000000",
+            "consumedValue": "0.0000",
+            "movementGroupId": null,
+            "journalEntryId": null
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "woNumber": "WO-000013",
+        "itemId": 12,
+        "bomId": 3,
+        "qtyToProduce": "25.000000",
+        "qtyProduced": "0.000000",
+        "wipLocationId": null,
+        "totalComponentCost": "0.0000",
+        "status": "RELEASED",
+        "plannedStart": "2026-07-03",
+        "plannedEnd": "2026-07-10",
+        "components": [
+          {
+            "id": 24,
+            "lineNo": 1,
+            "componentItemId": 3,
+            "plannedQty": "25.000000",
+            "consumedQty": "0.000000",
+            "consumedValue": "0.0000",
+            "movementGroupId": null,
+            "journalEntryId": null
+          },
+          {
+            "id": 25,
+            "lineNo": 2,
+            "componentItemId": 4,
+            "plannedQty": "25.000000",
+            "consumedQty": "0.000000",
+            "consumedValue": "0.0000",
+            "movementGroupId": null,
+            "journalEntryId": null
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "woNumber": "WO-000012",
+        "itemId": 11,
+        "bomId": 2,
+        "qtyToProduce": "30.000000",
+        "qtyProduced": "0.000000",
+        "wipLocationId": null,
+        "totalComponentCost": "0.0000",
+        "status": "RELEASED",
+        "plannedStart": "2026-06-30",
+        "plannedEnd": "2026-07-07",
+        "components": [
+          {
+            "id": 22,
+            "lineNo": 1,
+            "componentItemId": 3,
+            "plannedQty": "60.000000",
+            "consumedQty": "0.000000",
+            "consumedValue": "0.0000",
+            "movementGroupId": null,
+            "journalEntryId": null
+          },
+          {
+            "id": 23,
+            "lineNo": 2,
+            "componentItemId": 6,
+            "plannedQty": "30.000000",
+            "consumedQty": "0.000000",
+            "consumedValue": "0.0000",
+            "movementGroupId": null,
+            "journalEntryId": null
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "woNumber": "WO-000011",
+        "itemId": 15,
+        "bomId": 6,
+        "qtyToProduce": "40.000000",
+        "qtyProduced": "40.000000",
+        "wipLocationId": 4,
+        "totalComponentCost": "11985.3694",
+        "status": "DONE",
+        "plannedStart": "2026-06-09",
+        "plannedEnd": "2026-06-15",
+        "components": [
+          {
+            "id": 20,
+            "lineNo": 1,
+            "componentItemId": 5,
+            "plannedQty": "80.000000",
+            "consumedQty": "80.000000",
+            "consumedValue": "7020.4082",
+            "movementGroupId": "898b62c5-e92f-4d47-ab9f-0fdc87947358",
+            "journalEntryId": 105
+          },
+          {
+            "id": 21,
+            "lineNo": 2,
+            "componentItemId": 4,
+            "plannedQty": "40.000000",
+            "consumedQty": "40.000000",
+            "consumedValue": "4964.9612",
+            "movementGroupId": "982cbbea-8adb-480e-8e31-1cf3a27f1e3a",
+            "journalEntryId": 106
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "woNumber": "WO-000010",
+        "itemId": 15,
+        "bomId": 6,
+        "qtyToProduce": "50.000000",
+        "qtyProduced": "50.000000",
+        "wipLocationId": 4,
+        "totalComponentCost": "14981.7118",
+        "status": "DONE",
+        "plannedStart": "2026-05-09",
+        "plannedEnd": "2026-05-15",
+        "components": [
+          {
+            "id": 18,
+            "lineNo": 1,
+            "componentItemId": 5,
+            "plannedQty": "100.000000",
+            "consumedQty": "100.000000",
+            "consumedValue": "8775.5102",
+            "movementGroupId": "548f4327-2422-423f-b11e-e5f47ba8b805",
+            "journalEntryId": 102
+          },
+          {
+            "id": 19,
+            "lineNo": 2,
+            "componentItemId": 4,
+            "plannedQty": "50.000000",
+            "consumedQty": "50.000000",
+            "consumedValue": "6206.2016",
+            "movementGroupId": "564285f4-365d-4ab7-a05c-66e1610a68c5",
+            "journalEntryId": 103
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "woNumber": "WO-000009",
+        "itemId": 14,
+        "bomId": 5,
+        "qtyToProduce": "40.000000",
+        "qtyProduced": "40.000000",
+        "wipLocationId": 4,
+        "totalComponentCost": "19414.2041",
+        "status": "DONE",
+        "plannedStart": "2026-06-09",
+        "plannedEnd": "2026-06-15",
+        "components": [
+          {
+            "id": 16,
+            "lineNo": 1,
+            "componentItemId": 7,
+            "plannedQty": "80.000000",
+            "consumedQty": "80.000000",
+            "consumedValue": "15904.0000",
+            "movementGroupId": "8b20eaa8-4978-4392-b16b-02de7e737357",
+            "journalEntryId": 99
+          },
+          {
+            "id": 17,
+            "lineNo": 2,
+            "componentItemId": 5,
+            "plannedQty": "40.000000",
+            "consumedQty": "40.000000",
+            "consumedValue": "3510.2041",
+            "movementGroupId": "7d506542-c201-439d-b95c-a233dce37938",
+            "journalEntryId": 100
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "woNumber": "WO-000008",
+        "itemId": 14,
+        "bomId": 5,
+        "qtyToProduce": "50.000000",
+        "qtyProduced": "50.000000",
+        "wipLocationId": 4,
+        "totalComponentCost": "24267.7551",
+        "status": "DONE",
+        "plannedStart": "2026-05-09",
+        "plannedEnd": "2026-05-15",
+        "components": [
+          {
+            "id": 14,
+            "lineNo": 1,
+            "componentItemId": 7,
+            "plannedQty": "100.000000",
+            "consumedQty": "100.000000",
+            "consumedValue": "19880.0000",
+            "movementGroupId": "a39f0a16-64d5-4b0c-821d-42f1fcd34b82",
+            "journalEntryId": 96
+          },
+          {
+            "id": 15,
+            "lineNo": 2,
+            "componentItemId": 5,
+            "plannedQty": "50.000000",
+            "consumedQty": "50.000000",
+            "consumedValue": "4387.7551",
+            "movementGroupId": "418873d2-9b55-4893-ae65-d5e1dbd8b9d5",
+            "journalEntryId": 97
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "woNumber": "WO-000007",
+        "itemId": 13,
+        "bomId": 4,
+        "qtyToProduce": "40.000000",
+        "qtyProduced": "40.000000",
+        "wipLocationId": 4,
+        "totalComponentCost": "17881.9225",
+        "status": "DONE",
+        "plannedStart": "2026-06-09",
+        "plannedEnd": "2026-06-15",
+        "components": [
+          {
+            "id": 12,
+            "lineNo": 1,
+            "componentItemId": 4,
+            "plannedQty": "80.000000",
+            "consumedQty": "80.000000",
+            "consumedValue": "9929.9225",
+            "movementGroupId": "c9d9af6b-b85f-4294-98d9-1c7ac3fcd306",
+            "journalEntryId": 93
+          },
+          {
+            "id": 13,
+            "lineNo": 2,
+            "componentItemId": 7,
+            "plannedQty": "40.000000",
+            "consumedQty": "40.000000",
+            "consumedValue": "7952.0000",
+            "movementGroupId": "4e3ed3bc-719e-4dd1-b689-c92d9a0d5e7f",
+            "journalEntryId": 94
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "woNumber": "WO-000006",
+        "itemId": 13,
+        "bomId": 4,
+        "qtyToProduce": "50.000000",
+        "qtyProduced": "50.000000",
+        "wipLocationId": 4,
+        "totalComponentCost": "22352.4031",
+        "status": "DONE",
+        "plannedStart": "2026-05-09",
+        "plannedEnd": "2026-05-15",
+        "components": [
+          {
+            "id": 10,
+            "lineNo": 1,
+            "componentItemId": 4,
+            "plannedQty": "100.000000",
+            "consumedQty": "100.000000",
+            "consumedValue": "12412.4031",
+            "movementGroupId": "bbf1f9ba-286b-4522-95fe-d90485d0f8c6",
+            "journalEntryId": 90
+          },
+          {
+            "id": 11,
+            "lineNo": 2,
+            "componentItemId": 7,
+            "plannedQty": "50.000000",
+            "consumedQty": "50.000000",
+            "consumedValue": "9940.0000",
+            "movementGroupId": "4ff269cf-b521-4b5f-9a03-fc46ea683dcc",
+            "journalEntryId": 91
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "woNumber": "WO-000005",
+        "itemId": 12,
+        "bomId": 3,
+        "qtyToProduce": "40.000000",
+        "qtyProduced": "40.000000",
+        "wipLocationId": 4,
+        "totalComponentCost": "11126.2727",
+        "status": "DONE",
+        "plannedStart": "2026-06-09",
+        "plannedEnd": "2026-06-15",
+        "components": [
+          {
+            "id": 8,
+            "lineNo": 1,
+            "componentItemId": 3,
+            "plannedQty": "40.000000",
+            "consumedQty": "40.000000",
+            "consumedValue": "6161.3115",
+            "movementGroupId": "032ffae5-a22e-4999-8af9-fd70fa41ae4c",
+            "journalEntryId": 87
+          },
+          {
+            "id": 9,
+            "lineNo": 2,
+            "componentItemId": 4,
+            "plannedQty": "40.000000",
+            "consumedQty": "40.000000",
+            "consumedValue": "4964.9612",
+            "movementGroupId": "22ce3b16-1b88-4cae-afce-0066d496f204",
+            "journalEntryId": 88
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "woNumber": "WO-000004",
+        "itemId": 12,
+        "bomId": 3,
+        "qtyToProduce": "50.000000",
+        "qtyProduced": "50.000000",
+        "wipLocationId": 4,
+        "totalComponentCost": "13907.8410",
+        "status": "DONE",
+        "plannedStart": "2026-05-09",
+        "plannedEnd": "2026-05-15",
+        "components": [
+          {
+            "id": 6,
+            "lineNo": 1,
+            "componentItemId": 3,
+            "plannedQty": "50.000000",
+            "consumedQty": "50.000000",
+            "consumedValue": "7701.6394",
+            "movementGroupId": "25e115a1-4b31-4ead-a4f0-d81f2df9072f",
+            "journalEntryId": 84
+          },
+          {
+            "id": 7,
+            "lineNo": 2,
+            "componentItemId": 4,
+            "plannedQty": "50.000000",
+            "consumedQty": "50.000000",
+            "consumedValue": "6206.2016",
+            "movementGroupId": "6fa3fdb9-2beb-4fdf-af7b-8577389ef216",
+            "journalEntryId": 85
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "woNumber": "WO-000003",
+        "itemId": 11,
+        "bomId": 2,
+        "qtyToProduce": "40.000000",
+        "qtyProduced": "40.000000",
+        "wipLocationId": 4,
+        "totalComponentCost": "13889.2897",
+        "status": "DONE",
+        "plannedStart": "2026-06-09",
+        "plannedEnd": "2026-06-15",
+        "components": [
+          {
+            "id": 4,
+            "lineNo": 1,
+            "componentItemId": 3,
+            "plannedQty": "80.000000",
+            "consumedQty": "80.000000",
+            "consumedValue": "12322.6230",
+            "movementGroupId": "43461b79-79be-4275-a660-8ca13875cac8",
+            "journalEntryId": 81
+          },
+          {
+            "id": 5,
+            "lineNo": 2,
+            "componentItemId": 6,
+            "plannedQty": "40.000000",
+            "consumedQty": "40.000000",
+            "consumedValue": "1566.6667",
+            "movementGroupId": "631e0bf6-b1a0-427b-a90b-853782aeafef",
+            "journalEntryId": 82
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "woNumber": "WO-000002",
+        "itemId": 11,
+        "bomId": 2,
+        "qtyToProduce": "50.000000",
+        "qtyProduced": "50.000000",
+        "wipLocationId": 4,
+        "totalComponentCost": "17361.6121",
+        "status": "DONE",
+        "plannedStart": "2026-05-09",
+        "plannedEnd": "2026-05-15",
+        "components": [
+          {
+            "id": 2,
+            "lineNo": 1,
+            "componentItemId": 3,
+            "plannedQty": "100.000000",
+            "consumedQty": "100.000000",
+            "consumedValue": "15403.2787",
+            "movementGroupId": "be67f1b5-6b5c-4f46-8f2d-0066d0744ea3",
+            "journalEntryId": 78
+          },
+          {
+            "id": 3,
+            "lineNo": 2,
+            "componentItemId": 6,
+            "plannedQty": "50.000000",
+            "consumedQty": "50.000000",
+            "consumedValue": "1958.3334",
+            "movementGroupId": "ad506690-5c4e-4a9a-b26c-d6a8369d3d2c",
+            "journalEntryId": 79
+          }
+        ]
+      },
+      {
         "id": 1,
         "woNumber": "WO-000001",
         "itemId": 2,
@@ -443,6 +4027,8 @@
         "wipLocationId": 4,
         "totalComponentCost": "500.0000",
         "status": "DONE",
+        "plannedStart": null,
+        "plannedEnd": null,
         "components": [
           {
             "id": 1,
@@ -451,14 +4037,39 @@
             "plannedQty": "50.000000",
             "consumedQty": "50.000000",
             "consumedValue": "500.0000",
-            "movementGroupId": "38fc6e33-729c-455e-987c-afcea4396d81",
-            "journalEntryId": 4
+            "movementGroupId": "f4cfd833-012d-4d80-b6f5-2ad045fb2a24",
+            "journalEntryId": 5
           }
         ]
       }
     ],
     "/api/manufacturing/reorder-report": {
-      "items": []
+      "items": [
+        {
+          "itemId": 9,
+          "sku": "RM-GLASS",
+          "name": "Glass Panel",
+          "onHandQty": "10.000000",
+          "reorderPoint": "50.000000",
+          "reorderQty": "150.000000"
+        },
+        {
+          "itemId": 8,
+          "sku": "RM-COPPER",
+          "name": "Copper Wire",
+          "onHandQty": "20.000000",
+          "reorderPoint": "100.000000",
+          "reorderQty": "200.000000"
+        },
+        {
+          "itemId": 10,
+          "sku": "RM-LUBE",
+          "name": "Lubricant Oil",
+          "onHandQty": "15.000000",
+          "reorderPoint": "80.000000",
+          "reorderQty": "120.000000"
+        }
+      ]
     },
     "/api/masterdata/items": [
       {
@@ -473,6 +4084,83 @@
         "reorderQty": null
       },
       {
+        "id": 13,
+        "sku": "FG-MOTOR",
+        "name": "Servo Motor",
+        "itemType": "FINISHED",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "0.000000",
+        "reorderPoint": null,
+        "reorderQty": null
+      },
+      {
+        "id": 15,
+        "sku": "FG-PANEL",
+        "name": "Control Panel",
+        "itemType": "FINISHED",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "0.000000",
+        "reorderPoint": null,
+        "reorderQty": null
+      },
+      {
+        "id": 11,
+        "sku": "FG-PUMP",
+        "name": "Hydraulic Pump",
+        "itemType": "FINISHED",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "0.000000",
+        "reorderPoint": null,
+        "reorderQty": null
+      },
+      {
+        "id": 14,
+        "sku": "FG-SENSOR",
+        "name": "Pressure Sensor",
+        "itemType": "FINISHED",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "0.000000",
+        "reorderPoint": null,
+        "reorderQty": null
+      },
+      {
+        "id": 12,
+        "sku": "FG-VALVE",
+        "name": "Control Valve",
+        "itemType": "FINISHED",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "0.000000",
+        "reorderPoint": null,
+        "reorderQty": null
+      },
+      {
+        "id": 4,
+        "sku": "RM-ALU",
+        "name": "Aluminium Bar",
+        "itemType": "RAW",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "120.000000",
+        "reorderPoint": null,
+        "reorderQty": null
+      },
+      {
+        "id": 8,
+        "sku": "RM-COPPER",
+        "name": "Copper Wire",
+        "itemType": "RAW",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "60.000000",
+        "reorderPoint": "100.000000",
+        "reorderQty": "200.000000"
+      },
+      {
         "id": 1,
         "sku": "RM-DEMO",
         "name": "Demo Raw Material",
@@ -482,6 +4170,72 @@
         "standardCost": "10.000000",
         "reorderPoint": "20.000000",
         "reorderQty": "100.000000"
+      },
+      {
+        "id": 9,
+        "sku": "RM-GLASS",
+        "name": "Glass Panel",
+        "itemType": "RAW",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "90.000000",
+        "reorderPoint": "50.000000",
+        "reorderQty": "150.000000"
+      },
+      {
+        "id": 10,
+        "sku": "RM-LUBE",
+        "name": "Lubricant Oil",
+        "itemType": "RAW",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "30.000000",
+        "reorderPoint": "80.000000",
+        "reorderQty": "120.000000"
+      },
+      {
+        "id": 7,
+        "sku": "RM-PCB",
+        "name": "PCB Board",
+        "itemType": "RAW",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "200.000000",
+        "reorderPoint": null,
+        "reorderQty": null
+      },
+      {
+        "id": 5,
+        "sku": "RM-POLY",
+        "name": "Polymer Resin",
+        "itemType": "RAW",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "80.000000",
+        "reorderPoint": null,
+        "reorderQty": null
+      },
+      {
+        "id": 6,
+        "sku": "RM-RUBBER",
+        "name": "Rubber Seal",
+        "itemType": "RAW",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "15.000000",
+        "reorderPoint": null,
+        "reorderQty": null
+      },
+      {
+        "id": 3,
+        "sku": "RM-STEEL",
+        "name": "Steel Sheet",
+        "itemType": "RAW",
+        "uom": "EA",
+        "stocked": true,
+        "standardCost": "150.000000",
+        "reorderPoint": null,
+        "reorderQty": null
       }
     ],
     "/api/masterdata/partners": [
@@ -491,6 +4245,78 @@
         "name": "Demo Customer",
         "vendor": false,
         "customer": true,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
+      },
+      {
+        "id": 10,
+        "code": "CUST-EAST",
+        "name": "Eastern Automation",
+        "vendor": false,
+        "customer": true,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
+      },
+      {
+        "id": 12,
+        "code": "CUST-GLOBAL",
+        "name": "Global Distributors",
+        "vendor": false,
+        "customer": true,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
+      },
+      {
+        "id": 8,
+        "code": "CUST-NORTH",
+        "name": "Northern Machinery",
+        "vendor": false,
+        "customer": true,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
+      },
+      {
+        "id": 9,
+        "code": "CUST-SOUTH",
+        "name": "Southern Industries",
+        "vendor": false,
+        "customer": true,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
+      },
+      {
+        "id": 11,
+        "code": "CUST-WEST",
+        "name": "Western Robotics",
+        "vendor": false,
+        "customer": true,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
+      },
+      {
+        "id": 4,
+        "code": "VEND-ALLOY",
+        "name": "Pacific Alloy Ltd.",
+        "vendor": true,
+        "customer": false,
         "taxId": null,
         "paymentTermsDays": 30,
         "apAccountCode": null,
@@ -508,6 +4334,54 @@
         "apAccountCode": null,
         "arAccountCode": null,
         "active": true
+      },
+      {
+        "id": 6,
+        "code": "VEND-ELEC",
+        "name": "Hsinchu Electronics",
+        "vendor": true,
+        "customer": false,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
+      },
+      {
+        "id": 7,
+        "code": "VEND-PKG",
+        "name": "Kaohsiung Packaging",
+        "vendor": true,
+        "customer": false,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
+      },
+      {
+        "id": 5,
+        "code": "VEND-POLY",
+        "name": "Taipei Polymers Inc.",
+        "vendor": true,
+        "customer": false,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
+      },
+      {
+        "id": 3,
+        "code": "VEND-STEEL",
+        "name": "Formosa Steel Co.",
+        "vendor": true,
+        "customer": false,
+        "taxId": null,
+        "paymentTermsDays": 30,
+        "apAccountCode": null,
+        "arAccountCode": null,
+        "active": true
       }
     ],
     "/api/masterdata/warehouses": [
@@ -516,6 +4390,1867 @@
         "code": "WH1",
         "name": "Main Warehouse",
         "active": true
+      }
+    ],
+    "/api/hr/departments": [
+      {
+        "id": 3,
+        "code": "ADM",
+        "name": "Finance & Admin",
+        "budgetAccountCode": "6100",
+        "active": true
+      },
+      {
+        "id": 1,
+        "code": "ENG",
+        "name": "Engineering",
+        "budgetAccountCode": "6100",
+        "active": true
+      },
+      {
+        "id": 2,
+        "code": "OPS",
+        "name": "Operations",
+        "budgetAccountCode": "6100",
+        "active": true
+      }
+    ],
+    "/api/hr/positions": [
+      {
+        "id": 4,
+        "code": "ACCOUNTANT",
+        "title": "Accountant",
+        "standardSalary": "60000.0000",
+        "active": true
+      },
+      {
+        "id": 1,
+        "code": "ENGINEER",
+        "title": "Engineer",
+        "standardSalary": "70000.0000",
+        "active": true
+      },
+      {
+        "id": 2,
+        "code": "MANAGER",
+        "title": "Manager",
+        "standardSalary": "95000.0000",
+        "active": true
+      },
+      {
+        "id": 3,
+        "code": "OPERATOR",
+        "title": "Operator",
+        "standardSalary": "42000.0000",
+        "active": true
+      }
+    ],
+    "/api/hr/employees": [
+      {
+        "id": 1,
+        "code": "EMP-001",
+        "firstName": "Wei-Lun",
+        "lastName": "Chou",
+        "departmentId": 1,
+        "positionId": 2,
+        "monthlySalary": "98000.0000",
+        "status": "ACTIVE",
+        "hireDate": "2020-04-01",
+        "terminationDate": null
+      },
+      {
+        "id": 2,
+        "code": "EMP-002",
+        "firstName": "Mei",
+        "lastName": "Lin",
+        "departmentId": 1,
+        "positionId": 1,
+        "monthlySalary": "72000.0000",
+        "status": "ACTIVE",
+        "hireDate": "2021-04-01",
+        "terminationDate": null
+      },
+      {
+        "id": 3,
+        "code": "EMP-003",
+        "firstName": "Cheng",
+        "lastName": "Wang",
+        "departmentId": 1,
+        "positionId": 1,
+        "monthlySalary": "68000.0000",
+        "status": "ACTIVE",
+        "hireDate": "2022-04-01",
+        "terminationDate": null
+      },
+      {
+        "id": 4,
+        "code": "EMP-004",
+        "firstName": "Ya-Ting",
+        "lastName": "Chen",
+        "departmentId": 2,
+        "positionId": 2,
+        "monthlySalary": "90000.0000",
+        "status": "ACTIVE",
+        "hireDate": "2019-04-01",
+        "terminationDate": null
+      },
+      {
+        "id": 5,
+        "code": "EMP-005",
+        "firstName": "Jun",
+        "lastName": "Huang",
+        "departmentId": 2,
+        "positionId": 3,
+        "monthlySalary": "44000.0000",
+        "status": "ACTIVE",
+        "hireDate": "2022-04-01",
+        "terminationDate": null
+      },
+      {
+        "id": 6,
+        "code": "EMP-006",
+        "firstName": "Hsin",
+        "lastName": "Liu",
+        "departmentId": 2,
+        "positionId": 3,
+        "monthlySalary": "41000.0000",
+        "status": "ACTIVE",
+        "hireDate": "2023-04-01",
+        "terminationDate": null
+      },
+      {
+        "id": 7,
+        "code": "EMP-007",
+        "firstName": "Pei",
+        "lastName": "Yang",
+        "departmentId": 3,
+        "positionId": 4,
+        "monthlySalary": "61000.0000",
+        "status": "ACTIVE",
+        "hireDate": "2021-04-01",
+        "terminationDate": null
+      },
+      {
+        "id": 8,
+        "code": "EMP-008",
+        "firstName": "Kai",
+        "lastName": "Wu",
+        "departmentId": 3,
+        "positionId": 4,
+        "monthlySalary": "58000.0000",
+        "status": "ACTIVE",
+        "hireDate": "2023-04-01",
+        "terminationDate": null
+      }
+    ],
+    "/api/hr/attendance": [
+      {
+        "id": 127,
+        "employeeId": 8,
+        "workDate": "2026-07-02",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 109,
+        "employeeId": 7,
+        "workDate": "2026-07-02",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 91,
+        "employeeId": 6,
+        "workDate": "2026-07-02",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 73,
+        "employeeId": 5,
+        "workDate": "2026-07-02",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 55,
+        "employeeId": 4,
+        "workDate": "2026-07-02",
+        "status": "LEAVE",
+        "workedHours": "0.00",
+        "note": null
+      },
+      {
+        "id": 37,
+        "employeeId": 3,
+        "workDate": "2026-07-02",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 19,
+        "employeeId": 2,
+        "workDate": "2026-07-02",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 1,
+        "employeeId": 1,
+        "workDate": "2026-07-02",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 128,
+        "employeeId": 8,
+        "workDate": "2026-07-01",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 110,
+        "employeeId": 7,
+        "workDate": "2026-07-01",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 92,
+        "employeeId": 6,
+        "workDate": "2026-07-01",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 74,
+        "employeeId": 5,
+        "workDate": "2026-07-01",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 56,
+        "employeeId": 4,
+        "workDate": "2026-07-01",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 38,
+        "employeeId": 3,
+        "workDate": "2026-07-01",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 20,
+        "employeeId": 2,
+        "workDate": "2026-07-01",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 2,
+        "employeeId": 1,
+        "workDate": "2026-07-01",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 129,
+        "employeeId": 8,
+        "workDate": "2026-06-30",
+        "status": "LEAVE",
+        "workedHours": "0.00",
+        "note": null
+      },
+      {
+        "id": 111,
+        "employeeId": 7,
+        "workDate": "2026-06-30",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 93,
+        "employeeId": 6,
+        "workDate": "2026-06-30",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 75,
+        "employeeId": 5,
+        "workDate": "2026-06-30",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 57,
+        "employeeId": 4,
+        "workDate": "2026-06-30",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 39,
+        "employeeId": 3,
+        "workDate": "2026-06-30",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 21,
+        "employeeId": 2,
+        "workDate": "2026-06-30",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 3,
+        "employeeId": 1,
+        "workDate": "2026-06-30",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 130,
+        "employeeId": 8,
+        "workDate": "2026-06-29",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 112,
+        "employeeId": 7,
+        "workDate": "2026-06-29",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 94,
+        "employeeId": 6,
+        "workDate": "2026-06-29",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 76,
+        "employeeId": 5,
+        "workDate": "2026-06-29",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 58,
+        "employeeId": 4,
+        "workDate": "2026-06-29",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 40,
+        "employeeId": 3,
+        "workDate": "2026-06-29",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 22,
+        "employeeId": 2,
+        "workDate": "2026-06-29",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 4,
+        "employeeId": 1,
+        "workDate": "2026-06-29",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 131,
+        "employeeId": 8,
+        "workDate": "2026-06-26",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 113,
+        "employeeId": 7,
+        "workDate": "2026-06-26",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 95,
+        "employeeId": 6,
+        "workDate": "2026-06-26",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 77,
+        "employeeId": 5,
+        "workDate": "2026-06-26",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 59,
+        "employeeId": 4,
+        "workDate": "2026-06-26",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 41,
+        "employeeId": 3,
+        "workDate": "2026-06-26",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 23,
+        "employeeId": 2,
+        "workDate": "2026-06-26",
+        "status": "LEAVE",
+        "workedHours": "0.00",
+        "note": null
+      },
+      {
+        "id": 5,
+        "employeeId": 1,
+        "workDate": "2026-06-26",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 132,
+        "employeeId": 8,
+        "workDate": "2026-06-25",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 114,
+        "employeeId": 7,
+        "workDate": "2026-06-25",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 96,
+        "employeeId": 6,
+        "workDate": "2026-06-25",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 78,
+        "employeeId": 5,
+        "workDate": "2026-06-25",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 60,
+        "employeeId": 4,
+        "workDate": "2026-06-25",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 42,
+        "employeeId": 3,
+        "workDate": "2026-06-25",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 24,
+        "employeeId": 2,
+        "workDate": "2026-06-25",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 6,
+        "employeeId": 1,
+        "workDate": "2026-06-25",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 133,
+        "employeeId": 8,
+        "workDate": "2026-06-24",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 115,
+        "employeeId": 7,
+        "workDate": "2026-06-24",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 97,
+        "employeeId": 6,
+        "workDate": "2026-06-24",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 79,
+        "employeeId": 5,
+        "workDate": "2026-06-24",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 61,
+        "employeeId": 4,
+        "workDate": "2026-06-24",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 43,
+        "employeeId": 3,
+        "workDate": "2026-06-24",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 25,
+        "employeeId": 2,
+        "workDate": "2026-06-24",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 7,
+        "employeeId": 1,
+        "workDate": "2026-06-24",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 134,
+        "employeeId": 8,
+        "workDate": "2026-06-23",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 116,
+        "employeeId": 7,
+        "workDate": "2026-06-23",
+        "status": "LEAVE",
+        "workedHours": "0.00",
+        "note": null
+      },
+      {
+        "id": 98,
+        "employeeId": 6,
+        "workDate": "2026-06-23",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 80,
+        "employeeId": 5,
+        "workDate": "2026-06-23",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 62,
+        "employeeId": 4,
+        "workDate": "2026-06-23",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 44,
+        "employeeId": 3,
+        "workDate": "2026-06-23",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 26,
+        "employeeId": 2,
+        "workDate": "2026-06-23",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 8,
+        "employeeId": 1,
+        "workDate": "2026-06-23",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 135,
+        "employeeId": 8,
+        "workDate": "2026-06-22",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 117,
+        "employeeId": 7,
+        "workDate": "2026-06-22",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 99,
+        "employeeId": 6,
+        "workDate": "2026-06-22",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 81,
+        "employeeId": 5,
+        "workDate": "2026-06-22",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 63,
+        "employeeId": 4,
+        "workDate": "2026-06-22",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 45,
+        "employeeId": 3,
+        "workDate": "2026-06-22",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 27,
+        "employeeId": 2,
+        "workDate": "2026-06-22",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 9,
+        "employeeId": 1,
+        "workDate": "2026-06-22",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 136,
+        "employeeId": 8,
+        "workDate": "2026-06-19",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 118,
+        "employeeId": 7,
+        "workDate": "2026-06-19",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 100,
+        "employeeId": 6,
+        "workDate": "2026-06-19",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 82,
+        "employeeId": 5,
+        "workDate": "2026-06-19",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 64,
+        "employeeId": 4,
+        "workDate": "2026-06-19",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 46,
+        "employeeId": 3,
+        "workDate": "2026-06-19",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 28,
+        "employeeId": 2,
+        "workDate": "2026-06-19",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 10,
+        "employeeId": 1,
+        "workDate": "2026-06-19",
+        "status": "LEAVE",
+        "workedHours": "0.00",
+        "note": null
+      },
+      {
+        "id": 137,
+        "employeeId": 8,
+        "workDate": "2026-06-18",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 119,
+        "employeeId": 7,
+        "workDate": "2026-06-18",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 101,
+        "employeeId": 6,
+        "workDate": "2026-06-18",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 83,
+        "employeeId": 5,
+        "workDate": "2026-06-18",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 65,
+        "employeeId": 4,
+        "workDate": "2026-06-18",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 47,
+        "employeeId": 3,
+        "workDate": "2026-06-18",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 29,
+        "employeeId": 2,
+        "workDate": "2026-06-18",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 11,
+        "employeeId": 1,
+        "workDate": "2026-06-18",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 138,
+        "employeeId": 8,
+        "workDate": "2026-06-17",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 120,
+        "employeeId": 7,
+        "workDate": "2026-06-17",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 102,
+        "employeeId": 6,
+        "workDate": "2026-06-17",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 84,
+        "employeeId": 5,
+        "workDate": "2026-06-17",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 66,
+        "employeeId": 4,
+        "workDate": "2026-06-17",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 48,
+        "employeeId": 3,
+        "workDate": "2026-06-17",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 30,
+        "employeeId": 2,
+        "workDate": "2026-06-17",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 12,
+        "employeeId": 1,
+        "workDate": "2026-06-17",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 139,
+        "employeeId": 8,
+        "workDate": "2026-06-16",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 121,
+        "employeeId": 7,
+        "workDate": "2026-06-16",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 103,
+        "employeeId": 6,
+        "workDate": "2026-06-16",
+        "status": "LEAVE",
+        "workedHours": "0.00",
+        "note": null
+      },
+      {
+        "id": 85,
+        "employeeId": 5,
+        "workDate": "2026-06-16",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 67,
+        "employeeId": 4,
+        "workDate": "2026-06-16",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 49,
+        "employeeId": 3,
+        "workDate": "2026-06-16",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 31,
+        "employeeId": 2,
+        "workDate": "2026-06-16",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 13,
+        "employeeId": 1,
+        "workDate": "2026-06-16",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 140,
+        "employeeId": 8,
+        "workDate": "2026-06-15",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 122,
+        "employeeId": 7,
+        "workDate": "2026-06-15",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 104,
+        "employeeId": 6,
+        "workDate": "2026-06-15",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 86,
+        "employeeId": 5,
+        "workDate": "2026-06-15",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 68,
+        "employeeId": 4,
+        "workDate": "2026-06-15",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 50,
+        "employeeId": 3,
+        "workDate": "2026-06-15",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 32,
+        "employeeId": 2,
+        "workDate": "2026-06-15",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 14,
+        "employeeId": 1,
+        "workDate": "2026-06-15",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 141,
+        "employeeId": 8,
+        "workDate": "2026-06-12",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 123,
+        "employeeId": 7,
+        "workDate": "2026-06-12",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 105,
+        "employeeId": 6,
+        "workDate": "2026-06-12",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 87,
+        "employeeId": 5,
+        "workDate": "2026-06-12",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 69,
+        "employeeId": 4,
+        "workDate": "2026-06-12",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 51,
+        "employeeId": 3,
+        "workDate": "2026-06-12",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 33,
+        "employeeId": 2,
+        "workDate": "2026-06-12",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 15,
+        "employeeId": 1,
+        "workDate": "2026-06-12",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 142,
+        "employeeId": 8,
+        "workDate": "2026-06-11",
+        "status": "LEAVE",
+        "workedHours": "0.00",
+        "note": null
+      },
+      {
+        "id": 124,
+        "employeeId": 7,
+        "workDate": "2026-06-11",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 106,
+        "employeeId": 6,
+        "workDate": "2026-06-11",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 88,
+        "employeeId": 5,
+        "workDate": "2026-06-11",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 70,
+        "employeeId": 4,
+        "workDate": "2026-06-11",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 52,
+        "employeeId": 3,
+        "workDate": "2026-06-11",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 34,
+        "employeeId": 2,
+        "workDate": "2026-06-11",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 16,
+        "employeeId": 1,
+        "workDate": "2026-06-11",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 143,
+        "employeeId": 8,
+        "workDate": "2026-06-10",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 125,
+        "employeeId": 7,
+        "workDate": "2026-06-10",
+        "status": "LATE",
+        "workedHours": "7.00",
+        "note": null
+      },
+      {
+        "id": 107,
+        "employeeId": 6,
+        "workDate": "2026-06-10",
+        "status": "REMOTE",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 89,
+        "employeeId": 5,
+        "workDate": "2026-06-10",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 71,
+        "employeeId": 4,
+        "workDate": "2026-06-10",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 53,
+        "employeeId": 3,
+        "workDate": "2026-06-10",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 35,
+        "employeeId": 2,
+        "workDate": "2026-06-10",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 17,
+        "employeeId": 1,
+        "workDate": "2026-06-10",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 144,
+        "employeeId": 8,
+        "workDate": "2026-06-09",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 126,
+        "employeeId": 7,
+        "workDate": "2026-06-09",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 108,
+        "employeeId": 6,
+        "workDate": "2026-06-09",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 90,
+        "employeeId": 5,
+        "workDate": "2026-06-09",
+        "status": "LEAVE",
+        "workedHours": "0.00",
+        "note": null
+      },
+      {
+        "id": 72,
+        "employeeId": 4,
+        "workDate": "2026-06-09",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 54,
+        "employeeId": 3,
+        "workDate": "2026-06-09",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 36,
+        "employeeId": 2,
+        "workDate": "2026-06-09",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      },
+      {
+        "id": 18,
+        "employeeId": 1,
+        "workDate": "2026-06-09",
+        "status": "PRESENT",
+        "workedHours": "8.00",
+        "note": null
+      }
+    ],
+    "/api/hr/leave-requests": [
+      {
+        "id": 5,
+        "employeeId": 6,
+        "leaveType": "UNPAID",
+        "startDate": "2026-08-01",
+        "endDate": "2026-08-15",
+        "days": "15.00",
+        "reason": "Sabbatical",
+        "status": "REJECTED",
+        "decidedBy": "seed",
+        "decidedOn": "2026-07-02"
+      },
+      {
+        "id": 4,
+        "employeeId": 1,
+        "leaveType": "ANNUAL",
+        "startDate": "2026-06-12",
+        "endDate": "2026-06-16",
+        "days": "5.00",
+        "reason": "Vacation",
+        "status": "APPROVED",
+        "decidedBy": "seed",
+        "decidedOn": "2026-07-02"
+      },
+      {
+        "id": 3,
+        "employeeId": 3,
+        "leaveType": "SICK",
+        "startDate": "2026-06-29",
+        "endDate": "2026-06-30",
+        "days": "2.00",
+        "reason": "Flu",
+        "status": "APPROVED",
+        "decidedBy": "seed",
+        "decidedOn": "2026-07-02"
+      },
+      {
+        "id": 2,
+        "employeeId": 5,
+        "leaveType": "PERSONAL",
+        "startDate": "2026-07-12",
+        "endDate": "2026-07-12",
+        "days": "1.00",
+        "reason": "Personal errand",
+        "status": "PENDING",
+        "decidedBy": null,
+        "decidedOn": null
+      },
+      {
+        "id": 1,
+        "employeeId": 2,
+        "leaveType": "ANNUAL",
+        "startDate": "2026-07-09",
+        "endDate": "2026-07-11",
+        "days": "3.00",
+        "reason": "Family trip",
+        "status": "PENDING",
+        "decidedBy": null,
+        "decidedOn": null
+      }
+    ],
+    "/api/hr/timesheets": [
+      {
+        "id": 12,
+        "employeeId": 4,
+        "weekEnding": "2026-06-26",
+        "regularHours": "38.00",
+        "overtimeHours": "0.00",
+        "status": "DRAFT",
+        "note": null
+      },
+      {
+        "id": 9,
+        "employeeId": 3,
+        "weekEnding": "2026-06-26",
+        "regularHours": "38.00",
+        "overtimeHours": "0.00",
+        "status": "DRAFT",
+        "note": null
+      },
+      {
+        "id": 6,
+        "employeeId": 2,
+        "weekEnding": "2026-06-26",
+        "regularHours": "38.00",
+        "overtimeHours": "0.00",
+        "status": "DRAFT",
+        "note": null
+      },
+      {
+        "id": 3,
+        "employeeId": 1,
+        "weekEnding": "2026-06-26",
+        "regularHours": "38.00",
+        "overtimeHours": "0.00",
+        "status": "DRAFT",
+        "note": null
+      },
+      {
+        "id": 11,
+        "employeeId": 4,
+        "weekEnding": "2026-06-19",
+        "regularHours": "40.00",
+        "overtimeHours": "2.00",
+        "status": "SUBMITTED",
+        "note": null
+      },
+      {
+        "id": 8,
+        "employeeId": 3,
+        "weekEnding": "2026-06-19",
+        "regularHours": "40.00",
+        "overtimeHours": "2.00",
+        "status": "SUBMITTED",
+        "note": null
+      },
+      {
+        "id": 5,
+        "employeeId": 2,
+        "weekEnding": "2026-06-19",
+        "regularHours": "40.00",
+        "overtimeHours": "2.00",
+        "status": "SUBMITTED",
+        "note": null
+      },
+      {
+        "id": 2,
+        "employeeId": 1,
+        "weekEnding": "2026-06-19",
+        "regularHours": "40.00",
+        "overtimeHours": "2.00",
+        "status": "SUBMITTED",
+        "note": null
+      },
+      {
+        "id": 10,
+        "employeeId": 4,
+        "weekEnding": "2026-06-12",
+        "regularHours": "40.00",
+        "overtimeHours": "4.00",
+        "status": "APPROVED",
+        "note": null
+      },
+      {
+        "id": 7,
+        "employeeId": 3,
+        "weekEnding": "2026-06-12",
+        "regularHours": "40.00",
+        "overtimeHours": "3.00",
+        "status": "APPROVED",
+        "note": null
+      },
+      {
+        "id": 4,
+        "employeeId": 2,
+        "weekEnding": "2026-06-12",
+        "regularHours": "40.00",
+        "overtimeHours": "2.00",
+        "status": "APPROVED",
+        "note": null
+      },
+      {
+        "id": 1,
+        "employeeId": 1,
+        "weekEnding": "2026-06-12",
+        "regularHours": "40.00",
+        "overtimeHours": "1.00",
+        "status": "APPROVED",
+        "note": null
+      }
+    ],
+    "/api/hr/payroll": [
+      {
+        "id": 1,
+        "periodYear": 2026,
+        "periodMonth": 6,
+        "status": "POSTED",
+        "grossTotal": "532000.00",
+        "taxTotal": "31920.00",
+        "insuranceTotal": "26600.00",
+        "netTotal": "473480.00",
+        "postingDate": "2026-07-02",
+        "journalEntryId": 1,
+        "lines": [
+          {
+            "id": 1,
+            "employeeId": 1,
+            "gross": "98000.00",
+            "tax": "5880.00",
+            "insurance": "4900.00",
+            "net": "87220.00"
+          },
+          {
+            "id": 2,
+            "employeeId": 2,
+            "gross": "72000.00",
+            "tax": "4320.00",
+            "insurance": "3600.00",
+            "net": "64080.00"
+          },
+          {
+            "id": 3,
+            "employeeId": 3,
+            "gross": "68000.00",
+            "tax": "4080.00",
+            "insurance": "3400.00",
+            "net": "60520.00"
+          },
+          {
+            "id": 4,
+            "employeeId": 4,
+            "gross": "90000.00",
+            "tax": "5400.00",
+            "insurance": "4500.00",
+            "net": "80100.00"
+          },
+          {
+            "id": 5,
+            "employeeId": 5,
+            "gross": "44000.00",
+            "tax": "2640.00",
+            "insurance": "2200.00",
+            "net": "39160.00"
+          },
+          {
+            "id": 6,
+            "employeeId": 6,
+            "gross": "41000.00",
+            "tax": "2460.00",
+            "insurance": "2050.00",
+            "net": "36490.00"
+          },
+          {
+            "id": 7,
+            "employeeId": 7,
+            "gross": "61000.00",
+            "tax": "3660.00",
+            "insurance": "3050.00",
+            "net": "54290.00"
+          },
+          {
+            "id": 8,
+            "employeeId": 8,
+            "gross": "58000.00",
+            "tax": "3480.00",
+            "insurance": "2900.00",
+            "net": "51620.00"
+          }
+        ]
+      }
+    ],
+    "/api/reporting/revenue-trend": [
+      {
+        "month": "2026-02",
+        "revenue": "3440.0000",
+        "cogs": "2225.2546",
+        "grossMargin": "1214.7454"
+      },
+      {
+        "month": "2026-03",
+        "revenue": "6240.0000",
+        "cogs": "3576.3845",
+        "grossMargin": "2663.6155"
+      },
+      {
+        "month": "2026-04",
+        "revenue": "4480.0000",
+        "cogs": "3882.8408",
+        "grossMargin": "597.1592"
+      },
+      {
+        "month": "2026-05",
+        "revenue": "62080.0000",
+        "cogs": "39545.6030",
+        "grossMargin": "22534.3970"
+      },
+      {
+        "month": "2026-06",
+        "revenue": "48460.0000",
+        "cogs": "30639.2547",
+        "grossMargin": "17820.7453"
+      },
+      {
+        "month": "2026-07",
+        "revenue": "4040.0000",
+        "cogs": "2525.2546",
+        "grossMargin": "1514.7454"
+      }
+    ],
+    "/api/reporting/cash-flow": [
+      {
+        "month": "2026-02",
+        "inflow": "0.0000",
+        "outflow": "65625.0000",
+        "net": "-65625.0000"
+      },
+      {
+        "month": "2026-03",
+        "inflow": "0.0000",
+        "outflow": "37170.0000",
+        "net": "-37170.0000"
+      },
+      {
+        "month": "2026-04",
+        "inflow": "0.0000",
+        "outflow": "51754.5000",
+        "net": "-51754.5000"
+      },
+      {
+        "month": "2026-05",
+        "inflow": "60900.0000",
+        "outflow": "43050.0000",
+        "net": "17850.0000"
+      },
+      {
+        "month": "2026-06",
+        "inflow": "45675.0000",
+        "outflow": "0.0000",
+        "net": "45675.0000"
+      },
+      {
+        "month": "2026-07",
+        "inflow": "630.0000",
+        "outflow": "1050.0000",
+        "net": "-420.0000"
+      }
+    ],
+    "/api/reporting/kpi-summary": {
+      "currentMonth": "2026-07",
+      "previousMonth": "2026-06",
+      "revenue": {
+        "current": "4040.0000",
+        "previous": "48460.0000",
+        "deltaPct": "-91.7"
+      },
+      "grossProfit": {
+        "current": "1514.7454",
+        "previous": "17820.7453",
+        "deltaPct": "-91.5"
+      },
+      "netCash": {
+        "current": "-420.0000",
+        "previous": "45675.0000",
+        "deltaPct": "-100.9"
+      }
+    },
+    "/api/reporting/budget-variance": {
+      "year": 2026,
+      "month": 7,
+      "lines": [
+        {
+          "accountCode": "4100",
+          "name": "Sales Revenue",
+          "budget": "260000.00",
+          "actual": "4040.0000",
+          "variance": "-255960.0000"
+        },
+        {
+          "accountCode": "5100",
+          "name": "COGS",
+          "budget": "150000.00",
+          "actual": "2525.2546",
+          "variance": "-147474.7454"
+        },
+        {
+          "accountCode": "6100",
+          "name": "Salaries Expense",
+          "budget": "560000.00",
+          "actual": "532000.0000",
+          "variance": "-28000.0000"
+        }
+      ]
+    },
+    "/api/inventory/items-status": [
+      {
+        "itemId": 3,
+        "sku": "RM-STEEL",
+        "name": "Steel Sheet",
+        "itemType": "RAW",
+        "value": "52371.1474",
+        "onHandQty": "340.000000",
+        "reorderPoint": null,
+        "status": "OK"
+      },
+      {
+        "itemId": 7,
+        "sku": "RM-PCB",
+        "name": "PCB Board",
+        "itemType": "RAW",
+        "value": "45724.0000",
+        "onHandQty": "230.000000",
+        "reorderPoint": null,
+        "status": "OK"
+      },
+      {
+        "itemId": 4,
+        "sku": "RM-ALU",
+        "name": "Aluminium Bar",
+        "itemType": "RAW",
+        "value": "35375.3488",
+        "onHandQty": "285.000000",
+        "reorderPoint": null,
+        "status": "OK"
+      },
+      {
+        "itemId": 14,
+        "sku": "FG-SENSOR",
+        "name": "Pressure Sensor",
+        "itemType": "FINISHED",
+        "value": "22811.6899",
+        "onHandQty": "47.000000",
+        "reorderPoint": null,
+        "status": "OK"
+      },
+      {
+        "itemId": 13,
+        "sku": "FG-MOTOR",
+        "name": "Servo Motor",
+        "itemType": "FINISHED",
+        "value": "21011.2590",
+        "onHandQty": "47.000000",
+        "reorderPoint": null,
+        "status": "OK"
+      },
+      {
+        "itemId": 5,
+        "sku": "RM-POLY",
+        "name": "Polymer Resin",
+        "itemType": "RAW",
+        "value": "19306.1224",
+        "onHandQty": "220.000000",
+        "reorderPoint": null,
+        "status": "OK"
+      },
+      {
+        "itemId": 15,
+        "sku": "FG-PANEL",
+        "name": "Control Panel",
+        "itemType": "FINISHED",
+        "value": "14082.8091",
+        "onHandQty": "47.000000",
+        "reorderPoint": null,
+        "status": "OK"
+      },
+      {
+        "itemId": 11,
+        "sku": "FG-PUMP",
+        "name": "Hydraulic Pump",
+        "itemType": "FINISHED",
+        "value": "13542.0576",
+        "onHandQty": "39.000000",
+        "reorderPoint": null,
+        "status": "OK"
+      },
+      {
+        "itemId": 12,
+        "sku": "FG-VALVE",
+        "name": "Control Valve",
+        "itemType": "FINISHED",
+        "value": "10848.1158",
+        "onHandQty": "39.000000",
+        "reorderPoint": null,
+        "status": "OK"
+      },
+      {
+        "itemId": 6,
+        "sku": "RM-RUBBER",
+        "name": "Rubber Seal",
+        "itemType": "RAW",
+        "value": "5874.9999",
+        "onHandQty": "150.000000",
+        "reorderPoint": null,
+        "status": "OK"
+      },
+      {
+        "itemId": 8,
+        "sku": "RM-COPPER",
+        "name": "Copper Wire",
+        "itemType": "RAW",
+        "value": "1200.0000",
+        "onHandQty": "20.000000",
+        "reorderPoint": "100.000000",
+        "status": "LOW"
+      },
+      {
+        "itemId": 9,
+        "sku": "RM-GLASS",
+        "name": "Glass Panel",
+        "itemType": "RAW",
+        "value": "900.0000",
+        "onHandQty": "10.000000",
+        "reorderPoint": "50.000000",
+        "status": "LOW"
+      },
+      {
+        "itemId": 1,
+        "sku": "RM-DEMO",
+        "name": "Demo Raw Material",
+        "itemType": "RAW",
+        "value": "500.0000",
+        "onHandQty": "50.000000",
+        "reorderPoint": "20.000000",
+        "status": "OK"
+      },
+      {
+        "itemId": 10,
+        "sku": "RM-LUBE",
+        "name": "Lubricant Oil",
+        "itemType": "RAW",
+        "value": "450.0000",
+        "onHandQty": "15.000000",
+        "reorderPoint": "80.000000",
+        "status": "LOW"
+      },
+      {
+        "itemId": 2,
+        "sku": "FG-DEMO",
+        "name": "Demo Finished Good",
+        "itemType": "FINISHED",
+        "value": "200.0000",
+        "onHandQty": "20.000000",
+        "reorderPoint": null,
+        "status": "OK"
+      }
+    ],
+    "/api/purchasing/suppliers/performance": [
+      {
+        "partnerId": 4,
+        "name": "Pacific Alloy Ltd.",
+        "totalReceipts": 2,
+        "onTime": 2,
+        "onTimePct": "100.0"
+      },
+      {
+        "partnerId": 6,
+        "name": "Hsinchu Electronics",
+        "totalReceipts": 1,
+        "onTime": 1,
+        "onTimePct": "100.0"
+      },
+      {
+        "partnerId": 3,
+        "name": "Formosa Steel Co.",
+        "totalReceipts": 2,
+        "onTime": 1,
+        "onTimePct": "50.0"
+      },
+      {
+        "partnerId": 5,
+        "name": "Taipei Polymers Inc.",
+        "totalReceipts": 1,
+        "onTime": 0,
+        "onTimePct": "0.0"
       }
     ]
   }
