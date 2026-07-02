@@ -96,6 +96,7 @@ export const en = {
     ledger: 'Ledger',
     humanResources: 'Human Resources',
     audit: 'Audit Trail',
+    toggleSection: 'Toggle {module} section',
   },
   login: {
     subtitle: 'Sign in to continue',

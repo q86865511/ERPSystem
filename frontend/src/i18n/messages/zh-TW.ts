@@ -88,6 +88,7 @@ export const zhTW: Messages = {
     ledger: '總帳',
     humanResources: '人力資源',
     audit: '審計軌跡',
+    toggleSection: '展開/收合{module}',
   },
   login: {
     subtitle: '請登入以繼續',

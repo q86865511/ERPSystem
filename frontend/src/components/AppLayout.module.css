@@ -1,0 +1,45 @@
+/* Sidebar parent row: a navigating label (flex-filled link) + an independent expand/collapse chevron.
+   Splitting the two hit-areas is the ERP-001 fix — Mantine's collapsible NavLink swallows the click. */
+.parentRow {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  position: relative;
+  border-radius: var(--mantine-radius-sm);
+}
+
+.parentRow:hover {
+  background-color: var(--mantine-color-gray-0);
+}
+
+[data-mantine-color-scheme='dark'] .parentRow:hover {
+  background-color: var(--mantine-color-dark-6);
+}
+
+/* Active module: light brand wash across the whole row. The 3px brand left rail comes from the
+   theme's global active-NavLink box-shadow (theme.ts), same as every other active nav item. */
+.parentRow[data-active] {
+  background-color: var(--mantine-color-brand-light);
+}
+
+/* The label owns the row width so the click target spans everything but the chevron. */
+.parentLink {
+  flex: 1 1 auto;
+  min-width: 0;
+  background-color: transparent;
+}
+
+.chevron {
+  flex: none;
+  margin-inline-end: 4px;
+  transition: transform 150ms ease;
+}
+
+.chevron[data-open] {
+  transform: rotate(90deg);
+}
+
+/* Sub-items indent under the parent label text. */
+.children {
+  padding-inline-start: var(--mantine-spacing-xl);
+}
