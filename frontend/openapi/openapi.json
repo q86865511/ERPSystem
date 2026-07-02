@@ -1150,6 +1150,48 @@
         "tags" : [ "manufacturing-controller" ]
       }
     },
+    "/api/manufacturing/downtime" : {
+      "get" : {
+        "operationId" : "downtime",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DowntimeReason"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      }
+    },
+    "/api/manufacturing/oee" : {
+      "get" : {
+        "operationId" : "oee",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/EquipmentOee"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "manufacturing-controller" ]
+      }
+    },
     "/api/manufacturing/reorder-report" : {
       "get" : {
         "operationId" : "reorderReport",
@@ -3860,6 +3902,18 @@
           }
         }
       },
+      "DowntimeReason" : {
+        "type" : "object",
+        "properties" : {
+          "minutes" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "reason" : {
+            "type" : "string"
+          }
+        }
+      },
       "EmployeeResponse" : {
         "type" : "object",
         "properties" : {
@@ -3898,6 +3952,33 @@
           "terminationDate" : {
             "type" : "string",
             "format" : "date"
+          }
+        }
+      },
+      "EquipmentOee" : {
+        "type" : "object",
+        "properties" : {
+          "availability" : {
+            "type" : "string"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "equipmentId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "oee" : {
+            "type" : "string"
+          },
+          "performance" : {
+            "type" : "string"
+          },
+          "quality" : {
+            "type" : "string"
           }
         }
       },

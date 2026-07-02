@@ -2,6 +2,9 @@ package com.erp.manufacturing.web;
 
 import com.erp.manufacturing.application.BomService;
 import com.erp.manufacturing.application.BomService.ComponentInput;
+import com.erp.manufacturing.application.DowntimeReason;
+import com.erp.manufacturing.application.EquipmentOee;
+import com.erp.manufacturing.application.OeeService;
 import com.erp.manufacturing.application.ReorderReport;
 import com.erp.manufacturing.application.ReorderReportService;
 import com.erp.manufacturing.application.WorkOrderService;
@@ -27,12 +30,26 @@ public class ManufacturingController {
     private final BomService bomService;
     private final WorkOrderService workOrderService;
     private final ReorderReportService reorderReportService;
+    private final OeeService oeeService;
 
     public ManufacturingController(BomService bomService, WorkOrderService workOrderService,
-                                   ReorderReportService reorderReportService) {
+                                   ReorderReportService reorderReportService, OeeService oeeService) {
         this.bomService = bomService;
         this.workOrderService = workOrderService;
         this.reorderReportService = reorderReportService;
+        this.oeeService = oeeService;
+    }
+
+    /** Per-equipment OEE (Availability × Performance × Quality) for the manufacturing OEE dashboard. */
+    @GetMapping("/oee")
+    public List<EquipmentOee> oee() {
+        return oeeService.oee();
+    }
+
+    /** Total downtime minutes by reason, across all equipment (for the downtime breakdown). */
+    @GetMapping("/downtime")
+    public List<DowntimeReason> downtime() {
+        return oeeService.downtime();
     }
 
     public record CreateBomComponent(Long componentItemId, BigDecimal qtyPer, BigDecimal scrapPct) {
