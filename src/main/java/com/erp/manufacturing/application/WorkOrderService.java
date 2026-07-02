@@ -81,6 +81,15 @@ public class WorkOrderService {
         return workOrderRepository.saveAndFlush(workOrder);
     }
 
+    /** Creates a work order with a planned production window (for the schedule Gantt). */
+    @Transactional
+    public WorkOrder create(Long itemId, Long bomId, BigDecimal qtyToProduce, LocalDate plannedStart,
+                            LocalDate plannedEnd, String actor) {
+        WorkOrder workOrder = create(itemId, bomId, qtyToProduce, actor);
+        workOrder.schedule(plannedStart, plannedEnd);
+        return workOrderRepository.saveAndFlush(workOrder);
+    }
+
     /** Snapshots the BOM (scaled to the order quantity) into frozen planned components. */
     @Transactional
     public WorkOrder release(Long woId, String actor) {

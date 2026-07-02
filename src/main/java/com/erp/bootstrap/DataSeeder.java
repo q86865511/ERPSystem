@@ -433,14 +433,16 @@ public class DataSeeder implements ApplicationRunner {
             produce(f.finished(), f.bomId(), "40", stock, monthAt(months, 5));
         }
         // Released work orders (not issued) -> WIP KPI, progress board and dispatch queue have data.
-        releaseWorkOrder(fPump, families.get(0).bomId(), "30");
-        releaseWorkOrder(fValve, families.get(1).bomId(), "25");
-        releaseWorkOrder(fMotor, families.get(2).bomId(), "45");
-        releaseWorkOrder(fSensor, families.get(3).bomId(), "20");
-        releaseWorkOrder(fPanel, families.get(4).bomId(), "35");
-        // Draft work orders (not released) -> more depth on the dispatch queue.
-        workOrderService.create(fPump, families.get(0).bomId(), new BigDecimal("15"), ACTOR);
-        workOrderService.create(fMotor, families.get(2).bomId(), new BigDecimal("10"), ACTOR);
+        releaseWorkOrder(fPump, families.get(0).bomId(), "30", today.minusDays(2), today.plusDays(5));
+        releaseWorkOrder(fValve, families.get(1).bomId(), "25", today.plusDays(1), today.plusDays(8));
+        releaseWorkOrder(fMotor, families.get(2).bomId(), "45", today.plusDays(3), today.plusDays(11));
+        releaseWorkOrder(fSensor, families.get(3).bomId(), "20", today.plusDays(6), today.plusDays(12));
+        releaseWorkOrder(fPanel, families.get(4).bomId(), "35", today.plusDays(8), today.plusDays(16));
+        // Draft work orders (scheduled further out) -> dispatch queue + schedule Gantt depth.
+        workOrderService.create(fPump, families.get(0).bomId(), new BigDecimal("15"),
+                today.plusDays(12), today.plusDays(19), ACTOR);
+        workOrderService.create(fMotor, families.get(2).bomId(), new BigDecimal("10"),
+                today.plusDays(14), today.plusDays(22), ACTOR);
 
         // --- Sales: delivered-invoiced-and-paid, spread over recent months (revenue/COGS, no AR) -------
         for (int i = 0; i < families.size(); i++) {
@@ -556,15 +558,17 @@ public class DataSeeder implements ApplicationRunner {
     /** WO → release → issue → complete the full quantity. WIP nets back to zero on completion. */
     private void produce(Long finished, Long bomId, String qty, Long stock, LocalDate date) {
         BigDecimal q = new BigDecimal(qty);
-        WorkOrder wo = workOrderService.create(finished, bomId, q, ACTOR);
+        WorkOrder wo = workOrderService.create(finished, bomId, q, date.minusDays(6), date, ACTOR);
         workOrderService.release(wo.getId(), ACTOR);
         workOrderService.issue(wo.getId(), stock, date, ACTOR);
         workOrderService.complete(wo.getId(), q, stock, date, ACTOR);
     }
 
     /** WO → release only (never issued), so it stays RELEASED and touches no WIP account. */
-    private void releaseWorkOrder(Long finished, Long bomId, String qty) {
-        WorkOrder wo = workOrderService.create(finished, bomId, new BigDecimal(qty), ACTOR);
+    private void releaseWorkOrder(Long finished, Long bomId, String qty, LocalDate plannedStart,
+                                  LocalDate plannedEnd) {
+        WorkOrder wo = workOrderService.create(finished, bomId, new BigDecimal(qty), plannedStart,
+                plannedEnd, ACTOR);
         workOrderService.release(wo.getId(), ACTOR);
     }
 

@@ -2343,6 +2343,10 @@ export interface components {
             id?: number;
             /** Format: int64 */
             itemId?: number;
+            /** Format: date */
+            plannedEnd?: string;
+            /** Format: date */
+            plannedStart?: string;
             qtyProduced?: string;
             qtyToProduce?: string;
             status?: string;

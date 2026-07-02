@@ -5417,6 +5417,14 @@
             "type" : "integer",
             "format" : "int64"
           },
+          "plannedEnd" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "plannedStart" : {
+            "type" : "string",
+            "format" : "date"
+          },
           "qtyProduced" : {
             "type" : "string"
           },

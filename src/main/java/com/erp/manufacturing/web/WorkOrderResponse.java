@@ -4,6 +4,7 @@ import com.erp.manufacturing.domain.WorkOrder;
 import com.erp.manufacturing.domain.WorkOrderComponent;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,6 +19,8 @@ public record WorkOrderResponse(
         Long wipLocationId,
         BigDecimal totalComponentCost,
         String status,
+        LocalDate plannedStart,
+        LocalDate plannedEnd,
         List<WorkOrderComponentView> components) {
 
     public record WorkOrderComponentView(
@@ -36,7 +39,8 @@ public record WorkOrderResponse(
                 .map(WorkOrderResponse::toView).toList();
         return new WorkOrderResponse(wo.getId(), wo.getWoNumber(), wo.getItemId(), wo.getBomId(),
                 wo.getQtyToProduce(), wo.getQtyProduced(), wo.getWipLocationId(),
-                wo.getTotalComponentCost(), wo.getStatus().name(), components);
+                wo.getTotalComponentCost(), wo.getStatus().name(), wo.getPlannedStart(),
+                wo.getPlannedEnd(), components);
     }
 
     private static WorkOrderComponentView toView(WorkOrderComponent component) {
