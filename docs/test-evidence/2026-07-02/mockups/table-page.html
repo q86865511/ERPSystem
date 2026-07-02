@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<title>設計提案 — 清單頁(工具列、排序、分頁、密度)</title>
+<style>
+  :root{
+    --brand-6:#2563eb; --brand-0:#eff6ff;
+    --gray-0:#f8fafc; --gray-2:#e2e8f0; --gray-3:#cbd5e1; --gray-5:#64748b; --gray-7:#334155; --gray-9:#0f172a;
+    --pos-tx:#066649; --pos-bg:#e6fcf5;
+    --radius:10px; --fz:13.5px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI","Noto Sans TC",system-ui,sans-serif;background:#fff;color:var(--gray-9);padding:24px;max-width:1100px}
+  h1{font-size:22px} .sub{color:var(--gray-5);font-size:13px;margin:4px 0 14px}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--gray-2);margin-bottom:14px}
+  .tab{padding:8px 14px;font-size:14px;color:var(--gray-5);cursor:pointer;border-bottom:2px solid transparent}
+  .tab.cur{color:var(--brand-6);font-weight:600;border-bottom-color:var(--brand-6)}
+  .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+  .search{display:flex;align-items:center;gap:6px;border:1px solid var(--gray-3);border-radius:8px;padding:6px 10px;width:240px;color:var(--gray-5);font-size:var(--fz)}
+  .filter{border:1px solid var(--gray-3);border-radius:8px;padding:6px 10px;font-size:var(--fz);color:var(--gray-7);display:flex;gap:6px;align-items:center}
+  .filter b{color:var(--brand-6)}
+  .count{font-size:12.5px;color:var(--gray-5);margin-left:4px}
+  .sp{flex:1}
+  .ghost{border:1px solid var(--gray-3);background:#fff;border-radius:8px;padding:7px 12px;font-size:var(--fz);color:var(--gray-7)}
+  .primary{background:var(--brand-6);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:var(--fz);font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:var(--fz)}
+  thead th{position:sticky;top:0;text-align:left;font-size:12.5px;color:var(--gray-5);font-weight:600;
+           background:var(--gray-0);border-bottom:1px solid var(--gray-2);padding:9px 12px;white-space:nowrap}
+  thead th.sorted{color:var(--brand-6)}
+  tbody td{padding:9px 12px;border-bottom:1px solid #eef2f7}
+  tbody tr:hover{background:var(--brand-0)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .badge{font-size:11.5px;font-weight:600;border-radius:6px;padding:2px 8px}
+  .b-draft{background:#f1f5f9;color:#3f4a5a;border:1px solid var(--gray-2)}
+  .b-conf{background:var(--brand-0);color:#1d4fd7;border:1px solid #c7dbff}
+  .b-closed{background:var(--pos-bg);color:var(--pos-tx);border:1px solid #b7ebdb}
+  .foot{display:flex;align-items:center;gap:14px;padding:12px 4px;color:var(--gray-5);font-size:12.5px}
+  .pages{margin-left:auto;display:flex;gap:4px}
+  .pg{min-width:28px;height:28px;display:grid;place-items:center;border-radius:6px;border:1px solid var(--gray-2)}
+  .pg.cur{background:var(--brand-6);color:#fff;border-color:var(--brand-6)}
+  .fn{margin-top:16px;font-size:12px;color:var(--gray-5);line-height:1.8;border-top:1px dashed var(--gray-2);padding-top:10px}
+  .fn b{color:var(--brand-6)}
+</style>
+</head>
+<body>
+  <h1>銷售</h1>
+  <div class="sub">訂單到收款:銷售單 → 出貨 → 發票 → 收款</div>
+  <div class="tabs">
+    <div class="tab cur">銷售單</div><div class="tab">出貨</div><div class="tab">發票</div>
+    <div class="tab">收款</div><div class="tab">退貨</div><div class="tab">AR 帳齡</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search">🔍 搜尋單號 / 客戶…</div>
+    <div class="filter">狀態:<b>全部 ▾</b></div>
+    <div class="filter">期間:<b>近 6 個月 ▾</b></div>
+    <span class="count">共 24 筆</span>
+    <div class="sp"></div>
+    <button class="ghost">⬇ 匯出 CSV</button>
+    <button class="primary">＋ 新增銷售單</button>
+  </div>
+
+  <table>
+    <thead><tr>
+      <th>銷售單號 ↕</th><th>客戶 ↕</th><th class="sorted">訂單日期 ▼</th><th class="num">金額</th><th>狀態 ↕</th><th></th>
+    </tr></thead>
+    <tbody>
+      <tr><td>SO-000024</td><td>CUST-NORTH — Northern Machinery</td><td>2026-07-02</td><td class="num">18,400.00</td><td><span class="badge b-draft">草稿</span></td><td>›</td></tr>
+      <tr><td>SO-000023</td><td>CUST-GLOBAL — Global Distributors</td><td>2026-07-02</td><td class="num">9,750.00</td><td><span class="badge b-draft">草稿</span></td><td>›</td></tr>
+      <tr><td>SO-000022</td><td>CUST-WEST — Western Robotics</td><td>2026-07-02</td><td class="num">27,300.00</td><td><span class="badge b-conf">已確認</span></td><td>›</td></tr>
+      <tr><td>SO-000021</td><td>CUST-EAST — Eastern Automation</td><td>2026-07-02</td><td class="num">12,880.00</td><td><span class="badge b-conf">已確認</span></td><td>›</td></tr>
+      <tr><td>SO-000018</td><td>CUST-SOUTH — Southern Industries</td><td>2026-07-02</td><td class="num">31,050.00</td><td><span class="badge b-closed">已結案</span></td><td>›</td></tr>
+      <tr><td>SO-000017</td><td>CUST-NORTH — Northern Machinery</td><td>2026-06-15</td><td class="num">22,140.00</td><td><span class="badge b-closed">已結案</span></td><td>›</td></tr>
+      <tr><td>SO-000016</td><td>CUST-GLOBAL — Global Distributors</td><td>2026-05-15</td><td class="num">8,660.00</td><td><span class="badge b-closed">已結案</span></td><td>›</td></tr>
+    </tbody>
+  </table>
+  <div class="foot">
+    每頁 <b style="color:var(--gray-7)">25 ▾</b> 筆
+    <span>顯示 1–24 / 24</span>
+    <div class="pages"><span class="pg">‹</span><span class="pg cur">1</span><span class="pg">›</span></div>
+  </div>
+
+  <div class="fn">
+    設計重點:<b>①</b> 工具列 = 搜尋 + 狀態/期間篩選 + 筆數 + 匯出 + 主要動作(靠右)
+    <b>②</b> 取消藍色斑馬紋 → 白底 + 細分隔線 + hover 淺藍(表頭灰底,三層藍不再互搶)
+    <b>③</b> 可排序欄位 ↕(active 欄 ▼ 品牌色)、表頭 sticky
+    <b>④</b> 金額欄右對齊 tabular-nums(新增「金額」欄,清單即可比大小)
+    <b>⑤</b> 分頁 footer(預設 25/頁)— 出勤等大表(實測 144 列)必備
+    <b>⑥</b> 狀態徽章加 1px 邊框、文字 .9 色階(WCAG AA)。空狀態:插圖 + 「新增第一筆銷售單」CTA。
+  </div>
+</body>
+</html>

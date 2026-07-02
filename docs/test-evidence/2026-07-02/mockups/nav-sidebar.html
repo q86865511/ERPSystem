@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<title>設計提案 — 導覽側欄互動(修復 ERP-001 後)</title>
+<style>
+  :root{
+    --brand-6:#2563eb; --brand-0:#eff6ff; --brand-1:#dbeafe;
+    --gray-0:#f8fafc; --gray-2:#e2e8f0; --gray-5:#64748b; --gray-7:#334155; --gray-9:#0f172a;
+    --radius:8px; --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px;
+    --fz-sm:13px; --fz-md:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI","Noto Sans TC",system-ui,sans-serif;background:#fff;color:var(--gray-9);display:flex;gap:40px;padding:28px}
+  .sidebar{width:260px;border:1px solid var(--gray-2);border-radius:12px;padding:var(--sp-2);background:#fff}
+  .item{display:flex;align-items:center;gap:var(--sp-3);padding:9px var(--sp-3);border-radius:var(--radius);
+        font-size:var(--fz-md);color:var(--gray-7);cursor:pointer;position:relative}
+  .item:hover{background:var(--gray-0)}
+  .item .ico{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7}
+  .item .lbl{flex:1}
+  .chev{width:26px;height:26px;flex:none;display:grid;place-items:center;border-radius:6px;color:var(--gray-5)}
+  .chev:hover{background:var(--brand-1);color:var(--brand-6)}
+  .chev svg{width:14px;height:14px;transition:transform .15s}
+  .open .chev svg{transform:rotate(90deg)}
+  .active{background:var(--brand-0);color:var(--brand-6);font-weight:600}
+  .active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:2px;background:var(--brand-6)}
+  .child{display:flex;align-items:center;padding:7px var(--sp-3) 7px 46px;border-radius:var(--radius);
+         font-size:var(--fz-sm);color:var(--gray-5);cursor:pointer;position:relative}
+  .child:hover{background:var(--gray-0);color:var(--gray-7)}
+  .child.cur{color:var(--brand-6);font-weight:600;background:var(--brand-0)}
+  .child.cur::before{content:"";position:absolute;left:34px;width:5px;height:5px;border-radius:50%;background:var(--brand-6);top:calc(50% - 2.5px)}
+  .focusring{outline:2px solid var(--brand-6);outline-offset:2px}
+  .note{max-width:420px}
+  .note h1{font-size:18px;margin-bottom:10px}
+  .note ol{margin:12px 0 0 18px;line-height:1.9;font-size:var(--fz-md);color:var(--gray-7)}
+  .note b{color:var(--brand-6)}
+  .tag{display:inline-block;background:var(--brand-6);color:#fff;font-size:11px;border-radius:10px;padding:1px 8px;margin-left:6px;vertical-align:2px}
+  .divider{height:1px;background:var(--gray-2);margin:6px 4px}
+  kbd{border:1px solid var(--gray-2);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-size:12px;background:var(--gray-0)}
+</style>
+</head>
+<body>
+  <nav class="sidebar" aria-label="主導覽">
+    <div class="item"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="lbl">儀表板</span></div>
+    <div class="item"><svg class="ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/></svg><span class="lbl">主檔</span>
+      <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span></div>
+    <div class="item open active"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M3 4h2l2.6 12h10.8L21 8H7"/></svg><span class="lbl">採購</span>
+      <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span></div>
+    <div class="child cur">採購單</div>
+    <div class="child">收貨</div>
+    <div class="child">進項發票</div>
+    <div class="child">付款</div>
+    <div class="child">AP 帳齡</div>
+    <div class="item"><svg class="ico" viewBox="0 0 24 24"><path d="M3 21V8l7-5 4 3V4h4v17"/><path d="M3 21h18"/></svg><span class="lbl">製造</span>
+      <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span></div>
+    <div class="item focusring"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8V21H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg><span class="lbl">庫存</span>
+      <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span></div>
+    <div class="divider"></div>
+    <div class="item"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span class="lbl">審計軌跡</span></div>
+  </nav>
+
+  <aside class="note">
+    <h1>導覽互動規格(修復 ERP-001 後)<span class="tag">提案</span></h1>
+    <ol>
+      <li><b>點擊文字/圖示區</b> → <code>navigate(item.to)</code> 導航至模組(預設分頁),同時展開子選單。父項不再用 <code>component={Link}</code> + 受控 opened 的組合。</li>
+      <li><b>點擊右側 chevron</b>(獨立 hit-area 26×26)→ 只展開/收合,不導航。chevron 旋轉 90° 表示展開。</li>
+      <li><b>Active 樣式</b>:左側 3px 品牌色 rail + 淺藍底;目前子項前加圓點。</li>
+      <li><b>子項縮排 46px</b> 對齊父項文字,收合動畫 150ms。</li>
+      <li><b>鍵盤</b>:<kbd>Enter</kbd> = 導航、<kbd>→</kbd>/<kbd>←</kbd> = 展開/收合(庫存項展示 focus ring)。</li>
+      <li><b>行動版</b>:點文字導航並關閉抽屜;點 chevron 展開不關抽屜。</li>
+    </ol>
+  </aside>
+</body>
+</html>

@@ -1,0 +1,845 @@
+{
+  "base": "http://localhost:8081",
+  "at": "2026-07-02T05:50:21.521Z",
+  "cells": [
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/masterdata/items",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/hr/departments",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/purchasing/vendor-bills",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/sales/sales-invoices",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/sales/customer-returns",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/payments/out",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/ledger/journal-entries",
+      "status": 400,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/sales/sales-orders",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/sales/deliveries",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/purchasing/purchase-orders",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/inventory/adjustments",
+      "status": 400,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/manufacturing/work-orders",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "admin",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 200,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/masterdata/items",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/hr/departments",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/purchasing/vendor-bills",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/sales/sales-invoices",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/sales/customer-returns",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/payments/out",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/ledger/journal-entries",
+      "status": 400,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/sales/sales-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/sales/deliveries",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/purchasing/purchase-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/inventory/adjustments",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/manufacturing/work-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "accountant",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/masterdata/items",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/hr/departments",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/purchasing/vendor-bills",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/sales/sales-invoices",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/sales/customer-returns",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/payments/out",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/ledger/journal-entries",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/sales/sales-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/sales/deliveries",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/purchasing/purchase-orders",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/inventory/adjustments",
+      "status": 400,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/manufacturing/work-orders",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "warehouse",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/masterdata/items",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/hr/departments",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/purchasing/vendor-bills",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/sales/sales-invoices",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/sales/customer-returns",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/payments/out",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/ledger/journal-entries",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/sales/sales-orders",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/sales/deliveries",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/purchasing/purchase-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/inventory/adjustments",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/manufacturing/work-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "sales",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/masterdata/items",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/hr/departments",
+      "status": 500,
+      "expectedAllowed": true,
+      "observedAllowed": true,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/purchasing/vendor-bills",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/sales/sales-invoices",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/sales/customer-returns",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/payments/out",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/ledger/journal-entries",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/sales/sales-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/sales/deliveries",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/purchasing/purchase-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/inventory/adjustments",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/manufacturing/work-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "hr",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/masterdata/items",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/hr/departments",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/purchasing/vendor-bills",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/sales/sales-invoices",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/sales/customer-returns",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/payments/out",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/ledger/journal-entries",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/sales/sales-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/sales/deliveries",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/purchasing/purchase-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/inventory/adjustments",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "POST",
+      "path": "/api/manufacturing/work-orders",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    },
+    {
+      "account": "guest",
+      "method": "GET",
+      "path": "/api/audit",
+      "status": 403,
+      "expectedAllowed": false,
+      "observedAllowed": false,
+      "ok": true
+    }
+  ],
+  "mismatches": [],
+  "sample400": null,
+  "fiveHundreds": [
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/masterdata/items",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:20.918Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/masterdata/items\"}"
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/hr/departments",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:20.941Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/hr/departments\"}"
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/purchasing/vendor-bills",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:20.955Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/purchasing/vendor-bills\"}"
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/sales/sales-invoices",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:20.963Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/sales/sales-invoices\"}"
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/sales/customer-returns",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:20.974Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/sales/customer-returns\"}"
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/payments/out",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:20.981Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/payments/out\"}"
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/sales/sales-orders",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.003Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/sales/sales-orders\"}"
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/sales/deliveries",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.011Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/sales/deliveries\"}"
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/purchasing/purchase-orders",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.018Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/purchasing/purchase-orders\"}"
+    },
+    {
+      "account": "admin",
+      "method": "POST",
+      "path": "/api/manufacturing/work-orders",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.032Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/manufacturing/work-orders\"}"
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/purchasing/vendor-bills",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.131Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/purchasing/vendor-bills\"}"
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/sales/sales-invoices",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.137Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/sales/sales-invoices\"}"
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/sales/customer-returns",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.142Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/sales/customer-returns\"}"
+    },
+    {
+      "account": "accountant",
+      "method": "POST",
+      "path": "/api/payments/out",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.148Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/payments/out\"}"
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/sales/deliveries",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.245Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/sales/deliveries\"}"
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/purchasing/purchase-orders",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.250Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/purchasing/purchase-orders\"}"
+    },
+    {
+      "account": "warehouse",
+      "method": "POST",
+      "path": "/api/manufacturing/work-orders",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.259Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/manufacturing/work-orders\"}"
+    },
+    {
+      "account": "sales",
+      "method": "POST",
+      "path": "/api/sales/sales-orders",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.339Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/sales/sales-orders\"}"
+    },
+    {
+      "account": "hr",
+      "method": "POST",
+      "path": "/api/hr/departments",
+      "status": 500,
+      "body": "{\"timestamp\":\"2026-07-02T05:50:21.413Z\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/api/hr/departments\"}"
+    }
+  ]
+}

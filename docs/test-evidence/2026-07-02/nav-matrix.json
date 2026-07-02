@@ -1,0 +1,111 @@
+{
+  "base": "https://erp.terrychou.com",
+  "startedAt": "2026-07-02T05:41:50.540Z",
+  "desktop": [
+    {
+      "to": "/",
+      "before": "/",
+      "after": "/",
+      "navigated": false,
+      "submenuExpanded": null
+    },
+    {
+      "to": "/masterdata",
+      "before": "/",
+      "after": "/",
+      "navigated": false,
+      "submenuExpanded": false
+    },
+    {
+      "to": "/purchasing",
+      "before": "/",
+      "after": "/",
+      "navigated": false,
+      "submenuExpanded": false
+    },
+    {
+      "to": "/sales",
+      "before": "/",
+      "after": "/",
+      "navigated": false,
+      "submenuExpanded": false
+    },
+    {
+      "to": "/manufacturing",
+      "before": "/",
+      "after": "/",
+      "navigated": false,
+      "submenuExpanded": false
+    },
+    {
+      "to": "/inventory",
+      "before": "/",
+      "after": "/",
+      "navigated": false,
+      "submenuExpanded": false
+    },
+    {
+      "to": "/reporting",
+      "before": "/",
+      "after": "/",
+      "navigated": false,
+      "submenuExpanded": false
+    },
+    {
+      "to": "/ledger",
+      "before": "/",
+      "after": "/",
+      "navigated": false,
+      "submenuExpanded": false
+    },
+    {
+      "to": "/hr",
+      "before": "/",
+      "after": "/",
+      "navigated": false,
+      "submenuExpanded": false
+    },
+    {
+      "to": "/audit",
+      "before": "/",
+      "after": "/audit",
+      "navigated": true,
+      "submenuExpanded": null
+    }
+  ],
+  "keyboard": {
+    "enter": {
+      "before": "/",
+      "after": "/",
+      "navigated": false
+    },
+    "space": {
+      "before": "/",
+      "after": "/",
+      "navigated": false,
+      "submenuExpanded": false
+    }
+  },
+  "mobile": {
+    "drawerOpenBeforeClick": true,
+    "clicked": "/sales",
+    "before": "/",
+    "after": "/",
+    "navigated": false,
+    "drawerOpenAfterClick": true
+  },
+  "childFromModulePage": {
+    "before": "/masterdata",
+    "after": "/masterdata?tab=partners",
+    "navigated": true
+  },
+  "directUrlWorkaround": {
+    "url": "/purchasing?tab=orders",
+    "rendered": true
+  },
+  "console": [
+    "[desktop][error] Failed to load resource: the server responded with a status of 401 ()",
+    "[mobile][error] Failed to load resource: the server responded with a status of 401 ()"
+  ],
+  "finishedAt": "2026-07-02T05:42:15.048Z"
+}
