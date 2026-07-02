@@ -289,6 +289,7 @@ export function AppLayout() {
             // Section is expanded when the user opened it, else it follows the active route. Two hit-areas:
             // the label (a real link) navigates + expands; the chevron only toggles expansion (ERP-001).
             const open = openSections[item.to] ?? active;
+            const sectionId = `nav-section-${item.to.slice(1)}`;
             return (
               <div key={item.to}>
                 <div className={classes.parentRow} data-active={active || undefined}>
@@ -312,6 +313,7 @@ export function AppLayout() {
                     color="gray"
                     data-open={open || undefined}
                     aria-expanded={open}
+                    aria-controls={sectionId}
                     aria-label={t('nav.toggleSection', { module: t(item.labelKey) })}
                     onClick={(e) => {
                       // Toggle expansion only — never navigate, never close the mobile drawer.
@@ -323,7 +325,7 @@ export function AppLayout() {
                     <IconChevronRight size={16} />
                   </ActionIcon>
                 </div>
-                <Collapse expanded={open}>
+                <Collapse expanded={open} id={sectionId}>
                   <div className={classes.children}>
                     {item.children.map((child) => (
                       <NavLink

@@ -16,19 +16,10 @@
   background-color: var(--mantine-color-dark-6);
 }
 
-/* Active module: light brand wash + a 3px brand rail down the left edge. */
+/* Active module: light brand wash across the whole row. The 3px brand left rail comes from the
+   theme's global active-NavLink box-shadow (theme.ts), same as every other active nav item. */
 .parentRow[data-active] {
   background-color: var(--mantine-color-brand-light);
-}
-
-.parentRow[data-active]::before {
-  content: '';
-  position: absolute;
-  inset-block: 6px;
-  inset-inline-start: 0;
-  width: 3px;
-  border-radius: 2px;
-  background-color: var(--mantine-color-brand-filled);
 }
 
 /* The label owns the row width so the click target spans everything but the chevron. */
