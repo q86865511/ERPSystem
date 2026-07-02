@@ -1,10 +1,12 @@
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import {
+  ActionIcon,
   AppShell,
   Avatar,
   Burger,
   Button,
   Center,
+  Collapse,
   Group,
   Loader,
   Menu,
@@ -24,6 +26,7 @@ import {
   IconHelpCircle,
   IconHistory,
   IconLayoutDashboard,
+  IconChevronRight,
   IconLogout,
   IconMoon,
   IconReportAnalytics,
@@ -33,6 +36,7 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import classes from './AppLayout.module.css';
 import { useAuth } from '../auth/useAuth';
 import type { Role } from '../auth/roles';
 import { useI18n } from '../i18n';
@@ -154,6 +158,9 @@ const NAV: {
 
 export function AppLayout() {
   const [opened, { toggle, close }] = useDisclosure();
+  // Per-section expand overrides keyed by route. Defaults to the route-active module (see `open` below),
+  // but the chevron lets users expand a non-active module or collapse the active one.
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const location = useLocation();
   const { user, logout, hasRole } = useAuth();
   const { locale, setLocale, t } = useI18n();
@@ -276,34 +283,61 @@ export function AppLayout() {
                 />
               );
             }
-            // The active module auto-expands (accordion-follows-route); the current `?tab=` (or the first
-            // child when none) is the active sub-item.
+            // The current `?tab=` (or the first child when none) is the active sub-item.
             const currentTab = new URLSearchParams(location.search).get('tab');
             const activeTab = currentTab ?? item.children[0]?.value;
+            // Section is expanded when the user opened it, else it follows the active route. Two hit-areas:
+            // the label (a real link) navigates + expands; the chevron only toggles expansion (ERP-001).
+            const open = openSections[item.to] ?? active;
             return (
-              <NavLink
-                key={item.to}
-                component={Link}
-                to={item.to}
-                label={t(item.labelKey)}
-                leftSection={<Icon size={18} />}
-                active={active}
-                opened={active}
-                onClick={close}
-                data-onboarding={item.onboardingId}
-                childrenOffset={28}
-              >
-                {item.children.map((child) => (
+              <div key={item.to}>
+                <div className={classes.parentRow} data-active={active || undefined}>
                   <NavLink
-                    key={child.value}
+                    className={classes.parentLink}
                     component={Link}
-                    to={`${item.to}?tab=${child.value}`}
-                    label={t(child.labelKey)}
-                    active={active && activeTab === child.value}
-                    onClick={close}
+                    to={item.to}
+                    label={t(item.labelKey)}
+                    leftSection={<Icon size={18} />}
+                    active={active}
+                    variant="subtle"
+                    onClick={() => {
+                      setOpenSections((s) => ({ ...s, [item.to]: true }));
+                      close();
+                    }}
+                    data-onboarding={item.onboardingId}
                   />
-                ))}
-              </NavLink>
+                  <ActionIcon
+                    className={classes.chevron}
+                    variant="subtle"
+                    color="gray"
+                    data-open={open || undefined}
+                    aria-expanded={open}
+                    aria-label={t('nav.toggleSection', { module: t(item.labelKey) })}
+                    onClick={(e) => {
+                      // Toggle expansion only — never navigate, never close the mobile drawer.
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setOpenSections((s) => ({ ...s, [item.to]: !open }));
+                    }}
+                  >
+                    <IconChevronRight size={16} />
+                  </ActionIcon>
+                </div>
+                <Collapse expanded={open}>
+                  <div className={classes.children}>
+                    {item.children.map((child) => (
+                      <NavLink
+                        key={child.value}
+                        component={Link}
+                        to={`${item.to}?tab=${child.value}`}
+                        label={t(child.labelKey)}
+                        active={active && activeTab === child.value}
+                        onClick={close}
+                      />
+                    ))}
+                  </div>
+                </Collapse>
+              </div>
             );
           })}
         </ScrollArea>
