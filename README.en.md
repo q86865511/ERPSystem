@@ -250,9 +250,9 @@ type and actor.
 > blue enterprise-SaaS look (primary `#2563EB` + a cool slate neutral scale) and is deployed — **the
 > screenshots on this page are the blue version**. Four `@mantine/charts` data dashboards (ERP overview /
 > finance center / inventory / manufacturing) are wired to real endpoints; finance analytics (revenue trend
-> / cash flow / budget variance / KPI deltas) are now wired to real backends (C1); the remaining deeper
-> widgets (per-item heat treemap, supplier on-time rate, work-order Gantt, OEE) are still honestly marked
-> **PLANNED**, to be filled in by later backend PRs.
+> / cash flow / budget variance / KPI deltas, C1), the per-item heat treemap (C2), supplier on-time rate
+> (C3) and the work-order Gantt (C4) are now wired to real backends; only **OEE / equipment** (C5) remains
+> honestly marked **PLANNED**, to be filled in by a later backend PR.
 
 **The design system (Blue Enterprise)**: a self-built Mantine theme — a blue enterprise primary color
 (`#2563EB`) + a cool slate neutral scale + a self-hosted Plus Jakarta Sans;
