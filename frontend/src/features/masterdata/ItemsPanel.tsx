@@ -86,6 +86,13 @@ export function ItemsPanel() {
         rowKey={(i) => i.id ?? i.sku ?? ''}
         isLoading={isLoading}
         emptyMessage={t('masterdata.items.empty')}
+        emptyCta={
+          canDo('masterdata.create') ? (
+            <Button leftSection={<IconPlus size={16} />} onClick={open}>
+              {t('masterdata.items.new')}
+            </Button>
+          ) : undefined
+        }
         minWidth={640}
       />
 

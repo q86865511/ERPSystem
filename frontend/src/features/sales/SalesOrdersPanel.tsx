@@ -102,6 +102,13 @@ export function SalesOrdersPanel() {
         rowKey={(so) => so.id ?? so.soNumber ?? ''}
         isLoading={isLoading}
         emptyMessage={t('sales.order.empty')}
+        emptyCta={
+          canDo('sales.order') ? (
+            <Button leftSection={<IconPlus size={16} />} onClick={open}>
+              {t('sales.order.new')}
+            </Button>
+          ) : undefined
+        }
         onRowClick={(so) => setDetailId(so.id ?? null)}
         minWidth={620}
         searchable

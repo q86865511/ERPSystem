@@ -37,10 +37,18 @@
   --erp-chart-8: #f97316;
 }
 
+/* `:root[data-mantine-color-scheme]` (Mantine's own variable-resolver selector) outranks a bare attribute
+   selector, so the dimmed override below must match that specificity to actually win the cascade. */
+:root[data-mantine-color-scheme='dark'],
 [data-mantine-color-scheme='dark'] {
   --mantine-color-body: #0f172a;
   --app-color-card: #1b2436;
   --app-color-border: #2a3650;
+
+  /* Mantine's default dark dimmed (dark.2 = #828282) is only 4.04:1 on our card surface (#1b2436) — fails
+     WCAG AA. One step lighter (dark.1 = #b8b8b8, Mantine's own stock ramp) clears 7.8:1+ on every dark
+     surface we use, including the generic Mantine defaults (#242424/#1a1b1e) for headroom. */
+  --mantine-color-dimmed: #b8b8b8;
 
   --erp-positive-bg: #0b3b30;
   --erp-positive-text: #63e6be; /* light teal — AA on the dark wash */

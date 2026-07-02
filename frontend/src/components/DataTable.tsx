@@ -35,6 +35,7 @@ export function DataTable<T>({
   isLoading,
   isEmpty,
   emptyMessage,
+  emptyCta,
   onRowClick,
   rowActionLabel,
   minWidth,
@@ -47,6 +48,8 @@ export function DataTable<T>({
   isLoading?: boolean;
   isEmpty?: boolean;
   emptyMessage: string;
+  /** Optional call-to-action rendered under the empty message (e.g. "Add the first order…"). */
+  emptyCta?: ReactNode;
   onRowClick?: (row: T) => void;
   rowActionLabel?: string;
   minWidth?: number;
@@ -125,7 +128,7 @@ export function DataTable<T>({
     return minWidth ? <Table.ScrollContainer minWidth={minWidth}>{skeleton}</Table.ScrollContainer> : skeleton;
   }
   if (isEmpty || rows.length === 0) {
-    return <EmptyState message={emptyMessage} />;
+    return <EmptyState message={emptyMessage} cta={emptyCta} />;
   }
 
   const toggleSort = (key: string) => {

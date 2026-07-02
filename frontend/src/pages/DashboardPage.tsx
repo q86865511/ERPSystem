@@ -1,11 +1,12 @@
 import { Badge, Card, Group, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
-import { FunnelChart, LineChart } from '@mantine/charts';
+import { LineChart } from '@mantine/charts';
 import { IconAlertTriangle, IconBox, IconChartPie, IconClockExclamation, IconCoin, IconFileInvoice, IconUsers } from '@tabler/icons-react';
 import { useAuth } from '../auth/useAuth';
 import { useI18n } from '../i18n';
 import { LiveBadge } from '../components/LiveBadge';
 import { KpiTile, parseDeltaPct } from '../components/charts/KpiTile';
 import { DonutCard, type DonutDatum } from '../components/charts/DonutCard';
+import { PipelineBars } from '../components/charts/PipelineBars';
 import { categoryColors, chartSeries } from '../components/charts/palette';
 import { formatMoney, sumMoney } from '../components/Money';
 import { ReconciliationHero } from '../features/reporting/ReconciliationHero';
@@ -28,8 +29,6 @@ export function DashboardPage() {
   const revenueTrend = useRevenueTrend(6);
   const kpi = useKpiSummary();
 
-  const live = <LiveBadge />;
-
   const kpisLoading = is.isLoading || ar.isLoading || so.isLoading || inv.isLoading;
   const netIncomeNegative = Number(is.data?.netIncome ?? 0) < 0;
   const revenueDelta = parseDeltaPct(kpi.data?.revenue?.deltaPct);
@@ -40,10 +39,10 @@ export function DashboardPage() {
   const shipped = orders.filter((o) => SHIPPED_STATES.has(o.status ?? '')).length;
   const closed = orders.filter((o) => o.status === 'CLOSED').length;
   const funnel = [
-    { name: t('dashboard.overview.stageCreated'), value: created, color: chartSeries[0] },
-    { name: t('dashboard.overview.stageConfirmed'), value: confirmed, color: chartSeries[1] },
-    { name: t('dashboard.overview.stageShipped'), value: shipped, color: chartSeries[2] },
-    { name: t('dashboard.overview.stageClosed'), value: closed, color: chartSeries[3] },
+    { name: t('dashboard.overview.stageCreated'), value: created, color: chartSeries[0] ?? 'var(--erp-chart-1)' },
+    { name: t('dashboard.overview.stageConfirmed'), value: confirmed, color: chartSeries[1] ?? 'var(--erp-chart-2)' },
+    { name: t('dashboard.overview.stageShipped'), value: shipped, color: chartSeries[2] ?? 'var(--erp-chart-3)' },
+    { name: t('dashboard.overview.stageClosed'), value: closed, color: chartSeries[3] ?? 'var(--erp-chart-4)' },
   ];
 
   const invLabel = (code?: string) =>
@@ -59,7 +58,10 @@ export function DashboardPage() {
   return (
     <Stack gap="lg">
       <Stack gap={4}>
-        <Title order={2}>{t('nav.dashboard')}</Title>
+        <Group gap="sm">
+          <Title order={2}>{t('nav.dashboard')}</Title>
+          <LiveBadge />
+        </Group>
         <Group gap="xs">
           <Text c="dimmed">{t('dashboard.signedInAs')}</Text>
           <Text fw={600}>{user?.username}</Text>
@@ -86,26 +88,24 @@ export function DashboardPage() {
               label={t('dashboard.overview.revenue')}
               value={is.data?.totalRevenue}
               icon={<IconCoin size={16} />}
-              status={live}
               delta={revenueDelta}
               deltaLabel={t('dashboard.kpiBasis')}
             />
-            <KpiTile label={t('dashboard.netIncome')} value={is.data?.netIncome} icon={<IconChartPie size={16} />} status={live} valueColor={netIncomeNegative ? 'var(--erp-negative-text)' : undefined} />
-            <KpiTile label={t('dashboard.overview.orders')} value={String(created)} money={false} icon={<IconFileInvoice size={16} />} status={live} />
-            <KpiTile label={t('dashboard.overview.receivables')} value={ar.data?.total} icon={<IconUsers size={16} />} status={live} />
-            <KpiTile label={t('dashboard.overview.inventoryValue')} value={invTotal} icon={<IconBox size={16} />} status={live} />
+            <KpiTile label={t('dashboard.netIncome')} value={is.data?.netIncome} icon={<IconChartPie size={16} />} valueColor={netIncomeNegative ? 'var(--erp-negative-text)' : undefined} />
+            <KpiTile label={t('dashboard.overview.orders')} value={String(created)} money={false} icon={<IconFileInvoice size={16} />} />
+            <KpiTile label={t('dashboard.overview.receivables')} value={ar.data?.total} icon={<IconUsers size={16} />} />
+            <KpiTile label={t('dashboard.overview.inventoryValue')} value={invTotal} icon={<IconBox size={16} />} />
           </>
         )}
       </SimpleGrid>
 
       <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }}>
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('dashboard.overview.orderPipeline')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('dashboard.overview.orderPipeline')}
+          </Text>
           {created > 0 ? (
-            <FunnelChart data={funnel} h={200} withLabels labelsPosition="right" withTooltip />
+            <PipelineBars stages={funnel} />
           ) : (
             <Text c="dimmed" size="sm" py="xl" ta="center">
               —
@@ -113,13 +113,12 @@ export function DashboardPage() {
           )}
         </Card>
 
-        <DonutCard title={t('dashboard.overview.inventoryStatus')} badge={live} data={invData} centerLabel={formatMoney(invTotal)} />
+        <DonutCard title={t('dashboard.overview.inventoryStatus')} data={invData} centerLabel={formatMoney(invTotal)} />
 
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('dashboard.overview.alerts')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('dashboard.overview.alerts')}
+          </Text>
           <Group justify="space-between" py={9} style={{ borderBottom: '0.5px solid var(--app-color-border)' }}>
             <Group gap={8} style={{ color: 'var(--erp-warning-text)' }}>
               <IconAlertTriangle size={16} />
@@ -142,10 +141,9 @@ export function DashboardPage() {
       </SimpleGrid>
 
       <Card withBorder padding="md">
-        <Group justify="space-between" mb="sm" wrap="nowrap">
-          <Text fw={500}>{t('dashboard.overview.salesTrend')}</Text>
-          {live}
-        </Group>
+        <Text fw={500} mb="sm">
+          {t('dashboard.overview.salesTrend')}
+        </Text>
         <LineChart
           h={200}
           data={(revenueTrend.data ?? []).map((p) => ({

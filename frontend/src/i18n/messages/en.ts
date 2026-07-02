@@ -27,6 +27,7 @@ import { salesEn } from './modules/sales';
 export const en = {
   app: {
     title: 'Manufacturing ERP',
+    skipToContent: 'Skip to main content',
   },
   common: {
     signOut: 'Sign out',

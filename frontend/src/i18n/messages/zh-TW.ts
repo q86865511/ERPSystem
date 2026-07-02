@@ -20,6 +20,7 @@ import { salesZh } from './modules/sales';
 export const zhTW: Messages = {
   app: {
     title: '製造業 ERP',
+    skipToContent: '跳至主要內容',
   },
   common: {
     signOut: '登出',

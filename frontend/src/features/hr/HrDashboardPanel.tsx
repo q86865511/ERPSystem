@@ -1,5 +1,6 @@
-import { Badge, Card, Group, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Card, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { IconBriefcase, IconBuilding, IconCalendar, IconClock, IconCoin, IconUsers } from '@tabler/icons-react';
+import { LiveBadge } from '../../components/LiveBadge';
 import { KpiTile } from '../../components/charts/KpiTile';
 import { DonutCard, type DonutDatum } from '../../components/charts/DonutCard';
 import { categoryColors, moneyToNumber } from '../../components/charts/palette';
@@ -14,12 +15,6 @@ export function HrDashboardPanel() {
   const pos = usePositions();
   const att = useAttendance();
   const pendingLeave = useLeaveRequests('PENDING');
-
-  const live = (
-    <Badge color="teal" variant="light" size="sm">
-      {t('reporting.overview.liveData')}
-    </Badge>
-  );
 
   const money = (n: number) =>
     n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -51,22 +46,25 @@ export function HrDashboardPanel() {
 
   return (
     <Stack gap="md">
+      <Group justify="flex-end">
+        <LiveBadge />
+      </Group>
+
       <SimpleGrid cols={{ base: 1, xs: 2, md: 3 }}>
-        <KpiTile label={t('hr.dash.headcount')} value={String(active.length)} money={false} icon={<IconUsers size={16} />} status={live} />
-        <KpiTile label={t('hr.dash.departments')} value={String(departments.length)} money={false} icon={<IconBuilding size={16} />} status={live} />
-        <KpiTile label={t('hr.dash.positions')} value={String(positions.length)} money={false} icon={<IconBriefcase size={16} />} status={live} />
-        <KpiTile label={t('hr.dash.avgSalary')} value={money(avg)} money={false} icon={<IconCoin size={16} />} status={live} />
-        <KpiTile label={t('hr.dash.attendanceRate')} value={attRate} money={false} icon={<IconClock size={16} />} status={live} />
-        <KpiTile label={t('hr.dash.pendingLeaves')} value={String(pendingLeaveCount)} money={false} icon={<IconCalendar size={16} />} status={live} />
+        <KpiTile label={t('hr.dash.headcount')} value={String(active.length)} money={false} icon={<IconUsers size={16} />} />
+        <KpiTile label={t('hr.dash.departments')} value={String(departments.length)} money={false} icon={<IconBuilding size={16} />} />
+        <KpiTile label={t('hr.dash.positions')} value={String(positions.length)} money={false} icon={<IconBriefcase size={16} />} />
+        <KpiTile label={t('hr.dash.avgSalary')} value={money(avg)} money={false} icon={<IconCoin size={16} />} />
+        <KpiTile label={t('hr.dash.attendanceRate')} value={attRate} money={false} icon={<IconClock size={16} />} />
+        <KpiTile label={t('hr.dash.pendingLeaves')} value={String(pendingLeaveCount)} money={false} icon={<IconCalendar size={16} />} />
       </SimpleGrid>
 
       <SimpleGrid cols={{ base: 1, md: 2 }}>
-        <DonutCard title={t('hr.dash.byDepartment')} badge={live} data={byDept} centerLabel={String(active.length)} />
+        <DonutCard title={t('hr.dash.byDepartment')} data={byDept} centerLabel={String(active.length)} />
         <Card withBorder padding="md">
-          <Group justify="space-between" mb="sm" wrap="nowrap">
-            <Text fw={500}>{t('hr.dash.payroll')}</Text>
-            {live}
-          </Group>
+          <Text fw={500} mb="sm">
+            {t('hr.dash.payroll')}
+          </Text>
           <Text fw={700} size="xl" ff="monospace">
             {money(totalPayroll)}
           </Text>

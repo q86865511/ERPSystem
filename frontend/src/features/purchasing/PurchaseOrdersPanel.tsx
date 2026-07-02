@@ -108,6 +108,13 @@ export function PurchaseOrdersPanel() {
         rowKey={(po) => po.id ?? po.poNumber ?? ''}
         isLoading={isLoading}
         emptyMessage={t('purchasing.po.none')}
+        emptyCta={
+          canDo('purchasing.write') ? (
+            <Button leftSection={<IconPlus size={16} />} onClick={open}>
+              {t('purchasing.po.new')}
+            </Button>
+          ) : undefined
+        }
         onRowClick={(po) => setDetailId(po.id ?? null)}
         minWidth={620}
       />

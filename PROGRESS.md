@@ -14,6 +14,13 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-02] ✨ **UI polish 批次五(測試報告 §6.4 殘餘設計/a11y 項,前端)**。分支 `feat/ui-polish-batch5`。報告的編號問題與設計建議至此全部清空。
+  - **徽章整頁一枚**:Dashboard + 4 個 dashboard panel 移除每卡重複的「實際資料」徽章,各頁/panel 頂部一枚共用 `LiveBadge`(順帶把幾個 panel 殘留的 inline teal Badge 統一成 ERP-015 語意 token 版)。
+  - **漏斗階段標籤**:新元件 `PipelineBars`(水平階段條:標籤+比例橫條+tabular 數字,role=list a11y),Dashboard 訂單管道取代無標籤的 FunnelChart。
+  - **空狀態 CTA**:DataTable 加 `emptyCta` prop 接 EmptyState 既有 cta;SalesOrders/PurchaseOrders/Items 三清單接上(沿用 canDo() RBAC 守衛,guest 不顯示)。
+  - **跳至主內容**:AppLayout skip link(focus 浮現,z-index 1000)+ `AppShell.Main#main-content`;i18n `app.skipToContent`。
+  - **暗色 dimmed 對比**:dark 覆寫 `--mantine-color-dimmed: #b8b8b8`(原 #828282 在卡面 #1b2436 僅 4.04:1 → 7.83:1;選擇器需 `:root[data-mantine-color-scheme='dark']` 提高 specificity 否則被 Mantine 自家定義蓋掉)。
+  - **驗證**:Vitest **100**(98+2)+ types + build 綠;Playwright fixture-mock 驗證(徽章=1、漏斗 4 標籤、dimmed computed 值、空狀態 CTA、Tab 首聚焦 skip link)。雙審(Opus+Codex)無高嚴重度,2 誤報經親查排除,1 項 a11y 建議已修。**待 merge**(git 模式 c)。
 - [2026-07-02] 📊 **批次三尾聲:KPI delta chip + 圖表色盤 CSS 變數化(ERP-010b/003,前端)**。分支 `feat/ui-ux-batch3-kpi-palette`。批次三(UI/UX)至此全數完成。
   - **ERP-010b delta chip**:KpiTile delta 從 teal-7/red-7 純文字升級為語意 token 膠囊 chip(`--erp-positive/negative-text` + 新增 `--erp-negative-bg`,亮暗對比 5.99:1/6.99:1);新增 `deltaLabel` 口徑標注 prop 與 `parseDeltaPct` 守衛(null/空白/非數字串不顯示 chip,防假 0.0%)。Dashboard Revenue 卡 + 財務中心 cash 卡接 kpi-summary `deltaPct`,標注「vs 上月同期」(i18n en/zh);其他卡無環比資料不加(no fabricated trends)。
   - **ERP-003 色盤**:`palette.ts` chartSeries 改 `var(--erp-chart-1..8)`(index.css :root 定義,dark 只覆寫主色 #2563EB→#3B82F6,原對比 3.0:1 壓線);aging/category 色盤主色同步 var 化,其餘 mid-tone hex 保留。審查追進 @mantine/charts 9.4.1 原始碼確認 CSS var 原樣透傳 SVG fill,無 theme-key 解析風險。
