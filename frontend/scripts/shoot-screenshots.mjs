@@ -153,6 +153,8 @@ async function main() {
   await shoot('09-new-item-modal', { route: '/masterdata', prepare: openNewItemModal });
   await shoot('10-dark-mode', { route: '/', theme: 'dark' });
   await shoot('11-onboarding-tour', { route: '/', onboarding: 'show', prepare: waitForTour });
+  await shoot('12-hr-dashboard', { route: '/hr?tab=dashboard' });
+  await shoot('13-hr-payroll', { route: '/hr?tab=payroll' });
 
   await browser.close();
   server.close();

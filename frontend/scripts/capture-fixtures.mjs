@@ -41,6 +41,16 @@ const GET_PATHS = [
   '/api/hr/departments',
   '/api/hr/positions',
   '/api/hr/employees',
+  '/api/hr/attendance',
+  '/api/hr/leave-requests',
+  '/api/hr/timesheets',
+  '/api/hr/payroll',
+  '/api/reporting/revenue-trend',
+  '/api/reporting/cash-flow',
+  '/api/reporting/kpi-summary',
+  '/api/reporting/budget-variance',
+  '/api/inventory/items-status',
+  '/api/purchasing/suppliers/performance',
 ];
 
 const here = dirname(fileURLToPath(import.meta.url));

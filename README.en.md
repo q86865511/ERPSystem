@@ -75,9 +75,15 @@ zero after a complete cycle. This one report is the project's hero artifact.
 
 <p align="center"><img src="docs/screenshots/01-dashboard.png" alt="Dashboard — reconciliation hero" width="100%"></p>
 
-| Purchasing (P2P) | Manufacturing (WO state machine) | Financial statements |
+| Purchasing (P2P) | Manufacturing (WO state machine + schedule Gantt) | Financial statements + analytics |
 |---|---|---|
 | <img src="docs/screenshots/03-purchasing.png" alt="Purchasing"> | <img src="docs/screenshots/05-manufacturing.png" alt="Manufacturing"> | <img src="docs/screenshots/07-reporting.png" alt="Reports"> |
+
+**Human Resources (employees / attendance / leave / timesheets / payroll-to-GL) + deeper analytics widgets** (finance analytics / inventory heat treemap / supplier on-time):
+
+| HR dashboard | Payroll → ledger | Inventory heat + supplier on-time |
+|---|---|---|
+| <img src="docs/screenshots/12-hr-dashboard.png" alt="HR dashboard"> | <img src="docs/screenshots/13-hr-payroll.png" alt="Payroll"> | <img src="docs/screenshots/06-inventory.png" alt="Inventory analytics"> |
 
 **The "Blue Enterprise" redesign** (blue enterprise palette + dark mode + a hand-rolled onboarding tour):
 
