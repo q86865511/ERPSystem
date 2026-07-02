@@ -50,6 +50,10 @@ export const en = {
     all: 'All',
     loading: 'Loading…',
     noData: 'No data yet',
+    search: 'Search…',
+    noResults: 'No matching results',
+    rowsTotal: '{total} rows',
+    showingRange: '{from}–{to} of {total}',
   },
   // Shared column / form-field labels reused across modules (keep wording consistent via the glossary).
   field: {

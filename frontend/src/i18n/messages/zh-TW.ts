@@ -43,6 +43,10 @@ export const zhTW: Messages = {
     all: '全部',
     loading: '載入中…',
     noData: '尚無資料',
+    search: '搜尋…',
+    noResults: '查無符合資料',
+    rowsTotal: '共 {total} 筆',
+    showingRange: '{from}–{to} / 共 {total} 筆',
   },
   field: {
     date: '日期',

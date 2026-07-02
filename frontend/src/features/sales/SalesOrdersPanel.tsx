@@ -75,14 +75,15 @@ export function SalesOrdersPanel() {
 
   const rows = data ?? [];
   const columns: DataTableColumn<(typeof rows)[number]>[] = [
-    { key: 'soNumber', label: t('sales.order.soNumber') },
+    { key: 'soNumber', label: t('sales.order.soNumber'), sortable: true },
     {
       key: 'customer',
       label: t('field.customer'),
       render: (so) => (so.partnerId != null ? (partners.get(so.partnerId) ?? so.partnerId) : '—'),
+      searchValue: (so) => (so.partnerId != null ? (partners.get(so.partnerId) ?? String(so.partnerId)) : ''),
     },
-    { key: 'orderDate', label: t('sales.order.orderDate') },
-    { key: 'status', label: t('field.status'), render: (so) => <StatusBadge status={so.status} /> },
+    { key: 'orderDate', label: t('sales.order.orderDate'), sortable: true },
+    { key: 'status', label: t('field.status'), sortable: true, render: (so) => <StatusBadge status={so.status} /> },
   ];
 
   return (
@@ -103,6 +104,7 @@ export function SalesOrdersPanel() {
         emptyMessage={t('sales.order.empty')}
         onRowClick={(so) => setDetailId(so.id ?? null)}
         minWidth={620}
+        searchable
       />
 
       <Modal opened={opened} onClose={close} title={t('sales.order.modalTitle')} size="xl">

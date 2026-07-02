@@ -75,10 +75,21 @@ export function AttendancePanel() {
 
   const rows = data ?? [];
   const columns: DataTableColumn<(typeof rows)[number]>[] = [
-    { key: 'employee', label: t('hr.common.employee'), render: (a) => empName.get(a.employeeId) ?? '—' },
+    {
+      key: 'employee',
+      label: t('hr.common.employee'),
+      render: (a) => empName.get(a.employeeId) ?? '—',
+      searchValue: (a) => empName.get(a.employeeId) ?? '',
+    },
     { key: 'workDate', label: t('hr.attendance.th.date'), render: (a) => a.workDate },
     { key: 'status', label: t('field.status'), render: (a) => <StatusBadge status={a.status} /> },
-    { key: 'hours', label: t('hr.attendance.th.hours'), align: 'right', render: (a) => a.workedHours ?? '—' },
+    {
+      key: 'hours',
+      label: t('hr.attendance.th.hours'),
+      align: 'right',
+      render: (a) => a.workedHours ?? '—',
+      searchValue: (a) => a.workedHours,
+    },
     { key: 'note', label: t('hr.common.note'), render: (a) => a.note ?? '—' },
   ];
 
@@ -108,6 +119,7 @@ export function AttendancePanel() {
         isLoading={isLoading}
         emptyMessage={t('hr.attendance.empty')}
         minWidth={720}
+        searchable
       />
 
       <Modal opened={opened} onClose={close} title={t('hr.attendance.new')}>
