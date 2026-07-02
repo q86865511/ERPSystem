@@ -14,6 +14,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-02] 🧪 **測試基建批次(報告 §10):RBAC 全矩陣 IT + axe CI 關卡 + gen:api:check 掛 CI**。分支 `test/infra-rbac-axe`。報告 §10 建議至此全部落地。
+  - **RbacMatrixIT**:6 帳號 × 13 端點 = 78 格參數化授權矩陣(對照 SecurityConfig 與 rbac-results.json;與既有 RbacIT 具名案例並存)。判準:deny=403;allow=`handler 有解析`(防路徑/方法漂移假綠)+ 非 401/403(業務 404 屬授權後正常回應,不誤殺 —— 初版鈍判準排除 404 誤殺 6 格業務 404,已修)。
+  - **axe CI 關卡**:`@axe-core/playwright`;e2e/axe.spec.ts(離線 fixture-mock)掃 login、dashboard 亮/暗、sales 表格頁;serious/critical=0 才過,moderate 以下 attach 記錄;掃描前等 skeleton 消失 + 實際內容(防假綠);login 頁固定 401 refresh 避免自動登入重導競態。**上線即抓到既存問題**:sales 頁 teal StatusBadge 4.32:1(ERP-015 當時只修 dashboard 漏了表格頁)→ StatusBadge teal 家族改用 ERP-015 語意 token(同 LiveBadge 模式)轉綠。
+  - **gen:api:check 掛 CI**:ci.yml frontend job npm ci 後插一步;.gitattributes 釘 `schema.d.ts eol=lf` 防 CRLF 假紅。
+  - **驗證**:`mvnw verify` 全綠(81 unit + **215 IT**,矩陣 78/78);e2e:local **9/9**(nav 5 + axe 4);gen:api:check 綠。雙審(Opus+Codex)高 1(紅燈不可照合)中 3 全數處理。**待 merge**(git 模式 c)。
 - [2026-07-02] ✨ **UI polish 批次五(測試報告 §6.4 殘餘設計/a11y 項,前端)**。分支 `feat/ui-polish-batch5`。報告的編號問題與設計建議至此全部清空。
   - **徽章整頁一枚**:Dashboard + 4 個 dashboard panel 移除每卡重複的「實際資料」徽章,各頁/panel 頂部一枚共用 `LiveBadge`(順帶把幾個 panel 殘留的 inline teal Badge 統一成 ERP-015 語意 token 版)。
   - **漏斗階段標籤**:新元件 `PipelineBars`(水平階段條:標籤+比例橫條+tabular 數字,role=list a11y),Dashboard 訂單管道取代無標籤的 FunnelChart。

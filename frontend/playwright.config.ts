@@ -3,8 +3,9 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * Two projects:
  *  - `local`  — deterministic, offline: Playwright builds+serves dist (see webServer) and specs mock /api.
- *               This is the blocking-CI navigation regression (e2e/nav.spec.ts). Runs in the sandbox too
- *               (plain node:http loopback works; vite dev/preview does not).
+ *               This is the blocking-CI regression suite (e2e/nav.spec.ts navigation + e2e/axe.spec.ts
+ *               accessibility). Runs in the sandbox too (plain node:http loopback works; vite dev/preview
+ *               does not).
  *  - `live`   — the conservative smoke (e2e/smoke.spec.ts) against a running target (deployed demo by
  *               default). Nightly + manual only, never a required gate. Set PLAYWRIGHT_BASE_URL to point it.
  *
@@ -22,7 +23,7 @@ export default defineConfig({
   projects: [
     {
       name: 'local',
-      testMatch: /nav\.spec\.ts/,
+      testMatch: /(nav|axe)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], baseURL: `http://127.0.0.1:${PORT}` },
     },
     {
