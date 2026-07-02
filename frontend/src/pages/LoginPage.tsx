@@ -18,7 +18,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import { useI18n } from '../i18n';
 
-const ROLE_USERS = ['admin', 'accountant', 'warehouse', 'sales'];
+const ROLE_USERS = ['admin', 'accountant', 'warehouse', 'sales', 'hr'];
 
 export function LoginPage() {
   const { login, user } = useAuth();

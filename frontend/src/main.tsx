@@ -17,7 +17,6 @@ import './index.css';
 import { queryClient } from './app/queryClient';
 import { router } from './app/router';
 import { I18nProvider } from './i18n';
-import { OnboardingTourProvider } from './onboarding/useOnboardingTour';
 import { theme } from './theme';
 
 const rootElement = document.getElementById('root');
@@ -32,9 +31,7 @@ createRoot(rootElement).render(
         <Notifications />
         <QueryClientProvider client={queryClient}>
           <ModalsProvider>
-            <OnboardingTourProvider>
-              <RouterProvider router={router} />
-            </OnboardingTourProvider>
+            <RouterProvider router={router} />
           </ModalsProvider>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>

@@ -5,6 +5,7 @@ import { AuthProvider } from '../auth/AuthContext';
 import { RequireAuth } from '../auth/RequireAuth';
 import { RequireRole } from '../auth/RequireRole';
 import { AppLayout } from '../components/AppLayout';
+import { OnboardingTourProvider } from '../onboarding/useOnboardingTour';
 
 // Lazy-loaded so each page (and the @tabler icons it pulls) becomes its own chunk, instead of one ~890 KB
 // monolith. The auth/layout/print shells stay eager (tiny, always needed). Named exports need the adapter.
@@ -62,9 +63,13 @@ export const router = createBrowserRouter([
       {
         // AppLayout is eager; it wraps its own <Outlet> in Suspense so the nav/header stay put while a
         // lazy page chunk loads (only the content area shows the loader).
+        // Onboarding tour lives inside the authenticated shell so its spotlight never covers the login page
+        // (ERP-017) — the first-visit tour begins on the dashboard, not before sign-in.
         element: (
           <RequireAuth>
-            <AppLayout />
+            <OnboardingTourProvider>
+              <AppLayout />
+            </OnboardingTourProvider>
           </RequireAuth>
         ),
         children: [
