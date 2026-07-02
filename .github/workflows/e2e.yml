@@ -38,7 +38,7 @@ jobs:
         working-directory: frontend
 
       - name: Run smoke tests
-        run: npm run e2e
+        run: npm run e2e:live
         working-directory: frontend
         env:
           PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.baseUrl || 'https://erp.terrychou.com' }}
