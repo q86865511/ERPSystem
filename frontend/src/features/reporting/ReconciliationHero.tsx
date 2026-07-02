@@ -64,7 +64,16 @@ export function ReconciliationHero({ asOf }: { asOf?: string }) {
           </Stack>
         </Group>
         {!isLoading && (
-          <Badge size="lg" color={data?.trialBalanceBalanced ? 'teal' : 'red'} variant="light">
+          <Badge
+            size="lg"
+            variant="light"
+            color={data?.trialBalanceBalanced ? undefined : 'red'}
+            styles={
+              data?.trialBalanceBalanced
+                ? { root: { backgroundColor: 'var(--erp-positive-bg)' }, label: { color: 'var(--erp-positive-text)' } }
+                : undefined
+            }
+          >
             {data?.trialBalanceBalanced
               ? t('reporting.reconciliation.trialBalanceBalanced')
               : t('reporting.reconciliation.trialBalanceUnbalanced')}

@@ -15,12 +15,24 @@
   --mantine-color-body: #f4f7fb;
   --app-color-card: #ffffff;
   --app-color-border: #e2e8f0;
+
+  /* Semantic tokens: light wash + a text/icon shade dark enough for WCAG AA (>=4.5:1) on that wash and
+     on white. Fixes the teal "light" badge (was 4.32:1) and the amber/red alert text (was 2.57/3.28). */
+  --erp-positive-bg: #e6fcf5;
+  --erp-positive-text: #0a5c42; /* deep teal — AA on the wash and on white */
+  --erp-warning-text: #a5480a; /* deep amber — AA on white */
+  --erp-negative-text: #b42020; /* deep red — AA on white */
 }
 
 [data-mantine-color-scheme='dark'] {
   --mantine-color-body: #0f172a;
   --app-color-card: #1b2436;
   --app-color-border: #2a3650;
+
+  --erp-positive-bg: #0b3b30;
+  --erp-positive-text: #63e6be; /* light teal — AA on the dark wash */
+  --erp-warning-text: #ffc078;
+  --erp-negative-text: #ff8787;
 }
 
 body {

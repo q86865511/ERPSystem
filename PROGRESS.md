@@ -14,6 +14,12 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-02] 🎨 **修復批次三-a:UI/UX 視覺品質(ERP-015 對比 + ERP-005 skeleton)**。測試報告 §9 批次三第一部分。分支 `feat/ui-ux-batch3`。
+  - **語意色 token**:`index.css` 加 positive/warning/negative CSS 變數(亮暗雙值,達 WCAG AA)。
+  - **ERP-015 對比**:共用 `LiveBadge` 取代 Dashboard teal「實際資料」徽章(原 4.32:1);ReconciliationHero「試算表已平衡」徽章、Dashboard 提醒文字改語意色 → **亮色 Dashboard axe color-contrast 12→0(實測)**。KpiTile 加 `valueColor`,淨利為負顯示紅字。
+  - **ERP-005 skeleton**:DataTable 載入改「表頭+5列」欄位骨架(不再版面跳動);Dashboard KPI 卡載入 skeleton。
+  - **驗證**:前端 `build` + `test:types` + Vitest **87** + nav e2e **5** 綠;亮色 axe 0(暗色 dimmed 文字 #828282 對比為 Mantine 預設之既有問題,非本次引入,留待後續 theme dark 調色)。**待 merge**(git 模式 c)。
+  - **批次三剩餘(PR 3b)**:ERP-004 DataTable 工具列+排序+分頁、去藍斑馬、暗色圖表色盤變數化、暗色 dimmed 對比。
 - [2026-07-02] 🧾 **修復批次二:後端錯誤契約統一(ERP-013/014/012/008)**。依測試報告 §9 批次二。分支 `fix/error-contract-unification`(基於已 merge 的批次一 main)。**全部錯誤路徑統一為 RFC 9457 `application/problem+json`**。
   - **ERP-014 全域例外 advice**:新 `com.erp.config.GlobalExceptionHandler`(@RestControllerAdvice,ArchUnit-safe 套件)—— `IllegalStateException`→409(狀態機違規,原本 unhandled 500)、`IllegalArgumentException`→400、`MethodArgumentNotValidException`/`ConstraintViolationException`/`HttpMessageNotReadableException`→400,皆 `ProblemDetail.forStatusAndDetail`(比照既有 8 個模組 advice 樣式;各模組 advice 仍優先處理自家 domain 例外,無覆蓋)。
   - **ERP-013 bean validation**:13 個 controller 的 22 個 POST `@RequestBody` 加 `@Valid`;request record 依**領域真實必填**加 `@NotNull/@NotBlank`,list(lines/components/allocations)加 `@Valid`(cascade)+ `@NotEmpty`(付款 allocations 僅 `@NotNull`,允許空)。刻意留為 optional 的欄位(taxRateCode/postingDate 等 controller 有預設、budgetAccountCode/standardSalary/monthlySalary/status/unitCost/reason/scrapPct 等領域不強制或 UI 未驗)—— 領域仍強制者現改由 IllegalArgument→400 回覆。空 body `{}` 現回 400(原 NPE 500)。
