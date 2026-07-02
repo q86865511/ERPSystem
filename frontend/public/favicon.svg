@@ -3,13 +3,13 @@
        with weights, and two ledger lines. Self-adapting to the browser's color scheme so the tab icon
        stays legible on light and dark chrome. -->
   <style>
-    .bg { fill: #FAF7F4; stroke: #D4C9BD; }
-    .mark { fill: #C0532E; }
-    .markline { stroke: #C0532E; }
+    .bg { fill: #F1F5F9; stroke: #CBD5E1; }
+    .mark { fill: #2563EB; }
+    .markline { stroke: #2563EB; }
     @media (prefers-color-scheme: dark) {
-      .bg { fill: #2A1F1A; stroke: #4A3A30; }
-      .mark { fill: #E8937D; }
-      .markline { stroke: #E8937D; }
+      .bg { fill: #1B2436; stroke: #2A3650; }
+      .mark { fill: #3B7EE8; }
+      .markline { stroke: #3B7EE8; }
     }
   </style>
   <circle class="bg" cx="32" cy="32" r="31" stroke-width="1"/>

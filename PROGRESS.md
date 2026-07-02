@@ -14,6 +14,12 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-02] ✨ **修復批次四-a:品牌與登入/導覽打磨(ERP-009/011/017)**。測試報告 §9 批次四前端部分。分支 `feat/hardening-batch4`。
+  - **ERP-009**:`index.html` theme-color 改藍(亮 #2563eb / 暗 #1b2436,media 分色);`favicon.svg` 由 terracotta 改藍(亮 #2563EB / 暗 #3B7EE8 + 冷色底)—— 修掉線上仍為舊橘紅的殘留。
+  - **ERP-011**:登入頁 demo 快速鍵補 `hr`(原缺,HR 模組寫入無快速入口)。
+  - **ERP-017**:`OnboardingTourProvider` 由 main.tsx 全域移入 router 的**已認證 AppLayout** 內 → 首訪導覽不再遮蔽登入頁;登入後儀表板首訪 tour 仍正常。
+  - **驗證**:前端 `build` + `test:types` + Vitest **89** + nav e2e **5** 綠;首訪 `/login` 截圖確認 hr 按鈕可點、無 overlay 遮擋、藍色主題;儀表板首訪 tour dialog 仍出現。**待 merge**(git 模式 c)。
+  - **批次四剩餘(獨立 infra PR)**:ERP-016 nginx 安全 header(HSTS/nosniff/X-Frame-Options/CSP)+ ERP-007 index.html no-cache —— 需本機 compose curl 驗證 header 繼承且不破壞 Swagger,另開 PR。ERP-010(seeder 比例/KPI 口徑)另議。
 - [2026-07-02] 📋 **修復批次三-b:ERP-004 DataTable 搜尋/排序/分頁 + 去斑馬**。分支 `feat/ui-ux-batch3b`(基於已 merge 的 3a main)。
   - 共用 `DataTable` 內建 client 端搜尋(`searchable`,含 `searchValue` 供 render-only 欄位如客戶/員工名)、欄位排序(`sortable`,三態 asc→desc→清除)、自動分頁(rows>pageSize 顯示 Mantine Pagination,預設 25)—— **呼叫端零改動即自動分頁**;去藍斑馬改 `highlightOnHover + withRowBorders`(白底細線)。
   - 示範啟用:SalesOrders(soNumber/orderDate/status 可排序 + 搜尋含客戶名)、Attendance(搜尋含員工名/工時 + 144 列自動分頁)。i18n 加 `common.search/noResults/rowsTotal/showingRange`。
