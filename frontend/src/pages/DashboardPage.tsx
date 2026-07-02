@@ -1,8 +1,9 @@
-import { Badge, Card, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { Badge, Card, Group, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { FunnelChart, LineChart } from '@mantine/charts';
 import { IconAlertTriangle, IconBox, IconChartPie, IconClockExclamation, IconCoin, IconFileInvoice, IconUsers } from '@tabler/icons-react';
 import { useAuth } from '../auth/useAuth';
 import { useI18n } from '../i18n';
+import { LiveBadge } from '../components/LiveBadge';
 import { KpiTile } from '../components/charts/KpiTile';
 import { DonutCard, type DonutDatum } from '../components/charts/DonutCard';
 import { categoryColors, chartSeries } from '../components/charts/palette';
@@ -26,11 +27,10 @@ export function DashboardPage() {
   const reorder = useReorderReport();
   const revenueTrend = useRevenueTrend(6);
 
-  const live = (
-    <Badge color="teal" variant="light" size="sm">
-      {t('reporting.overview.liveData')}
-    </Badge>
-  );
+  const live = <LiveBadge />;
+
+  const kpisLoading = is.isLoading || ar.isLoading || so.isLoading || inv.isLoading;
+  const netIncomeNegative = Number(is.data?.netIncome ?? 0) < 0;
 
   const orders = so.data ?? [];
   const created = orders.length;
@@ -70,11 +70,23 @@ export function DashboardPage() {
       </Stack>
 
       <SimpleGrid cols={{ base: 1, xs: 2, md: 3, lg: 5 }}>
-        <KpiTile label={t('dashboard.overview.revenue')} value={is.data?.totalRevenue} icon={<IconCoin size={16} />} status={live} />
-        <KpiTile label={t('dashboard.netIncome')} value={is.data?.netIncome} icon={<IconChartPie size={16} />} status={live} />
-        <KpiTile label={t('dashboard.overview.orders')} value={String(created)} money={false} icon={<IconFileInvoice size={16} />} status={live} />
-        <KpiTile label={t('dashboard.overview.receivables')} value={ar.data?.total} icon={<IconUsers size={16} />} status={live} />
-        <KpiTile label={t('dashboard.overview.inventoryValue')} value={invTotal} icon={<IconBox size={16} />} status={live} />
+        {kpisLoading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <Card key={i} withBorder padding="md">
+              <Skeleton height={30} width={30} radius="md" mb="md" />
+              <Skeleton height={12} width="55%" mb={10} />
+              <Skeleton height={22} width="80%" />
+            </Card>
+          ))
+        ) : (
+          <>
+            <KpiTile label={t('dashboard.overview.revenue')} value={is.data?.totalRevenue} icon={<IconCoin size={16} />} status={live} />
+            <KpiTile label={t('dashboard.netIncome')} value={is.data?.netIncome} icon={<IconChartPie size={16} />} status={live} valueColor={netIncomeNegative ? 'var(--erp-negative-text)' : undefined} />
+            <KpiTile label={t('dashboard.overview.orders')} value={String(created)} money={false} icon={<IconFileInvoice size={16} />} status={live} />
+            <KpiTile label={t('dashboard.overview.receivables')} value={ar.data?.total} icon={<IconUsers size={16} />} status={live} />
+            <KpiTile label={t('dashboard.overview.inventoryValue')} value={invTotal} icon={<IconBox size={16} />} status={live} />
+          </>
+        )}
       </SimpleGrid>
 
       <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }}>
@@ -100,7 +112,7 @@ export function DashboardPage() {
             {live}
           </Group>
           <Group justify="space-between" py={9} style={{ borderBottom: '0.5px solid var(--app-color-border)' }}>
-            <Group gap={8} c="orange">
+            <Group gap={8} style={{ color: 'var(--erp-warning-text)' }}>
               <IconAlertTriangle size={16} />
               <Text size="sm">{t('dashboard.overview.lowStock')}</Text>
             </Group>
@@ -109,7 +121,7 @@ export function DashboardPage() {
             </Text>
           </Group>
           <Group justify="space-between" py={9}>
-            <Group gap={8} c="red">
+            <Group gap={8} style={{ color: 'var(--erp-negative-text)' }}>
               <IconClockExclamation size={16} />
               <Text size="sm">{t('dashboard.overview.overdueAr')}</Text>
             </Group>
@@ -123,9 +135,7 @@ export function DashboardPage() {
       <Card withBorder padding="md">
         <Group justify="space-between" mb="sm" wrap="nowrap">
           <Text fw={500}>{t('dashboard.overview.salesTrend')}</Text>
-          <Badge color="teal" variant="light" size="sm">
-            {t('reporting.overview.liveData')}
-          </Badge>
+          {live}
         </Group>
         <LineChart
           h={200}

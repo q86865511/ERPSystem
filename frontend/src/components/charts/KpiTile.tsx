@@ -18,6 +18,8 @@ export interface KpiTileProps {
   spark?: number[];
   /** Top-right slot (e.g. a live/planned badge). */
   status?: ReactNode;
+  /** Optional sentiment color for the value (e.g. red for a negative net income). */
+  valueColor?: string;
 }
 
 /**
@@ -25,7 +27,7 @@ export interface KpiTileProps {
  * period-over-period delta + sparkline. Deltas/sparklines are only shown when real data is supplied — no
  * fabricated trends.
  */
-export function KpiTile({ label, value, money = true, icon, delta, invertDelta, spark, status }: KpiTileProps) {
+export function KpiTile({ label, value, money = true, icon, delta, invertDelta, spark, status, valueColor }: KpiTileProps) {
   const hasDelta = typeof delta === 'number';
   const up = hasDelta && delta >= 0;
   const good = hasDelta ? (invertDelta ? !up : up) : false;
@@ -58,7 +60,7 @@ export function KpiTile({ label, value, money = true, icon, delta, invertDelta, 
       <Text size="sm" c="dimmed">
         {label}
       </Text>
-      <Text fw={600} fz="xl" ff="monospace" mt={2}>
+      <Text fw={600} fz="xl" ff="monospace" mt={2} c={valueColor}>
         {money ? <MoneyText value={value} /> : (value ?? '—')}
       </Text>
       {(hasDelta || (spark && spark.length > 1)) && (
