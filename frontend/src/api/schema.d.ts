@@ -356,6 +356,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/inventory/items-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["itemsStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/inventory/items/{itemId}/on-hand": {
         parameters: {
             query?: never;
@@ -932,6 +948,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/purchasing/suppliers/performance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["supplierPerformance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/purchasing/vendor-bills": {
         parameters: {
             query?: never;
@@ -980,6 +1012,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/reporting/budget-variance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["budgetVariance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reporting/cash-flow": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["cashFlow"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/reporting/general-ledger/{accountCode}": {
         parameters: {
             query?: never;
@@ -1012,6 +1076,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/reporting/kpi-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["kpiSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/reporting/reconciliation": {
         parameters: {
             query?: never;
@@ -1020,6 +1100,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["reconciliation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reporting/revenue-trend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["revenueTrend"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1335,11 +1431,31 @@ export interface components {
             /** Format: int32 */
             version?: number;
         };
+        BudgetVarianceLine: {
+            accountCode?: string;
+            actual?: string;
+            budget?: string;
+            name?: string;
+            variance?: string;
+        };
+        BudgetVarianceReport: {
+            lines?: components["schemas"]["BudgetVarianceLine"][];
+            /** Format: int32 */
+            month?: number;
+            /** Format: int32 */
+            year?: number;
+        };
         CancelRequest: {
             /** Format: date */
             postingDate?: string;
             /** Format: int64 */
             stockLocationId?: number;
+        };
+        CashFlowPoint: {
+            inflow?: string;
+            month?: string;
+            net?: string;
+            outflow?: string;
         };
         ClearingBalance: {
             accountCode?: string;
@@ -1725,6 +1841,18 @@ export interface components {
             stocked?: boolean;
             uom?: string;
         };
+        ItemStatus: {
+            /** Format: int64 */
+            itemId?: number;
+            /** @enum {string} */
+            itemType?: "RAW" | "WIP" | "FINISHED" | "SERVICE";
+            name?: string;
+            onHandQty?: string;
+            reorderPoint?: string;
+            sku?: string;
+            status?: string;
+            value?: string;
+        };
         ItemStock: {
             avgUnitCost?: string;
             /** Format: int64 */
@@ -1790,6 +1918,18 @@ export interface components {
             status?: string;
             totalCredit?: string;
             totalDebit?: string;
+        };
+        KpiMetric: {
+            current?: string;
+            deltaPct?: string;
+            previous?: string;
+        };
+        KpiSummary: {
+            currentMonth?: string;
+            grossProfit?: components["schemas"]["KpiMetric"];
+            netCash?: components["schemas"]["KpiMetric"];
+            previousMonth?: string;
+            revenue?: components["schemas"]["KpiMetric"];
         };
         LeaveRequestResponse: {
             days?: string;
@@ -2015,6 +2155,12 @@ export interface components {
         ReorderReport: {
             items?: components["schemas"]["ReorderItem"][];
         };
+        RevenuePoint: {
+            cogs?: string;
+            grossMargin?: string;
+            month?: string;
+            revenue?: string;
+        };
         ReverseEntryRequest: {
             memo?: string;
             /** Format: date */
@@ -2088,6 +2234,16 @@ export interface components {
             label?: string;
             reconciled?: boolean;
             subledger?: string;
+        };
+        SupplierPerformance: {
+            name?: string;
+            /** Format: int32 */
+            onTime?: number;
+            onTimePct?: string;
+            /** Format: int64 */
+            partnerId?: number;
+            /** Format: int32 */
+            totalReceipts?: number;
         };
         TimesheetResponse: {
             /** Format: int64 */
@@ -2187,6 +2343,10 @@ export interface components {
             id?: number;
             /** Format: int64 */
             itemId?: number;
+            /** Format: date */
+            plannedEnd?: string;
+            /** Format: date */
+            plannedStart?: string;
             qtyProduced?: string;
             qtyToProduce?: string;
             status?: string;
@@ -2862,6 +3022,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AdjustmentResponse"];
+                };
+            };
+        };
+    };
+    itemsStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ItemStatus"][];
                 };
             };
         };
@@ -3857,6 +4037,26 @@ export interface operations {
             };
         };
     };
+    supplierPerformance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SupplierPerformance"][];
+                };
+            };
+        };
+    };
     listBills: {
         parameters: {
             query?: never;
@@ -3945,6 +4145,53 @@ export interface operations {
             };
         };
     };
+    budgetVariance: {
+        parameters: {
+            query?: {
+                year?: number;
+                month?: number;
+                asOf?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BudgetVarianceReport"];
+                };
+            };
+        };
+    };
+    cashFlow: {
+        parameters: {
+            query?: {
+                months?: number;
+                asOf?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CashFlowPoint"][];
+                };
+            };
+        };
+    };
     generalLedger: {
         parameters: {
             query?: {
@@ -3991,6 +4238,28 @@ export interface operations {
             };
         };
     };
+    kpiSummary: {
+        parameters: {
+            query?: {
+                asOf?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["KpiSummary"];
+                };
+            };
+        };
+    };
     reconciliation: {
         parameters: {
             query?: {
@@ -4009,6 +4278,29 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ReconciliationReport"];
+                };
+            };
+        };
+    };
+    revenueTrend: {
+        parameters: {
+            query?: {
+                months?: number;
+                asOf?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RevenuePoint"][];
                 };
             };
         };

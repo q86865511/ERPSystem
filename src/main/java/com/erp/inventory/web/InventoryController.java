@@ -2,6 +2,7 @@ package com.erp.inventory.web;
 
 import com.erp.inventory.application.AccountSubledgerValue;
 import com.erp.inventory.application.InventoryReportService;
+import com.erp.inventory.application.ItemStatus;
 import com.erp.inventory.application.ItemStock;
 import com.erp.inventory.application.StockAdjustmentService;
 import org.springframework.http.HttpStatus;
@@ -57,5 +58,11 @@ public class InventoryController {
     @GetMapping("/reconciliation")
     public List<AccountSubledgerValue> reconciliation() {
         return inventoryReportService.subledgerByInventoryAccount();
+    }
+
+    /** Per-item on-hand value + OUT/LOW/OK flag (highest value first) for the inventory heat treemap. */
+    @GetMapping("/items-status")
+    public List<ItemStatus> itemsStatus() {
+        return inventoryReportService.itemsStatus();
     }
 }

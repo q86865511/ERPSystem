@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,26 @@ public class InventoryReportService {
         Map<String, BigDecimal> ordered = new LinkedHashMap<>(byAccount);
         List<AccountSubledgerValue> result = new ArrayList<>();
         ordered.forEach((code, value) -> result.add(new AccountSubledgerValue(code, value)));
+        return result;
+    }
+
+    /** Per-item on-hand value + health flag (OUT/LOW/OK), highest value first, for the heat treemap. */
+    public List<ItemStatus> itemsStatus() {
+        List<ItemStatus> result = new ArrayList<>();
+        for (ItemCostState state : itemCostStateRepository.findAll()) {
+            ItemView item = masterDataQuery.findItem(state.getItemId()).orElse(null);
+            if (item == null) {
+                continue;
+            }
+            BigDecimal onHand = state.getOnHandQty();
+            BigDecimal reorderPoint = item.reorderPoint();
+            String status = onHand.signum() <= 0 ? "OUT"
+                    : reorderPoint != null && onHand.compareTo(reorderPoint) <= 0 ? "LOW"
+                    : "OK";
+            result.add(new ItemStatus(item.id(), item.sku(), item.name(), item.itemType(),
+                    state.getTotalValue(), onHand, reorderPoint, status));
+        }
+        result.sort(Comparator.comparing(ItemStatus::value, Comparator.reverseOrder()));
         return result;
     }
 

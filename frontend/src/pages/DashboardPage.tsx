@@ -1,5 +1,5 @@
 import { Badge, Card, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
-import { FunnelChart } from '@mantine/charts';
+import { FunnelChart, LineChart } from '@mantine/charts';
 import { IconAlertTriangle, IconBox, IconChartPie, IconClockExclamation, IconCoin, IconFileInvoice, IconUsers } from '@tabler/icons-react';
 import { useAuth } from '../auth/useAuth';
 import { useI18n } from '../i18n';
@@ -8,7 +8,8 @@ import { DonutCard, type DonutDatum } from '../components/charts/DonutCard';
 import { categoryColors, chartSeries } from '../components/charts/palette';
 import { formatMoney, sumMoney } from '../components/Money';
 import { ReconciliationHero } from '../features/reporting/ReconciliationHero';
-import { useIncomeStatement } from '../features/reporting/api';
+import { compactNumber, moneyToNumber } from '../components/charts/palette';
+import { useIncomeStatement, useRevenueTrend } from '../features/reporting/api';
 import { useArAging, useOrders as useSalesOrders } from '../features/sales/api';
 import { useInventoryReconciliation } from '../features/inventory/api';
 import { useReorderReport } from '../features/manufacturing/api';
@@ -23,6 +24,7 @@ export function DashboardPage() {
   const so = useSalesOrders();
   const inv = useInventoryReconciliation();
   const reorder = useReorderReport();
+  const revenueTrend = useRevenueTrend(6);
 
   const live = (
     <Badge color="teal" variant="light" size="sm">
@@ -118,13 +120,35 @@ export function DashboardPage() {
         </Card>
       </SimpleGrid>
 
+      <Card withBorder padding="md">
+        <Group justify="space-between" mb="sm" wrap="nowrap">
+          <Text fw={500}>{t('dashboard.overview.salesTrend')}</Text>
+          <Badge color="teal" variant="light" size="sm">
+            {t('reporting.overview.liveData')}
+          </Badge>
+        </Group>
+        <LineChart
+          h={200}
+          data={(revenueTrend.data ?? []).map((p) => ({
+            month: p.month,
+            revenue: moneyToNumber(p.revenue),
+            grossMargin: moneyToNumber(p.grossMargin),
+          }))}
+          dataKey="month"
+          curveType="monotone"
+          withLegend
+          series={[
+            { name: 'revenue', label: t('reporting.overview.seriesRevenue'), color: 'brand.6' },
+            { name: 'grossMargin', label: t('reporting.overview.seriesGrossMargin'), color: 'teal.6' },
+          ]}
+          valueFormatter={(v) => formatMoney(v)}
+          yAxisProps={{ width: 52, tickFormatter: (v) => compactNumber(Number(v)) }}
+        />
+      </Card>
+
       <div data-onboarding="reconciliation-hero">
         <ReconciliationHero />
       </div>
-
-      <Text size="xs" c="dimmed">
-        {t('dashboard.overview.salesTrend')} — {t('reporting.overview.plannedNote')}
-      </Text>
     </Stack>
   );
 }

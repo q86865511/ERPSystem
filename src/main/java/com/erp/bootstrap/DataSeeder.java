@@ -30,6 +30,8 @@ import com.erp.purchasing.application.VendorBillService;
 import com.erp.purchasing.application.VendorBillService.BillLineInput;
 import com.erp.purchasing.domain.PurchaseOrder;
 import com.erp.purchasing.domain.VendorBill;
+import com.erp.reporting.application.BudgetRepository;
+import com.erp.reporting.domain.Budget;
 import com.erp.sales.application.DeliveryService;
 import com.erp.sales.application.DeliveryService.DeliveryLineInput;
 import com.erp.sales.application.SalesInvoiceService;
@@ -83,6 +85,7 @@ public class DataSeeder implements ApplicationRunner {
     private final LeaveService leaveService;
     private final TimesheetService timesheetService;
     private final PayrollService payrollService;
+    private final BudgetRepository budgetRepository;
     private final MasterDataService masterDataService;
     private final MasterDataQuery masterDataQuery;
     private final WarehouseRepository warehouseRepository;
@@ -105,12 +108,14 @@ public class DataSeeder implements ApplicationRunner {
                       SalesOrderService salesOrderService, DeliveryService deliveryService,
                       SalesInvoiceService salesInvoiceService, HrService hrService,
                       AttendanceService attendanceService, LeaveService leaveService,
-                      TimesheetService timesheetService, PayrollService payrollService) {
+                      TimesheetService timesheetService, PayrollService payrollService,
+                      BudgetRepository budgetRepository) {
         this.hrService = hrService;
         this.attendanceService = attendanceService;
         this.leaveService = leaveService;
         this.timesheetService = timesheetService;
         this.payrollService = payrollService;
+        this.budgetRepository = budgetRepository;
         this.masterDataService = masterDataService;
         this.masterDataQuery = masterDataQuery;
         this.warehouseRepository = warehouseRepository;
@@ -188,6 +193,20 @@ public class DataSeeder implements ApplicationRunner {
                 invoice.getInvoiceNumber());
 
         seedRichDemoData(stock, today);
+        seedBudgets(today.getYear());
+    }
+
+    /** Seed a monthly budget for the key P&L accounts so the budget-variance report has targets. */
+    private void seedBudgets(int year) {
+        record BudgetLine(String account, String amount) {}
+        List<BudgetLine> budgets = List.of(
+                new BudgetLine("4100", "260000"),   // Sales revenue
+                new BudgetLine("5100", "150000"),   // COGS
+                new BudgetLine("6100", "560000"));  // Salaries expense
+        for (BudgetLine b : budgets) {
+            budgetRepository.save(new Budget(year, b.account(), new BigDecimal(b.amount())));
+        }
+        log.info("Budget seed complete: {} account budgets for {}.", budgets.size(), year);
     }
 
     private Long stockLocationId() {
@@ -373,6 +392,21 @@ public class DataSeeder implements ApplicationRunner {
         buyAndPay(vendors.get(3), rCopper, "20", "60", monthAt(months, 2), stock);
         buyAndPay(vendors.get(4), rLube, "15", "30", monthAt(months, 3), stock);
 
+        // --- Supplier on-time performance: POs with an expected delivery date, received on-time or late.
+        LocalDate schedOrder = monthAt(months, 0);
+        buyWithSchedule(vendors.get(0), rSteel, "40", "150", schedOrder, schedOrder.plusDays(7),
+                schedOrder.plusDays(5), stock);   // on time
+        buyWithSchedule(vendors.get(0), rSteel, "30", "152", schedOrder, schedOrder.plusDays(7),
+                schedOrder.plusDays(12), stock);  // late
+        buyWithSchedule(vendors.get(1), rAlu, "45", "120", schedOrder, schedOrder.plusDays(10),
+                schedOrder.plusDays(6), stock);   // on time
+        buyWithSchedule(vendors.get(1), rAlu, "20", "121", schedOrder, schedOrder.plusDays(6),
+                schedOrder.plusDays(6), stock);   // on time (met exactly)
+        buyWithSchedule(vendors.get(2), rPoly, "30", "80", schedOrder, schedOrder.plusDays(5),
+                schedOrder.plusDays(9), stock);   // late
+        buyWithSchedule(vendors.get(3), rPcb, "40", "200", schedOrder, schedOrder.plusDays(8),
+                schedOrder.plusDays(3), stock);   // on time
+
         // --- Purchasing: received-and-billed but UNPAID, back-dated -> fills the AP aging buckets ------
         Long[] apRaw = {rSteel, rAlu, rPoly, rPcb, rRubber, rSteel};
         for (int i = 0; i < months.size(); i++) {
@@ -399,14 +433,16 @@ public class DataSeeder implements ApplicationRunner {
             produce(f.finished(), f.bomId(), "40", stock, monthAt(months, 5));
         }
         // Released work orders (not issued) -> WIP KPI, progress board and dispatch queue have data.
-        releaseWorkOrder(fPump, families.get(0).bomId(), "30");
-        releaseWorkOrder(fValve, families.get(1).bomId(), "25");
-        releaseWorkOrder(fMotor, families.get(2).bomId(), "45");
-        releaseWorkOrder(fSensor, families.get(3).bomId(), "20");
-        releaseWorkOrder(fPanel, families.get(4).bomId(), "35");
-        // Draft work orders (not released) -> more depth on the dispatch queue.
-        workOrderService.create(fPump, families.get(0).bomId(), new BigDecimal("15"), ACTOR);
-        workOrderService.create(fMotor, families.get(2).bomId(), new BigDecimal("10"), ACTOR);
+        releaseWorkOrder(fPump, families.get(0).bomId(), "30", today.minusDays(2), today.plusDays(5));
+        releaseWorkOrder(fValve, families.get(1).bomId(), "25", today.plusDays(1), today.plusDays(8));
+        releaseWorkOrder(fMotor, families.get(2).bomId(), "45", today.plusDays(3), today.plusDays(11));
+        releaseWorkOrder(fSensor, families.get(3).bomId(), "20", today.plusDays(6), today.plusDays(12));
+        releaseWorkOrder(fPanel, families.get(4).bomId(), "35", today.plusDays(8), today.plusDays(16));
+        // Draft work orders (scheduled further out) -> dispatch queue + schedule Gantt depth.
+        workOrderService.create(fPump, families.get(0).bomId(), new BigDecimal("15"),
+                today.plusDays(12), today.plusDays(19), ACTOR);
+        workOrderService.create(fMotor, families.get(2).bomId(), new BigDecimal("10"),
+                today.plusDays(14), today.plusDays(22), ACTOR);
 
         // --- Sales: delivered-invoiced-and-paid, spread over recent months (revenue/COGS, no AR) -------
         for (int i = 0; i < families.size(); i++) {
@@ -469,6 +505,24 @@ public class DataSeeder implements ApplicationRunner {
 
     // ---- Purchasing helpers -------------------------------------------------------------------------
 
+    /** PO (with an expected delivery date) → confirm → receive on {@code receiveDate} → bill → pay. Drives
+     *  the supplier on-time report: on time iff the receive date is on or before the expected date. */
+    private void buyWithSchedule(Long vendor, Long item, String qty, String price, LocalDate orderDate,
+                                 LocalDate expectedDate, LocalDate receiveDate, Long stock) {
+        BigDecimal q = new BigDecimal(qty);
+        BigDecimal p = new BigDecimal(price);
+        PurchaseOrder po = purchaseOrderService.createOrder(vendor,
+                List.of(new PoLineInput(item, q, p, expectedDate)), orderDate, ACTOR);
+        purchaseOrderService.confirm(po.getId(), ACTOR);
+        Long line = po.getLines().get(0).getId();
+        goodsReceiptService.receive(po.getId(), stock, List.of(new ReceiptLineInput(line, q)),
+                receiveDate, ACTOR);
+        VendorBill bill = vendorBillService.postBill(po.getId(),
+                List.of(new BillLineInput(line, q, p)), TAX_CODE, receiveDate, ACTOR);
+        paymentService.payOut(vendor, bill.getGrossAmount(), receiveDate,
+                List.of(new Allocation(bill.getId(), bill.getGrossAmount())), ACTOR);
+    }
+
     /** PO → confirm → receive → bill (+VAT) → pay in full. Adds inventory, leaves no AP open. */
     private void buyAndPay(Long vendor, Long item, String qty, String price, LocalDate date, Long stock) {
         VendorBill posted = receiveAndBill(vendor, item, qty, price, date, stock);
@@ -504,15 +558,17 @@ public class DataSeeder implements ApplicationRunner {
     /** WO → release → issue → complete the full quantity. WIP nets back to zero on completion. */
     private void produce(Long finished, Long bomId, String qty, Long stock, LocalDate date) {
         BigDecimal q = new BigDecimal(qty);
-        WorkOrder wo = workOrderService.create(finished, bomId, q, ACTOR);
+        WorkOrder wo = workOrderService.create(finished, bomId, q, date.minusDays(6), date, ACTOR);
         workOrderService.release(wo.getId(), ACTOR);
         workOrderService.issue(wo.getId(), stock, date, ACTOR);
         workOrderService.complete(wo.getId(), q, stock, date, ACTOR);
     }
 
     /** WO → release only (never issued), so it stays RELEASED and touches no WIP account. */
-    private void releaseWorkOrder(Long finished, Long bomId, String qty) {
-        WorkOrder wo = workOrderService.create(finished, bomId, new BigDecimal(qty), ACTOR);
+    private void releaseWorkOrder(Long finished, Long bomId, String qty, LocalDate plannedStart,
+                                  LocalDate plannedEnd) {
+        WorkOrder wo = workOrderService.create(finished, bomId, new BigDecimal(qty), plannedStart,
+                plannedEnd, ACTOR);
         workOrderService.release(wo.getId(), ACTOR);
     }
 

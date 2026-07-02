@@ -19,10 +19,17 @@ export const qk = {
     balanceSheet: (asOf?: string) => ['reporting', 'balance-sheet', asOf ?? 'today'] as const,
     generalLedger: (accountCode: string, asOf?: string) =>
       ['reporting', 'general-ledger', accountCode, asOf ?? 'today'] as const,
+    revenueTrend: (months: number, asOf?: string) =>
+      ['reporting', 'revenue-trend', months, asOf ?? 'today'] as const,
+    cashFlow: (months: number, asOf?: string) =>
+      ['reporting', 'cash-flow', months, asOf ?? 'today'] as const,
+    kpiSummary: (asOf?: string) => ['reporting', 'kpi-summary', asOf ?? 'today'] as const,
+    budgetVariance: (asOf?: string) => ['reporting', 'budget-variance', asOf ?? 'today'] as const,
   },
   inventory: {
     reconciliation: () => ['inventory', 'reconciliation'] as const,
     onHand: (itemId: number) => ['inventory', 'on-hand', itemId] as const,
+    itemsStatus: () => ['inventory', 'items-status'] as const,
   },
   purchasing: {
     orders: () => ['purchasing', 'orders'] as const,
@@ -30,6 +37,7 @@ export const qk = {
     receipts: () => ['purchasing', 'receipts'] as const,
     bills: () => ['purchasing', 'bills'] as const,
     apAging: (asOf?: string) => ['purchasing', 'ap-aging', asOf ?? 'today'] as const,
+    supplierPerformance: () => ['purchasing', 'supplier-performance'] as const,
   },
   payments: {
     list: (direction?: string) => ['payments', 'list', direction ?? 'all'] as const,

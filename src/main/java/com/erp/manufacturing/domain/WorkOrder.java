@@ -62,6 +62,12 @@ public class WorkOrder {
     @Column(nullable = false)
     private WorkOrderStatus status;
 
+    @Column(name = "planned_start")
+    private java.time.LocalDate plannedStart;
+
+    @Column(name = "planned_end")
+    private java.time.LocalDate plannedEnd;
+
     @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL, orphanRemoval = true,
             fetch = FetchType.EAGER)
     @OrderBy("lineNo ASC")
@@ -84,6 +90,12 @@ public class WorkOrder {
         this.qtyProduced = BigDecimal.ZERO;
         this.totalComponentCost = BigDecimal.ZERO;
         this.status = WorkOrderStatus.DRAFT;
+    }
+
+    /** Sets the planned production window shown on the schedule Gantt. Purely informational. */
+    public void schedule(java.time.LocalDate plannedStart, java.time.LocalDate plannedEnd) {
+        this.plannedStart = plannedStart;
+        this.plannedEnd = plannedEnd;
     }
 
     /** Snapshots a BOM component as a frozen planned line. Only allowed while DRAFT. */

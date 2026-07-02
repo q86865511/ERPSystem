@@ -132,7 +132,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 | `sales` | SO → 出貨 → 發票 → 退貨、Deferred-COGS、AR 子帳 | `ReceivableDocuments`、`ReceivablesQuery` |
 | `manufacturing` | BOM、工單、WIP 領料/完工、再訂點 | — |
 | `payments` | 客戶/廠商收付款 + 配款(in/out) | — |
-| `reporting` | read-side 財務報表 + 對帳健康檢查 | — |
+| `reporting` | read-side 財務報表 + 對帳健康檢查 + 財會分析(趨勢/現金流/預算) | — |
 | `hr` | 員工/部門/職位主檔 + 考勤/請假/工時 + 薪資過帳(HR) | `HrQuery` |
 | `iam` | 認證與角色授權 | — |
 
@@ -175,7 +175,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 **審計軌跡(ADMIN-only)**:過帳、期間關閉/重開、登入成功/失敗都會寫入 append-only 的 `audit_log`(domain event + `AFTER_COMMIT` 監聽,只記真正 committed 的動作;DB trigger 擋改/刪)。ADMIN 角色可在「審計軌跡」頁依事件類型 / 操作者篩選檢視。
 
-> 🔵 **「Blue Enterprise」重設計(Phase 1 已上線)**:前端已由 Warm Terracotta 換為藍色企業 SaaS 風(主色 `#2563EB` + 冷 slate 中性色)並部署上線,**本頁截圖皆為藍色版**。四張 `@mantine/charts` 資料儀表板(ERP 總覽 / 財務中心 / 庫存 / 生產)已接真實端點;更深的 widget(逐品項熱度 treemap、供應商準時率、工單 Gantt、OEE、現金流 / 預算差異 / KPI 環比)仍誠實標示為 **PLANNED**,由後續後端 PR 補上。
+> 🔵 **「Blue Enterprise」重設計(Phase 1 已上線)**:前端已由 Warm Terracotta 換為藍色企業 SaaS 風(主色 `#2563EB` + 冷 slate 中性色)並部署上線,**本頁截圖皆為藍色版**。四張 `@mantine/charts` 資料儀表板(ERP 總覽 / 財務中心 / 庫存 / 生產)已接真實端點;財會分析(營收趨勢 / 現金流 / 預算差異 / KPI 環比,C1)、逐品項熱度 treemap(C2)、供應商準時率(C3)、工單 Gantt(C4)皆已接真實後端;僅剩 **OEE / 設備**(C5)仍誠實標示為 **PLANNED**,由後續後端 PR 補上。
 
 **設計系統(Blue Enterprise)**:自建的 Mantine theme —— 藍色企業主色(`#2563EB`)+ 冷 slate 中性色階 + 自託管 Plus Jakarta Sans;深/淺色模式右上角即時切換(預設跟隨系統,偏好存 localStorage)。元件層採 `theme.components` 全域覆寫(表格、卡片、輸入框等)加上共用元件(`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`KpiTile`/`DonutCard`/`AmountAllocationTable`/`EmptyState`/強化版 `PageHeader`)—— 隨模組實際採用而建,不預先造死碼。
 

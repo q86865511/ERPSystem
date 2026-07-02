@@ -1,6 +1,7 @@
 import { Badge, Card, Group, Progress, SimpleGrid, Stack, Text } from '@mantine/core';
 import { IconChecklist, IconClipboardList, IconProgressCheck } from '@tabler/icons-react';
 import { KpiTile } from '../../components/charts/KpiTile';
+import { GanttBoard } from '../../components/charts/GanttBoard';
 import { moneyToNumber } from '../../components/charts/palette';
 import { StatusBadge } from '../../components/StatusBadge';
 import { useI18n } from '../../i18n';
@@ -45,6 +46,21 @@ export function ManufacturingDashboardPanel() {
 
   const active = wos.filter((w) => OPEN_STATES.has(w.status ?? ''));
   const dispatch = wos.filter((w) => DISPATCH_STATES.has(w.status ?? ''));
+  const scheduled = wos
+    .filter((w) => w.plannedStart)
+    .slice(0, 8)
+    .map((w) => {
+      const to = moneyToNumber(w.qtyToProduce);
+      const done = moneyToNumber(w.qtyProduced);
+      return {
+        id: w.id ?? 0,
+        label: w.woNumber ?? '',
+        start: w.plannedStart as string,
+        end: (w.plannedEnd ?? w.plannedStart) as string,
+        status: w.status ?? 'DRAFT',
+        pct: to > 0 ? Math.round((done / to) * 100) : 0,
+      };
+    });
 
   return (
     <Stack gap="md">
@@ -120,10 +136,21 @@ export function ManufacturingDashboardPanel() {
         </Card>
       </SimpleGrid>
 
-      <SimpleGrid cols={{ base: 1, md: 2 }}>
-        <PlannedCard title={t('manufacturing.dash.gantt')} note={t('reporting.overview.plannedNote')} />
-        <PlannedCard title={t('manufacturing.dash.oee')} note={t('reporting.overview.plannedNote')} />
-      </SimpleGrid>
+      <Card withBorder padding="md">
+        <Group justify="space-between" mb="sm" wrap="nowrap">
+          <Text fw={500}>{t('manufacturing.dash.gantt')}</Text>
+          {live}
+        </Group>
+        {scheduled.length === 0 ? (
+          <Text c="dimmed" size="sm" py="lg" ta="center">
+            —
+          </Text>
+        ) : (
+          <GanttBoard rows={scheduled} />
+        )}
+      </Card>
+
+      <PlannedCard title={t('manufacturing.dash.oee')} note={t('reporting.overview.plannedNote')} />
     </Stack>
   );
 }

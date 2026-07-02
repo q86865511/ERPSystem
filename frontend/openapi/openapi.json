@@ -804,6 +804,27 @@
         "tags" : [ "inventory-controller" ]
       }
     },
+    "/api/inventory/items-status" : {
+      "get" : {
+        "operationId" : "itemsStatus",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ItemStatus"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "inventory-controller" ]
+      }
+    },
     "/api/inventory/items/{itemId}/on-hand" : {
       "get" : {
         "operationId" : "onHand",
@@ -1993,6 +2014,27 @@
         "tags" : [ "purchasing-controller" ]
       }
     },
+    "/api/purchasing/suppliers/performance" : {
+      "get" : {
+        "operationId" : "supplierPerformance",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/SupplierPerformance"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      }
+    },
     "/api/purchasing/vendor-bills" : {
       "get" : {
         "operationId" : "listBills",
@@ -2094,6 +2136,88 @@
         "tags" : [ "reporting-controller" ]
       }
     },
+    "/api/reporting/budget-variance" : {
+      "get" : {
+        "operationId" : "budgetVariance",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "year",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "in" : "query",
+          "name" : "month",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "in" : "query",
+          "name" : "asOf",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BudgetVarianceReport"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "finance-analytics-controller" ]
+      }
+    },
+    "/api/reporting/cash-flow" : {
+      "get" : {
+        "operationId" : "cashFlow",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "months",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 6
+          }
+        }, {
+          "in" : "query",
+          "name" : "asOf",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CashFlowPoint"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "finance-analytics-controller" ]
+      }
+    },
     "/api/reporting/general-ledger/{accountCode}" : {
       "get" : {
         "operationId" : "generalLedger",
@@ -2158,6 +2282,33 @@
         "tags" : [ "reporting-controller" ]
       }
     },
+    "/api/reporting/kpi-summary" : {
+      "get" : {
+        "operationId" : "kpiSummary",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "asOf",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/KpiSummary"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "finance-analytics-controller" ]
+      }
+    },
     "/api/reporting/reconciliation" : {
       "get" : {
         "operationId" : "reconciliation",
@@ -2183,6 +2334,45 @@
           }
         },
         "tags" : [ "reporting-controller" ]
+      }
+    },
+    "/api/reporting/revenue-trend" : {
+      "get" : {
+        "operationId" : "revenueTrend",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "months",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 6
+          }
+        }, {
+          "in" : "query",
+          "name" : "asOf",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/RevenuePoint"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "finance-analytics-controller" ]
       }
     },
     "/api/reporting/trial-balance" : {
@@ -2893,6 +3083,45 @@
           }
         }
       },
+      "BudgetVarianceLine" : {
+        "type" : "object",
+        "properties" : {
+          "accountCode" : {
+            "type" : "string"
+          },
+          "actual" : {
+            "type" : "string"
+          },
+          "budget" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "variance" : {
+            "type" : "string"
+          }
+        }
+      },
+      "BudgetVarianceReport" : {
+        "type" : "object",
+        "properties" : {
+          "lines" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BudgetVarianceLine"
+            }
+          },
+          "month" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "year" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
       "CancelRequest" : {
         "type" : "object",
         "properties" : {
@@ -2903,6 +3132,23 @@
           "stockLocationId" : {
             "type" : "integer",
             "format" : "int64"
+          }
+        }
+      },
+      "CashFlowPoint" : {
+        "type" : "object",
+        "properties" : {
+          "inflow" : {
+            "type" : "string"
+          },
+          "month" : {
+            "type" : "string"
+          },
+          "net" : {
+            "type" : "string"
+          },
+          "outflow" : {
+            "type" : "string"
           }
         }
       },
@@ -3866,6 +4112,37 @@
           }
         }
       },
+      "ItemStatus" : {
+        "type" : "object",
+        "properties" : {
+          "itemId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "itemType" : {
+            "type" : "string",
+            "enum" : [ "RAW", "WIP", "FINISHED", "SERVICE" ]
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "onHandQty" : {
+            "type" : "string"
+          },
+          "reorderPoint" : {
+            "type" : "string"
+          },
+          "sku" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "value" : {
+            "type" : "string"
+          }
+        }
+      },
       "ItemStock" : {
         "type" : "object",
         "properties" : {
@@ -4039,6 +4316,40 @@
           },
           "totalDebit" : {
             "type" : "string"
+          }
+        }
+      },
+      "KpiMetric" : {
+        "type" : "object",
+        "properties" : {
+          "current" : {
+            "type" : "string"
+          },
+          "deltaPct" : {
+            "type" : "string"
+          },
+          "previous" : {
+            "type" : "string"
+          }
+        }
+      },
+      "KpiSummary" : {
+        "type" : "object",
+        "properties" : {
+          "currentMonth" : {
+            "type" : "string"
+          },
+          "grossProfit" : {
+            "$ref" : "#/components/schemas/KpiMetric"
+          },
+          "netCash" : {
+            "$ref" : "#/components/schemas/KpiMetric"
+          },
+          "previousMonth" : {
+            "type" : "string"
+          },
+          "revenue" : {
+            "$ref" : "#/components/schemas/KpiMetric"
           }
         }
       },
@@ -4616,6 +4927,23 @@
           }
         }
       },
+      "RevenuePoint" : {
+        "type" : "object",
+        "properties" : {
+          "cogs" : {
+            "type" : "string"
+          },
+          "grossMargin" : {
+            "type" : "string"
+          },
+          "month" : {
+            "type" : "string"
+          },
+          "revenue" : {
+            "type" : "string"
+          }
+        }
+      },
       "ReverseEntryRequest" : {
         "type" : "object",
         "properties" : {
@@ -4803,6 +5131,29 @@
           },
           "subledger" : {
             "type" : "string"
+          }
+        }
+      },
+      "SupplierPerformance" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "onTime" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "onTimePct" : {
+            "type" : "string"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalReceipts" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         }
       },
@@ -5065,6 +5416,14 @@
           "itemId" : {
             "type" : "integer",
             "format" : "int64"
+          },
+          "plannedEnd" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "plannedStart" : {
+            "type" : "string",
+            "format" : "date"
           },
           "qtyProduced" : {
             "type" : "string"

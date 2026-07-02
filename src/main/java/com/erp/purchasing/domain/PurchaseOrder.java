@@ -72,10 +72,16 @@ public class PurchaseOrder {
     }
 
     public PoLine addLine(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice) {
+        return addLine(itemId, qtyOrdered, unitPrice, null);
+    }
+
+    public PoLine addLine(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice,
+                          java.time.LocalDate expectedDeliveryDate) {
         if (status != PurchaseOrderStatus.DRAFT) {
             throw new IllegalStateException("can only add lines to a DRAFT order, was " + status);
         }
-        PoLine line = new PoLine(this, lines.size() + 1, itemId, qtyOrdered, unitPrice);
+        PoLine line = new PoLine(this, lines.size() + 1, itemId, qtyOrdered, unitPrice,
+                expectedDeliveryDate);
         lines.add(line);
         return line;
     }
