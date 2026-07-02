@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -59,6 +60,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         AuthenticationEntryPoint entryPoint = restAuthenticationEntryPoint();
+        AccessDeniedHandler deniedHandler = restAccessDeniedHandler();
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -98,22 +100,37 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .authenticationEntryPoint(entryPoint)   // suppress WWW-Authenticate: Bearer
+                        .accessDeniedHandler(deniedHandler)
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint));
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint).accessDeniedHandler(deniedHandler));
         return http.build();
+    }
+
+    /** RFC 9457 problem+json body (UTF-8), matching the rest of the API's error contract. */
+    private static void writeProblem(jakarta.servlet.http.HttpServletResponse response, int status,
+                                     String title, String detail) throws java.io.IOException {
+        response.setStatus(status);
+        response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.getWriter().write("{\"type\":\"about:blank\",\"title\":\"" + title
+                + "\",\"status\":" + status + ",\"detail\":\"" + detail + "\"}");
     }
 
     /**
      * Returns 401 on a missing/invalid token <em>without</em> a {@code WWW-Authenticate} header (which
      * would trigger the browser's native dialog over an XHR/fetch). The SPA renders its own login page and
-     * handles 401 itself (refreshing the access token where it can).
+     * handles 401 itself (refreshing the access token where it can). Body is RFC 9457 problem+json.
      */
     private static AuthenticationEntryPoint restAuthenticationEntryPoint() {
-        return (request, response, authException) -> {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\"}");
-        };
+        return (request, response, authException) ->
+                writeProblem(response, HttpStatus.UNAUTHORIZED.value(), "Unauthorized", "Authentication required");
+    }
+
+    /** Returns 403 problem+json (Spring's default access-denied body is empty), naming the missing permission. */
+    private static AccessDeniedHandler restAccessDeniedHandler() {
+        return (request, response, accessDeniedException) ->
+                writeProblem(response, HttpStatus.FORBIDDEN.value(), "Forbidden",
+                        "You do not have permission to perform this action");
     }
 
     /** Maps the JWT {@code roles} claim (e.g. ["ADMIN"]) to {@code ROLE_*} authorities; principal = sub. */
