@@ -14,6 +14,10 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-02] ⚙️🎉 **Phase 3 PLANNED widget C5 — OEE / 設備(全端)→ PLANNED 佔位全清**。最後一個深後端 widget:設備稼動/停機/不良。
+  - **後端** `manufacturing`:新 domain `Equipment`(設備主檔 + `idealUnitsPerHour`)+ `ProductionLog`(每設備每日:計畫/停機分鐘 + 停機原因 + 產出/良品,UNIQUE 設備×日)。`OeeService` 聚合每設備 **OEE = 稼動率 × 表現 × 良率**(皆百分比:稼動=runtime/planned、表現=實際產出/理想產出、良率=良品/產出),`downtime()` 依原因彙總停機分鐘。`GET /api/manufacturing/{oee,downtime}`。Flyway `V23`(equipment + production_log)。DataSeeder 播 3 設備 × 近 10 工作日日誌(OEE ~75–85%、停機原因分佈)。純營運資料、不過帳。`OeeIT`(A/P/Q/OEE 計算恆等 + 停機彙總)。
+  - **前端**:`ManufacturingDashboardPanel` OEE PLANNED → 各設備 `RingProgress`(OEE% + A/P/Q 分解、色依水準)+ 停機原因甜甜圈(`DonutCard`);移除 `PlannedCard`。i18n(en/zh)。`gen:api`。
+  - **驗證**:`./mvnw verify` 全綠(Surefire **81**、Failsafe **IT 131**;ArchUnit/OpenApiSpecIT/SeedDataIT 綠);前端 `build` + `test:types` + **Vitest 83** 綠。**🎉 C1–C5 全數落地,四張儀表板 + 財務中心的 PLANNED 佔位全部清空。** 整合視覺待部署 + Oracle 重 seed 後點測。
 - [2026-07-02] 📊🎉 **Phase 3 PLANNED widget C2–C4(全端,接續 C1 → C1–C4 全數落地)**。把庫存/生產儀表板剩餘的 PLANNED 佔位換成真圖表(C5 OEE 依使用者指示暫緩)。做法:各自後端唯讀彙總/domain 小改 + Flyway + IT + gen:api + 前端換真圖。
   - **C2 庫存 items-status treemap**:後端 `GET /api/inventory/items-status`(每品項 value + OUT/LOW/OK,依 value 排序,無 migration);前端 recharts `Treemap`(色依狀態、tile 依 value)+ 新 `components/charts/ItemsTreemap`;recharts 提為直接相依。`ItemsStatusIT`。
   - **C3 供應商準時率**:`PoLine` 加 `expectedDeliveryDate`(Flyway `V21`;`PoLineInput` 加第 4 欄 + 保留 3-arg 建構子、`addLine` 多載 → 既有呼叫零破壞、create API 不變);`SupplierPerformanceService` + `GET /api/purchasing/suppliers/performance`(GR 過帳日 ≤ 該行預計交期 = 準時,依準時率排序);DataSeeder `buyWithSchedule` 6 筆帶交期 PO(準時/遲到混合)。前端 InventoryDashboardPanel 供應商績效(KPI 整體準時% + 各供應商準時率條)。`SupplierPerformanceIT`。
