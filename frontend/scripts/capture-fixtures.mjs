@@ -51,6 +51,8 @@ const GET_PATHS = [
   '/api/reporting/budget-variance',
   '/api/inventory/items-status',
   '/api/purchasing/suppliers/performance',
+  '/api/manufacturing/oee',
+  '/api/manufacturing/downtime',
 ];
 
 const here = dirname(fileURLToPath(import.meta.url));
