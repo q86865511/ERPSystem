@@ -14,6 +14,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-02] 📊 **批次三尾聲:KPI delta chip + 圖表色盤 CSS 變數化(ERP-010b/003,前端)**。分支 `feat/ui-ux-batch3-kpi-palette`。批次三(UI/UX)至此全數完成。
+  - **ERP-010b delta chip**:KpiTile delta 從 teal-7/red-7 純文字升級為語意 token 膠囊 chip(`--erp-positive/negative-text` + 新增 `--erp-negative-bg`,亮暗對比 5.99:1/6.99:1);新增 `deltaLabel` 口徑標注 prop 與 `parseDeltaPct` 守衛(null/空白/非數字串不顯示 chip,防假 0.0%)。Dashboard Revenue 卡 + 財務中心 cash 卡接 kpi-summary `deltaPct`,標注「vs 上月同期」(i18n en/zh);其他卡無環比資料不加(no fabricated trends)。
+  - **ERP-003 色盤**:`palette.ts` chartSeries 改 `var(--erp-chart-1..8)`(index.css :root 定義,dark 只覆寫主色 #2563EB→#3B82F6,原對比 3.0:1 壓線);aging/category 色盤主色同步 var 化,其餘 mid-tone hex 保留。審查追進 @mantine/charts 9.4.1 原始碼確認 CSS var 原樣透傳 SVG fill,無 theme-key 解析風險。
+  - **e2e fixture**:kpi-summary deltaPct 由舊極端值(-91.7/-100.9)更新為 MTD 口徑合理值(+12.5/+8.6/-8.0),demo 截圖觀感正常。
+  - **驗證**:Vitest **98**(89+9 新 KpiTile/parseDeltaPct 測試)+ test:types + build 綠;Playwright 亮暗雙主題截圖 + computed style 確認(暗色 `--erp-chart-1`=#3b82f6、chip token 對應正確、其他卡無 chip)。雙審(Opus+Codex)無高嚴重度,3 項健壯性/觀感意見已修。**待 merge**(git 模式 c)。
 - [2026-07-02] 💰 **修復批次四-c:demo 財務數據真實感 + KPI 環比口徑(ERP-010,後端)**。分支 `fix/erp-010-demo-financials`。
   - **a) 損益比例**:DataSeeder 5 個產品族售價 ×10(6200/4300/7800/5600/5100,含 confirmed/draft SO 字面值),量不動(不連動生產/採購);4100 營收月預算 260k→500k 對齊(5100 COGS 由生產成本 roll-up、與售價無關,不動)。重種後 income-statement **淨利 +714,427**(revenue 1,331,600 vs expenses 617,172),不再是 -483k 慘賠公司。
   - **b) KPI 口徑改 MTD**:`FinanceAnalyticsService.kpiSummary` 的 previous 從「上月整月」改「上月 1 日~上月同日(clamp 到月底)」(新增巢狀 `Period` record + `clampDayOfMonth`;current 窗經審查驗證與原行為數值嚴格等價);revenueTrend/cashFlow/budgetVariance 保留整月語意。DTO 欄位不變、openapi spec 無 diff。月初 deltaPct 不再恆 -90%(上月同期無過帳時 previous=0→deltaPct=0,正確語意)。
