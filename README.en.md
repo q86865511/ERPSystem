@@ -185,7 +185,7 @@ an nginx container that reverse-proxies to the backend on a single origin.
 | `sales` | SO → delivery → invoice → return, Deferred-COGS, AR subledger | `ReceivableDocuments`, `ReceivablesQuery` |
 | `manufacturing` | BOM, work orders, WIP issue/completion, reorder report | — |
 | `payments` | Customer/vendor payments + allocation (in/out) | — |
-| `reporting` | Read-side financial statements + reconciliation health-check | — |
+| `reporting` | Read-side financial statements + reconciliation health-check + finance analytics (trends/cash-flow/budget) | — |
 | `hr` | Employees, departments, positions + attendance / leave / timesheets + payroll posting (HR) | `HrQuery` |
 | `iam` | Authentication & role-based authorization | — |
 
@@ -249,9 +249,10 @@ type and actor.
 > 🔵 **"Blue Enterprise" redesign (Phase 1 shipped)**: the frontend has moved from Warm Terracotta to a
 > blue enterprise-SaaS look (primary `#2563EB` + a cool slate neutral scale) and is deployed — **the
 > screenshots on this page are the blue version**. Four `@mantine/charts` data dashboards (ERP overview /
-> finance center / inventory / manufacturing) are wired to real endpoints; the deeper widgets (per-item
-> heat treemap, supplier on-time rate, work-order Gantt, OEE, cash-flow / budget-variance / KPI deltas) are
-> still honestly marked **PLANNED**, to be filled in by later backend PRs.
+> finance center / inventory / manufacturing) are wired to real endpoints; finance analytics (revenue trend
+> / cash flow / budget variance / KPI deltas) are now wired to real backends (C1); the remaining deeper
+> widgets (per-item heat treemap, supplier on-time rate, work-order Gantt, OEE) are still honestly marked
+> **PLANNED**, to be filled in by later backend PRs.
 
 **The design system (Blue Enterprise)**: a self-built Mantine theme — a blue enterprise primary color
 (`#2563EB`) + a cool slate neutral scale + a self-hosted Plus Jakarta Sans;
