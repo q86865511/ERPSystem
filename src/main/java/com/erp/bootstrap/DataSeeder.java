@@ -10,8 +10,12 @@ import com.erp.hr.application.PayrollService;
 import com.erp.hr.application.TimesheetService;
 import com.erp.manufacturing.application.BomService;
 import com.erp.manufacturing.application.BomService.ComponentInput;
+import com.erp.manufacturing.application.EquipmentRepository;
+import com.erp.manufacturing.application.ProductionLogRepository;
 import com.erp.manufacturing.application.WorkOrderService;
 import com.erp.manufacturing.domain.BillOfMaterials;
+import com.erp.manufacturing.domain.Equipment;
+import com.erp.manufacturing.domain.ProductionLog;
 import com.erp.manufacturing.domain.WorkOrder;
 import com.erp.masterdata.api.ItemType;
 import com.erp.masterdata.api.LocationType;
@@ -86,6 +90,8 @@ public class DataSeeder implements ApplicationRunner {
     private final TimesheetService timesheetService;
     private final PayrollService payrollService;
     private final BudgetRepository budgetRepository;
+    private final EquipmentRepository equipmentRepository;
+    private final ProductionLogRepository productionLogRepository;
     private final MasterDataService masterDataService;
     private final MasterDataQuery masterDataQuery;
     private final WarehouseRepository warehouseRepository;
@@ -109,13 +115,16 @@ public class DataSeeder implements ApplicationRunner {
                       SalesInvoiceService salesInvoiceService, HrService hrService,
                       AttendanceService attendanceService, LeaveService leaveService,
                       TimesheetService timesheetService, PayrollService payrollService,
-                      BudgetRepository budgetRepository) {
+                      BudgetRepository budgetRepository, EquipmentRepository equipmentRepository,
+                      ProductionLogRepository productionLogRepository) {
         this.hrService = hrService;
         this.attendanceService = attendanceService;
         this.leaveService = leaveService;
         this.timesheetService = timesheetService;
         this.payrollService = payrollService;
         this.budgetRepository = budgetRepository;
+        this.equipmentRepository = equipmentRepository;
+        this.productionLogRepository = productionLogRepository;
         this.masterDataService = masterDataService;
         this.masterDataQuery = masterDataQuery;
         this.warehouseRepository = warehouseRepository;
@@ -194,6 +203,49 @@ public class DataSeeder implements ApplicationRunner {
 
         seedRichDemoData(stock, today);
         seedBudgets(today.getYear());
+        seedEquipmentOee(today);
+    }
+
+    /** Seed a few machines and ~10 recent production-log days each, so the OEE dashboard has data. */
+    private void seedEquipmentOee(LocalDate today) {
+        record Machine(String code, String name, String idealPerHour) {}
+        List<Machine> machines = List.of(
+                new Machine("EQ-CNC-1", "CNC Mill #1", "30"),
+                new Machine("EQ-LATHE-1", "CNC Lathe #1", "24"),
+                new Machine("EQ-PRESS-1", "Hydraulic Press #1", "40"));
+        String[] reasons = {"Setup", "Maintenance", "Breakdown", "Material shortage"};
+
+        List<LocalDate> days = new ArrayList<>();
+        LocalDate day = today.minusDays(1);
+        while (days.size() < 10) {
+            if (day.getDayOfWeek() != DayOfWeek.SATURDAY && day.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                days.add(day);
+            }
+            day = day.minusDays(1);
+        }
+
+        int machineIndex = 0;
+        for (Machine machine : machines) {
+            Equipment equipment = equipmentRepository.save(
+                    new Equipment(machine.code(), machine.name(), new BigDecimal(machine.idealPerHour())));
+            BigDecimal idealPerHour = equipment.getIdealUnitsPerHour();
+            int d = 0;
+            for (LocalDate logDate : days) {
+                int planned = 480;
+                int downtime = 20 + ((machineIndex + d) % 5) * 10;   // 20..60 minutes
+                String reason = reasons[(machineIndex + d) % reasons.length];
+                int runtime = planned - downtime;
+                int idealOutput = idealPerHour.multiply(BigDecimal.valueOf(runtime))
+                        .divide(BigDecimal.valueOf(60), 0, java.math.RoundingMode.HALF_UP).intValue();
+                int produced = (int) Math.round(idealOutput * (0.85 + (d % 3) * 0.04));   // ~85–93%
+                int good = (int) Math.round(produced * (0.93 + (d % 2) * 0.03));           // ~93–96%
+                productionLogRepository.save(new ProductionLog(equipment.getId(), logDate, planned,
+                        downtime, reason, produced, good));
+                d++;
+            }
+            machineIndex++;
+        }
+        log.info("OEE seed complete: {} machines x {} production days.", machines.size(), days.size());
     }
 
     /** Seed a monthly budget for the key P&L accounts so the budget-variance report has targets. */

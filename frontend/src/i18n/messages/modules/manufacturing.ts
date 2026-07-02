@@ -24,7 +24,8 @@ export const manufacturingEn = {
     progressBoard: 'Work order progress',
     dispatchQueue: 'Dispatch queue',
     gantt: 'Production schedule (Gantt)',
-    oee: 'OEE / utilization / defects',
+    oee: 'OEE by equipment',
+    downtime: 'Downtime by reason',
   },
   // Bills of material
   bom: {
@@ -123,7 +124,8 @@ export const manufacturingZh: typeof manufacturingEn = {
     progressBoard: '工單進度看板',
     dispatchQueue: '待派工清單',
     gantt: '生產排程(Gantt)',
-    oee: 'OEE / 稼動 / 不良',
+    oee: '各設備 OEE',
+    downtime: '停機原因分佈',
   },
   bom: {
     newBom: '新增 BOM',

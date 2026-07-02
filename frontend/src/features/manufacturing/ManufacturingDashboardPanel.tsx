@@ -1,37 +1,25 @@
-import { Badge, Card, Group, Progress, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Badge, Card, Group, Progress, RingProgress, SimpleGrid, Stack, Text } from '@mantine/core';
 import { IconChecklist, IconClipboardList, IconProgressCheck } from '@tabler/icons-react';
 import { KpiTile } from '../../components/charts/KpiTile';
 import { GanttBoard } from '../../components/charts/GanttBoard';
-import { moneyToNumber } from '../../components/charts/palette';
+import { DonutCard, type DonutDatum } from '../../components/charts/DonutCard';
+import { categoryColors, moneyToNumber } from '../../components/charts/palette';
 import { StatusBadge } from '../../components/StatusBadge';
 import { useI18n } from '../../i18n';
-import { useWorkOrders } from './api';
+import { useDowntime, useOee, useWorkOrders } from './api';
 
 const OPEN_STATES = new Set(['DRAFT', 'RELEASED', 'IN_PROGRESS']);
 const WIP_STATES = new Set(['RELEASED', 'IN_PROGRESS']);
 const DISPATCH_STATES = new Set(['DRAFT', 'RELEASED']);
 
-function PlannedCard({ title, note }: { title: string; note: string }) {
-  const { t } = useI18n();
-  return (
-    <Card withBorder padding="md">
-      <Group justify="space-between" mb="sm" wrap="nowrap">
-        <Text fw={500}>{title}</Text>
-        <Badge color="gray" variant="light" size="sm">
-          {t('reporting.overview.planned')}
-        </Badge>
-      </Group>
-      <Text c="dimmed" size="sm" py="lg" ta="center">
-        {note}
-      </Text>
-    </Card>
-  );
-}
+const oeeColor = (pct: number) => (pct >= 85 ? 'teal' : pct >= 70 ? 'orange' : 'red');
 
 export function ManufacturingDashboardPanel() {
   const { t } = useI18n();
   const wo = useWorkOrders();
   const wos = wo.data ?? [];
+  const oee = useOee();
+  const downtime = useDowntime();
 
   const live = (
     <Badge color="teal" variant="light" size="sm">
@@ -61,6 +49,14 @@ export function ManufacturingDashboardPanel() {
         pct: to > 0 ? Math.round((done / to) * 100) : 0,
       };
     });
+
+  const machines = oee.data ?? [];
+  const downtimeData: DonutDatum[] = (downtime.data ?? []).map((d, i) => ({
+    name: d.reason ?? '—',
+    amount: String(d.minutes ?? 0),
+    color: categoryColors[i % categoryColors.length] ?? categoryColors[0],
+  }));
+  const totalDowntime = (downtime.data ?? []).reduce((s, d) => s + (d.minutes ?? 0), 0);
 
   return (
     <Stack gap="md">
@@ -150,7 +146,49 @@ export function ManufacturingDashboardPanel() {
         )}
       </Card>
 
-      <PlannedCard title={t('manufacturing.dash.oee')} note={t('reporting.overview.plannedNote')} />
+      <SimpleGrid cols={{ base: 1, md: 2 }}>
+        <Card withBorder padding="md">
+          <Group justify="space-between" mb="sm" wrap="nowrap">
+            <Text fw={500}>{t('manufacturing.dash.oee')}</Text>
+            {live}
+          </Group>
+          {machines.length === 0 ? (
+            <Text c="dimmed" size="sm" py="lg" ta="center">
+              —
+            </Text>
+          ) : (
+            <SimpleGrid cols={{ base: 1, xs: Math.min(3, machines.length) }}>
+              {machines.map((m) => {
+                const pct = Math.round(moneyToNumber(m.oee));
+                return (
+                  <Stack key={m.equipmentId} gap={2} align="center">
+                    <RingProgress
+                      size={104}
+                      thickness={9}
+                      roundCaps
+                      sections={[{ value: pct, color: oeeColor(pct) }]}
+                      label={<Text ta="center" fw={700} size="sm">{pct}%</Text>}
+                    />
+                    <Text size="xs" fw={500} ta="center" truncate>
+                      {m.name}
+                    </Text>
+                    <Text size="xs" c="dimmed" ta="center">
+                      A {Math.round(moneyToNumber(m.availability))} · P {Math.round(moneyToNumber(m.performance))} · Q {Math.round(moneyToNumber(m.quality))}
+                    </Text>
+                  </Stack>
+                );
+              })}
+            </SimpleGrid>
+          )}
+        </Card>
+
+        <DonutCard
+          title={t('manufacturing.dash.downtime')}
+          badge={live}
+          data={downtimeData}
+          centerLabel={`${totalDowntime}m`}
+        />
+      </SimpleGrid>
     </Stack>
   );
 }

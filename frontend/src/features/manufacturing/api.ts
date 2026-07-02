@@ -47,6 +47,28 @@ export function useWorkOrders() {
   });
 }
 
+export function useOee() {
+  return useQuery({
+    queryKey: qk.manufacturing.oee(),
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/manufacturing/oee');
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useDowntime() {
+  return useQuery({
+    queryKey: qk.manufacturing.downtime(),
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/manufacturing/downtime');
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
 export function useWorkOrder(id: number | null) {
   return useQuery({
     queryKey: qk.manufacturing.workOrder(id ?? 0),

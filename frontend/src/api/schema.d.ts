@@ -548,6 +548,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/manufacturing/downtime": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["downtime"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/manufacturing/oee": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["oee"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/manufacturing/reorder-report": {
         parameters: {
             query?: never;
@@ -1739,6 +1771,11 @@ export interface components {
             id?: number;
             name?: string;
         };
+        DowntimeReason: {
+            /** Format: int64 */
+            minutes?: number;
+            reason?: string;
+        };
         EmployeeResponse: {
             code?: string;
             /** Format: int64 */
@@ -1756,6 +1793,16 @@ export interface components {
             status?: "ACTIVE" | "ON_LEAVE" | "TERMINATED";
             /** Format: date */
             terminationDate?: string;
+        };
+        EquipmentOee: {
+            availability?: string;
+            code?: string;
+            /** Format: int64 */
+            equipmentId?: number;
+            name?: string;
+            oee?: string;
+            performance?: string;
+            quality?: string;
         };
         FiscalPeriodResponse: {
             /** Format: date */
@@ -3310,6 +3357,46 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["BomResponse"];
+                };
+            };
+        };
+    };
+    downtime: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DowntimeReason"][];
+                };
+            };
+        };
+    };
+    oee: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EquipmentOee"][];
                 };
             };
         };
