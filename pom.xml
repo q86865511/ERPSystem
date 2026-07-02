@@ -63,6 +63,36 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
+		<!-- ERP Copilot (assistant module): the official Anthropic Java SDK. Isolated behind the
+		     AnthropicPort interface so only the SDK adapter (built only when app.assistant.enabled=true)
+		     touches these types. Never constructs a client at startup, so a missing ANTHROPIC_API_KEY
+		     cannot fail boot. -->
+		<dependency>
+			<groupId>com.anthropic</groupId>
+			<artifactId>anthropic-java</artifactId>
+			<version>2.34.0</version>
+			<exclusions>
+				<!-- The SDK core drags in io.swagger.core.v3:swagger-annotations (the NON-jakarta artifact)
+				     for its own local JSON-schema tooling, which is unused by streaming text chat. It shares
+				     the io.swagger.v3.oas.annotations package with the swagger-annotations-JAKARTA that
+				     springdoc 3.0.3 needs (2.2.47), a split-package that makes springdoc read the older
+				     Schema class and NoSuchMethodError on $dynamicRef() when building /v3/api-docs. Exclude
+				     it (and its victools schema module) so only springdoc's jakarta swagger stack is on the
+				     classpath. -->
+				<exclusion>
+					<groupId>io.swagger.core.v3</groupId>
+					<artifactId>swagger-annotations</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.swagger.core.v3</groupId>
+					<artifactId>swagger-core-jakarta</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.github.victools</groupId>
+					<artifactId>jsonschema-module-swagger-2</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<!-- Interactive API docs (Swagger UI) + the OpenAPI spec the React client is generated from. -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
