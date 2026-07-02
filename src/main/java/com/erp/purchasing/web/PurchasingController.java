@@ -6,6 +6,8 @@ import com.erp.purchasing.application.GoodsReceiptService;
 import com.erp.purchasing.application.GoodsReceiptService.ReceiptLineInput;
 import com.erp.purchasing.application.PurchaseOrderService;
 import com.erp.purchasing.application.PurchaseOrderService.PoLineInput;
+import com.erp.purchasing.application.SupplierPerformance;
+import com.erp.purchasing.application.SupplierPerformanceService;
 import com.erp.purchasing.application.VendorBillService;
 import com.erp.purchasing.application.VendorBillService.BillLineInput;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,15 +34,23 @@ public class PurchasingController {
     private final GoodsReceiptService goodsReceiptService;
     private final VendorBillService vendorBillService;
     private final ApAgingService apAgingService;
+    private final SupplierPerformanceService supplierPerformanceService;
 
     public PurchasingController(PurchaseOrderService purchaseOrderService,
                                 GoodsReceiptService goodsReceiptService,
                                 VendorBillService vendorBillService,
-                                ApAgingService apAgingService) {
+                                ApAgingService apAgingService,
+                                SupplierPerformanceService supplierPerformanceService) {
         this.purchaseOrderService = purchaseOrderService;
         this.goodsReceiptService = goodsReceiptService;
         this.vendorBillService = vendorBillService;
         this.apAgingService = apAgingService;
+        this.supplierPerformanceService = supplierPerformanceService;
+    }
+
+    @GetMapping("/suppliers/performance")
+    public List<SupplierPerformance> supplierPerformance() {
+        return supplierPerformanceService.performance();
     }
 
     public record CreatePoLine(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice) {

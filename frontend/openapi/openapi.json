@@ -2014,6 +2014,27 @@
         "tags" : [ "purchasing-controller" ]
       }
     },
+    "/api/purchasing/suppliers/performance" : {
+      "get" : {
+        "operationId" : "supplierPerformance",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/SupplierPerformance"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "purchasing-controller" ]
+      }
+    },
     "/api/purchasing/vendor-bills" : {
       "get" : {
         "operationId" : "listBills",
@@ -5110,6 +5131,29 @@
           },
           "subledger" : {
             "type" : "string"
+          }
+        }
+      },
+      "SupplierPerformance" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "onTime" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "onTimePct" : {
+            "type" : "string"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalReceipts" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         }
       },

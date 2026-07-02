@@ -148,3 +148,14 @@ export function useApAging(asOf?: string) {
     },
   });
 }
+
+export function useSupplierPerformance() {
+  return useQuery({
+    queryKey: qk.purchasing.supplierPerformance(),
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/purchasing/suppliers/performance');
+      if (error) throw error;
+      return data;
+    },
+  });
+}

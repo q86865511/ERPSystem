@@ -29,7 +29,12 @@ public class PurchaseOrderService {
         this.masterDataQuery = masterDataQuery;
     }
 
-    public record PoLineInput(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice) {
+    public record PoLineInput(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice,
+                              LocalDate expectedDeliveryDate) {
+
+        public PoLineInput(Long itemId, BigDecimal qtyOrdered, BigDecimal unitPrice) {
+            this(itemId, qtyOrdered, unitPrice, null);
+        }
     }
 
     @Transactional
@@ -47,7 +52,8 @@ public class PurchaseOrderService {
             if (masterDataQuery.findItem(line.itemId()).isEmpty()) {
                 throw new PurchasingValidationException("unknown item " + line.itemId());
             }
-            order.addLine(line.itemId(), line.qtyOrdered(), line.unitPrice());
+            order.addLine(line.itemId(), line.qtyOrdered(), line.unitPrice(),
+                    line.expectedDeliveryDate());
         }
         return purchaseOrderRepository.saveAndFlush(order);
     }

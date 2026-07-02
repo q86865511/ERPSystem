@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -52,8 +53,11 @@ public class PoLine {
     @Column(name = "unit_price", nullable = false, precision = 19, scale = 6)
     private BigDecimal unitPrice;
 
+    @Column(name = "expected_delivery_date")
+    private LocalDate expectedDeliveryDate;
+
     PoLine(PurchaseOrder purchaseOrder, int lineNo, Long itemId, BigDecimal qtyOrdered,
-           BigDecimal unitPrice) {
+           BigDecimal unitPrice, LocalDate expectedDeliveryDate) {
         if (itemId == null) {
             throw new IllegalArgumentException("itemId is required");
         }
@@ -70,6 +74,7 @@ public class PoLine {
         this.qtyReceived = BigDecimal.ZERO;
         this.qtyBilled = BigDecimal.ZERO;
         this.unitPrice = unitPrice;
+        this.expectedDeliveryDate = expectedDeliveryDate;
     }
 
     public BigDecimal outstandingToReceive() {

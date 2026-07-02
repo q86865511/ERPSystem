@@ -37,6 +37,7 @@ export const qk = {
     receipts: () => ['purchasing', 'receipts'] as const,
     bills: () => ['purchasing', 'bills'] as const,
     apAging: (asOf?: string) => ['purchasing', 'ap-aging', asOf ?? 'today'] as const,
+    supplierPerformance: () => ['purchasing', 'supplier-performance'] as const,
   },
   payments: {
     list: (direction?: string) => ['payments', 'list', direction ?? 'all'] as const,

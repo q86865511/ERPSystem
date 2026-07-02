@@ -392,6 +392,21 @@ public class DataSeeder implements ApplicationRunner {
         buyAndPay(vendors.get(3), rCopper, "20", "60", monthAt(months, 2), stock);
         buyAndPay(vendors.get(4), rLube, "15", "30", monthAt(months, 3), stock);
 
+        // --- Supplier on-time performance: POs with an expected delivery date, received on-time or late.
+        LocalDate schedOrder = monthAt(months, 0);
+        buyWithSchedule(vendors.get(0), rSteel, "40", "150", schedOrder, schedOrder.plusDays(7),
+                schedOrder.plusDays(5), stock);   // on time
+        buyWithSchedule(vendors.get(0), rSteel, "30", "152", schedOrder, schedOrder.plusDays(7),
+                schedOrder.plusDays(12), stock);  // late
+        buyWithSchedule(vendors.get(1), rAlu, "45", "120", schedOrder, schedOrder.plusDays(10),
+                schedOrder.plusDays(6), stock);   // on time
+        buyWithSchedule(vendors.get(1), rAlu, "20", "121", schedOrder, schedOrder.plusDays(6),
+                schedOrder.plusDays(6), stock);   // on time (met exactly)
+        buyWithSchedule(vendors.get(2), rPoly, "30", "80", schedOrder, schedOrder.plusDays(5),
+                schedOrder.plusDays(9), stock);   // late
+        buyWithSchedule(vendors.get(3), rPcb, "40", "200", schedOrder, schedOrder.plusDays(8),
+                schedOrder.plusDays(3), stock);   // on time
+
         // --- Purchasing: received-and-billed but UNPAID, back-dated -> fills the AP aging buckets ------
         Long[] apRaw = {rSteel, rAlu, rPoly, rPcb, rRubber, rSteel};
         for (int i = 0; i < months.size(); i++) {
@@ -487,6 +502,24 @@ public class DataSeeder implements ApplicationRunner {
     }
 
     // ---- Purchasing helpers -------------------------------------------------------------------------
+
+    /** PO (with an expected delivery date) → confirm → receive on {@code receiveDate} → bill → pay. Drives
+     *  the supplier on-time report: on time iff the receive date is on or before the expected date. */
+    private void buyWithSchedule(Long vendor, Long item, String qty, String price, LocalDate orderDate,
+                                 LocalDate expectedDate, LocalDate receiveDate, Long stock) {
+        BigDecimal q = new BigDecimal(qty);
+        BigDecimal p = new BigDecimal(price);
+        PurchaseOrder po = purchaseOrderService.createOrder(vendor,
+                List.of(new PoLineInput(item, q, p, expectedDate)), orderDate, ACTOR);
+        purchaseOrderService.confirm(po.getId(), ACTOR);
+        Long line = po.getLines().get(0).getId();
+        goodsReceiptService.receive(po.getId(), stock, List.of(new ReceiptLineInput(line, q)),
+                receiveDate, ACTOR);
+        VendorBill bill = vendorBillService.postBill(po.getId(),
+                List.of(new BillLineInput(line, q, p)), TAX_CODE, receiveDate, ACTOR);
+        paymentService.payOut(vendor, bill.getGrossAmount(), receiveDate,
+                List.of(new Allocation(bill.getId(), bill.getGrossAmount())), ACTOR);
+    }
 
     /** PO → confirm → receive → bill (+VAT) → pay in full. Adds inventory, leaves no AP open. */
     private void buyAndPay(Long vendor, Long item, String qty, String price, LocalDate date, Long stock) {
