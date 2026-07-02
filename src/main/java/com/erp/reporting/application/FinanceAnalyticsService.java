@@ -66,17 +66,23 @@ public class FinanceAnalyticsService {
     public KpiSummary kpiSummary(LocalDate asOf) {
         YearMonth current = YearMonth.from(asOf);
         YearMonth previous = current.minusMonths(1);
+        // Compare like-for-like: the current month runs from its 1st through asOf (month-to-date), so the
+        // previous period must be the same slice of last month, not the whole month — otherwise a fresh
+        // month always reads as a steep drop. The previous window is last month's 1st through the same
+        // day-of-month, clamped to that month's length (e.g. asOf on the 31st still lands on Feb's last day).
+        Period cur = new Period(current.atDay(1), asOf);
+        Period prev = new Period(previous.atDay(1), clampDayOfMonth(previous, asOf.getDayOfMonth()));
         List<LedgerLineView> rev = generalLedgerQuery.linesForAccount(REVENUE, asOf);
         List<LedgerLineView> cogs = generalLedgerQuery.linesForAccount(COGS, asOf);
         List<LedgerLineView> cash = generalLedgerQuery.linesForAccount(CASH, asOf);
 
-        KpiSummary.Metric revenue = metric(creditNet(rev, current), creditNet(rev, previous));
+        KpiSummary.Metric revenue = metric(creditNet(rev, cur), creditNet(rev, prev));
         KpiSummary.Metric grossProfit = metric(
-                creditNet(rev, current).subtract(debitNet(cogs, current)),
-                creditNet(rev, previous).subtract(debitNet(cogs, previous)));
+                creditNet(rev, cur).subtract(debitNet(cogs, cur)),
+                creditNet(rev, prev).subtract(debitNet(cogs, prev)));
         KpiSummary.Metric netCash = metric(
-                sum(cash, current, LedgerLineView::debit).subtract(sum(cash, current, LedgerLineView::credit)),
-                sum(cash, previous, LedgerLineView::debit).subtract(sum(cash, previous, LedgerLineView::credit)));
+                sum(cash, cur, LedgerLineView::debit).subtract(sum(cash, cur, LedgerLineView::credit)),
+                sum(cash, prev, LedgerLineView::debit).subtract(sum(cash, prev, LedgerLineView::credit)));
         return new KpiSummary(current.toString(), previous.toString(), revenue, grossProfit, netCash);
     }
 
@@ -132,6 +138,34 @@ public class FinanceAnalyticsService {
 
     private static BigDecimal debitNet(List<LedgerLineView> lines, YearMonth ym) {
         return sum(lines, ym, LedgerLineView::debit).subtract(sum(lines, ym, LedgerLineView::credit));
+    }
+
+    /** An inclusive posting-date window [from, to] used for month-to-date KPI aggregation. */
+    private record Period(LocalDate from, LocalDate to) {
+        boolean contains(LocalDate date) {
+            return !date.isBefore(from) && !date.isAfter(to);
+        }
+    }
+
+    /** {@code day} in {@code ym}, clamped to the month's length so e.g. day 31 in February lands on the 28th/29th. */
+    private static LocalDate clampDayOfMonth(YearMonth ym, int day) {
+        return ym.atDay(Math.min(day, ym.lengthOfMonth()));
+    }
+
+    private static BigDecimal sum(List<LedgerLineView> lines, Period period,
+                                  Function<LedgerLineView, BigDecimal> field) {
+        return lines.stream()
+                .filter(l -> period.contains(l.postingDate()))
+                .map(l -> nz(field.apply(l)))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private static BigDecimal creditNet(List<LedgerLineView> lines, Period period) {
+        return sum(lines, period, LedgerLineView::credit).subtract(sum(lines, period, LedgerLineView::debit));
+    }
+
+    private static BigDecimal debitNet(List<LedgerLineView> lines, Period period) {
+        return sum(lines, period, LedgerLineView::debit).subtract(sum(lines, period, LedgerLineView::credit));
     }
 
     private static KpiSummary.Metric metric(BigDecimal current, BigDecimal previous) {

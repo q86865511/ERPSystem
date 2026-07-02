@@ -74,4 +74,50 @@ class FinanceAnalyticsIT {
         assertThat(kpi.revenue().current()).isNotNull();
         assertThat(kpi.grossProfit().current()).isNotNull();
     }
+
+    /**
+     * The KPI previous-period figure is month-to-date: it aggregates last month only up to asOf's
+     * day-of-month, so a fresh month reads like-for-like instead of always plunging vs a full prior month.
+     * A revenue posting dated late in the previous month is excluded while asOf is early, then included once
+     * asOf reaches that day.
+     */
+    @Test
+    void kpiPreviousPeriodIsMonthToDate() {
+        // Baselines first, so any pre-existing April postings cancel out of both assertions below.
+        BigDecimal earlyBefore = analyticsService.kpiSummary(LocalDate.of(2026, 5, 10)).revenue().previous();
+        BigDecimal lateBefore = analyticsService.kpiSummary(LocalDate.of(2026, 5, 25)).revenue().previous();
+
+        // A distinctive revenue posting on the 20th of April 2026 (the previous month relative to May).
+        BigDecimal amount = new BigDecimal("777");
+        ledgerPosting.post(new JournalEntryRequest(null, LocalDate.of(2026, 4, 20), "mtd revenue probe",
+                null, "TEST-MTD", "MTD-REV-1", "POST", List.of(
+                new Line("1010", amount, null, "cash in"),
+                new Line("4100", null, amount, "revenue"))), "test");
+
+        // asOf on May 10th -> previous window is Apr 1–10, so the Apr-20 posting is still NOT counted.
+        assertThat(analyticsService.kpiSummary(LocalDate.of(2026, 5, 10)).revenue().previous())
+                .isEqualByComparingTo(earlyBefore);
+        // asOf on May 25th -> previous window is Apr 1–25, so the Apr-20 posting IS now counted.
+        assertThat(analyticsService.kpiSummary(LocalDate.of(2026, 5, 25)).revenue().previous().subtract(lateBefore))
+                .isEqualByComparingTo(amount);
+    }
+
+    /**
+     * When asOf's day-of-month exceeds the previous month's length, the window clamps to that month's last
+     * day: asOf on May 31st compares against the whole of April (Apr 1–30), so a posting on April 30th counts.
+     */
+    @Test
+    void kpiPreviousPeriodClampsToShorterMonths() {
+        LocalDate asOf = LocalDate.of(2026, 5, 31);
+        BigDecimal before = analyticsService.kpiSummary(asOf).revenue().previous();
+
+        BigDecimal amount = new BigDecimal("333");
+        ledgerPosting.post(new JournalEntryRequest(null, LocalDate.of(2026, 4, 30), "clamp probe",
+                null, "TEST-MTD", "MTD-REV-2", "POST", List.of(
+                new Line("1010", amount, null, "cash in"),
+                new Line("4100", null, amount, "revenue"))), "test");
+
+        assertThat(analyticsService.kpiSummary(asOf).revenue().previous().subtract(before))
+                .isEqualByComparingTo(amount);
+    }
 }
