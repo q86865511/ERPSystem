@@ -43,7 +43,9 @@ export function KpiTile({ label, value, money = true, icon, delta, invertDelta, 
   const good = hasDelta ? (invertDelta ? !up : up) : false;
   const deltaTextColor = good ? 'var(--erp-positive-text)' : 'var(--erp-negative-text)';
   const deltaBg = good ? 'var(--erp-positive-bg)' : 'var(--erp-negative-bg)';
-  const sparkColor = good ? 'teal.6' : 'red.6';
+  // Semantic tokens (not the stock teal/red swatches) so the sparkline always matches the delta chip's
+  // positive/negative wording, and follows the same light/dark-mode overrides as the rest of the app.
+  const sparkColor = good ? 'var(--erp-positive-text)' : 'var(--erp-negative-text)';
 
   return (
     <Card withBorder padding="md">
@@ -71,7 +73,17 @@ export function KpiTile({ label, value, money = true, icon, delta, invertDelta, 
       <Text size="sm" c="dimmed">
         {label}
       </Text>
-      <Text fw={600} fz="xl" ff="monospace" mt={2} c={valueColor}>
+      {/* KPI display number (design.md §3): 21–24px/700 serif, tabular-nums for column alignment when
+          several KPI tiles sit side by side. Serif is only for h1–h4 + this display number — nothing
+          else in the data layer gets it. */}
+      <Text
+        fw={700}
+        fz={22}
+        ff="'Noto Serif TC', 'Source Serif 4', Georgia, serif"
+        style={{ fontVariantNumeric: 'tabular-nums' }}
+        mt={2}
+        c={valueColor}
+      >
         {money ? <MoneyText value={value} /> : (value ?? '—')}
       </Text>
       {(hasDelta || (spark && spark.length > 1)) && (

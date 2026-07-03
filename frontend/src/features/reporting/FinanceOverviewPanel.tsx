@@ -115,7 +115,7 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
             h={190}
             data={plData}
             dataKey="metric"
-            series={[{ name: 'amount', color: 'brand.6' }]}
+            series={[{ name: 'amount', color: 'var(--erp-chart-1)' }]}
             withLegend={false}
             valueFormatter={(v) => formatMoney(v)}
             yAxisProps={{ width: 52, tickFormatter: (v) => compactNumber(Number(v)) }}
@@ -136,8 +136,9 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
             curveType="monotone"
             withLegend
             series={[
-              { name: 'revenue', label: t('reporting.overview.seriesRevenue'), color: 'brand.6' },
-              { name: 'grossMargin', label: t('reporting.overview.seriesGrossMargin'), color: 'teal.6' },
+              { name: 'revenue', label: t('reporting.overview.seriesRevenue'), color: 'var(--erp-chart-1)' },
+              // Celadon from the §2.6 chart palette — stock teal is off-palette in the ink-ledger system.
+              { name: 'grossMargin', label: t('reporting.overview.seriesGrossMargin'), color: 'var(--erp-chart-6)' },
             ]}
             valueFormatter={(v) => formatMoney(v)}
             yAxisProps={{ width: 52, tickFormatter: (v) => compactNumber(Number(v)) }}
@@ -153,8 +154,10 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
             dataKey="month"
             withLegend
             series={[
-              { name: 'inflow', label: t('reporting.overview.seriesInflow'), color: 'teal.6' },
-              { name: 'outflow', label: t('reporting.overview.seriesOutflow'), color: 'red.6' },
+              // Full bar series are chart data, not danger/positive UI semantics — §2.6 palette only
+              // (§8: seal red never fills a chart; brick #A8574A is the palette's red stand-in).
+              { name: 'inflow', label: t('reporting.overview.seriesInflow'), color: 'var(--erp-chart-1)' },
+              { name: 'outflow', label: t('reporting.overview.seriesOutflow'), color: 'var(--erp-chart-4)' },
             ]}
             valueFormatter={(v) => formatMoney(v)}
             yAxisProps={{ width: 52, tickFormatter: (v) => compactNumber(Number(v)) }}
@@ -172,7 +175,7 @@ export function FinanceOverviewPanel({ asOf }: { asOf?: string }) {
             withLegend
             series={[
               { name: 'budget', label: t('reporting.overview.seriesBudget'), color: 'gray.5' },
-              { name: 'actual', label: t('reporting.overview.seriesActual'), color: 'brand.6' },
+              { name: 'actual', label: t('reporting.overview.seriesActual'), color: 'var(--erp-chart-1)' },
             ]}
             valueFormatter={(v) => formatMoney(v)}
             yAxisProps={{ width: 52, tickFormatter: (v) => compactNumber(Number(v)) }}

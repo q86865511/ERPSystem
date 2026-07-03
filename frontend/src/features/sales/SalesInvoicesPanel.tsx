@@ -250,7 +250,7 @@ export function SalesInvoicesPanel() {
         {detail.data && (
           <>
             <Group>
-              <StatusBadge status={detail.data.status} />
+              <StatusBadge status={detail.data.status} size="md" />
               {detail.data.journalEntryId != null && (
                 <Badge variant="light">{t('sales.je', { id: detail.data.journalEntryId })}</Badge>
               )}

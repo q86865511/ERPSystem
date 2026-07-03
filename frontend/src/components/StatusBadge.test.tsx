@@ -15,6 +15,9 @@ function badgeStyle(status: string, colorScheme: 'light' | 'dark'): string {
   return container.querySelector('.mantine-Badge-root')?.getAttribute('style') ?? '';
 }
 
+// Statuses that stay on the plain light-Badge path (i.e. NOT routed to SealBadge). DRAFT is deliberately
+// included: it flows through SealBadge's `draft` branch, which still renders a gray light Badge, so its
+// `.mantine-Badge-root` + gray-token assertions and snapshot remain valid.
 const REPRESENTATIVE = ['DRAFT', 'CONFIRMED', 'RELEASED', 'IN_PROGRESS', 'CANCELLED'] as const;
 
 describe('StatusBadge', () => {
@@ -34,6 +37,49 @@ describe('StatusBadge', () => {
     expect(badgeStyle('CANCELLED', 'light')).toContain('red');
     expect(badgeStyle('PAID', 'light')).toContain('teal');
     expect(badgeStyle('DRAFT', 'light')).toContain('gray');
+  });
+
+  // --- SealBadge routing (design.md §6) — the split is internal to StatusBadge; panels are unchanged. ---
+  describe('routes stamp-language statuses to SealBadge', () => {
+    function render(status: string) {
+      return renderWithProviders(<StatusBadge status={status} />, { colorScheme: 'light' });
+    }
+
+    it('APPROVED renders the 朱印 circular stamp, not a light Badge', () => {
+      const { container } = render('APPROVED');
+      expect(container.querySelector('[data-seal-variant="stamp"]')).not.toBeNull();
+      // The stamp is a bespoke <span>, not a Mantine Badge.
+      expect(container.querySelector('.mantine-Badge-root')).toBeNull();
+    });
+
+    it.each(['POSTED', 'CLOSED'])('%s renders the 墨印 ink stamp', (status) => {
+      const { container } = render(status);
+      expect(container.querySelector('[data-seal-variant="ink"]')).not.toBeNull();
+      expect(container.querySelector('.mantine-Badge-root')).toBeNull();
+    });
+
+    it.each(['PENDING', 'SUBMITTED'])('%s renders the 待審 grey chip (no stamp)', (status) => {
+      const { container } = render(status);
+      expect(container.querySelector('[data-seal-variant="pending"]')).not.toBeNull();
+      expect(container.querySelector('[data-seal-variant="stamp"]')).toBeNull();
+    });
+
+    it('DRAFT routes through the draft branch but keeps the gray light Badge look', () => {
+      const { container } = render('DRAFT');
+      const el = container.querySelector('[data-seal-variant="draft"]');
+      expect(el).not.toBeNull();
+      expect(el?.classList.contains('mantine-Badge-root')).toBe(true);
+    });
+
+    // Regression guard: statuses that merely *look* stamp-adjacent must NOT be hijacked by the seal router.
+    it.each(['CONFIRMED', 'RELEASED', 'IN_PROGRESS', 'PAID', 'CANCELLED', 'DONE'])(
+      '%s stays on the plain light Badge path',
+      (status) => {
+        const { container } = render(status);
+        expect(container.querySelector('[data-seal-variant]')).toBeNull();
+        expect(container.querySelector('.mantine-Badge-root')).not.toBeNull();
+      },
+    );
   });
 
   // Dark-mode parity (spec §7.2 / §11): each representative status renders crash-free and identically

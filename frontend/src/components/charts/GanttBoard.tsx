@@ -12,10 +12,10 @@ export type GanttRow = {
 
 const STATUS_COLOR: Record<string, string> = {
   DRAFT: 'var(--mantine-color-gray-5)',
-  RELEASED: 'var(--mantine-color-brand-5)',
-  IN_PROGRESS: 'var(--mantine-color-brand-6)',
-  DONE: 'var(--mantine-color-teal-6)',
-  CANCELLED: 'var(--mantine-color-red-5)',
+  RELEASED: 'var(--mantine-color-brand-4)',
+  IN_PROGRESS: 'var(--erp-chart-1)',
+  DONE: 'var(--erp-positive-text)',
+  CANCELLED: 'var(--erp-negative-text)',
 };
 
 /** A minimal self-drawn Gantt: one row per work order, bar positioned by its planned start→end window,

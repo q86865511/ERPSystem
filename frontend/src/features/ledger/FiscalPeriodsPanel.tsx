@@ -89,7 +89,7 @@ export function FiscalPeriodsPanel() {
           })}
         >
           <Group gap="xs">
-            <StatusBadge status={result.status} />
+            <StatusBadge status={result.status} size="md" />
             <Text size="sm" c="dimmed">
               {result.startDate} → {result.endDate}
             </Text>

@@ -232,7 +232,7 @@ export function VendorBillsPanel() {
         {detail.data && (
           <>
             <Group>
-              <StatusBadge status={detail.data.status} />
+              <StatusBadge status={detail.data.status} size="md" />
               {detail.data.journalEntryId != null && (
                 <Badge variant="light">
                   {t('purchasing.bill.journalEntry', { id: detail.data.journalEntryId })}

@@ -1,0 +1,159 @@
+/* SealBadge — the one signature element of Ink Ledger (design.md §6). Four shapes for document
+   review/posting states; every other status keeps the plain light <Badge> path in StatusBadge.
+   Colors reference the brand (ink) / seal / gray ramps only — no raw hex — so both schemes derive
+   from theme.ts. Serif label font matches the ledger headings stack (design.md §3).
+
+   Two sizes (design.md §6): `md` = full 40px stamp for a detail page's status area; `sm` = a scaled-
+   down ~28px stamp for table cells / list rows, so a seal never makes its row taller than its
+   neighbours (§4 row-height rhythm). The compact stamp shrinks *proportionally* via CSS custom
+   properties (diameter, font, frame gap all scale together) rather than a transform, so no frame ends
+   up rendering below 1px. */
+
+.serif {
+  font-family: 'Noto Serif TC', 'Source Serif 4', Georgia, serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* --- size tokens: `.md` (full / detail) vs `.sm` (compact / list). Every dimension below is derived
+   from these so the two sizes stay in exact proportion. --- */
+.md {
+  --seal-diameter: 40px;
+  --seal-font: 12px;
+  --seal-frame-gap: 2px;
+  --seal-outer-bd: 1.5px;
+  --seal-inner-bd: 1px;
+  --seal-rect-pad-y: 4px;
+  --seal-rect-pad-x: 10px;
+}
+.sm {
+  --seal-diameter: 28px;
+  --seal-font: 9px;
+  --seal-frame-gap: 1.5px;
+  --seal-outer-bd: 1.25px;
+  --seal-inner-bd: 1px;
+  --seal-rect-pad-y: 2px;
+  --seal-rect-pad-x: 7px;
+}
+
+/* 朱印 (circular) — vermillion circular double-frame. Outer + inner ring with a gap between them
+   (design.md §6). Only used for short CJK labels (≤3 chars); longer labels use `.stampRect` below.
+   Rotated -8deg at rest; the inner ring is a ::before pseudo so the double frame needs no extra DOM. */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+  width: var(--seal-diameter);
+  height: var(--seal-diameter);
+  font-size: var(--seal-font);
+  border-radius: 50%;
+  border: var(--seal-outer-bd) solid var(--mantine-color-seal-5);
+  color: var(--mantine-color-seal-5);
+  transform: rotate(-8deg);
+  text-align: center;
+}
+.stamp::before {
+  content: '';
+  position: absolute;
+  inset: var(--seal-frame-gap);
+  border-radius: 50%;
+  border: var(--seal-inner-bd) solid var(--mantine-color-seal-5);
+}
+
+/* 朱印 (rounded-rect) — same vermillion double-frame + -8deg rotation + drop animation, but a pill so
+   non-CJK / longer labels (e.g. English "Approved") fit on one line, width auto from the text
+   (design.md §6). Everything about the stamp language is preserved; only the outline is a rounded rect. */
+.stampRect {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+  padding: var(--seal-rect-pad-y) var(--seal-rect-pad-x);
+  font-size: var(--seal-font);
+  border-radius: var(--mantine-radius-sm);
+  border: var(--seal-outer-bd) solid var(--mantine-color-seal-5);
+  color: var(--mantine-color-seal-5);
+  transform: rotate(-8deg);
+  white-space: nowrap;
+}
+.stampRect::before {
+  content: '';
+  position: absolute;
+  inset: var(--seal-frame-gap);
+  border-radius: calc(var(--mantine-radius-sm) - var(--seal-frame-gap));
+  border: var(--seal-inner-bd) solid var(--mantine-color-seal-5);
+}
+
+/* dark mode: both stamp outlines step to seal-4 (design.md §6). */
+[data-mantine-color-scheme='dark'] .stamp,
+[data-mantine-color-scheme='dark'] .stampRect {
+  border-color: var(--mantine-color-seal-4);
+  color: var(--mantine-color-seal-4);
+}
+[data-mantine-color-scheme='dark'] .stamp::before,
+[data-mantine-color-scheme='dark'] .stampRect::before {
+  border-color: var(--mantine-color-seal-4);
+}
+
+/* 墨印 — ink filled rounded-rectangle stamp, NOT rotated, white serif label (design.md §6). Used for
+   POSTED / CLOSED. Padding + font scale with size so the compact chip keeps the ≥40px row rhythm. */
+.inkStamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: var(--seal-rect-pad-y) var(--seal-rect-pad-x);
+  font-size: var(--seal-font);
+  border-radius: var(--mantine-radius-sm);
+  background-color: var(--mantine-color-brand-8);
+  color: var(--mantine-color-white);
+}
+[data-mantine-color-scheme='dark'] .inkStamp {
+  /* ink-8 is near-black on the dark card; step up to ink-6 so the stamp reads as a filled chip. */
+  background-color: var(--mantine-color-brand-6);
+}
+
+/* 待審 — "not stamped yet" grey outline chip: gray-3 frame, no stamp styling (design.md §6).
+   Sans-serif on purpose — it is the absence of a seal, not a seal. Label is gray-6 (dark: gray-4),
+   NOT §6's original gray-5: #77786F measures 4.47:1 on white / 3.44:1 on the dark card, under the
+   AA floor — same §2.3-style contradiction as the dimmed token (review finding #1, adjudicated). */
+.pendingChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: var(--seal-rect-pad-y) var(--seal-rect-pad-x);
+  font-size: var(--seal-font);
+  border-radius: var(--mantine-radius-sm);
+  border: 1px solid var(--mantine-color-gray-3);
+  color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-gray-4));
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Stamp-drop micro-animation (design.md §6/§7): only plays when a mounted badge *transitions into*
+   the approved stamp — StatusBadge adds this class only then (first render never gets it). The one
+   performative motion in the whole system. Applies to both the circular and rounded-rect stamps. */
+.stampDrop {
+  animation: seal-drop 180ms ease-out;
+}
+@keyframes seal-drop {
+  from {
+    transform: scale(1.2) rotate(-12deg);
+  }
+  to {
+    transform: scale(1) rotate(-8deg);
+  }
+}
+
+/* Respect reduced-motion at the CSS layer (design.md §7): the stamp simply appears, no keyframes. */
+@media (prefers-reduced-motion: reduce) {
+  .stampDrop {
+    animation: none;
+  }
+}

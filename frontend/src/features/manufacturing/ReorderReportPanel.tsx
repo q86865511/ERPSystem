@@ -16,7 +16,7 @@ export function ReorderReportPanel() {
       label: t('manufacturing.reorder.onHand'),
       align: 'right',
       render: (r) => (
-        <Text c={Number(r.onHandQty ?? 0) <= Number(r.reorderPoint ?? 0) ? 'red' : undefined}>
+        <Text c={Number(r.onHandQty ?? 0) <= Number(r.reorderPoint ?? 0) ? 'var(--erp-negative-text)' : undefined}>
           {r.onHandQty}
         </Text>
       ),

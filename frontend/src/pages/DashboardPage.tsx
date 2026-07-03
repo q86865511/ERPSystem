@@ -155,8 +155,9 @@ export function DashboardPage() {
           curveType="monotone"
           withLegend
           series={[
-            { name: 'revenue', label: t('reporting.overview.seriesRevenue'), color: 'brand.6' },
-            { name: 'grossMargin', label: t('reporting.overview.seriesGrossMargin'), color: 'teal.6' },
+            { name: 'revenue', label: t('reporting.overview.seriesRevenue'), color: 'var(--erp-chart-1)' },
+            // Celadon from the §2.6 chart palette — stock teal is off-palette in the ink-ledger system.
+            { name: 'grossMargin', label: t('reporting.overview.seriesGrossMargin'), color: 'var(--erp-chart-6)' },
           ]}
           valueFormatter={(v) => formatMoney(v)}
           yAxisProps={{ width: 52, tickFormatter: (v) => compactNumber(Number(v)) }}

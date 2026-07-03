@@ -1,0 +1,162 @@
+#!/usr/bin/env node
+/**
+ * Self-hosts Noto Serif TC (weights 600 + 700) so the Docker demo needs no runtime font CDN — same
+ * rationale as the existing PlusJakartaSans-latin.woff2 self-host (see index.css). Google's CSS2 API
+ * splits Chinese-traditional coverage into many small unicode-range chunks; we fetch that CSS with a
+ * desktop Chrome UA (so Google serves woff2, not woff/ttf), download every chunk once, and re-emit a
+ * local stylesheet with the same @font-face rules pointed at the local files.
+ *
+ * Usage: node scripts/fetch-noto-serif-tc.mjs
+ * Output: src/assets/fonts/noto-serif-tc/*.woff2 + src/assets/fonts/noto-serif-tc.css
+ */
+import { mkdir, readdir, unlink, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const FONTS_DIR = path.join(__dirname, '..', 'src', 'assets', 'fonts');
+const OUT_DIR = path.join(FONTS_DIR, 'noto-serif-tc');
+const OUT_CSS = path.join(FONTS_DIR, 'noto-serif-tc.css');
+
+const GOOGLE_CSS_URL =
+  'https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700&display=swap';
+
+// A real desktop Chrome UA — Google's CSS2 endpoint sniffs User-Agent and only serves woff2 (with
+// unicode-range subsetting) to modern browsers; anything else falls back to woff/ttf mega-files.
+const CHROME_UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
+  'Chrome/124.0.0.0 Safari/537.36';
+
+async function fetchGoogleFontsCss() {
+  const res = await fetch(GOOGLE_CSS_URL, { headers: { 'User-Agent': CHROME_UA } });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch Google Fonts CSS: ${res.status} ${res.statusText}`);
+  }
+  return res.text();
+}
+
+/**
+ * Parses the Google-served CSS into one entry per @font-face block: weight, unicode-range, and the
+ * (remote) woff2 URL. Blocks look like:
+ *   @font-face {
+ *     font-family: 'Noto Serif TC';
+ *     font-style: normal;
+ *     font-weight: 600;
+ *     font-display: swap;
+ *     src: url(https://fonts.gstatic.com/s/notoseriftc/.../xxxx.woff2) format('woff2');
+ *     unicode-range: U+xxxx-xxxx, ...;
+ *   }
+ */
+function parseFontFaces(css) {
+  const blocks = css.match(/@font-face\s*\{[^}]*\}/g) ?? [];
+  const faces = [];
+  for (const block of blocks) {
+    const weightMatch = block.match(/font-weight:\s*([\d.]+)/);
+    const urlMatch = block.match(/src:\s*url\(([^)]+)\)\s*format\(['"]woff2['"]\)/);
+    const rangeMatch = block.match(/unicode-range:\s*([^;]+);/);
+    if (!weightMatch || !urlMatch || !rangeMatch) continue;
+    faces.push({
+      weight: weightMatch[1],
+      url: urlMatch[1].trim(),
+      unicodeRange: rangeMatch[1].trim(),
+    });
+  }
+  return faces;
+}
+
+/** Chunk index per weight, so filenames stay stable/readable: noto-serif-tc-600-000.woff2, ... */
+function buildFileName(weight, indexForWeight) {
+  return `noto-serif-tc-${weight}-${String(indexForWeight).padStart(3, '0')}.woff2`;
+}
+
+async function downloadChunk(url) {
+  const res = await fetch(url, { headers: { 'User-Agent': CHROME_UA } });
+  if (!res.ok) {
+    throw new Error(`Failed to download font chunk ${url}: ${res.status} ${res.statusText}`);
+  }
+  const buf = Buffer.from(await res.arrayBuffer());
+  return buf;
+}
+
+async function main() {
+  console.log('Fetching Google Fonts CSS for Noto Serif TC (600, 700)...');
+  const css = await fetchGoogleFontsCss();
+  const faces = parseFontFaces(css);
+  if (faces.length === 0) {
+    throw new Error('No @font-face woff2 entries parsed from Google Fonts CSS — UA sniffing may have changed.');
+  }
+  // Fail fast on a PARTIAL parse too (review finding #6): if Google's CSS format drifts so only one
+  // weight (or a fraction of the chunks) survives the regex, refuse to overwrite the committed set with
+  // a half-empty stylesheet. Google currently serves ~108 chinese-traditional chunks per weight.
+  const MIN_CHUNKS_PER_WEIGHT = 50;
+  for (const weight of ['600', '700']) {
+    const count = faces.filter((f) => f.weight === weight).length;
+    if (count < MIN_CHUNKS_PER_WEIGHT) {
+      throw new Error(
+        `Parsed only ${count} chunks for weight ${weight} (expected ~108, floor ${MIN_CHUNKS_PER_WEIGHT}) — ` +
+          `Google's CSS2 format may have changed; refusing to write a partial font set.`,
+      );
+    }
+  }
+  console.log(`Parsed ${faces.length} font-face chunks.`);
+
+  await mkdir(OUT_DIR, { recursive: true });
+  // Chunk boundaries/order can shift between Google refreshes and filenames are per-weight sequence
+  // numbers, so stale chunks from a previous run would otherwise linger as orphans. Clear the woff2 set
+  // (and only the woff2 set — OFL.txt stays) before regenerating.
+  const stale = (await readdir(OUT_DIR)).filter((f) => f.endsWith('.woff2'));
+  for (const f of stale) {
+    await unlink(path.join(OUT_DIR, f));
+  }
+  if (stale.length > 0) {
+    console.log(`Removed ${stale.length} stale chunks before regenerating.`);
+  }
+
+  const perWeightCounter = new Map();
+  const cssFaces = [];
+  let totalBytes = 0;
+
+  for (const face of faces) {
+    const idx = perWeightCounter.get(face.weight) ?? 0;
+    perWeightCounter.set(face.weight, idx + 1);
+    const fileName = buildFileName(face.weight, idx);
+    const filePath = path.join(OUT_DIR, fileName);
+
+    const bytes = await downloadChunk(face.url);
+    await writeFile(filePath, bytes);
+    totalBytes += bytes.length;
+
+    cssFaces.push({ weight: face.weight, unicodeRange: face.unicodeRange, fileName });
+    process.stdout.write(`.`);
+  }
+  console.log(`\nDownloaded ${faces.length} chunks, ${(totalBytes / (1024 * 1024)).toFixed(2)} MB total.`);
+
+  const cssOut =
+    `/* Noto Serif TC — self-hosted chinese-traditional woff2 chunks (weights 600 + 700), generated by\n` +
+    `   scripts/fetch-noto-serif-tc.mjs. Mirrors the PlusJakartaSans self-host: zero runtime font CDN so\n` +
+    `   the Docker demo (and its CSP) never reaches out to fonts.gstatic.com. Each @font-face keeps the\n` +
+    `   unicode-range Google assigned, so the browser only pulls the chunks a page actually needs. Do not\n` +
+    `   hand-edit — re-run the fetch script to refresh. */\n` +
+    cssFaces
+      .map(
+        (f) =>
+          `@font-face {\n` +
+          `  font-family: 'Noto Serif TC';\n` +
+          `  font-style: normal;\n` +
+          `  font-weight: ${f.weight};\n` +
+          `  font-display: swap;\n` +
+          `  src: url('./noto-serif-tc/${f.fileName}') format('woff2');\n` +
+          `  unicode-range: ${f.unicodeRange};\n` +
+          `}\n`,
+      )
+      .join('\n');
+
+  await writeFile(OUT_CSS, cssOut, 'utf8');
+  console.log(`Wrote ${OUT_CSS}`);
+  console.log(`Wrote ${faces.length} files to ${OUT_DIR}`);
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
+});

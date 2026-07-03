@@ -13,7 +13,8 @@ const OPEN_STATES = new Set(['DRAFT', 'RELEASED', 'IN_PROGRESS']);
 const WIP_STATES = new Set(['RELEASED', 'IN_PROGRESS']);
 const DISPATCH_STATES = new Set(['DRAFT', 'RELEASED']);
 
-const oeeColor = (pct: number) => (pct >= 85 ? 'teal' : pct >= 70 ? 'orange' : 'red');
+const oeeColor = (pct: number) =>
+  pct >= 85 ? 'var(--erp-positive-text)' : pct >= 70 ? 'var(--erp-warning-text)' : 'var(--erp-negative-text)';
 
 export function ManufacturingDashboardPanel() {
   const { t } = useI18n();
