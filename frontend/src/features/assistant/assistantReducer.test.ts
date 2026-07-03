@@ -76,15 +76,35 @@ describe('assistantReducer', () => {
     ]);
   });
 
-  it('parks a write tool as proposed + pending on awaiting_confirmation, then done(awaiting_confirmation)', () => {
+  // The REAL backend sends NO `tool_call` for write tools — only `awaiting_confirmation` (it stops the
+  // stream at the first write). The reducer must upsert the proposed ToolCard from that event alone;
+  // relying on a prior write `tool_call` deadlocked the drawer in live verification (pending locks the
+  // input, but no card meant no confirm/reject buttons existed anywhere).
+  it('parks a write tool as proposed + pending on awaiting_confirmation alone (no prior tool_call)', () => {
+    const state = run([
+      { type: 'user_send', id: 'm1', text: 'create PO' },
+      sse({ type: 'awaiting_confirmation', id: 'w1', name: 'create_po', input: { qty: 5 } }),
+      sse({ type: 'done', stopReason: 'awaiting_confirmation' }),
+    ]);
+    expect(state.streaming).toBe(false);
+    expect(state.pending).toEqual({ toolUseId: 'w1', name: 'create_po', input: { qty: 5 } });
+    expect(draft(state).tools[0]).toMatchObject({
+      id: 'w1',
+      status: 'proposed',
+      kind: 'write',
+      input: { qty: 5 },
+    });
+  });
+
+  it('still parks correctly when a write tool_call did precede awaiting_confirmation (no duplicate card)', () => {
     const state = run([
       { type: 'user_send', id: 'm1', text: 'create PO' },
       sse({ type: 'tool_call', id: 'w1', name: 'create_po', input: { qty: 5 }, kind: 'write' }),
       sse({ type: 'awaiting_confirmation', id: 'w1', name: 'create_po', input: { qty: 5 } }),
       sse({ type: 'done', stopReason: 'awaiting_confirmation' }),
     ]);
-    expect(state.streaming).toBe(false);
-    expect(state.pending).toEqual({ toolUseId: 'w1', name: 'create_po', input: { qty: 5 } });
+    expect(state.pending?.toolUseId).toBe('w1');
+    expect(draft(state).tools).toHaveLength(1);
     expect(draft(state).tools[0]).toMatchObject({ status: 'proposed', kind: 'write' });
   });
 
@@ -92,7 +112,6 @@ describe('assistantReducer', () => {
     const parked = run([
       { type: 'user_send', id: 'm1', text: 'create PO' },
       sse({ type: 'text_delta', text: 'Creating…' }),
-      sse({ type: 'tool_call', id: 'w1', name: 'create_po', input: { qty: 5 }, kind: 'write' }),
       sse({ type: 'awaiting_confirmation', id: 'w1', name: 'create_po', input: { qty: 5 } }),
       sse({ type: 'done', stopReason: 'awaiting_confirmation' }),
     ]);
