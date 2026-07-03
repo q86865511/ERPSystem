@@ -413,6 +413,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
   - 多代理人設計工作流(6 維度 → 整合 → 對抗式審查);定案技術棧、模組化單體、移動加權平均、並行鎖序、編號、idempotency、退貨等決策。計畫檔見 `~/.claude/plans/`。
 
 ## 進行中
+- [2026-07-03] **前端視覺重設計「墨青帳房」啟動**(分支 `feat/frontend-redesign`)—— 以官方 `frontend-design` plugin(skill)引導,自三個 mockup 提案(墨青帳房/精密儀表/翡翠總帳)選定「墨青帳房」:墨青綠 `#123F3C` 主色 + 宣紙白頁面 + 朱印紅 `#C43D2F` 審核章(簽名元件 `SealBadge`)+ Noto Serif TC 標題。規範已寫入 **`frontend/design.md`**(色彩 ramp/字體/tokens/Mantine 元件對應/動效/遷移備註),為後續 UI 改版的唯一美術依據;實際 UI 程式碼修改尚未開始。
 - **🎉 Phase 7(全端化)Stage 1–8 全數完成** —— 全部 8 個模組皆有完整 React 前端,一鍵 `docker compose -f compose.demo.yaml up --build` 起 postgres + 自動 seed 後端 + 前端;雙語 README。每 stage 一個 PR。Stage 8 PR 待 merge。**可選後續**:在使用者機器上實跑 `up` 驗收 + 補前端畫面 screenshots(`docs/`);JWT/持久化使用者庫;雲端部署;前端 bundle code-split(@tabler/icons barrel)。
 - **基底 Phase 0–6 全數完成** —— 總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / 打磨與打包,完整路線圖落地,CI 綠。
 
