@@ -324,10 +324,33 @@ function applySse(state: AssistantState, event: SseAssistantEvent): AssistantSta
         };
       }
       // Pause immediately: don't wait for the `done(awaiting_confirmation)` that follows to unblock input.
+      //
+      // Upsert the proposed tool into the draft ourselves: the REAL backend never sends a `tool_call`
+      // for write tools (it stops the stream at the first write and emits only this event), so without
+      // this the draft has no ToolCard for the pending id — no confirm/reject buttons ever render while
+      // the input stays pending-locked (a hard deadlock, found in live verification; the old e2e fixture
+      // masked it by emitting an extra `tool_call` the backend does not send). The upsert also puts the
+      // write tool_use into the draft so the resume POST's history actually contains the block the
+      // backend re-validates against.
       return {
         ...state,
         streaming: false,
         pending: { toolUseId: event.id, name: event.name, input: event.input },
+        messages: mapDraft(state.messages, (d) => ({
+          ...d,
+          tools: d.tools.some((t) => t.id === event.id)
+            ? d.tools.map((t) => (t.id === event.id ? { ...t, status: 'proposed' as const } : t))
+            : [
+                ...d.tools,
+                {
+                  id: event.id,
+                  name: event.name,
+                  kind: 'write' as const,
+                  input: event.input,
+                  status: 'proposed' as const,
+                },
+              ],
+        })),
       };
 
     case 'done':

@@ -24,7 +24,9 @@ const TURN_1 = sseBody([
   ['text_delta', { text: 'Let me check that for you. ' }],
   ['tool_call', { id: 'r1', name: 'list_items', input: { q: 'widget' }, kind: 'read' }],
   ['tool_result', { id: 'r1', ok: true, result: '[{"sku":"W-1"}]' }],
-  ['tool_call', { id: 'w1', name: 'create_purchase_order', input: { partnerId: 7, qty: 5 }, kind: 'write' }],
+  // NOTE: the real backend emits NO `tool_call` for write tools — it stops the stream at the first write
+  // and sends only `awaiting_confirmation` + `done` (see AgentLoopService). The fixture must mirror that:
+  // an extra write `tool_call` here once masked a reducer deadlock that live verification then hit.
   ['awaiting_confirmation', { id: 'w1', name: 'create_purchase_order', input: { partnerId: 7, qty: 5 } }],
   ['done', { stopReason: 'awaiting_confirmation', usage: { inputTokens: 10, outputTokens: 20 } }],
 ]);

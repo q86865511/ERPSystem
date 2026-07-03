@@ -16,6 +16,12 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-03] 🐛 **修正:側欄 HITL 確認卡死鎖(實機驗證抓到;e2e fixture 與真後端事件序不符的假綠)**。分支 `fix/assistant-confirm-deadlock`。
+  - **症狀**:write 提案後 UI 全鎖 — 輸入框因 `pending` 停用(by design),但確認/拒絕按鈕永遠不出現。
+  - **根因**:確認按鈕渲染在「`tool.id`==pending id 的 ToolCard」上,而 ToolCard 條目只由 `tool_call` 事件建立;**真後端對 write 從不發 `tool_call`**(遇第一個 write 直接 `awaiting_confirmation` 斷流)→ 卡永不存在。e2e 綠是因為 fixture 自己多塞了一個 write `tool_call`(與 `AgentLoopService` 實際行為不符)。
+  - **修**:reducer 的 `awaiting_confirmation` 分支 upsert proposed ToolCard(一石二鳥:按鈕能渲染 + resume POST 歷史才含 write `tool_use` block);fixture 改為真後端序列並註記;reducer 測試改以「無 tool_call 的 awaiting」為正典 + 保留兩種序列容忍測試。
+  - **教訓**:fixture-mock 的事件序必須對照真後端實作逐一核對,否則整條 e2e 是在測自己的想像。
+  - **驗證**:types / Vitest **157** / build / Playwright **13** 全綠;實機側欄確認卡待重 build 後複測。
 - [2026-07-03] 🐛 **修正:assistant flag 開了也永遠 enabled:false(實機驗證抓到,兩個疊加的潛藏 bug)**。分支 `fix/assistant-enabled-selfdefeat`。
   - **Bug 1(元兇)**:`AnthropicSdkAdapter` 的 `@ConditionalOnMissingBean(AnthropicPort.class)` 放在 component-scan 的 `@Component` 上 → OnBeanCondition 看到**它自己剛註冊的 bean definition** 而自我否決,adapter 在任何情況都不會建立(DEBUG 條件報告:`found beans ... anthropicSdkAdapter`)。CI 全綠是因為所有測試裡「adapter 不存在」剛好都像預期行為;「flag=true → 真 adapter 存在」這條路徑從未被任何測試覆蓋。
   - **Bug 2(被 Bug 1 遮住)**:adapter 有兩個建構子(正式 + 測試 seam)但沒標 `@Autowired` → 即使條件過了也 `No default constructor found`。
