@@ -4,6 +4,7 @@
  * 對帳/過帳…)。enum 的 value 維持後端代碼,這裡只翻顯示用的 label。
  */
 import type { Messages } from '../types';
+import { assistantZh } from './modules/assistant';
 import { auditZh } from './modules/audit';
 import { hrZh } from './modules/hr';
 import { inventoryZh } from './modules/inventory';
@@ -202,4 +203,5 @@ export const zhTW: Messages = {
   print: printZh,
   audit: auditZh,
   onboarding: onboardingZh,
+  assistant: assistantZh,
 };

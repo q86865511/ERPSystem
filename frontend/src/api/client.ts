@@ -22,7 +22,10 @@ const isAuthPath = (url: string): boolean => AUTH_PATHS.some((p) => url.includes
 // Single-flight refresh: many concurrent 401s share one POST /api/auth/refresh (the httpOnly refresh cookie
 // is sent automatically, being same-origin). Resolves true when a fresh access token was stored.
 let refreshing: Promise<boolean> | null = null;
-function refreshAccessToken(): Promise<boolean> {
+// Exported so the assistant's raw-fetch SSE call (which bypasses openapi-fetch and thus the auth
+// middleware) can replay a 401'd stream once against a fresh token, sharing this single-flight refresh
+// instead of duplicating the /api/auth/refresh dance.
+export function refreshAccessToken(): Promise<boolean> {
   refreshing ??= fetch('/api/auth/refresh', { method: 'POST' })
     .then(async (res) => {
       if (!res.ok) return false;

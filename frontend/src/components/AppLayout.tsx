@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import {
   ActionIcon,
   AppShell,
@@ -31,6 +31,7 @@ import {
   IconMoon,
   IconReportAnalytics,
   IconShoppingCart,
+  IconSparkles,
   IconSun,
   IconTruckDelivery,
   IconUsers,
@@ -42,6 +43,12 @@ import type { Role } from '../auth/roles';
 import { useI18n } from '../i18n';
 import type { Locale, TranslationKey } from '../i18n';
 import { useOnboardingTour } from '../onboarding/useOnboardingTour';
+import { useAssistantStatus } from '../features/assistant/api';
+
+// Lazy chunk: the assistant UI (and its SSE machinery) loads only when the drawer is first opened.
+const AssistantDrawer = lazy(() =>
+  import('../features/assistant/AssistantDrawer').then((m) => ({ default: m.AssistantDrawer })),
+);
 
 /** A sidebar sub-item: `value` is the module page's tab id (deep-linked as `?tab=`); `labelKey` reuses the
  *  module's existing tab i18n key. */
@@ -158,6 +165,13 @@ const NAV: {
 
 export function AppLayout() {
   const [opened, { toggle, close }] = useDisclosure();
+  const [assistantOpened, { open: openAssistant, close: closeAssistant }] = useDisclosure(false);
+  // Once the assistant has been opened at least once, keep its chunk mounted (Drawer itself uses
+  // keepMounted so closing just plays the close animation instead of unmounting) so the conversation and
+  // useAssistantChat state survive a close/reopen — only the *first* open is gated behind this flag so the
+  // lazy chunk still isn't fetched until the user actually wants it.
+  const [hasOpenedAssistant, setHasOpenedAssistant] = useState(false);
+  const assistantStatus = useAssistantStatus();
   // Per-section expand overrides keyed by route. Defaults to the route-active module (see `open` below),
   // but the chevron lets users expand a non-active module or collapse the active one.
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
@@ -216,6 +230,20 @@ export function AppLayout() {
             </Link>
           </Group>
           <Group gap="sm">
+            {assistantStatus.data?.enabled && (
+              <ActionIcon
+                variant="subtle"
+                color="brand"
+                size="lg"
+                aria-label={t('assistant.open')}
+                onClick={() => {
+                  setHasOpenedAssistant(true);
+                  openAssistant();
+                }}
+              >
+                <IconSparkles size={20} />
+              </ActionIcon>
+            )}
             <SegmentedControl
               size="xs"
               aria-label={t('common.colorScheme')}
@@ -360,6 +388,15 @@ export function AppLayout() {
           <Outlet />
         </Suspense>
       </AppShell.Main>
+
+      {/* Gated on hasOpenedAssistant (sticky true) rather than assistantOpened (toggles false on close) so
+          the lazy chunk loads once, on first open, and then stays mounted — Drawer's own keepMounted then
+          keeps the conversation/useAssistantChat state alive across subsequent close/reopen cycles. */}
+      {hasOpenedAssistant && (
+        <Suspense fallback={null}>
+          <AssistantDrawer opened={assistantOpened} onClose={closeAssistant} />
+        </Suspense>
+      )}
     </AppShell>
   );
 }

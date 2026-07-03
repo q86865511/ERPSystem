@@ -86,6 +86,32 @@ test.describe('accessibility (axe, light)', () => {
   });
 });
 
+test.describe('accessibility (axe, assistant drawer)', () => {
+  test('open assistant drawer has no serious/critical violations', async ({ page }, testInfo) => {
+    // Enable the feature flag and stream a small canned turn so the drawer renders real content.
+    await page.route('**/api/assistant/status', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ enabled: true }) }));
+    await page.route('**/api/assistant/chat', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'text/event-stream',
+        body:
+          'event: text_delta\ndata: {"text":"Here is a summary."}\n\n' +
+          'event: done\ndata: {"stopReason":"end_turn"}\n\n',
+      }));
+    await enterApp(page);
+
+    await page.getByRole('button', { name: 'Open assistant' }).click();
+    const drawer = page.getByRole('dialog', { name: 'ERP Copilot' });
+    await expect(drawer).toBeVisible();
+    await drawer.getByRole('textbox').fill('Summarize sales');
+    await page.getByRole('button', { name: 'Send' }).click();
+    await expect(drawer.getByText('Here is a summary.')).toBeVisible();
+
+    await scan(page, testInfo, 'assistant-drawer-light');
+  });
+});
+
 test.describe('accessibility (axe, dark)', () => {
   test.use({ colorScheme: 'dark' });
 

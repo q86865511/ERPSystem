@@ -23,7 +23,7 @@ export default defineConfig({
   projects: [
     {
       name: 'local',
-      testMatch: /(nav|axe)\.spec\.ts/,
+      testMatch: /(nav|axe|assistant)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], baseURL: `http://127.0.0.1:${PORT}` },
     },
     {
