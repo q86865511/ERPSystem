@@ -158,6 +158,15 @@ docker compose -f compose.demo.yaml up --build
 
 > For a fresh dataset: `docker compose -f compose.demo.yaml down -v` to drop the volume, then `up`.
 
+**Enable ERP Copilot (AI assistant, optional)**: off by default. Drop a `.env` (git-ignored) next to `compose.demo.yaml`:
+
+```bash
+APP_ASSISTANT_ENABLED=true
+ANTHROPIC_API_KEY=sk-ant-...   # your Anthropic API key, backend-only
+```
+
+After `up`, log in with a role account (e.g. `sales`) — a ✨ icon appears top-right in the header to open the assistant sidebar. Writes (like creating an order) pause on a confirmation card and only run once you approve, and the books still balance afterwards. For the MCP server (Claude Desktop / Claude Code operating the ERP directly), see [mcp-server/README.md](mcp-server/README.md).
+
 ### Local development
 
 ```bash
