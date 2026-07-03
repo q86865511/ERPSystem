@@ -166,7 +166,7 @@ export function BomsPanel() {
         {detail && (
           <>
             <Group>
-              <StatusBadge status={detail.status} />
+              <StatusBadge status={detail.status} size="md" />
               <Text size="sm" c="dimmed">
                 {t('manufacturing.bom.outputQtyValue', { qty: detail.outputQty ?? '' })}
               </Text>

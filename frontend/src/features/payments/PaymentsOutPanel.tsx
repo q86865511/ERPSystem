@@ -147,7 +147,7 @@ export function PaymentsOutPanel() {
         {detail.data && (
           <>
             <Group>
-              <StatusBadge status={detail.data.status} />
+              <StatusBadge status={detail.data.status} size="md" />
               {detail.data.journalEntryId != null && (
                 <Badge variant="light">{t('payments.je', { id: detail.data.journalEntryId })}</Badge>
               )}

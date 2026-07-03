@@ -2,7 +2,7 @@ import { Badge } from '@mantine/core';
 import { useI18n } from '../i18n';
 import type { TranslationKey } from '../i18n';
 import { SealBadge } from './SealBadge';
-import type { SealVariant } from './SealBadge';
+import type { SealSize, SealVariant } from './SealBadge';
 
 /**
  * Document review/posting statuses that render as a stamp (design.md §6) instead of a plain light Badge.
@@ -65,7 +65,12 @@ const POSITIVE_STYLES = {
   label: { color: 'var(--erp-positive-text)' },
 };
 
-export function StatusBadge({ status }: { status: string | undefined }) {
+/**
+ * @param size Only affects the SealBadge path (design.md §6): `sm` (default) is the compact stamp for
+ *   table cells / list rows; `md` is the full stamp for a detail page's status area. Plain-Badge statuses
+ *   ignore it (Mantine Badge sizing is unchanged), so list columns can keep calling `<StatusBadge status/>`.
+ */
+export function StatusBadge({ status, size = 'sm' }: { status: string | undefined; size?: SealSize }) {
   const { t } = useI18n();
   if (!status) return null;
   // status.* mirrors the backend enum codes; fall back to the prettified code for any unmapped token.
@@ -76,7 +81,7 @@ export function StatusBadge({ status }: { status: string | undefined }) {
   // Stamp-language statuses (design.md §6) render as a SealBadge; everything else stays on the Badge path.
   const sealVariant = SEAL_VARIANT[status];
   if (sealVariant) {
-    return <SealBadge status={status} variant={sealVariant} label={text} />;
+    return <SealBadge status={status} variant={sealVariant} label={text} size={size} />;
   }
 
   const color = COLOR[status] ?? 'gray';

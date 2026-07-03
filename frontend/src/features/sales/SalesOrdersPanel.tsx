@@ -195,7 +195,7 @@ export function SalesOrdersPanel() {
         {detail.data && (
           <>
             <Group>
-              <StatusBadge status={detail.data.status} />
+              <StatusBadge status={detail.data.status} size="md" />
               <Text c="dimmed" size="sm">
                 {detail.data.partnerId != null ? partners.get(detail.data.partnerId) : ''} ·{' '}
                 {detail.data.orderDate}

@@ -239,7 +239,7 @@ export function WorkOrdersPanel() {
           <>
             <Group justify="space-between">
               <Group>
-                <StatusBadge status={status} />
+                <StatusBadge status={status} size="md" />
                 <Text size="sm" c="dimmed">
                   {t('manufacturing.wo.produceSummary', {
                     item: (detail.data.itemId != null ? items.get(detail.data.itemId) : '') ?? '',

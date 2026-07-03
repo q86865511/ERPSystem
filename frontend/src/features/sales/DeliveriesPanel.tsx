@@ -183,7 +183,7 @@ export function DeliveriesPanel() {
       >
         {detail.data && (
           <>
-            <StatusBadge status={detail.data.status} />
+            <StatusBadge status={detail.data.status} size="md" />
             <Table>
               <Table.Thead>
                 <Table.Tr>

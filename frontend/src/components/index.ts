@@ -10,5 +10,5 @@ export { EmptyState } from './EmptyState';
 export { PageHeader } from './PageHeader';
 export { StatusBadge } from './StatusBadge';
 export { SealBadge } from './SealBadge';
-export type { SealVariant } from './SealBadge';
+export type { SealVariant, SealSize } from './SealBadge';
 export { MoneyText, formatMoney, sumMoney } from './Money';

@@ -136,7 +136,7 @@ export function CustomerReturnsPanel() {
         {detail.data && (
           <>
             <Group>
-              <StatusBadge status={detail.data.status} />
+              <StatusBadge status={detail.data.status} size="md" />
               {detail.data.creditNoteJournalEntryId != null && (
                 <Badge variant="light">
                   {t('sales.return.creditNoteJe', { id: detail.data.creditNoteJournalEntryId })}

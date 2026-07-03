@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '../test/test-utils';
 import { SealBadge } from './SealBadge';
+import { StatusBadge } from './StatusBadge';
 
 /**
  * SealBadge is the Ink Ledger signature element (design.md §6). These tests pin the four shape branches,
@@ -51,6 +52,76 @@ describe('SealBadge shapes', () => {
     // English label fits or not is a layout concern; the component must render exactly what it is given.
     const { container } = seal('APPROVED', 'stamp', 'Approved');
     expect(container.querySelector('[data-seal-variant="stamp"]')?.textContent).toBe('Approved');
+  });
+});
+
+describe('SealBadge 朱印 outline: circle for short CJK, rounded-rect otherwise (design.md §6)', () => {
+  it('uses the circular stamp for a ≤3-char CJK label (已核准)', () => {
+    const { container } = seal('APPROVED', 'stamp', '已核准');
+    expect(container.querySelector('[data-seal-variant="stamp"]')?.getAttribute('data-seal-shape')).toBe('circle');
+  });
+
+  it('uses the rounded-rect stamp for an English label that a circle can not hold (Approved)', () => {
+    const { container } = seal('APPROVED', 'stamp', 'Approved');
+    expect(container.querySelector('[data-seal-variant="stamp"]')?.getAttribute('data-seal-shape')).toBe('rect');
+  });
+
+  it('uses the rounded-rect stamp for a CJK label longer than 3 chars', () => {
+    const { container } = seal('APPROVED', 'stamp', '已核准通過');
+    expect(container.querySelector('[data-seal-variant="stamp"]')?.getAttribute('data-seal-shape')).toBe('rect');
+  });
+
+  it('picks the outline the same way when the label comes from StatusBadge under each locale', async () => {
+    // Full path: StatusBadge resolves the i18n label, so zh-TW → 已核准 (circle) and en → Approved (rect).
+    // I18nProvider reads the persisted locale (saveLocale) at mount, so we set it before each render.
+    const { saveLocale } = await import('../i18n/localePreference');
+    try {
+      saveLocale('zh-TW');
+      const zh = renderWithProviders(<StatusBadge status="APPROVED" />);
+      expect(zh.container.querySelector('[data-seal-variant="stamp"]')?.getAttribute('data-seal-shape')).toBe(
+        'circle',
+      );
+      expect(zh.container.querySelector('[data-seal-variant="stamp"]')?.textContent).toBe('已核准');
+      zh.unmount();
+
+      saveLocale('en');
+      const en = renderWithProviders(<StatusBadge status="APPROVED" />);
+      expect(en.container.querySelector('[data-seal-variant="stamp"]')?.getAttribute('data-seal-shape')).toBe(
+        'rect',
+      );
+      expect(en.container.querySelector('[data-seal-variant="stamp"]')?.textContent).toBe('Approved');
+      en.unmount();
+    } finally {
+      localStorage.removeItem('erp.locale'); // don't leak a locale preference into other tests
+    }
+  });
+});
+
+describe('SealBadge size (design.md §6): sm compact for lists, md full for detail areas', () => {
+  it('defaults to the compact (sm) size when no size prop is given', () => {
+    const { container } = renderWithProviders(<SealBadge status="APPROVED" variant="stamp" label="已核准" />);
+    expect(container.querySelector('[data-seal-variant="stamp"]')?.getAttribute('data-seal-size')).toBe('sm');
+  });
+
+  it('applies the md size for the detail-area path', () => {
+    const { container } = renderWithProviders(
+      <SealBadge status="APPROVED" variant="stamp" label="已核准" size="md" />,
+    );
+    expect(container.querySelector('[data-seal-variant="stamp"]')?.getAttribute('data-seal-size')).toBe('md');
+  });
+
+  it('carries the size through every stamp-language shape (ink / pending)', () => {
+    const ink = renderWithProviders(<SealBadge status="POSTED" variant="ink" label="已過帳" size="md" />);
+    const pending = renderWithProviders(<SealBadge status="PENDING" variant="pending" label="待審" size="sm" />);
+    expect(ink.container.querySelector('[data-seal-variant="ink"]')?.getAttribute('data-seal-size')).toBe('md');
+    expect(pending.container.querySelector('[data-seal-variant="pending"]')?.getAttribute('data-seal-size')).toBe(
+      'sm',
+    );
+  });
+
+  it('StatusBadge forwards size="md" from a detail-area call site to the seal', () => {
+    const { container } = renderWithProviders(<StatusBadge status="APPROVED" size="md" />);
+    expect(container.querySelector('[data-seal-variant="stamp"]')?.getAttribute('data-seal-size')).toBe('md');
   });
 });
 
