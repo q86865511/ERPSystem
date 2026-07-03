@@ -15,7 +15,7 @@ export interface paths {
         put?: never;
         /**
          * Stream a chat turn
-         * @description Streams the assistant's reply as Server-Sent Events (text_delta*, then done or error). See the class doc for the event protocol.
+         * @description Streams the assistant's reply as Server-Sent Events (text_delta*, tool_call/tool_result*, then done, awaiting_confirmation or error). See the class doc for the event protocol.
          */
         post: operations["chat"];
         delete?: never;
@@ -1529,6 +1529,7 @@ export interface components {
             outflow?: string;
         };
         ChatRequest: {
+            decision?: components["schemas"]["Decision"];
             messages: components["schemas"]["Message"][];
         };
         ClearingBalance: {
@@ -1545,7 +1546,16 @@ export interface components {
             stockLocationId: number;
         };
         ContentBlock: {
-            text: string;
+            content?: string;
+            id?: string;
+            input?: components["schemas"]["JsonNode"];
+            isError?: boolean;
+            name?: string;
+            text?: string;
+            textPresentForTextBlocks?: boolean;
+            toolResultWellFormed?: boolean;
+            toolUseId?: string;
+            toolUseWellFormed?: boolean;
             type?: string;
         };
         CreateAdjustmentRequest: {
@@ -1776,6 +1786,10 @@ export interface components {
             salesOrderId?: number;
             status?: string;
             vatAmount?: string;
+        };
+        Decision: {
+            approved: boolean;
+            toolUseId: string;
         };
         DeliveryLine: {
             qty: string;
@@ -2011,6 +2025,34 @@ export interface components {
             status?: string;
             totalCredit?: string;
             totalDebit?: string;
+        };
+        JsonNode: {
+            array?: boolean;
+            bigDecimal?: boolean;
+            bigInteger?: boolean;
+            binary?: boolean;
+            boolean?: boolean;
+            container?: boolean;
+            double?: boolean;
+            embeddedValue?: boolean;
+            empty?: boolean;
+            float?: boolean;
+            floatingPointNumber?: boolean;
+            int?: boolean;
+            integralNumber?: boolean;
+            long?: boolean;
+            missingNode?: boolean;
+            /** @enum {string} */
+            nodeType?: "ARRAY" | "BINARY" | "BOOLEAN" | "MISSING" | "NULL" | "NUMBER" | "OBJECT" | "POJO" | "STRING";
+            null?: boolean;
+            number?: boolean;
+            object?: boolean;
+            pojo?: boolean;
+            short?: boolean;
+            string?: boolean;
+            /** @deprecated */
+            textual?: boolean;
+            valueNode?: boolean;
         };
         KpiMetric: {
             current?: string;
@@ -2473,7 +2515,9 @@ export interface operations {
     chat: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                Authorization?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2490,6 +2534,15 @@ export interface operations {
                 };
                 content: {
                     "text/event-stream": string;
+                };
+            };
+            /** @description Per-user rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
                 };
             };
             /** @description Assistant disabled or its executor is at capacity */

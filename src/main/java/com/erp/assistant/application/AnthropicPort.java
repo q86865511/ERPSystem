@@ -7,9 +7,9 @@ package com.erp.assistant.application;
  * {@code app.assistant.enabled=true} — keeping the SDK (and its {@code ANTHROPIC_API_KEY} requirement) off
  * the startup path when the assistant is off.
  *
- * <p>The listener callbacks are named for streaming semantics rather than SDK event shapes. PR2 will add
- * an {@code onToolUse(...)} callback to {@link ChatStreamListener}; existing callers keep working because
- * it will get a default no-op.
+ * <p>The listener callbacks are named for streaming semantics rather than SDK event shapes. The
+ * {@code onToolUse(...)} callback fires once per fully-accumulated tool-use block the model emitted in a
+ * turn; callers that predate tool use (e.g. test fakes) keep working via its default no-op.
  */
 public interface AnthropicPort {
 
@@ -25,6 +25,18 @@ public interface AnthropicPort {
 
         /** A chunk of assistant text. May be called many times; concatenate in order. */
         void onTextDelta(String text);
+
+        /**
+         * A tool-use block the model produced this turn, delivered once its streamed input JSON is fully
+         * accumulated (content_block_start → input_json_delta* → content_block_stop). Fires before
+         * {@link #onEnd} for a turn whose {@link StopInfo#stopReason()} is {@code tool_use}. Default no-op
+         * so text-only listeners are unaffected.
+         *
+         * @param id        the tool-use block id (echoed back in the matching tool_result)
+         * @param name      the tool name the model called
+         * @param inputJson the tool input as a JSON string (may be {@code "{}"} for a no-arg tool)
+         */
+        default void onToolUse(String id, String name, String inputJson) {}
 
         /** The response finished normally. */
         void onEnd(StopInfo stop);

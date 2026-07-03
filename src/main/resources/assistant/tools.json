@@ -1,0 +1,145 @@
+{
+  "$comment": "ERP Copilot tool manifest — the single source of truth for the assistant's tools. Read by ToolRegistry (com.erp.assistant.application) and, in future, shared with a standalone mcp-server. Each tool maps to one ERP REST endpoint. See ToolManifest's javadoc for the input->HTTP mapping rules. Descriptions are hand-written for the LLM; write tools state they require explicit user confirmation. 'requiredRoles' is optional (omit ⇒ any authenticated/role-holding caller); when present the caller must hold at least one of the listed ROLE_* authorities.",
+  "tools": [
+    {
+      "name": "search_items",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/masterdata/items",
+      "description": "List the item master (products, raw materials, finished goods) with their id, sku, name, item type, unit of measure and standard cost. Use this to resolve a human sku or product name to the numeric item id required by other tools such as create_sales_order. Returns every item; filter the result yourself.",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "search_partners",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/masterdata/partners",
+      "description": "List business partners (customers and vendors) with their id, code, name and vendor/customer flags. Pass vendor=true to list only vendors, or customer=true to list only customers; omit both to list all. Use this to resolve a customer name or code to the numeric partnerId required by create_sales_order.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "vendor": {
+            "type": "boolean",
+            "description": "When true, return only partners flagged as vendors."
+          },
+          "customer": {
+            "type": "boolean",
+            "description": "When true, return only partners flagged as customers."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_inventory_status",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/inventory/items-status",
+      "description": "Get the on-hand status of every stocked item: sku, name, item type, on-hand quantity, on-hand value and a stock-health flag (OK, LOW or OUT). Use this to answer questions about what is in stock, low stock or out of stock.",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "get_ar_aging",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/sales/ar-aging",
+      "description": "Get the accounts-receivable aging report as of a date: outstanding customer balances bucketed as current, 1-30, 31-60, 61-90 and 90+ days past due, plus the total. Use this to answer questions about overdue receivables and collections.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "asOf": {
+            "type": "string",
+            "description": "As-of date in ISO yyyy-MM-dd form. Omit for today."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_kpi_summary",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/reporting/kpi-summary",
+      "description": "Get the finance KPI summary for the current month versus the previous month: revenue, gross profit and net cash, each with current value, previous value and percent change. Use this to answer questions about headline financial performance and month-over-month trends.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "asOf": {
+            "type": "string",
+            "description": "Reference date in ISO yyyy-MM-dd form; the month it falls in is the current month. Omit for today."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_reconciliation_health",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/reporting/reconciliation",
+      "description": "Get the reconciliation health-check: whether the general ledger's trial balance balances and every subledger (AP, AR, inventory) equals its GL control account, with per-subledger figures and transitional clearing-account balances. Use this to answer whether the books are in balance and correct.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "asOf": {
+            "type": "string",
+            "description": "As-of date in ISO yyyy-MM-dd form. Omit for today."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_sales_order",
+      "kind": "write",
+      "method": "POST",
+      "pathTemplate": "/api/sales/sales-orders",
+      "description": "Create a new DRAFT sales order for a customer. This is a WRITE action and requires explicit user confirmation before it runs; it does not post any accounting entries (the order stays in DRAFT until separately confirmed). Before calling this, resolve the customer to a partnerId with search_partners and each product to an itemId with search_items — never guess ids. Provide partnerId, an orderDate and at least one line, each with itemId, qtyOrdered and unitPrice.",
+      "requiredRoles": ["SALES"],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "partnerId": {
+            "type": "integer",
+            "description": "Numeric id of the customer partner (from search_partners)."
+          },
+          "orderDate": {
+            "type": "string",
+            "description": "Order date in ISO yyyy-MM-dd form."
+          },
+          "lines": {
+            "type": "array",
+            "description": "Order lines; at least one.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "itemId": {
+                  "type": "integer",
+                  "description": "Numeric id of the item (from search_items)."
+                },
+                "qtyOrdered": {
+                  "type": "number",
+                  "description": "Quantity ordered."
+                },
+                "unitPrice": {
+                  "type": "number",
+                  "description": "Unit price."
+                }
+              },
+              "required": ["itemId", "qtyOrdered", "unitPrice"]
+            }
+          }
+        },
+        "required": ["partnerId", "orderDate", "lines"]
+      }
+    }
+  ]
+}

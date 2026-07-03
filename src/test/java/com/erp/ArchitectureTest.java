@@ -180,6 +180,8 @@ class ArchitectureTest {
                     .should().dependOnClassesThat()
                     .resideInAnyPackage("..ledger.domain..", "..ledger.application..", "..ledger.web..",
                             "..iam.domain..", "..iam.application..", "..iam.web..",
+                            // audit consumes assistant's published event (assistant.api) but never its internals.
+                            "..assistant.domain..", "..assistant.application..", "..assistant.web..",
                             "..masterdata..", "..inventory..", "..purchasing..", "..payments..",
                             "..sales..", "..manufacturing..", "..reporting..");
 
@@ -201,13 +203,22 @@ class ArchitectureTest {
                             "..payments..", "..sales..", "..manufacturing..", "..reporting..", "..hr..",
                             "..iam..", "..audit..", "..observation..");
 
-    // Nothing depends on the assistant module; it is a leaf that other modules never reference.
+    // Nothing depends on the assistant module except audit, which consumes its published event
+    // (assistant.api) — mirroring how audit depends on iam.api. audit is therefore exempt from this rule;
+    // a companion check keeps that dependency confined to assistant.api.
     @ArchTest
     static final ArchRule no_module_depends_on_assistant =
             noClasses().that().resideInAnyPackage("..ledger..", "..masterdata..", "..inventory..",
                             "..purchasing..", "..sales..", "..manufacturing..", "..reporting..",
-                            "..payments..", "..iam..", "..audit..", "..observation..", "..hr..")
+                            "..payments..", "..iam..", "..observation..", "..hr..")
                     .should().dependOnClassesThat().resideInAPackage("..assistant..");
+
+    // The one allowed inbound edge (audit → assistant) may target only assistant.api, never its internals.
+    @ArchTest
+    static final ArchRule audit_depends_on_assistant_only_via_api =
+            noClasses().that().resideInAPackage("..audit..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage("..assistant.domain..", "..assistant.application..", "..assistant.web..");
 
     // The observation module (metrics listener) is, like audit, a cross-cutting event consumer: it touches
     // other modules' published events/api only, never their internals.
