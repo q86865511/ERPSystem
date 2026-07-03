@@ -17,7 +17,7 @@ import com.anthropic.models.messages.ToolResultBlockParam;
 import com.anthropic.models.messages.ToolUseBlockParam;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -29,13 +29,14 @@ import java.util.Map;
 /**
  * {@link AnthropicPort} implementation over the official Anthropic Java SDK.
  *
- * <p>Created <em>only</em> when {@code app.assistant.enabled=true} <em>and</em> no other
- * {@link AnthropicPort} bean is already defined. That guard is load-bearing:
+ * <p>Created <em>only</em> when {@code app.assistant.enabled=true}. That guard is load-bearing:
  * {@link AnthropicOkHttpClient#fromEnv()} throws when {@code ANTHROPIC_API_KEY} is unset, so the client
  * must never be constructed unless the operator has deliberately turned the assistant on (with a key
  * present). With the flag off there is no bean, and {@code POST /api/assistant/chat} answers with
- * problem+json instead. The {@code @ConditionalOnMissingBean} lets an integration test enable the
- * assistant (flag on) while supplying a scripted fake port, so the real SDK client is never built.
+ * problem+json instead. Integration tests that need a model port keep the flag OFF and register a scripted
+ * {@link AnthropicPort} bean instead — do NOT gate this class with {@code @ConditionalOnMissingBean}: on a
+ * component-scanned class that condition sees the adapter's own just-registered bean definition and
+ * disables it unconditionally (found out the hard way — the flag could never be turned on in production).
  *
  * <p>Per Anthropic's Opus-4.8 request contract: adaptive thinking, no {@code temperature}/{@code top_p}/
  * {@code top_k} (they 400), and the system prompt sent as cache-controlled text blocks (prompt caching).
@@ -47,13 +48,16 @@ import java.util.Map;
  */
 @Component
 @ConditionalOnProperty(name = "app.assistant.enabled", havingValue = "true")
-@ConditionalOnMissingBean(AnthropicPort.class)
 public class AnthropicSdkAdapter implements AnthropicPort {
 
     private final AnthropicClient client;
     private final AssistantProperties properties;
     private final ObjectMapper mapper;
 
+    // @Autowired is required: with the test seam below this class has two constructors, and Spring
+    // refuses to guess ("No default constructor found") — which stayed hidden as long as the bean was
+    // never actually instantiated.
+    @Autowired
     public AnthropicSdkAdapter(AssistantProperties properties, ObjectMapper mapper) {
         // Reads ANTHROPIC_API_KEY from the environment. Only reached because enabled=true.
         this.client = AnthropicOkHttpClient.fromEnv();

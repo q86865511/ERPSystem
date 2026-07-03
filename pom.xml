@@ -235,6 +235,13 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<environmentVariables>
+						<!-- Lets AssistantEnabledIT build the real SDK adapter (the client reads the key at
+						     construction; no network call is made). Deliberately a fake value. -->
+						<ANTHROPIC_API_KEY>sk-ant-dummy-for-integration-tests</ANTHROPIC_API_KEY>
+					</environmentVariables>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>

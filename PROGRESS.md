@@ -16,6 +16,12 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-03] 🐛 **修正:assistant flag 開了也永遠 enabled:false(實機驗證抓到,兩個疊加的潛藏 bug)**。分支 `fix/assistant-enabled-selfdefeat`。
+  - **Bug 1(元兇)**:`AnthropicSdkAdapter` 的 `@ConditionalOnMissingBean(AnthropicPort.class)` 放在 component-scan 的 `@Component` 上 → OnBeanCondition 看到**它自己剛註冊的 bean definition** 而自我否決,adapter 在任何情況都不會建立(DEBUG 條件報告:`found beans ... anthropicSdkAdapter`)。CI 全綠是因為所有測試裡「adapter 不存在」剛好都像預期行為;「flag=true → 真 adapter 存在」這條路徑從未被任何測試覆蓋。
+  - **Bug 2(被 Bug 1 遮住)**:adapter 有兩個建構子(正式 + 測試 seam)但沒標 `@Autowired` → 即使條件過了也 `No default constructor found`。
+  - **修**:移除 `@ConditionalOnMissingBean`(javadoc 記錄反模式教訓);正式建構子加 `@Autowired`;`AssistantToolLoopIT` 不再開 flag(scripted @Primary port 本就足夠 — `isAvailable()` 看 port 存在非 flag);新增 **`AssistantEnabledIT`** 釘住真路徑(flag=true → 真 adapter bean + status enabled:true;failsafe `environmentVariables` 注入 dummy `ANTHROPIC_API_KEY`,建構不打網路)。
+  - **教訓**:`@ConditionalOnMissingBean` 只能用在 auto-configuration/@Bean 方法,放在被掃描的 @Component 上會自我否決;「feature flag 開啟」的生產路徑必須有專屬測試,不能只測關閉路徑。
+  - **驗證**:`mvnw verify` 全綠(IT 231,含新 AssistantEnabledIT 2);實機 compose 重 build 後 status 回 `{enabled:true}`(見下方驗證紀錄)。
 - [2026-07-03] 🚀 **ERP Copilot PR6:demo 部署與收尾**。分支 `feat/assistant-pr6-deploy`。
   - `compose.demo.yaml` 加 `APP_ASSISTANT_ENABLED`(default false)+ `ANTHROPIC_API_KEY`(default 空)env passthrough(`.env` 啟用,oracle overlay 自動繼承);README(繁/英)加 ERP Copilot 技術亮點、assistant 模組表列、前端功能段、mcp-server 文件索引;移除 PR4 誤入的 `frontend/design.md`(architect 工作筆記)。
   - **待使用者實機驗證**(需 API key):(1) compose 同目錄放 `.env`(兩行)→ `up` → 側欄查庫存/開 SO 確認流/preset 分析 → dashboard 對帳 hero 仍全綠 + audit 頁有 AI 動作;(2) `mcp-server` 依 README 接 Claude Desktop 或 `claude mcp add` 實測;(3) Oracle 若要開,`~/erp-demo-test/.env` 加同兩行(nightly reseed 不受影響,assistant 無狀態無新表)。
