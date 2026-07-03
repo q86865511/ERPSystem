@@ -1,11 +1,13 @@
 package com.erp.audit.application;
 
+import com.erp.assistant.api.AssistantToolExecutedEvent;
 import com.erp.audit.domain.AuditLog;
 import com.erp.iam.api.AuthAuditEvent;
 import com.erp.ledger.api.FiscalPeriodChangedEvent;
 import com.erp.ledger.api.JournalPostedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -48,6 +50,20 @@ public class AuditEventListener {
     public void onAuth(AuthAuditEvent e) {
         save(new AuditLog(e.success() ? "LOGIN_SUCCESS" : "LOGIN_FAILURE", e.username(), null, null,
                 (e.success() ? "Login success" : "Login failure") + " for " + e.username(), null));
+    }
+
+    /**
+     * Records every tool ERP Copilot actually executed (reads, and writes the user confirmed). Plain
+     * {@code @EventListener}: the assistant publishes this from its (non-transactional) streaming thread
+     * after the tool's own HTTP call has already committed, so there is no ambient transaction to hook —
+     * {@link AuditWriter} opens its own. Only truncated summaries are stored, never full payloads.
+     */
+    @EventListener
+    public void onAssistantToolExecuted(AssistantToolExecutedEvent e) {
+        String status = e.ok() ? "ok" : "failed";
+        save(new AuditLog("ASSISTANT_TOOL_EXECUTED", e.actor(), "ASSISTANT_TOOL", e.toolName(),
+                "ERP Copilot executed " + e.kind() + " tool " + e.toolName() + " (" + status + ")",
+                "input=" + e.inputSummary() + "; result=" + e.resultSummary()));
     }
 
     private void save(AuditLog entry) {

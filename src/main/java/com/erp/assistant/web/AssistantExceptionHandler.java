@@ -2,6 +2,8 @@ package com.erp.assistant.web;
 
 import com.erp.assistant.application.AssistantBusyException;
 import com.erp.assistant.application.AssistantDisabledException;
+import com.erp.assistant.application.AssistantRateLimitedException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -10,9 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * Translates assistant errors into RFC 9457 problem responses, matching the per-module advice style. Two
- * cases in PR1, both 503: a chat attempted while the assistant is disabled, and a chat rejected because the
- * SSE executor is at capacity.
+ * Translates assistant errors into RFC 9457 problem responses, matching the per-module advice style: a chat
+ * attempted while the assistant is disabled (503), a chat rejected because the SSE executor is at capacity
+ * (503), and a per-user rate limit exceeded (429, with a {@code Retry-After} hint).
  *
  * <p>Handlers return {@code ResponseEntity<ProblemDetail>} with an explicit
  * {@code application/problem+json} content type rather than a bare {@link ProblemDetail}: {@code POST
@@ -31,6 +33,14 @@ public class AssistantExceptionHandler {
     @ExceptionHandler(AssistantBusyException.class)
     public ResponseEntity<ProblemDetail> onBusy(AssistantBusyException ex) {
         return problem(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    }
+
+    @ExceptionHandler(AssistantRateLimitedException.class)
+    public ResponseEntity<ProblemDetail> onRateLimited(AssistantRateLimitedException ex) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.retryAfterSeconds()))
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage()));
     }
 
     private static ResponseEntity<ProblemDetail> problem(HttpStatus status, String detail) {

@@ -3,6 +3,7 @@ package com.erp.assistant.web;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
@@ -14,18 +15,25 @@ import java.util.List;
  * { "messages": [ { "role": "user", "content": [ { "type": "text", "text": "..." } ] } ] }
  * }</pre>
  *
- * The content-block shape mirrors the Anthropic Messages API so PR2 can add {@code tool_use}/
- * {@code tool_result} block types without a breaking change to this contract. PR1 only handles
- * {@code type == "text"}.
+ * The content-block shape mirrors the Anthropic Messages API. Three block types are accepted:
+ * <ul>
+ *   <li>{@code text} — {@code text} holds the message text;</li>
+ *   <li>{@code tool_use} — an assistant tool call replayed from history: {@code id}, {@code name},
+ *       {@code input} (an arbitrary JSON object);</li>
+ *   <li>{@code tool_result} — a fed-back outcome replayed from history: {@code toolUseId},
+ *       {@code content}, optional {@code isError}.</li>
+ * </ul>
+ * To resume after a write-confirmation pause, the client re-sends the full history (whose last assistant
+ * turn contains the write {@code tool_use}) plus a {@link Decision}.
  *
  * <p>Validation cascades through the whole structure ({@code @Valid} on {@code messages} and each turn's
- * {@code content}), so a malformed nested field (bad role, empty content, blank text) fails with the same
- * 400 problem+json as a top-level violation — handled by the shared
- * {@code GlobalExceptionHandler#onValidation}, not re-implemented here.
+ * {@code content}), so a malformed nested field fails with the same 400 problem+json as a top-level
+ * violation — handled by the shared {@code GlobalExceptionHandler#onValidation}.
  *
  * @param messages the conversation, oldest first (at least one turn)
+ * @param decision optional answer to a pending write-tool confirmation (null on a fresh turn)
  */
-public record ChatRequest(@NotEmpty @Valid List<Message> messages) {
+public record ChatRequest(@NotEmpty @Valid List<Message> messages, @Valid Decision decision) {
 
     /**
      * One conversation turn.
@@ -38,13 +46,56 @@ public record ChatRequest(@NotEmpty @Valid List<Message> messages) {
             @NotEmpty @Valid List<ContentBlock> content) {}
 
     /**
-     * A content block. PR1: {@code type} is {@code "text"} and {@code text} holds the text. Additional
-     * fields (tool ids, inputs, outputs) are added in PR2 for {@code tool_use}/{@code tool_result}.
+     * A content block. {@code type} is one of {@code text}, {@code tool_use}, {@code tool_result}; only the
+     * fields relevant to that type are populated. Type-specific requirements (e.g. tool_use needs id/name)
+     * are checked in the controller when mapping to the model shape, keeping bean-validation type-agnostic
+     * here except for the discriminator itself.
      *
-     * @param type block discriminator (PR1: {@code "text"})
-     * @param text text payload for text blocks
+     * @param type      block discriminator: {@code text} | {@code tool_use} | {@code tool_result}
+     * @param text      text payload (text blocks)
+     * @param id        tool-use id (tool_use blocks)
+     * @param name      tool name (tool_use blocks)
+     * @param input     tool input as an arbitrary JSON object (tool_use blocks)
+     * @param toolUseId the id this result answers (tool_result blocks)
+     * @param content   result content (tool_result blocks)
+     * @param isError   whether the result is an error (tool_result blocks)
      */
     public record ContentBlock(
-            @Pattern(regexp = "text", message = "must be 'text'") String type,
-            @NotBlank String text) {}
+            @Pattern(regexp = "text|tool_use|tool_result",
+                    message = "must be 'text', 'tool_use' or 'tool_result'") String type,
+            String text,
+            String id,
+            String name,
+            tools.jackson.databind.JsonNode input,
+            String toolUseId,
+            String content,
+            Boolean isError) {
+
+        /** A text block must carry non-blank text (kept from PR1's contract). */
+        @jakarta.validation.constraints.AssertTrue(message = "text blocks must have non-blank text")
+        public boolean isTextPresentForTextBlocks() {
+            return !"text".equals(type) || (text != null && !text.isBlank());
+        }
+
+        /** A tool_use block must carry a non-blank id and name. */
+        @jakarta.validation.constraints.AssertTrue(message = "tool_use blocks must have id and name")
+        public boolean isToolUseWellFormed() {
+            return !"tool_use".equals(type)
+                    || (id != null && !id.isBlank() && name != null && !name.isBlank());
+        }
+
+        /** A tool_result block must reference the tool_use id it answers. */
+        @jakarta.validation.constraints.AssertTrue(message = "tool_result blocks must have a toolUseId")
+        public boolean isToolResultWellFormed() {
+            return !"tool_result".equals(type) || (toolUseId != null && !toolUseId.isBlank());
+        }
+    }
+
+    /**
+     * The user's answer to a pending write-tool confirmation.
+     *
+     * @param toolUseId the write tool_use id being answered (must match the last assistant turn)
+     * @param approved  true to execute the write, false to decline
+     */
+    public record Decision(@NotBlank String toolUseId, @NotNull Boolean approved) {}
 }

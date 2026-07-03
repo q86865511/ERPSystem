@@ -14,9 +14,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *                     {@code POST /api/assistant/chat} returns problem+json.
  * @param model        Claude model id. Adaptive-thinking Opus tier by default.
  * @param maxTokens    per-response output-token ceiling.
- * @param maxTurns     agentic-loop turn cap (PR1 is single-turn; carried for PR2's tool loop).
- * @param selfBaseUrl  base URL the assistant calls back into this ERP's read API (PR2). Defined, unused in PR1.
- * @param rateLimit    per-user rate-limit parameters (PR3). Defined, unused in PR1.
+ * @param maxTurns     agentic-loop turn cap for the tool-calling loop.
+ * @param selfBaseUrl  base URL the assistant calls back into this ERP's read API (the tools).
+ * @param rateLimit    per-user rate-limit parameters (chat/hour and concurrent streams).
  */
 @ConfigurationProperties(prefix = "app.assistant")
 public record AssistantProperties(
@@ -46,11 +46,19 @@ public record AssistantProperties(
     }
 
     /**
-     * Per-user rate-limit knobs (PR3, unused in PR1). Zero means "unset" — the limiter is a no-op until
-     * PR3 wires it in and non-zero defaults are chosen.
+     * Per-user rate-limit knobs. Non-positive means "use the default"; the limiter never runs unlimited.
      *
-     * @param requestsPerMinute max chat requests per user per minute
-     * @param burst             short-burst allowance above the steady rate
+     * @param maxChatsPerHour      max chat requests per user per rolling hour (default 30)
+     * @param maxConcurrentStreams max simultaneous streams per user (default 1)
      */
-    public record RateLimit(int requestsPerMinute, int burst) {}
+    public record RateLimit(int maxChatsPerHour, int maxConcurrentStreams) {
+        public RateLimit {
+            if (maxChatsPerHour <= 0) {
+                maxChatsPerHour = 30;
+            }
+            if (maxConcurrentStreams <= 0) {
+                maxConcurrentStreams = 1;
+            }
+        }
+    }
 }

@@ -43,25 +43,29 @@ class AnthropicSdkAdapterTest {
 
     private static final AssistantProperties PROPERTIES =
             new AssistantProperties(true, "claude-opus-4-8", 4096, 8, null, null);
+    private static final tools.jackson.databind.ObjectMapper MAPPER =
+            new tools.jackson.databind.ObjectMapper();
 
     // ---- toParams: pure mapping, no SDK call -------------------------------------------------
 
     @Test
     void toParamsMapsRolesAndSystemPromptWithoutSamplingParams() {
-        AnthropicSdkAdapter adapter = new AnthropicSdkAdapter((AnthropicClient) null, PROPERTIES);
+        AnthropicSdkAdapter adapter = new AnthropicSdkAdapter((AnthropicClient) null, PROPERTIES, MAPPER);
         ChatModelRequest request = new ChatModelRequest("You are ERP Copilot.", List.of(
                 new ChatModelRequest.ChatMessage("user", List.of(ChatModelRequest.ContentBlock.text("hi"))),
-                new ChatModelRequest.ChatMessage("assistant", List.of(ChatModelRequest.ContentBlock.text("hello")))));
+                new ChatModelRequest.ChatMessage("assistant", List.of(ChatModelRequest.ContentBlock.text("hello")))),
+                List.of());
 
         MessageCreateParams params = adapter.toParams(request);
 
-        // Role mapping: user/assistant turns land as their corresponding MessageParam.Role.
+        // Role mapping: user/assistant turns land as their corresponding MessageParam.Role, and each turn's
+        // content is now a block-param list (text blocks), not the plain-string overload.
         List<MessageParam> messages = params.messages();
         assertThat(messages).hasSize(2);
         assertThat(messages.get(0).role().toString()).isEqualTo("user");
-        assertThat(messages.get(0).content().asString()).isEqualTo("hi");
+        assertThat(firstText(messages.get(0))).isEqualTo("hi");
         assertThat(messages.get(1).role().toString()).isEqualTo("assistant");
-        assertThat(messages.get(1).content().asString()).isEqualTo("hello");
+        assertThat(firstText(messages.get(1))).isEqualTo("hello");
 
         // System prompt sent as a cache-controlled text block, not the plain string overload.
         assertThat(params.system()).isPresent();
@@ -88,11 +92,12 @@ class AnthropicSdkAdapterTest {
         RawMessageStreamEvent noopEvent = RawMessageStreamEvent.ofMessageStop(RawMessageStopEvent.builder().build());
         FakeStreamResponse fakeStream = new FakeStreamResponse(List.of(noopEvent, noopEvent, noopEvent));
         AnthropicClient client = new FakeAnthropicClient(fakeStream);
-        AnthropicSdkAdapter adapter = new AnthropicSdkAdapter(client, PROPERTIES);
+        AnthropicSdkAdapter adapter = new AnthropicSdkAdapter(client, PROPERTIES, MAPPER);
 
         CancelledListener listener = new CancelledListener();
         adapter.stream(new ChatModelRequest("system", List.of(
-                new ChatModelRequest.ChatMessage("user", List.of(ChatModelRequest.ContentBlock.text("hi"))))),
+                new ChatModelRequest.ChatMessage("user", List.of(ChatModelRequest.ContentBlock.text("hi")))),
+                List.of()),
                 listener);
 
         assertThat(listener.endCalled).isFalse();
@@ -107,16 +112,74 @@ class AnthropicSdkAdapterTest {
         RawMessageStreamEvent noopEvent = RawMessageStreamEvent.ofMessageStop(RawMessageStopEvent.builder().build());
         FakeStreamResponse fakeStream = new FakeStreamResponse(List.of(noopEvent));
         AnthropicClient client = new FakeAnthropicClient(fakeStream);
-        AnthropicSdkAdapter adapter = new AnthropicSdkAdapter(client, PROPERTIES);
+        AnthropicSdkAdapter adapter = new AnthropicSdkAdapter(client, PROPERTIES, MAPPER);
 
         RecordingListener listener = new RecordingListener();
         adapter.stream(new ChatModelRequest("system", List.of(
-                new ChatModelRequest.ChatMessage("user", List.of(ChatModelRequest.ContentBlock.text("hi"))))),
+                new ChatModelRequest.ChatMessage("user", List.of(ChatModelRequest.ContentBlock.text("hi")))),
+                List.of()),
                 listener);
 
         assertThat(listener.endCalled).isTrue();
         assertThat(listener.errorCalled).isFalse();
         assertThat(fakeStream.closed).isTrue();
+    }
+
+    // ---- stream: tool_use accumulation across input_json_delta chunks -------------------------
+
+    @Test
+    void streamAccumulatesToolUseInputAcrossChunksAndEmitsOnStop() throws Exception {
+        // A tool_use block streamed as: content_block_start(id/name) → two input_json_delta fragments that
+        // only form valid JSON once concatenated → content_block_stop. The adapter must emit exactly one
+        // onToolUse with the reassembled input, and report stop_reason=tool_use.
+        long index = 0L;
+        RawMessageStreamEvent start = RawMessageStreamEvent.ofContentBlockStart(
+                com.anthropic.models.messages.RawContentBlockStartEvent.builder()
+                        .index(index)
+                        .contentBlock(com.anthropic.models.messages.RawContentBlockStartEvent.ContentBlock.ofToolUse(
+                                com.anthropic.models.messages.ToolUseBlock.builder()
+                                        .id("tu_9").name("create_sales_order")
+                                        .input(com.anthropic.core.JsonValue.from(java.util.Map.of()))
+                                        .caller(com.anthropic.models.messages.DirectCaller.builder().build())
+                                        .build()))
+                        .build());
+        RawMessageStreamEvent delta1 = inputJsonDelta(index, "{\"partnerId\":1,\"lines\":[");
+        RawMessageStreamEvent delta2 = inputJsonDelta(index, "{\"itemId\":2,\"qtyOrdered\":3,\"unitPrice\":4}]}");
+        RawMessageStreamEvent stop = RawMessageStreamEvent.ofContentBlockStop(
+                com.anthropic.models.messages.RawContentBlockStopEvent.builder().index(index).build());
+
+        FakeStreamResponse fakeStream = new FakeStreamResponse(List.of(start, delta1, delta2, stop));
+        AnthropicSdkAdapter adapter =
+                new AnthropicSdkAdapter(new FakeAnthropicClient(fakeStream), PROPERTIES, MAPPER);
+
+        ToolUseRecordingListener listener = new ToolUseRecordingListener();
+        adapter.stream(new ChatModelRequest("system", List.of(
+                new ChatModelRequest.ChatMessage("user", List.of(ChatModelRequest.ContentBlock.text("hi")))),
+                List.of()), listener);
+
+        // The tool_use block is emitted once, at content_block_stop, with id/name from the start event.
+        assertThat(listener.toolUseId).isEqualTo("tu_9");
+        assertThat(listener.toolUseName).isEqualTo("create_sales_order");
+        // The two input_json_delta fragments — invalid JSON individually — reassemble into valid JSON.
+        var parsed = MAPPER.readTree(listener.toolUseInput);
+        assertThat(parsed.get("partnerId").asInt()).isEqualTo(1);
+        assertThat(parsed.get("lines").get(0).get("itemId").asInt()).isEqualTo(2);
+        // onEnd still fires (the stream completed) even though no message_delta carried a stop reason.
+        assertThat(listener.endStop).isNotNull();
+    }
+
+    private static RawMessageStreamEvent inputJsonDelta(long index, String partialJson) {
+        return RawMessageStreamEvent.ofContentBlockDelta(
+                com.anthropic.models.messages.RawContentBlockDeltaEvent.builder()
+                        .index(index)
+                        .delta(com.anthropic.models.messages.RawContentBlockDelta.ofInputJson(
+                                com.anthropic.models.messages.InputJsonDelta.builder()
+                                        .partialJson(partialJson).build()))
+                        .build());
+    }
+
+    private static String firstText(MessageParam message) {
+        return message.content().asBlockParams().get(0).asText().text();
     }
 
     // ---- fake listeners -------------------------------------------------------------------------
@@ -160,6 +223,32 @@ class AnthropicSdkAdapterTest {
         public void onError(Throwable error) {
             errorCalled = true;
         }
+    }
+
+    /** Captures the single accumulated tool_use block and the terminal stop info. */
+    private static final class ToolUseRecordingListener implements AnthropicPort.ChatStreamListener {
+        String toolUseId;
+        String toolUseName;
+        String toolUseInput;
+        AnthropicPort.StopInfo endStop;
+
+        @Override
+        public void onTextDelta(String text) {}
+
+        @Override
+        public void onToolUse(String id, String name, String inputJson) {
+            this.toolUseId = id;
+            this.toolUseName = name;
+            this.toolUseInput = inputJson;
+        }
+
+        @Override
+        public void onEnd(AnthropicPort.StopInfo stop) {
+            this.endStop = stop;
+        }
+
+        @Override
+        public void onError(Throwable error) {}
     }
 
     // ---- fake SDK plumbing (no network) ----------------------------------------------------------
