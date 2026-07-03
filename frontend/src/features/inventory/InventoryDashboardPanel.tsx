@@ -67,7 +67,8 @@ export function InventoryDashboardPanel() {
                 const rp = moneyToNumber(it.reorderPoint);
                 const pct = rp > 0 ? Math.min(100, Math.round((onHand / rp) * 100)) : 0;
                 const out = onHand <= 0;
-                const color = out ? 'red' : 'orange';
+                const badgeColor = out ? 'red' : 'orange';
+                const progressColor = out ? 'var(--erp-negative-text)' : 'var(--erp-warning-text)';
                 return (
                   <div key={it.itemId}>
                     <Group justify="space-between" gap="xs" wrap="nowrap" mb={4}>
@@ -78,12 +79,12 @@ export function InventoryDashboardPanel() {
                         <Text size="xs" c="dimmed" ff="monospace">
                           {formatMoney(it.onHandQty)} / {formatMoney(it.reorderPoint)}
                         </Text>
-                        <Badge color={color} variant="light" size="sm">
+                        <Badge color={badgeColor} variant="light" size="sm">
                           {out ? t('inventory.dash.out') : t('inventory.dash.low')}
                         </Badge>
                       </Group>
                     </Group>
-                    <Progress value={pct} color={color} size="sm" radius="xl" />
+                    <Progress value={pct} color={progressColor} size="sm" radius="xl" />
                   </div>
                 );
               })}
@@ -117,7 +118,8 @@ export function InventoryDashboardPanel() {
             <Stack gap="sm">
               {suppliers.slice(0, 6).map((p) => {
                 const pct = Math.round(moneyToNumber(p.onTimePct));
-                const color = pct >= 90 ? 'teal' : pct >= 70 ? 'orange' : 'red';
+                const color =
+                  pct >= 90 ? 'var(--erp-positive-text)' : pct >= 70 ? 'var(--erp-warning-text)' : 'var(--erp-negative-text)';
                 return (
                   <div key={p.partnerId}>
                     <Group justify="space-between" gap="xs" wrap="nowrap" mb={4}>

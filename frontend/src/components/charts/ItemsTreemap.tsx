@@ -1,12 +1,7 @@
 import { ResponsiveContainer, Treemap } from 'recharts';
+import { treemapFill, treemapLabelColor } from './palette';
 
 export type ItemsTreemapDatum = { name: string; value: number; status: string };
-
-const STATUS_FILL: Record<string, string> = {
-  OUT: 'var(--mantine-color-red-6)',
-  LOW: 'var(--mantine-color-orange-5)',
-  OK: 'var(--mantine-color-teal-6)',
-};
 
 type CellProps = {
   x?: number;
@@ -19,6 +14,7 @@ type CellProps = {
 
 /** A single treemap tile, filled by its item's OUT/LOW/OK status and labelled with the SKU when it fits. */
 function StatusCell({ x = 0, y = 0, width = 0, height = 0, name = '', status = 'OK' }: CellProps) {
+  const key = (status as keyof typeof treemapFill) in treemapFill ? (status as keyof typeof treemapFill) : 'OK';
   return (
     <g>
       <rect
@@ -26,10 +22,10 @@ function StatusCell({ x = 0, y = 0, width = 0, height = 0, name = '', status = '
         y={y}
         width={width}
         height={height}
-        style={{ fill: STATUS_FILL[status] ?? STATUS_FILL.OK, stroke: 'var(--mantine-color-body)', strokeWidth: 2 }}
+        style={{ fill: treemapFill[key], stroke: 'var(--mantine-color-body)', strokeWidth: 2 }}
       />
       {width > 46 && height > 18 && (
-        <text x={x + 5} y={y + 15} fill="#fff" fontSize={11} style={{ pointerEvents: 'none' }}>
+        <text x={x + 5} y={y + 15} fill={treemapLabelColor[key]} fontSize={11} style={{ pointerEvents: 'none' }}>
           {name}
         </text>
       )}

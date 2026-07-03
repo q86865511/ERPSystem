@@ -116,6 +116,9 @@ async function main() {
       const p = new URL(req.url()).pathname;
       const json = (body) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
       if (p === '/api/auth/refresh' || p === '/api/auth/login') return json(AUTH);
+      // The deployed demo runs with the assistant enabled, so shots should show its header button;
+      // the fixture map predates the copilot and would otherwise hide it behind `enabled: undefined`.
+      if (p === '/api/assistant/status') return json({ enabled: true });
       if (req.method() === 'GET') {
         if (Object.prototype.hasOwnProperty.call(GET, p)) return json(GET[p]);
         unmatched.add(p);
@@ -141,6 +144,10 @@ async function main() {
   const waitForTour = async (page) => {
     await page.getByRole('dialog').waitFor({ state: 'visible' });
   };
+  const openAssistant = async (page) => {
+    await page.getByRole('button', { name: /Open assistant|開啟助手/ }).click();
+    await page.getByRole('dialog').waitFor({ state: 'visible' });
+  };
 
   await shoot('01-dashboard', { route: '/' });
   await shoot('02-masterdata', { route: '/masterdata' });
@@ -155,6 +162,18 @@ async function main() {
   await shoot('11-onboarding-tour', { route: '/', onboarding: 'show', prepare: waitForTour });
   await shoot('12-hr-dashboard', { route: '/hr?tab=dashboard' });
   await shoot('13-hr-payroll', { route: '/hr?tab=payroll' });
+  // Ink-ledger redesign verification set: dark variants of the main pages (10-dark-mode already covers
+  // the dashboard), the assistant drawer in both schemes, and one zh-TW shot for the circular seals.
+  await shoot('14-masterdata-dark', { route: '/masterdata', theme: 'dark' });
+  await shoot('15-purchasing-dark', { route: '/purchasing', theme: 'dark' });
+  await shoot('16-sales-dark', { route: '/sales', theme: 'dark' });
+  await shoot('17-manufacturing-dark', { route: '/manufacturing?tab=dashboard', theme: 'dark', fullPage: true });
+  await shoot('18-inventory-dark', { route: '/inventory?tab=dashboard', theme: 'dark' });
+  await shoot('19-reporting-dark', { route: '/reporting?tab=overview', theme: 'dark' });
+  await shoot('20-ledger-dark', { route: '/ledger', theme: 'dark' });
+  await shoot('21-assistant', { route: '/', prepare: openAssistant });
+  await shoot('22-assistant-dark', { route: '/', theme: 'dark', prepare: openAssistant });
+  await shoot('23-hr-leave-zh', { route: '/hr?tab=leave', locale: 'zh-TW' });
 
   await browser.close();
   server.close();

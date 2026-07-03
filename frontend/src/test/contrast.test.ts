@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 import { sidebarColors, theme } from '../theme';
+import { treemapFill, treemapLabelColor } from '../components/charts/palette';
 // Vite's `?raw` suffix imports the file as a plain string (no Node `fs`/`path` needed — this project has
 // no @types/node dependency, and Vitest shares Vite's transform pipeline so this works under `vitest run`
 // exactly like it would in app code). Editing index.css automatically flows into this test unmodified.
@@ -277,6 +278,19 @@ describe('chart series vs dark card (design.md §2.6, non-text 3:1 floor)', () =
     const value = darkVars[name] ?? lightVars[name];
     if (!value) throw new Error(`Chart var ${name} not found in either scheme block`);
     expectAA(`dark ${name} vs card`, value, cssVar(darkVars, '--app-color-card'), AA_NON_TEXT);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Inventory heat-treemap tile labels (design.md §2.6): per-status label color vs its own tile fill,
+// both single-sourced from palette.ts (no hex re-typed here) — must clear the 4.5:1 text floor.
+// ---------------------------------------------------------------------------
+
+describe('treemap tile label colors (design.md §2.6)', () => {
+  const statuses = Object.keys(treemapFill) as Array<keyof typeof treemapFill>;
+
+  it.each(statuses)('%s label vs %s tile fill passes AA', (status) => {
+    expectAA(`treemap ${status} label vs fill`, treemapLabelColor[status], treemapFill[status]);
   });
 });
 

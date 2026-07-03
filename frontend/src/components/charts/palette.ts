@@ -33,6 +33,19 @@ export const agingColors = ['#2F6559', '#8A8B5C', '#C99235', '#A96C8E', '#A8574A
  */
 export const categoryColors = ['#2F6559', '#5E9E8F', '#C99235', '#A6A69C'] as const;
 
+/**
+ * Inventory heat-treemap tile fill by stock status (design.md §2.6 fixed hex — same OK/LOW/OUT semantic
+ * as the reorder Badge/Progress colors, but treemap tiles are SVG rects, not Mantine components, so they
+ * need raw hex rather than the `--erp-*` CSS vars): OK 墨青 #2F6559, LOW 藤黃 #C99235, OUT 磚朱 #A8574A.
+ */
+export const treemapFill = { OK: '#2F6559', LOW: '#C99235', OUT: '#A8574A' } as const;
+
+/**
+ * Per-status tile label color, chosen for >=4.5:1 contrast against `treemapFill`. White reads fine on the
+ * dark OK/OUT fills, but white-on-藤黃(LOW) is only ~2.75:1 — LOW gets a deep-ink label instead.
+ */
+export const treemapLabelColor = { OK: '#FFFFFF', LOW: '#1C2321', OUT: '#FFFFFF' } as const;
+
 /** Parse a backend money string ("12345.67") into a number for chart sizing only. */
 export function moneyToNumber(v: string | number | null | undefined): number {
   if (v == null || v === '') return 0;
