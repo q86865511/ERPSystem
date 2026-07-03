@@ -35,3 +35,7 @@ build/
 ### VS Code ###
 .vscode/
 node_modules/
+
+### mcp-server (standalone TS package, its own build output) ###
+mcp-server/node_modules/
+mcp-server/dist/

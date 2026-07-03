@@ -1,0 +1,12 @@
+{
+  "tools": [
+    {
+      "name": "bad_schema_tool",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/a",
+      "description": "bad schema",
+      "input_schema": "not-an-object"
+    }
+  ]
+}

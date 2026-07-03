@@ -1,0 +1,20 @@
+{
+  "tools": [
+    {
+      "name": "dup_tool",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/a",
+      "description": "first",
+      "input_schema": { "type": "object", "properties": {}, "required": [] }
+    },
+    {
+      "name": "dup_tool",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/b",
+      "description": "second",
+      "input_schema": { "type": "object", "properties": {}, "required": [] }
+    }
+  ]
+}
