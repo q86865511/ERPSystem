@@ -105,6 +105,7 @@ public class AssistantController {
 
         List<ChatModelRequest.ChatMessage> messages = toModelMessages(request);
         ToolDecision decision = toDecision(request);
+        String preset = request.preset();
 
         // Reserve rate-limit capacity up front (hourly cap + concurrency slot). Throws → 429 problem+json.
         rateLimiter.acquire(username);
@@ -116,7 +117,7 @@ public class AssistantController {
                 // Guard the whole background turn: any uncaught throwable becomes an error event, and the
                 // concurrency slot is always released.
                 try {
-                    agentLoop.chat(messages, decision, auth, bearerToken, listener);
+                    agentLoop.chat(messages, decision, preset, auth, bearerToken, listener);
                 } catch (Throwable ex) {
                     listener.onError(ex);
                 } finally {

@@ -67,18 +67,21 @@ export function useAssistantChat() {
   }, []);
 
   const send = useCallback(
-    (text: string) => {
+    (text: string, preset?: string) => {
       const trimmed = text.trim();
       if (!trimmed || state.streaming || state.pending) return;
       const id = `m${Date.now()}`;
-      dispatch({ type: 'user_send', id, text: trimmed });
+      dispatch({ type: 'user_send', id, text: trimmed, preset });
       const messages: Message[] = [
         ...state.conversation,
         { role: 'user', content: [{ type: 'text', text: trimmed }] },
       ];
-      void runStream({ messages });
+      // `preset` only takes effect on the first message (see the reducer); on a later message in the same
+      // conversation, state.preset (already settled) is what must be resent.
+      const effectivePreset = state.conversation.length === 0 ? preset : (state.preset ?? undefined);
+      void runStream({ messages, preset: effectivePreset });
     },
-    [state.conversation, state.streaming, state.pending, runStream],
+    [state.conversation, state.streaming, state.pending, state.preset, runStream],
   );
 
   // Confirm/reject a pending write tool. On confirm we resume the stream with the full history + decision
@@ -114,9 +117,9 @@ export function useAssistantChat() {
 
       dispatch({ type: 'resolve_confirmation', approved, resultText });
       if (!approved) return; // rejecting ends the turn locally — nothing to resume
-      void runStream({ messages, decision });
+      void runStream({ messages, decision, preset: state.preset ?? undefined });
     },
-    [state.pending, state.conversation, state.messages, runStream, t],
+    [state.pending, state.conversation, state.messages, state.preset, runStream, t],
   );
 
   const stop = useCallback(() => {

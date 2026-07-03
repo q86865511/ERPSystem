@@ -239,6 +239,32 @@ class AssistantControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
     }
 
+    @Test
+    void chatWithUnknownPresetReturns400() throws Exception {
+        String body = "{\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"hi\"}]}],"
+                + "\"preset\":\"not-a-real-preset\"}";
+
+        mockMvc(Optional.of(new TwoDeltaPort()))
+                .perform(post("/api/assistant/chat")
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
+    }
+
+    @Test
+    void chatWithReconciliationPresetIsAccepted() throws Exception {
+        MockMvc mvc = mockMvc(Optional.of(new TwoDeltaPort()));
+        String body = "{\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"hi\"}]}],"
+                + "\"preset\":\"reconciliation\"}";
+
+        MvcResult started = mvc.perform(post("/api/assistant/chat")
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mvc.perform(asyncDispatch(started)).andExpect(status().isOk());
+    }
+
     // ---- fakes --------------------------------------------------------------------------------
 
     private static final class TwoDeltaPort implements AnthropicPort {

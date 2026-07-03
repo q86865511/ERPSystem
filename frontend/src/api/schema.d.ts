@@ -1531,6 +1531,7 @@ export interface components {
         ChatRequest: {
             decision?: components["schemas"]["Decision"];
             messages: components["schemas"]["Message"][];
+            preset?: string;
         };
         ClearingBalance: {
             accountCode?: string;

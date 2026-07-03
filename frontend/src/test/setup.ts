@@ -29,6 +29,16 @@ if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {};
 }
 
+// jsdom has no CSS Font Loading API; Mantine's autosize Textarea (`<Textarea autosize>`) listens for
+// `document.fonts`' "loadingdone" event to recompute its height once web fonts land, and throws mounting
+// without it (`Cannot read properties of undefined (reading 'addEventListener')`).
+if (!document.fonts) {
+  Object.defineProperty(document, 'fonts', {
+    value: { addEventListener() {}, removeEventListener() {} },
+    configurable: true,
+  });
+}
+
 // Reset cross-test state: the access token and the API client's 401/403 handlers are module singletons, so a
 // test that sets them must not leak into the next.
 afterEach(() => {

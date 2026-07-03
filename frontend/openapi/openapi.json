@@ -3285,6 +3285,10 @@
               "$ref" : "#/components/schemas/Message"
             },
             "minItems" : 1
+          },
+          "preset" : {
+            "type" : "string",
+            "pattern" : "reconciliation|margin"
           }
         },
         "required" : [ "messages" ]

@@ -5,11 +5,23 @@ import com.erp.assistant.application.AnthropicPort;
 import com.erp.assistant.application.ToolInvoker;
 import com.erp.audit.application.AuditLogRepository;
 import com.erp.inventory.application.StockAdjustmentService;
+import com.erp.ledger.api.JournalEntryRequest;
+import com.erp.ledger.api.JournalEntryRequest.Line;
+import com.erp.ledger.api.LedgerPosting;
 import com.erp.masterdata.api.ItemType;
 import com.erp.masterdata.api.LocationType;
 import com.erp.masterdata.application.LocationRepository;
 import com.erp.masterdata.application.MasterDataService;
 import com.erp.masterdata.application.WarehouseRepository;
+import com.erp.purchasing.application.GoodsReceiptService;
+import com.erp.purchasing.application.GoodsReceiptService.ReceiptLineInput;
+import com.erp.purchasing.application.PurchaseOrderService;
+import com.erp.purchasing.application.PurchaseOrderService.PoLineInput;
+import com.erp.purchasing.application.VendorBillService;
+import com.erp.purchasing.application.VendorBillService.BillLineInput;
+import com.erp.purchasing.domain.PurchaseOrder;
+import com.erp.reporting.application.BudgetRepository;
+import com.erp.reporting.domain.Budget;
 import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +38,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 import static com.erp.iam.JwtTestTokens.bearer;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,6 +86,16 @@ class AssistantToolLoopIT {
     private AuditLogRepository auditLog;
     @Autowired
     private ScriptedAnthropicPort scriptedPort;
+    @Autowired
+    private PurchaseOrderService purchaseOrders;
+    @Autowired
+    private GoodsReceiptService goodsReceipts;
+    @Autowired
+    private VendorBillService vendorBills;
+    @Autowired
+    private LedgerPosting ledgerPosting;
+    @Autowired
+    private BudgetRepository budgetRepository;
 
     @BeforeEach
     void resetScript() {
@@ -126,6 +150,135 @@ class AssistantToolLoopIT {
         assertThat(body).contains("get_inventory_status");
         assertThat(body).contains("event:tool_result");
         assertThat(body).contains(sku);
+        assertThat(body).contains("event:done");
+    }
+
+    // ---- (a2) PR4: reconciliation preset drills a broken/-checked subledger into its GL lines ------
+
+    @Test
+    void reconciliationPresetCallsHealthCheckThenDrillsIntoGeneralLedger() throws Exception {
+        // A procure-to-pay cycle posts real lines to the AP control account (2100), matching
+        // ReconciliationIT's known-good setup — so the reconciliation health-check and the general-ledger
+        // drill-down both surface real seeded data, not just an empty/blank result.
+        int n = (int) (System.nanoTime() % 100000);
+        Long vendorId = masterData.createPartner("V-COPILOT-REC-" + n, "Copilot vendor " + n, true, false,
+                null, 30, null, null).getId();
+        Long itemId = masterData.createItem("RM-COPILOT-REC-" + n, "Copilot raw " + n, ItemType.RAW, "EA",
+                true, new BigDecimal("10"), null, null).getId();
+        LocalDate june = LocalDate.of(2026, 6, 15);
+        PurchaseOrder po = purchaseOrders.createOrder(vendorId,
+                List.of(new PoLineInput(itemId, new BigDecimal("20"), new BigDecimal("10"))), june, "tester");
+        purchaseOrders.confirm(po.getId(), "tester");
+        Long poLineId = po.getLines().get(0).getId();
+        goodsReceipts.receive(po.getId(), stockLocationId(),
+                List.of(new ReceiptLineInput(poLineId, new BigDecimal("20"))), june, "tester");
+        String billNumber = vendorBills.postBill(po.getId(),
+                List.of(new BillLineInput(poLineId, new BigDecimal("20"), new BigDecimal("10"))),
+                "STANDARD", june, "tester").getBillNumber();
+
+        // Turn 1: health-check. Turn 2: drill into the AP control account's GL lines. Turn 3: conclusion.
+        scriptedPort.enqueue(turn -> {
+            turn.onToolUse("tu_health", "get_reconciliation_health", "{\"asOf\":\"2026-12-31\"}");
+            turn.onEnd(new AnthropicPort.StopInfo("tool_use", 5L, 1L));
+        });
+        scriptedPort.enqueue(turn -> {
+            turn.onToolUse("tu_gl", "get_general_ledger",
+                    "{\"accountCode\":\"2100\",\"asOf\":\"2026-12-31\"}");
+            turn.onEnd(new AnthropicPort.StopInfo("tool_use", 8L, 2L));
+        });
+        scriptedPort.enqueue(turn -> {
+            turn.onTextDelta("The books balance; AP reconciles to the GL control account.");
+            turn.onEnd(new AnthropicPort.StopInfo("end_turn", 20L, 6L));
+        });
+
+        String body = chat("frank", "FINANCE",
+                "{\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":"
+                        + "\"why don't the books reconcile?\"}]}],\"preset\":\"reconciliation\"}");
+
+        // Both reporting tools ran (>= 2 reporting tool calls), each with a tool_result carrying real data.
+        assertThat(body).contains("event:tool_call");
+        assertThat(body).contains("get_reconciliation_health");
+        assertThat(body).contains("get_general_ledger");
+        assertThat(body).contains("\"trialBalanceBalanced\"");
+        assertThat(body).contains("\"accountCode\":\"2100\"");
+        // The vendor bill's own source document id shows up in the drill-down result — proof the drill-down
+        // surfaced the ledger line posted by *this* test's bill, not just any 2100 activity.
+        assertThat(body).contains("\"sourceDocId\":\"" + billNumber + "\"");
+        assertThat(body).contains("event:done");
+    }
+
+    // ---- (a3) PR4: margin preset exercises income-statement/revenue-trend tools ---------------------
+
+    @Test
+    void marginPresetCallsIncomeStatementTwiceAndRevenueTrend() throws Exception {
+        scriptedPort.enqueue(turn -> {
+            turn.onToolUse("tu_is1", "get_income_statement", "{\"asOf\":\"2026-07-31\"}");
+            turn.onEnd(new AnthropicPort.StopInfo("tool_use", 5L, 1L));
+        });
+        scriptedPort.enqueue(turn -> {
+            turn.onToolUse("tu_is2", "get_income_statement", "{\"asOf\":\"2026-06-30\"}");
+            turn.onEnd(new AnthropicPort.StopInfo("tool_use", 5L, 1L));
+        });
+        scriptedPort.enqueue(turn -> {
+            turn.onToolUse("tu_rt", "get_revenue_trend", "{\"months\":3,\"asOf\":\"2026-07-31\"}");
+            turn.onEnd(new AnthropicPort.StopInfo("tool_use", 5L, 1L));
+        });
+        scriptedPort.enqueue(turn -> {
+            turn.onTextDelta("Margin moved mainly due to revenue growth.");
+            turn.onEnd(new AnthropicPort.StopInfo("end_turn", 15L, 5L));
+        });
+
+        String body = chat("grace", "FINANCE",
+                "{\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":"
+                        + "\"why did gross margin change?\"}]}],\"preset\":\"margin\"}");
+
+        assertThat(body).contains("get_income_statement");
+        assertThat(body).contains("get_revenue_trend");
+        assertThat(body).contains("\"totalRevenue\"");
+        assertThat(body).contains("\"grossMargin\"");
+        assertThat(body).contains("event:done");
+    }
+
+    // ---- (a4) PR4: remaining new read tools each get at least one real call ------------------------
+
+    @Test
+    void cashFlowAndBudgetVarianceToolsReturnRealData() throws Exception {
+        // A distinctive cash + revenue posting in June 2026 (same pattern as FinanceAnalyticsIT), plus a
+        // guaranteed budget row for that same account/year (DataSeeder's demo budgets only run under the
+        // "seed" profile, which this IT does not activate) — so both tools' results below are checked against
+        // a figure this test knows is actually present, not just "some real data exists".
+        BigDecimal amount = new BigDecimal("1234");
+        ledgerPosting.post(new JournalEntryRequest(null, LocalDate.of(2026, 6, 18), "copilot cash/budget probe",
+                null, "TEST-COPILOT-CFBV", "CFBV-1", "POST", List.of(
+                new Line("1010", amount, null, "cash in"),
+                new Line("4100", null, amount, "revenue"))), "test");
+        if (!budgetRepository.existsByPeriodYearAndAccountCode(2026, "4100")) {
+            budgetRepository.saveAndFlush(new Budget(2026, "4100", new BigDecimal("500000")));
+        }
+
+        scriptedPort.enqueue(turn -> {
+            turn.onToolUse("tu_cf", "get_cash_flow", "{\"months\":3,\"asOf\":\"2026-06-30\"}");
+            turn.onEnd(new AnthropicPort.StopInfo("tool_use", 5L, 1L));
+        });
+        scriptedPort.enqueue(turn -> {
+            turn.onToolUse("tu_bv", "get_budget_variance", "{\"year\":2026,\"month\":6}");
+            turn.onEnd(new AnthropicPort.StopInfo("tool_use", 5L, 1L));
+        });
+        scriptedPort.enqueue(turn -> {
+            turn.onTextDelta("Here is the cash and budget picture.");
+            turn.onEnd(new AnthropicPort.StopInfo("end_turn", 10L, 4L));
+        });
+
+        String body = chat("heidi", "FINANCE",
+                "{\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":"
+                        + "\"how is cash and budget looking?\"}]}]}");
+
+        assertThat(body).contains("get_cash_flow");
+        assertThat(body).contains("get_budget_variance");
+        // The cash-flow series' June 2026 point includes this test's own cash inflow.
+        assertThat(body).contains("\"month\":\"2026-06\"");
+        // The budget-variance report carries the seeded 4100 budget line for June 2026.
+        assertThat(body).contains("\"accountCode\":\"4100\"");
         assertThat(body).contains("event:done");
     }
 

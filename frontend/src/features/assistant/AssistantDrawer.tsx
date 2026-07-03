@@ -3,6 +3,7 @@ import {
   ActionIcon,
   Alert,
   Box,
+  Button,
   Drawer,
   Group,
   Paper,
@@ -17,6 +18,9 @@ import { useI18n } from '../../i18n';
 import { ToolCard } from './ToolCard';
 import { useAssistantChat } from './useAssistantChat';
 import type { UiMessage } from './types';
+
+/** The two "why" analysis presets offered as starter chips when the conversation is empty. */
+const ANALYSIS_PRESETS = ['reconciliation', 'margin'] as const;
 
 interface AssistantDrawerProps {
   opened: boolean;
@@ -101,6 +105,13 @@ export function AssistantDrawer({ opened, onClose }: AssistantDrawerProps) {
     setDraft('');
   };
 
+  // Starts a conversation from one of the "why" analysis presets: a canned first message, tagged with the
+  // preset so the backend swaps in its specialised system prompt for the whole conversation.
+  const startPreset = (preset: (typeof ANALYSIS_PRESETS)[number]) => {
+    if (streaming || pending) return;
+    send(t(`assistant.preset.${preset}.prompt` as 'assistant.preset.reconciliation.prompt'), preset);
+  };
+
   const confirm = () => {
     setResolving(true);
     resolveConfirmation(true);
@@ -141,10 +152,31 @@ export function AssistantDrawer({ opened, onClose }: AssistantDrawerProps) {
 
       <ScrollArea style={{ flex: 1 }} viewportRef={viewportRef} type="auto">
         <Stack gap="md" pb="sm">
-          {messages.length === 0 && !error && (
-            <Text c="dimmed" size="sm" ta="center" mt="xl">
-              {t('assistant.empty')}
-            </Text>
+          {messages.length === 0 && (
+            <Stack gap="md" mt="xl" align="center">
+              {!error && (
+                <Text c="dimmed" size="sm" ta="center">
+                  {t('assistant.empty')}
+                </Text>
+              )}
+              {/* Gated on the conversation being empty, not on the absence of an error — a preset's first
+                  turn can fail (e.g. rate-limited, network drop) before any message lands, and the user must
+                  still be able to retry it from a chip rather than being stuck with no way to start over. */}
+              <Group justify="center" gap="xs">
+                {ANALYSIS_PRESETS.map((preset) => (
+                  <Button
+                    key={preset}
+                    variant="light"
+                    size="xs"
+                    radius="xl"
+                    disabled={streaming || !!pending}
+                    onClick={() => startPreset(preset)}
+                  >
+                    {t(`assistant.preset.${preset}.label` as 'assistant.preset.reconciliation.label')}
+                  </Button>
+                ))}
+              </Group>
+            </Stack>
           )}
           {messages.map((message) => (
             <MessageRow

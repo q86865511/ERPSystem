@@ -37,7 +37,11 @@ const TURN_2 = sseBody([
 ]);
 
 /** Chat POST request bodies captured in call order, for asserting the resume request's shape. */
-type ChatCall = { messages: Array<{ role: string; content: Array<Record<string, unknown>> }>; decision?: unknown };
+type ChatCall = {
+  messages: Array<{ role: string; content: Array<Record<string, unknown>> }>;
+  decision?: unknown;
+  preset?: string;
+};
 
 async function mockApi(
   page: Page,
@@ -136,5 +140,58 @@ test.describe('assistant side panel (ERP Copilot PR3)', () => {
     await mockApi(page, { enabled: false });
     await enterApp(page);
     await expect(page.getByRole('button', { name: 'Open assistant' })).toHaveCount(0);
+  });
+});
+
+// PR4: "why" analysis presets — starter chips shown on an empty conversation that kick off a chat tagged
+// with a preset (so the backend swaps in its reconciliation/margin system prompt).
+const PRESET_TURN = sseBody([
+  ['text_delta', { text: 'The books balance.' }],
+  ['done', { stopReason: 'end_turn', usage: { inputTokens: 5, outputTokens: 5 } }],
+]);
+
+test.describe('assistant analysis preset chips (ERP Copilot PR4)', () => {
+  test('clicking the reconciliation chip starts a conversation tagged with that preset', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('erp.locale', 'en');
+      localStorage.setItem('erp.onboarding', JSON.stringify({ completed: true, currentStep: 99 }));
+    });
+    await page.route('**/api/**', async (route) => {
+      const req = route.request();
+      const p = new URL(req.url()).pathname;
+      const json = (b: unknown) =>
+        route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(b) });
+      if (p === '/api/auth/refresh' || p === '/api/auth/login') return json(AUTH);
+      if (req.method() === 'GET') return json(Object.prototype.hasOwnProperty.call(GET, p) ? GET[p] : []);
+      return json({});
+    });
+    await page.route('**/api/assistant/status', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ enabled: true }) }),
+    );
+    const chatCalls: ChatCall[] = [];
+    await page.route('**/api/assistant/chat', (route) => {
+      chatCalls.push(route.request().postDataJSON() as ChatCall);
+      return route.fulfill({ status: 200, contentType: 'text/event-stream', body: PRESET_TURN });
+    });
+
+    await enterApp(page);
+    await page.getByRole('button', { name: 'Open assistant' }).click();
+    const drawer = page.getByRole('dialog', { name: 'ERP Copilot' });
+    await expect(drawer).toBeVisible();
+
+    // Both preset chips are offered on the empty conversation.
+    const reconciliationChip = drawer.getByText('Reconciliation health check');
+    await expect(reconciliationChip).toBeVisible();
+    await expect(drawer.getByText('Gross margin analysis')).toBeVisible();
+
+    await reconciliationChip.click();
+
+    // The conversation started (chips gone, canned prompt echoed as the user's message) and the assistant
+    // streamed its reply.
+    await expect(drawer.getByText('The books balance.')).toBeVisible();
+    await expect(reconciliationChip).toHaveCount(0);
+
+    expect(chatCalls).toHaveLength(1);
+    expect(chatCalls[0].preset).toBe('reconciliation');
   });
 });

@@ -20,6 +20,8 @@ export function useAssistantStatus() {
 export interface ChatBody {
   messages: Message[];
   decision?: Decision;
+  /** Optional analysis preset ('reconciliation' | 'margin') selecting a specialised system prompt. */
+  preset?: string;
 }
 
 /** The six event names the backend contract defines; anything else is an unknown/future event (ignored). */

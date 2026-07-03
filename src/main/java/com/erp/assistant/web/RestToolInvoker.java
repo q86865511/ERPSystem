@@ -1,6 +1,7 @@
 package com.erp.assistant.web;
 
 import com.erp.assistant.application.AssistantProperties;
+import com.erp.assistant.application.PathVariableFiller;
 import com.erp.assistant.application.ToolInvoker;
 import com.erp.assistant.application.ToolResult;
 import com.erp.assistant.application.ToolSpec;
@@ -11,10 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,34 +53,40 @@ public class RestToolInvoker implements ToolInvoker {
                 ? ((ObjectNode) input).deepCopy()
                 : mapper.createObjectNode();
 
-        String path = fillPathVariables(spec.pathTemplate(), remaining);
-
         try {
+            // The template keeps its {var} placeholders verbatim; pathVariables holds the raw (unencoded)
+            // values PathVariableFiller pulled (and validated) out of the input. Expanding them via
+            // UriBuilder.build(Map) below — rather than substituting a pre-encoded string ourselves — is what
+            // makes the encoding happen exactly once (see PathVariableFiller's class doc).
+            Map<String, String> pathVariables = PathVariableFiller.extract(spec.pathTemplate(), remaining);
             if ("GET".equals(spec.method())) {
-                return get(path, remaining, bearerToken);
+                return get(spec.pathTemplate(), pathVariables, remaining, bearerToken);
             }
-            return post(path, remaining, bearerToken);
+            return post(spec.pathTemplate(), pathVariables, remaining, bearerToken);
         } catch (RuntimeException ex) {
-            // Transport/serialization failure (not an HTTP error status, which we capture below): report it
-            // as an error result rather than aborting the whole turn.
+            // Transport/serialization failure (not an HTTP error status, which we capture below), or a path
+            // variable that failed validation in PathVariableFiller: report it as an error result rather than
+            // aborting the whole turn.
             return ToolResult.error("{\"error\":\"tool invocation failed\",\"detail\":\""
                     + safe(ex.getMessage()) + "\"}");
         }
     }
 
-    private ToolResult get(String path, ObjectNode fields, String bearerToken) {
+    private ToolResult get(String pathTemplate, Map<String, String> pathVariables, ObjectNode fields,
+                           String bearerToken) {
         // Build the URI through RestClient's own UriBuilder (starts from the configured base URL, if any)
         // rather than pre-encoding a String ourselves — passing an already-encoded String to .uri(String)
         // would have it percent-encoded a second time (e.g. a space would become %2520 instead of %20).
-        // UriBuilder.queryParam(name, value) encodes each value exactly once at .build(), so a raw "&",
-        // space or non-ASCII value cannot inject an extra query param or otherwise corrupt the request line.
+        // UriBuilder.queryParam(name, value) and the path-template variables in .build(Map) each encode
+        // exactly once, so a raw "&", "/", space or non-ASCII value cannot inject an extra query param/path
+        // segment or otherwise corrupt the request line.
         RestClient.ResponseSpec response = restClient.get()
                 .uri(uriBuilder -> {
-                    uriBuilder.path(path);
+                    uriBuilder.path(pathTemplate);
                     for (Map.Entry<String, JsonNode> entry : fields.properties()) {
                         uriBuilder.queryParam(entry.getKey(), scalarText(entry.getValue()));
                     }
-                    return uriBuilder.build();
+                    return uriBuilder.build(pathVariables);
                 })
                 .headers(h -> auth(h, bearerToken))
                 .accept(MediaType.APPLICATION_JSON)
@@ -91,9 +95,10 @@ public class RestToolInvoker implements ToolInvoker {
         return toResult(response);
     }
 
-    private ToolResult post(String path, ObjectNode body, String bearerToken) {
+    private ToolResult post(String pathTemplate, Map<String, String> pathVariables, ObjectNode body,
+                            String bearerToken) {
         RestClient.ResponseSpec response = restClient.post()
-                .uri(path)
+                .uri(uriBuilder -> uriBuilder.path(pathTemplate).build(pathVariables))
                 .headers(h -> auth(h, bearerToken))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -120,32 +125,6 @@ public class RestToolInvoker implements ToolInvoker {
         if (bearerToken != null && !bearerToken.isBlank()) {
             headers.setBearerAuth(bearerToken);
         }
-    }
-
-    /**
-     * Replaces every {@code {var}} in the template with the (URL-encoded) input field {@code var}, removing
-     * that field from {@code fields} so it is not also sent as a query param / in the body.
-     */
-    private String fillPathVariables(String template, ObjectNode fields) {
-        String path = template;
-        List<String> names = new ArrayList<>();
-        int i = 0;
-        while ((i = path.indexOf('{', i)) >= 0) {
-            int end = path.indexOf('}', i);
-            if (end < 0) {
-                break;
-            }
-            names.add(path.substring(i + 1, end));
-            i = end + 1;
-        }
-        for (String name : names) {
-            JsonNode value = fields.remove(name);
-            String encoded = value != null
-                    ? UriComponentsBuilder.fromPath("/").pathSegment(scalarText(value)).build().getPathSegments().get(0)
-                    : "";
-            path = path.replace("{" + name + "}", encoded);
-        }
-        return path;
     }
 
     private static String scalarText(JsonNode node) {

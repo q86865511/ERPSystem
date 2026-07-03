@@ -400,4 +400,39 @@ describe('assistantReducer', () => {
       });
     });
   });
+
+  describe('preset', () => {
+    it('has no preset by default', () => {
+      expect(initialAssistantState.preset).toBeNull();
+    });
+
+    it('sets the preset from the first user_send', () => {
+      const state = run([{ type: 'user_send', id: 'm1', text: 'why?', preset: 'reconciliation' }]);
+      expect(state.preset).toBe('reconciliation');
+    });
+
+    it('a plain user_send (no preset) leaves the preset null', () => {
+      const state = run([{ type: 'user_send', id: 'm1', text: 'hi' }]);
+      expect(state.preset).toBeNull();
+    });
+
+    it('keeps the first preset for later messages in the same conversation, ignoring a later preset arg', () => {
+      const state = run([
+        { type: 'user_send', id: 'm1', text: 'why?', preset: 'reconciliation' },
+        sse({ type: 'done', stopReason: 'end_turn' }),
+        // A second send in the same conversation passing a different preset must not override it —
+        // conversation.length is already > 0 by this point.
+        { type: 'user_send', id: 'm2', text: 'and then?', preset: 'margin' },
+      ]);
+      expect(state.preset).toBe('reconciliation');
+    });
+
+    it('reset clears the preset back to null', () => {
+      const state = run([
+        { type: 'user_send', id: 'm1', text: 'why?', preset: 'reconciliation' },
+        { type: 'reset' },
+      ]);
+      expect(state.preset).toBeNull();
+    });
+  });
 });
