@@ -1,6 +1,8 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
+**🖋️「墨青帳房(Ink Ledger)」前端全面改版完成,待 push/PR(2026-07-03,分支 `feat/ink-ledger-theme`,6 commits)** —— 以 `frontend/design.md` 為唯一美術依據,Blue Enterprise → 墨青帳房:ink/seal/paperGray 三 ramp、Noto Serif TC 自架 216 分片(零 CDN)、側欄固定深墨青、簽名元件 `SealBadge` 朱印章(含蓋章動效/reduced-motion/列表精簡章/非 CJK 矩形章)、圖表收斂八色文化 palette、`contrast.test.ts` 52 條 AA 對比斷言。/pipeline 流程:implementer+2×architect 分層派工、Opus+Codex 雙審 8 條發現(4 成立已修、2 誤報、2 依裁決不動)、design.md 三處自相矛盾以實測數據修訂並註記。build/types/**239 tests** 全綠;23 張截圖(8 主頁 light+dark、AI 側欄、zh 朱印)重製並目檢。
+
 **🤖 ERP Copilot(AI/LLM 整合)全數交付且實機驗證通過(2026-07-03,PR #100–#110)** —— 平台定位轉「技術實驗場」後的第一個實驗:Claude 驅動的 AI 助手側欄(SSE 串流、12 工具、**寫入人工確認 HITL**、audit、限流)、「為什麼」歸因分析(對帳紅燈診斷/毛利環比,agent 自己鑽報表)、MCP server(Claude Desktop/Code 直連 ERP)。核心安全設計:工具以使用者自己的 JWT 回打自家 REST(RBAC/驗證/審計全重用),**AI 動了帳之後對帳 hero 仍全綠(IT + 實機皆驗)**。每個 PR 皆經 Opus+Codex 雙審全修。預設關閉(`APP_ASSISTANT_ENABLED` + `ANTHROPIC_API_KEY` 啟用);線上 demo 未開。整體計劃 `~/.claude/plans/ui-woolly-finch.md`。
 **✅ 實機驗證完成(本機 compose 帶 key)**:MCP 經 Claude Code 查詢 + 開單(SO-000025);側欄完整 HITL 開單(SO-000026 DRAFT)、audit 6 筆 `ASSISTANT_TOOL_EXECUTED`、對帳 hero 全程綠、preset 分析可用。實機另抓到 3 個「CI 綠但實際壞」的潛藏 bug 並修(#108 flag 條件自我否決 + 雙建構子、#109 確認卡死鎖、#110 日期注入/prompt/工具卡防重複),各補回歸測試;#107 還原平行 session 誤刪的 design.md。
 
@@ -17,6 +19,15 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-03] 🖋️ **「墨青帳房」前端視覺全面改版(/pipeline 多模型協作)**。分支 `feat/ink-ledger-theme`(自 main,6 commits)。
+  - **Phase A tokens(implementer)**:`theme.ts` brand ramp 整組換墨青 ink 十階(名字保留 `brand`,零改名)+ 新增 `seal` + gray 換暖石灰;primaryShade `{light:8, dark:4}`;radius/shadows 調輕、headings serif(h1–h4,h5/h6 css 覆寫回無襯線);`index.css` 表面/語意/圖表變數 + table/sidebar per-scheme 變數;**Noto Serif TC 600/700 共 216 分片自架**(`fetch-noto-serif-tc.mjs`,比照 PJS 模式零 runtime CDN);`MoneyText` monospace→tabular-nums(先以 fontTools 驗證 PJS 有 `tnum` 才動手);新增 **`contrast.test.ts`** 把 WCAG AA 硬約束變單元測試。
+  - **B1 側欄深墨青(architect)**:navbar 固定 `#123F3C`/dark `#0F332F` 不隨模式翻轉;NavLink 深底配色鎖在 `.navbar` scope(Mantine `--nl-*`),青瓷 active 左條、wash hover、深底捲軸。
+  - **B2 SealBadge(architect)**:朱印圓章(-8°雙框)/墨印/待審灰框/草稿四型,`StatusBadge` 內部路由 6 狀態(16 panel 零改動);蓋章動效僅「掛載中轉入已核准」觸發、reduced-motion 純 CSS;裁決後補列表 28px 精簡章(12 個詳情點 `size="md"`)與非 CJK 矩形章,design.md §6 同步補註。
+  - **Phase C 整合驗證**:清掉 6 檔散落的 stock 色硬編碼(cash flow/revenue 系列、OEE 環、庫存/供應商 Progress、Gantt、treemap→§2.6 palette;語意健康指標→語意變數);shoot 腳本擴充至 23 張(8 主頁 light+dark、AI 側欄兩模式、zh 朱印頁)全數目檢。
+  - **Phase D 雙審(Opus reviewer + Codex MCP)**:8 條發現 → 裁決 4 修(待審 chip AA 上修 gray-6/gray-4、帳齡首色改 `--erp-chart-1` 吃 dark 覆寫、刪 `sidebarColors` 鏡像改測 index.css 實值、字體腳本 fail-fast+清舊檔)、2 誤報(CSS 變數繼承/Progress 相容,皆以實證駁回)、2 依裁決不動。**過程中對比測試真抓到一個解析 bug**(CSS 註解內提及變數名污染 regex 解析)。
+  - **design.md 三處自相矛盾以實測修訂**:§2.3 dimmed 數值(gray-4 實測 2.45:1)、§6 待審 gray-5(4.47:1)、§2.6 未定義帳齡/類別/treemap 映射——均以「不發明新視覺、選安全路徑、回報裁決」處理。
+  - **教訓**:子代理再派孫代理會產生主迴圈停不掉的孤兒任務(4 個 audit 代理掛 40 分鐘),之後派工簡報一律明令禁止。
+  - **驗證**:`npm run build` / `test:types` / **Vitest 239** 全綠(對比 52 案例);light+dark 全頁截圖目檢;§8 Do/Don't 自查(HR 列級 filled 鈕為前代既有,經裁決不動)。
 - [2026-07-03] ✨ **打磨:實機驗證第二輪的三個發現**。分支 `polish/assistant-live-findings`。側欄完整 HITL 已通(SO-000026 DRAFT 落庫、audit 6 筆 `ASSISTANT_TOOL_EXECUTED`、對帳 hero 仍綠),本輪收尾:
   - **今天日期注入 system prompt**(`AgentLoopService`,附在穩定 prompt 尾端 → 快取一天只 re-key 一次):模型原本不知今日,SO-000026 的 orderDate 被幻覺成 2026-02-16。
   - **prompt 加兩條規則**:write 就緒直接呼叫工具(不要文字要求「回覆確認」— 與內建確認卡打架,實測誤導使用者打字);回覆純文字禁 markdown(前端 verbatim 渲染,實測管線表格原樣顯示)。

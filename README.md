@@ -70,11 +70,15 @@
 |---|---|---|
 | <img src="docs/screenshots/12-hr-dashboard.png" alt="人資儀表板"> | <img src="docs/screenshots/13-hr-payroll.png" alt="薪資過帳"> | <img src="docs/screenshots/06-inventory.png" alt="庫存分析"> |
 
-**「Blue Enterprise」重設計**(藍色企業主色 + 深色模式 + 手刻新手導覽):
+**「墨青帳房(Ink Ledger)」設計系統**(墨青主色 + 宣紙暖灰 + 朱印簽名章 + 襯線標題;含深色模式與手刻新手導覽):
 
 | 深色模式 | 新手導覽(13 步,涵蓋每個模組首頁) |
 |---|---|
 | <img src="docs/screenshots/10-dark-mode.png" alt="深色模式"> | <img src="docs/screenshots/11-onboarding-tour.png" alt="新手導覽"> |
+
+| 朱印審核章(圓章/墨印/待審灰框) | AI 助手側欄(深色) |
+|---|---|
+| <img src="docs/screenshots/23-hr-leave-zh.png" alt="朱印審核章"> | <img src="docs/screenshots/22-assistant-dark.png" alt="AI 助手側欄(深色)"> |
 
 > 畫面由 headless Playwright 對**本機 production build** 自動截圖(`/api` 以擷取自 live demo 的資料 mock,見 [frontend/scripts/](frontend/scripts/README.md));深/淺色、各模組頁、開窗與新手導覽皆涵蓋。
 
@@ -252,6 +256,8 @@ cd frontend && npm run build      # tsc -b && vite build
 **✅「Warm Terracotta」UI/UX 重新設計**:全站 theme + `theme.components` 元件層覆寫(暖陶土主色、暖灰中性色階、自託管字體)、7 個隨採用而建的共用元件、8 大模組逐頁打磨、手刻新手導覽(13 步,涵蓋每個模組首頁)、a11y 折入(icon-only 控制皆有 `aria-label`,Modal/Drawer 全面延用 Mantine 內建 focus-trap)。分 12 個 PR 交付(`#62`–`#73`),設計 spec 見 [docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md](docs/superpowers/specs/2026-06-30-warm-terracotta-redesign-design.md)。
 
 **✅「Blue Enterprise」重設計(Phase 1)**:全站主色由 Warm Terracotta 換為藍色企業風(`#2563EB` + 冷 slate),導入 `@mantine/charts` 與共用圖表元件(`KpiTile` / `DonutCard`),交付四張接真實端點的資料儀表板(ERP 總覽 / 財務中心 / 庫存 / 生產)、可摺疊巢狀導覽 + URL 驅動分頁,並重拍全部截圖為藍色版(`#76`、`#77`)。更深的資料 widget(treemap / Gantt / OEE / 供應商準時率 / 現金流 / 預算差異)列為後續後端 PR。
+
+**✅「墨青帳房(Ink Ledger)」重設計**:把台灣商業文化「帳簿與印鑑」翻譯成設計系統(唯一美術依據 [frontend/design.md](frontend/design.md))——墨青 `#123F3C` 主色 + 朱印 `seal` 點睛色 + 宣紙暖石灰;標題與 KPI 大數字用 **Noto Serif TC**(自架 216 個 unicode-range 分片,零 runtime CDN);簽名元件 **`SealBadge` 朱印章**(已核准=雙框圓章 -8°、已過帳=墨印、待審=灰框 chip,蓋章動效 + `prefers-reduced-motion` 降級;列表精簡章/詳情完整章、非 CJK 標籤自動改矩形章);側欄固定深墨青(不隨深淺模式翻轉);圖表全數收斂到八色文化 palette;**WCAG AA 用 52 條對比單元測試客觀把關**(語意色/側欄/表頭/圖表/章,light+dark,`contrast.test.ts`)。金額一律右對齊 + 千分位 + tabular-nums。
 
 ## ⚠️ 刻意切割(非缺漏)
 

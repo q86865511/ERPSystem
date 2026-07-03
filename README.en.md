@@ -85,11 +85,15 @@ zero after a complete cycle. This one report is the project's hero artifact.
 |---|---|---|
 | <img src="docs/screenshots/12-hr-dashboard.png" alt="HR dashboard"> | <img src="docs/screenshots/13-hr-payroll.png" alt="Payroll"> | <img src="docs/screenshots/06-inventory.png" alt="Inventory analytics"> |
 
-**The "Blue Enterprise" redesign** (blue enterprise palette + dark mode + a hand-rolled onboarding tour):
+**The "Ink Ledger" design system** (deep-ink primary + warm paper neutrals + vermillion seal stamps + serif headings; includes dark mode and a hand-rolled onboarding tour):
 
 | Dark mode | Onboarding tour (13 steps, one per module landing page) |
 |---|---|
 | <img src="docs/screenshots/10-dark-mode.png" alt="Dark mode"> | <img src="docs/screenshots/11-onboarding-tour.png" alt="Onboarding tour"> |
+
+| Vermillion seal stamps (circular / ink / pending) | ERP Copilot drawer (dark) |
+|---|---|
+| <img src="docs/screenshots/23-hr-leave-zh.png" alt="Seal stamps"> | <img src="docs/screenshots/22-assistant-dark.png" alt="Assistant drawer (dark)"> |
 
 > Captured by headless Playwright against a **local production build**, with `/api` mocked from data
 > snapshotted off the live demo (see [frontend/scripts/](frontend/scripts/README.md)); covers light/dark,
@@ -286,16 +290,21 @@ MCP server that reads the same tool manifest, logs into the ERP with env credent
 tools to any MCP client (write confirmation is delegated to the client's native UX). Setup examples in
 [mcp-server/README.md](mcp-server/README.md).
 
-> 🔵 **"Blue Enterprise" redesign (Phase 1 shipped)**: the frontend has moved from Warm Terracotta to a
-> blue enterprise-SaaS look (primary `#2563EB` + a cool slate neutral scale) and is deployed — **the
-> screenshots on this page are the blue version**. Four `@mantine/charts` data dashboards (ERP overview /
-> finance center / inventory / manufacturing) are wired to real endpoints; finance analytics (revenue trend
-> / cash flow / budget variance / KPI deltas, C1), the per-item heat treemap (C2), supplier on-time rate
-> (C3), the work-order Gantt (C4) and OEE / equipment (C5) are **all wired to real backends — no PLANNED
-> placeholders remain**.
+> 🖋️ **"Ink Ledger" redesign shipped**: the frontend has moved from Blue Enterprise to the **Ink Ledger**
+> design system — **the screenshots on this page are the ink version**. It translates the trust language of
+> Taiwanese ledgers and personal seals: a deep-ink primary (`#123F3C`), a vermillion `seal` accent reserved
+> for approval stamps and danger, warm paper neutrals, and serif display type. All the data dashboards
+> below (finance analytics, per-item heat treemap, supplier on-time rate, work-order Gantt, OEE) remain
+> wired to real backends — no PLANNED placeholders.
 
-**The design system (Blue Enterprise)**: a self-built Mantine theme — a blue enterprise primary color
-(`#2563EB`) + a cool slate neutral scale + a self-hosted Plus Jakarta Sans;
+**The design system (Ink Ledger)**: a self-built Mantine theme — a deep-ink primary
+(`#123F3C`) + a vermillion seal accent + warm paper-gray neutrals + a self-hosted Plus Jakarta Sans, with
+**Noto Serif TC** display headings self-hosted as 216 unicode-range chunks (zero runtime font CDN);
+the signature **`SealBadge`** renders document review states as seals (approved = rotated double-ring
+vermillion stamp, posted = filled ink stamp, pending = a gray outline chip — "not stamped yet"), with a
+stamp-drop micro-animation that respects `prefers-reduced-motion`, compact list-cell sizing, and an
+auto rectangular variant for non-CJK labels; the sidebar stays fixed deep ink in BOTH color schemes; and
+WCAG AA is enforced objectively by 52 contrast unit-test assertions (`frontend/src/test/contrast.test.ts`);
 light/dark mode toggles instantly from the top bar (defaults to the OS preference, persisted to
 localStorage). The component layer is a global `theme.components` override (tables, cards, inputs, …)
 plus shared components (`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`KpiTile`/`DonutCard`/`AmountAllocationTable`/
@@ -386,6 +395,17 @@ blue enterprise look (`#2563EB` + cool slate), introducing `@mantine/charts` and
 center / inventory / manufacturing), a collapsible nested nav + URL-driven tabs, and re-shot every screenshot
 in blue (`#76`, `#77`). Deeper data widgets (treemap / Gantt / OEE / supplier on-time / cash-flow /
 budget-variance) are queued as later backend PRs.
+
+**✅ The "Ink Ledger" redesign**: the visual system moved from Blue Enterprise to **Ink Ledger** — the trust
+language of Taiwanese ledgers and personal seals as a design system (single source of truth:
+[frontend/design.md](frontend/design.md)). Deep-ink `#123F3C` primary + vermillion `seal` accent (reserved
+for approval stamps and danger) + warm paper-gray neutrals; **Noto Serif TC** display headings self-hosted
+as 216 unicode-range woff2 chunks (zero runtime font CDN); the signature **`SealBadge`** stamp component
+(approved = rotated double-ring vermillion circle, posted = filled ink stamp, pending = gray outline chip,
+with a stamp-drop micro-animation + `prefers-reduced-motion` fallback, compact list sizing, and an auto
+rectangular variant for non-CJK labels); a fixed deep-ink sidebar in both color schemes; the whole chart
+layer converged onto an eight-color cultural palette; and WCAG AA enforced by 52 contrast unit-test
+assertions across light + dark. Amounts are always right-aligned, thousands-grouped, tabular-nums.
 
 ## ⚠️ Consciously deferred (not gaps)
 
