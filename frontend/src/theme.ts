@@ -67,16 +67,6 @@ const paperGray: MantineColorsTuple = [
   '#121917', // 9  dark 頁面
 ];
 
-// Fixed (scheme-independent) sidebar colors — design.md §2.4/§5. Single source: the AppShell/NavLink
-// overrides (Phase B1) and contrast.test.ts both import this instead of re-typing the hex.
-export const sidebarColors = {
-  bgLight: '#123F3C',
-  bgDark: '#0F332F',
-  fg: '#DCE7E2',
-  fgInactive: '#A9C2BA',
-  activeWash: 'rgba(138,179,172,.16)',
-};
-
 export const theme = createTheme({
   primaryColor: 'brand',
   primaryShade: { light: 8, dark: 4 },

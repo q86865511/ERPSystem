@@ -9,7 +9,7 @@
  * Usage: node scripts/fetch-noto-serif-tc.mjs
  * Output: src/assets/fonts/noto-serif-tc/*.woff2 + src/assets/fonts/noto-serif-tc.css
  */
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -85,9 +85,32 @@ async function main() {
   if (faces.length === 0) {
     throw new Error('No @font-face woff2 entries parsed from Google Fonts CSS — UA sniffing may have changed.');
   }
+  // Fail fast on a PARTIAL parse too (review finding #6): if Google's CSS format drifts so only one
+  // weight (or a fraction of the chunks) survives the regex, refuse to overwrite the committed set with
+  // a half-empty stylesheet. Google currently serves ~108 chinese-traditional chunks per weight.
+  const MIN_CHUNKS_PER_WEIGHT = 50;
+  for (const weight of ['600', '700']) {
+    const count = faces.filter((f) => f.weight === weight).length;
+    if (count < MIN_CHUNKS_PER_WEIGHT) {
+      throw new Error(
+        `Parsed only ${count} chunks for weight ${weight} (expected ~108, floor ${MIN_CHUNKS_PER_WEIGHT}) — ` +
+          `Google's CSS2 format may have changed; refusing to write a partial font set.`,
+      );
+    }
+  }
   console.log(`Parsed ${faces.length} font-face chunks.`);
 
   await mkdir(OUT_DIR, { recursive: true });
+  // Chunk boundaries/order can shift between Google refreshes and filenames are per-weight sequence
+  // numbers, so stale chunks from a previous run would otherwise linger as orphans. Clear the woff2 set
+  // (and only the woff2 set — OFL.txt stays) before regenerating.
+  const stale = (await readdir(OUT_DIR)).filter((f) => f.endsWith('.woff2'));
+  for (const f of stale) {
+    await unlink(path.join(OUT_DIR, f));
+  }
+  if (stale.length > 0) {
+    console.log(`Removed ${stale.length} stale chunks before regenerating.`);
+  }
 
   const perWeightCounter = new Map();
   const cssFaces = [];

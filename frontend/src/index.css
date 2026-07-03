@@ -50,13 +50,13 @@
   --app-table-striped: #faf9f6; /* body tone, one notch off the white card */
   --app-table-hover: #ebf2f0; /* ink-0 */
 
-  /* Sidebar (design.md §2.4/§5): fixed ink, does not flip with the color scheme — see sidebarColors in
-     theme.ts (single source, imported by the AppShell override and by contrast.test.ts). The base
-     bg/fg/fgInactive triple lives here AND in theme.ts's `sidebarColors` (same hex, two consumers); the
-     derived-on-ink tokens below (active bar/wash, hover) are authored here only and parsed by
-     contrast.test.ts, so no fourth hand-copy exists. All of these are scheme-independent: the navbar stays
-     deep ink in light AND dark mode, so they sit outside the light/dark split (see the light block; the
-     dark block deliberately does NOT re-declare them). */
+  /* Sidebar (design.md §2.4/§5): fixed ink, does not flip with the color scheme. These custom properties
+     are THE single source for the sidebar — the AppShell override, AppLayout.module.css, and
+     contrast.test.ts (which parses this file) all read them; no theme.ts constant mirror exists (review
+     finding #3: a mirrored hex would let this file drift while the test stayed green). All of these are
+     scheme-independent except --app-sidebar-bg, which the dark block dims one step: the navbar stays deep
+     ink in light AND dark mode, so the rest sit outside the light/dark split (light block only; the dark
+     block deliberately does NOT re-declare them). */
   --app-sidebar-bg: #123f3c;
   --app-sidebar-fg: #dce7e2;
   --app-sidebar-fg-inactive: #a9c2ba;

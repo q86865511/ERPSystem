@@ -23,15 +23,18 @@ export const chartSeries = [
 
 /**
  * AR/AP aging severity, not-due → 90+ (design.md §2.6 hex, five-step ramp agreed for this migration):
- * not-due 墨青 #2F6559 → 1-30 苔綠 #8A8B5C → 31-60 藤黃 #C99235 → 61-90 牡丹 #A96C8E → 90+ 磚朱 #A8574A.
+ * not-due 墨青 → 1-30 苔綠 #8A8B5C → 31-60 藤黃 #C99235 → 61-90 牡丹 #A96C8E → 90+ 磚朱 #A8574A.
+ * The ink step goes through --erp-chart-1 (NOT raw #2F6559) so it picks up the dark-mode #5FA396
+ * override — raw ink is only ~2.3:1 on the dark card; the mid-tone rest needs no override.
  */
-export const agingColors = ['#2F6559', '#8A8B5C', '#C99235', '#A96C8E', '#A8574A'] as const;
+export const agingColors = ['var(--erp-chart-1)', '#8A8B5C', '#C99235', '#A96C8E', '#A8574A'] as const;
 
 /**
- * Inventory category (raw / WIP / finished / other), design.md §2.6 hex: raw 墨青 #2F6559, WIP 青瓷綠
- * #5E9E8F, finished 藤黃 #C99235, other 暖石灰 gray-4 #A6A69C (design.md §2.3, not a chart color).
+ * Inventory category (raw / WIP / finished / other), design.md §2.6: raw 墨青 via --erp-chart-1 (dark-
+ * aware, see agingColors note), WIP 青瓷綠 #5E9E8F, finished 藤黃 #C99235, other 暖石灰 gray-4 #A6A69C
+ * (design.md §2.3, not a chart color).
  */
-export const categoryColors = ['#2F6559', '#5E9E8F', '#C99235', '#A6A69C'] as const;
+export const categoryColors = ['var(--erp-chart-1)', '#5E9E8F', '#C99235', '#A6A69C'] as const;
 
 /**
  * Inventory heat-treemap tile fill by stock status (design.md §2.6 fixed hex — same OK/LOW/OUT semantic

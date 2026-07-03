@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
-import { sidebarColors, theme } from '../theme';
+import { theme } from '../theme';
 import { treemapFill, treemapLabelColor } from '../components/charts/palette';
 // Vite's `?raw` suffix imports the file as a plain string (no Node `fs`/`path` needed — this project has
 // no @types/node dependency, and Vitest shares Vite's transform pipeline so this works under `vitest run`
@@ -98,7 +98,10 @@ function parseCssVarsForScheme(scheme: 'light' | 'dark'): Record<string, string>
   );
   const match = cssSource.match(blockRegex);
   if (!match?.[1]) throw new Error(`Could not find a ${scheme}-scheme block in index.css`);
-  const body = match[1];
+  // Strip comments BEFORE matching declarations: an inline comment that merely *mentions* a token name
+  // (e.g. "== --app-sidebar-fg: inactive rows brighten…") would otherwise be captured as a declaration
+  // and overwrite the real value with comment prose.
+  const body = match[1].replace(/\/\*[\s\S]*?\*\//g, '');
   const vars: Record<string, string> = {};
   const declRegex = /(--[a-z0-9-]+)\s*:\s*([^;]+);/gi;
   let m: RegExpExecArray | null;
@@ -165,17 +168,23 @@ describe('semantic colors (design.md §2.5)', () => {
 // ---------------------------------------------------------------------------
 
 describe('sidebar colors (design.md §2.4/§5)', () => {
+  // All sidebar values are parsed from index.css — the SAME custom properties the AppShell override and
+  // AppLayout.module.css consume at runtime (review finding #3: the earlier theme.ts `sidebarColors`
+  // mirror was only ever read by this test, so a CSS edit could drift while the test stayed green).
+  // The bg flips per scheme block; the fg tokens are scheme-independent and live in the light block.
   const backgrounds: Array<[string, string]> = [
-    ['bgLight', sidebarColors.bgLight],
-    ['bgDark', sidebarColors.bgDark],
+    ['bgLight', cssVar(lightVars, '--app-sidebar-bg')],
+    ['bgDark', cssVar(darkVars, '--app-sidebar-bg')],
   ];
+  const sidebarFg = cssVar(lightVars, '--app-sidebar-fg');
+  const sidebarFgInactive = cssVar(lightVars, '--app-sidebar-fg-inactive');
 
   for (const [bgName, bg] of backgrounds) {
     it(`fg vs ${bgName} passes AA`, () => {
-      expectAA(`sidebar fg vs ${bgName}`, sidebarColors.fg, bg);
+      expectAA(`sidebar fg vs ${bgName}`, sidebarFg, bg);
     });
     it(`fgInactive vs ${bgName} passes AA`, () => {
-      expectAA(`sidebar fgInactive vs ${bgName}`, sidebarColors.fgInactive, bg);
+      expectAA(`sidebar fgInactive vs ${bgName}`, sidebarFgInactive, bg);
     });
     it(`active white label vs ${bgName} passes AA`, () => {
       expectAA(`sidebar active (#FFFFFF) vs ${bgName}`, '#FFFFFF', bg);
@@ -184,9 +193,8 @@ describe('sidebar colors (design.md §2.4/§5)', () => {
 
   // Phase B1 (design.md §5): the deep-ink NavLink states are washes over the sidebar bg, not opaque
   // colors, so the *rendered* text background is the wash composited over the bg — that's what must clear
-  // AA. The wash + fg tokens are parsed from index.css (single source; they live in the light block only,
-  // being scheme-independent), the two bg values come from theme.ts's sidebarColors, and the composite is
-  // the same flatten helper the semantic-color tests use.
+  // AA. Wash + fg tokens are parsed from index.css like everything above (scheme-independent, light block
+  // only), and the composite is the same flatten helper the semantic-color tests use.
   const activeWash = parseRgba(cssVar(lightVars, '--app-sidebar-active-wash'));
   const activeFg = cssVar(lightVars, '--app-sidebar-active-fg'); // #ffffff
   const hoverWash = parseRgba(cssVar(lightVars, '--app-sidebar-hover-wash'));
@@ -260,6 +268,32 @@ describe('dimmed text (design.md §2.3/§9.3)', () => {
 });
 
 // ---------------------------------------------------------------------------
+// SealBadge pending chip label (design.md §6, adjudicated 2026-07-03 review finding #1): gray-6 light /
+// gray-4 dark. §6 originally said gray-5, which measures 4.47:1 on the white card and 3.44:1 on the dark
+// card — under the AA floor the same spec demands (the dimmed-token §2.3 contradiction all over again).
+// Label values come from the theme ramp — the same ramp Mantine emits as --mantine-color-gray-*, which is
+// what SealBadge.module.css's light-dark() pair references.
+// ---------------------------------------------------------------------------
+
+describe('SealBadge pending chip label (design.md §6)', () => {
+  const lightLabel = grayRamp[6]!;
+  const darkLabel = grayRamp[4]!;
+
+  it('light label (gray-6) vs card passes AA', () => {
+    expectAA('pending chip light vs card', lightLabel, cssVar(lightVars, '--app-color-card'));
+  });
+  it('light label (gray-6) vs body passes AA', () => {
+    expectAA('pending chip light vs body', lightLabel, cssVar(lightVars, '--mantine-color-body'));
+  });
+  it('dark label (gray-4) vs card passes AA', () => {
+    expectAA('pending chip dark vs card', darkLabel, cssVar(darkVars, '--app-color-card'));
+  });
+  it('dark label (gray-4) vs body passes AA', () => {
+    expectAA('pending chip dark vs body', darkLabel, cssVar(darkVars, '--mantine-color-body'));
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Chart series (design.md §2.6): non-text 3:1 floor against the card surface. §2.6's own text only
 // mandates re-checking the DARK card ("dark 模式至少覆寫 --erp-chart-1... 其餘系列遷移時逐一檢查暗底對比,
 // 不足者提亮一階") — so that's what's asserted here. Chart-1 is overridden in dark; the rest inherit the
@@ -308,11 +342,12 @@ describe('contrast helper sanity checks', () => {
   });
 
   it('composites an rgba wash onto an opaque background before measuring', () => {
-    const { hex, alpha } = parseRgba(sidebarColors.activeWash);
-    const composited = compositeOverBackground(hex, alpha, sidebarColors.bgLight);
+    const { hex, alpha } = parseRgba(cssVar(lightVars, '--app-sidebar-active-wash'));
+    const sidebarBg = cssVar(lightVars, '--app-sidebar-bg');
+    const composited = compositeOverBackground(hex, alpha, sidebarBg);
     // The composited swatch must land strictly between the wash color and the bg (a real blend), not
     // equal either endpoint — guards against alpha-parsing regressions silently no-op'ing the blend.
-    expect(composited.toLowerCase()).not.toBe(sidebarColors.bgLight.toLowerCase());
+    expect(composited.toLowerCase()).not.toBe(sidebarBg.toLowerCase());
     expect(composited.toLowerCase()).not.toBe(hex.toLowerCase());
   });
 });

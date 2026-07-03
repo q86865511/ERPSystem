@@ -118,8 +118,10 @@
   background-color: var(--mantine-color-brand-6);
 }
 
-/* 待審 — "not stamped yet" grey outline chip: gray-3 frame, gray-5 label, no stamp styling
-   (design.md §6). Sans-serif on purpose — it is the absence of a seal, not a seal. */
+/* 待審 — "not stamped yet" grey outline chip: gray-3 frame, no stamp styling (design.md §6).
+   Sans-serif on purpose — it is the absence of a seal, not a seal. Label is gray-6 (dark: gray-4),
+   NOT §6's original gray-5: #77786F measures 4.47:1 on white / 3.44:1 on the dark card, under the
+   AA floor — same §2.3-style contradiction as the dimmed token (review finding #1, adjudicated). */
 .pendingChip {
   display: inline-flex;
   align-items: center;
@@ -129,7 +131,7 @@
   font-size: var(--seal-font);
   border-radius: var(--mantine-radius-sm);
   border: 1px solid var(--mantine-color-gray-3);
-  color: var(--mantine-color-gray-5);
+  color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-gray-4));
   line-height: 1;
   white-space: nowrap;
 }
