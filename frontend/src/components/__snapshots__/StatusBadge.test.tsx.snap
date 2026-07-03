@@ -59,6 +59,7 @@ exports[`StatusBadge > matches snapshot for CONFIRMED in light 1`] = `
 exports[`StatusBadge > matches snapshot for DRAFT in dark 1`] = `
 <div
   class="m_347db0ec mantine-Badge-root"
+  data-seal-variant="draft"
   data-variant="light"
   style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-gray-light); --badge-color: var(--mantine-color-gray-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
 >
@@ -73,6 +74,7 @@ exports[`StatusBadge > matches snapshot for DRAFT in dark 1`] = `
 exports[`StatusBadge > matches snapshot for DRAFT in light 1`] = `
 <div
   class="m_347db0ec mantine-Badge-root"
+  data-seal-variant="draft"
   data-variant="light"
   style="--badge-radius: var(--mantine-radius-sm); --badge-bg: var(--mantine-color-gray-light); --badge-color: var(--mantine-color-gray-light-color); --badge-bd: calc(0.0625rem * var(--mantine-scale)) solid transparent;"
 >

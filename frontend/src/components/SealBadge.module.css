@@ -1,0 +1,100 @@
+/* SealBadge — the one signature element of Ink Ledger (design.md §6). Four shapes for document
+   review/posting states; every other status keeps the plain light <Badge> path in StatusBadge.
+   Colors reference the brand (ink) / seal / gray ramps only — no raw hex — so both schemes derive
+   from theme.ts. Serif label font matches the ledger headings stack (design.md §3). */
+
+.serif {
+  font-family: 'Noto Serif TC', 'Source Serif 4', Georgia, serif;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* 朱印 — circular double-frame vermillion stamp. Outer 1.5px + inner 1px ring with a 2px gap between
+   them (design.md §6). Diameter 40px (top of the 36–40px range) to give the label the most room. The
+   inner ring is a ::before pseudo so the double frame needs no extra DOM. Rotated -8deg at rest. */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--mantine-color-seal-5);
+  color: var(--mantine-color-seal-5);
+  transform: rotate(-8deg);
+  text-align: center;
+}
+.stamp::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: 1px solid var(--mantine-color-seal-5);
+}
+[data-mantine-color-scheme='dark'] .stamp {
+  border-color: var(--mantine-color-seal-4);
+  color: var(--mantine-color-seal-4);
+}
+[data-mantine-color-scheme='dark'] .stamp::before {
+  border-color: var(--mantine-color-seal-4);
+}
+
+/* 墨印 — ink filled rounded-rectangle stamp, NOT rotated, white serif label (design.md §6). Used for
+   POSTED / CLOSED. Padding keeps it compact enough not to break the ≥40px row rhythm. */
+.inkStamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 4px 10px;
+  border-radius: var(--mantine-radius-sm);
+  background-color: var(--mantine-color-brand-8);
+  color: var(--mantine-color-white);
+}
+[data-mantine-color-scheme='dark'] .inkStamp {
+  /* ink-8 is near-black on the dark card; step up to ink-6 so the stamp reads as a filled chip. */
+  background-color: var(--mantine-color-brand-6);
+}
+
+/* 待審 — "not stamped yet" grey outline chip: gray-3 frame, gray-5 label, no stamp styling
+   (design.md §6). Sans-serif on purpose — it is the absence of a seal, not a seal. */
+.pendingChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 3px 10px;
+  border-radius: var(--mantine-radius-sm);
+  border: 1px solid var(--mantine-color-gray-3);
+  color: var(--mantine-color-gray-5);
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Stamp-drop micro-animation (design.md §6/§7): only plays when a mounted badge *transitions into*
+   the approved stamp — StatusBadge adds this class only then (first render never gets it). The one
+   performative motion in the whole system. */
+.stampDrop {
+  animation: seal-drop 180ms ease-out;
+}
+@keyframes seal-drop {
+  from {
+    transform: scale(1.2) rotate(-12deg);
+  }
+  to {
+    transform: scale(1) rotate(-8deg);
+  }
+}
+
+/* Respect reduced-motion at the CSS layer (design.md §7): the stamp simply appears, no keyframes. */
+@media (prefers-reduced-motion: reduce) {
+  .stampDrop {
+    animation: none;
+  }
+}
