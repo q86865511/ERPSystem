@@ -96,6 +96,40 @@ describe('assistantReducer', () => {
     });
   });
 
+  it('resume re-announcing the confirmed write via tool_call does not duplicate the card or the replay block', () => {
+    // Live-verification find: on approve, the backend re-announces the write with a tool_call for the id
+    // the awaiting_confirmation upsert already placed in the SAME draft. Blind-appending rendered two
+    // cards for one execution and, worse, made the commit cursor push a duplicate tool_use into the
+    // replayed conversation (which the model API would then reject on the next turn).
+    const parked = run([
+      { type: 'user_send', id: 'm1', text: 'create PO' },
+      sse({ type: 'awaiting_confirmation', id: 'w1', name: 'create_po', input: { qty: 5 } }),
+      sse({ type: 'done', stopReason: 'awaiting_confirmation' }),
+    ]);
+    const confirmed = assistantReducer(parked, {
+      type: 'resolve_confirmation',
+      approved: true,
+      resultText: '',
+    });
+    const finished = run(
+      [
+        sse({ type: 'tool_call', id: 'w1', name: 'create_po', input: { qty: 5 }, kind: 'write' }),
+        sse({ type: 'tool_result', id: 'w1', ok: true, result: '{"poId":42}' }),
+        sse({ type: 'text_delta', text: 'Done.' }),
+        sse({ type: 'done', stopReason: 'end_turn' }),
+      ],
+      confirmed,
+    );
+    // One card, settled.
+    expect(draft(finished).tools).toHaveLength(1);
+    expect(draft(finished).tools[0]).toMatchObject({ id: 'w1', status: 'success' });
+    // Exactly one tool_use block for w1 in the replay history.
+    const toolUses = finished.conversation.flatMap((m) =>
+      m.content.filter((b) => b.type === 'tool_use' && b.id === 'w1'),
+    );
+    expect(toolUses).toHaveLength(1);
+  });
+
   it('still parks correctly when a write tool_call did precede awaiting_confirmation (no duplicate card)', () => {
     const state = run([
       { type: 'user_send', id: 'm1', text: 'create PO' },

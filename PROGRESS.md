@@ -16,6 +16,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-03] ✨ **打磨:實機驗證第二輪的三個發現**。分支 `polish/assistant-live-findings`。側欄完整 HITL 已通(SO-000026 DRAFT 落庫、audit 6 筆 `ASSISTANT_TOOL_EXECUTED`、對帳 hero 仍綠),本輪收尾:
+  - **今天日期注入 system prompt**(`AgentLoopService`,附在穩定 prompt 尾端 → 快取一天只 re-key 一次):模型原本不知今日,SO-000026 的 orderDate 被幻覺成 2026-02-16。
+  - **prompt 加兩條規則**:write 就緒直接呼叫工具(不要文字要求「回覆確認」— 與內建確認卡打架,實測誤導使用者打字);回覆純文字禁 markdown(前端 verbatim 渲染,實測管線表格原樣顯示)。
+  - **工具卡 upsert 防重複**(reducer `tool_call` 分支):approve 續跑在同一 draft 上,後端 resume 會對同一 id 重發 tool_call → 原本盲目 append 造成雙卡,且 commit 游標會把重複 tool_use 推進 replay 歷史(下一輪就會被模型 API 拒收)。附回歸測試(單卡 + replay 恰一個 tool_use block)。
+  - **驗證**:後端 `mvnw verify` 全綠;前端 types / Vitest **158** / build / Playwright **13** 全綠。
 - [2026-07-03] 🐛 **修正:側欄 HITL 確認卡死鎖(實機驗證抓到;e2e fixture 與真後端事件序不符的假綠)**。分支 `fix/assistant-confirm-deadlock`。
   - **症狀**:write 提案後 UI 全鎖 — 輸入框因 `pending` 停用(by design),但確認/拒絕按鈕永遠不出現。
   - **根因**:確認按鈕渲染在「`tool.id`==pending id 的 ToolCard」上,而 ToolCard 條目只由 `tool_call` 事件建立;**真後端對 write 從不發 `tool_call`**(遇第一個 write 直接 `awaiting_confirmation` 斷流)→ 卡永不存在。e2e 綠是因為 fixture 自己多塞了一個 write `tool_call`(與 `AgentLoopService` 實際行為不符)。

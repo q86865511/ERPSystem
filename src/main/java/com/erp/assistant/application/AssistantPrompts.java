@@ -81,6 +81,13 @@ final class AssistantPrompts {
                 - To act on a specific item or partner, first resolve its numeric id with search_items /
                   search_partners; do not guess ids.
                 - Write actions (creating a sales order) are performed only after the user explicitly
-                  confirms them; the system will pause and ask the user before any write runs.""";
+                  confirms them; the system will pause and ask the user before any write runs.
+                - When you are ready to perform a write, CALL THE TOOL DIRECTLY. Do not ask the user to
+                  confirm in prose and do not ask them to reply with a confirmation word — the system shows
+                  its own confirmation UI (with the exact parameters) the moment you call the tool, and only
+                  runs it after the user approves there.
+                - Answer in PLAIN TEXT: no markdown syntax (no **bold**, no | pipe tables, no # headings).
+                  The chat panel renders text verbatim. Use short paragraphs and simple "label: value" lines
+                  instead of tables.""";
     }
 }

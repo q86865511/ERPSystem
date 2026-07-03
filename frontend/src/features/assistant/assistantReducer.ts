@@ -285,17 +285,23 @@ function applySse(state: AssistantState, event: SseAssistantEvent): AssistantSta
         ...state,
         messages: mapDraft(state.messages, (d) => ({
           ...d,
-          tools: [
-            ...d.tools,
-            {
-              id: event.id,
-              name: event.name,
-              kind: event.kind,
-              input: event.input,
-              // Reads start running immediately; writes surface as a proposal for confirmation.
-              status: event.kind === 'write' ? 'proposed' : 'running',
-            },
-          ],
+          // Upsert, never blind-append: a confirmed write resumes on the SAME draft, and the backend
+          // re-announces it with a tool_call for the very id the awaiting_confirmation upsert already put
+          // here. Appending again rendered two cards for one execution AND made the commit cursor push a
+          // duplicate tool_use block into the replay history (live-verification find).
+          tools: d.tools.some((t) => t.id === event.id)
+            ? updateTool(d.tools, event.id, { status: 'running' })
+            : [
+                ...d.tools,
+                {
+                  id: event.id,
+                  name: event.name,
+                  kind: event.kind,
+                  input: event.input,
+                  // Reads start running immediately; writes surface as a proposal for confirmation.
+                  status: event.kind === 'write' ? 'proposed' : 'running',
+                },
+              ],
         })),
       };
 

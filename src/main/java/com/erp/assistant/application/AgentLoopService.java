@@ -108,7 +108,11 @@ public class AgentLoopService {
         AnthropicPort resolved = port.orElseThrow(() ->
                 new IllegalStateException("ERP Copilot is disabled (app.assistant.enabled=false)"));
 
-        String systemPrompt = AssistantPrompts.forPreset(preset);
+        // The date is appended AFTER the stable prompt body so prompt caching only re-keys once a day.
+        // Without it the model guesses "today" from its training prior (live verification: a draft SO
+        // created with a hallucinated orderDate months in the past).
+        String systemPrompt = AssistantPrompts.forPreset(preset)
+                + "\n\nToday's date is " + java.time.LocalDate.now() + ".";
         List<com.anthropic.models.messages.Tool> tools = toolRegistry.toolsFor(auth);
         String actor = auth != null ? auth.getName() : "system";
         List<ChatModelRequest.ChatMessage> convo = new ArrayList<>(messages);
