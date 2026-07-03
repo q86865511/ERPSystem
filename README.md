@@ -72,7 +72,7 @@
 
 **「墨青帳房(Ink Ledger)」設計系統**(墨青主色 + 宣紙暖灰 + 朱印簽名章 + 襯線標題;含深色模式與手刻新手導覽):
 
-| 深色模式 | 新手導覽(13 步,涵蓋每個模組首頁) |
+| 深色模式 | 新手導覽(12 步,涵蓋每個模組首頁,依角色過濾) |
 |---|---|
 | <img src="docs/screenshots/10-dark-mode.png" alt="深色模式"> | <img src="docs/screenshots/11-onboarding-tour.png" alt="新手導覽"> |
 
@@ -204,7 +204,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 **設計系統(Blue Enterprise)**:自建的 Mantine theme —— 藍色企業主色(`#2563EB`)+ 冷 slate 中性色階 + 自託管 Plus Jakarta Sans;深/淺色模式右上角即時切換(預設跟隨系統,偏好存 localStorage)。元件層採 `theme.components` 全域覆寫(表格、卡片、輸入框等)加上共用元件(`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`KpiTile`/`DonutCard`/`AmountAllocationTable`/`EmptyState`/強化版 `PageHeader`)—— 隨模組實際採用而建,不預先造死碼。
 
-**新手導覽(手刻,無 tour 套件)**:~2.5KB 的 spotlight + callout 疊層,涵蓋登入頁示範帳號、對帳健康檢查、以及**每一個模組首頁**(共 13 步);以 `MutationObserver` 偵測目前頁面存在哪個目標元素,能跨頁自然接續(登入 → 儀表板 → 逐一模組),進度存 localStorage,可隨時從右上角使用者選單重新開始。
+**新手導覽(手刻,無 tour 套件)**:~2.5KB 的 spotlight + callout 疊層,涵蓋對帳健康檢查、側欄導覽、以及**每一個模組首頁**(ADMIN 共 12 步,依角色自動過濾稽核步);按「下一步」會**自動導航**到該步驟所在頁面,target 在 lazy chunk 掛載後由 `MutationObserver` 重新定位(不會因 Suspense 空窗跳步),fold 下方的目標會先捲動入鏡;進度存 localStorage,可隨時從右上角使用者選單重新開始。
 
 **可觀測性**:Micrometer 在 `/actuator/prometheus`(僅內部網路可達)暴露指標 —— 複用同一套 domain event 發業務 counter(過帳/登入/期間)+ 對帳健康 gauge,外加免費的 HTTP/JVM/連線池指標;結構化(ECS)JSON 日誌 + 每筆請求的關聯 ID。可選 `docker compose -f compose.demo.yaml -f compose.observability.yaml up` 起 Prometheus + Grafana(預載儀表板)。詳見 [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md)。
 

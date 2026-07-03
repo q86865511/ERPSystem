@@ -7,11 +7,6 @@ export const onboardingEn = {
       title: 'Welcome to Manufacturing ERP',
       description: 'This quick tour shows the key features. Restart anytime from the Help menu.',
     },
-    demoAccounts: {
-      title: 'Try Demo Accounts',
-      description:
-        'Sign in as admin / accountant / warehouse / sales (password = username), or browse as a read-only guest.',
-    },
     reconciliation: {
       title: 'Reconciliation Health Check',
       description: 'Shows whether the books balance. Check subledgers and clearing accounts before posting.',
@@ -39,10 +34,6 @@ export const onboardingZh: typeof onboardingEn = {
     loginWelcome: {
       title: '歡迎使用製造業 ERP',
       description: '這個快速導覽會介紹關鍵功能,隨時可從「說明」選單重新開始。',
-    },
-    demoAccounts: {
-      title: '試用示範帳號',
-      description: '以 admin / accountant / warehouse / sales 登入(密碼同帳號),或以唯讀訪客瀏覽。',
     },
     reconciliation: {
       title: '對帳健康檢查',

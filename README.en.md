@@ -87,7 +87,7 @@ zero after a complete cycle. This one report is the project's hero artifact.
 
 **The "Ink Ledger" design system** (deep-ink primary + warm paper neutrals + vermillion seal stamps + serif headings; includes dark mode and a hand-rolled onboarding tour):
 
-| Dark mode | Onboarding tour (13 steps, one per module landing page) |
+| Dark mode | Onboarding tour (12 steps, one per module landing page, role-filtered) |
 |---|---|
 | <img src="docs/screenshots/10-dark-mode.png" alt="Dark mode"> | <img src="docs/screenshots/11-onboarding-tour.png" alt="Onboarding tour"> |
 
@@ -311,10 +311,11 @@ plus shared components (`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`Kpi
 `EmptyState`/an enhanced `PageHeader`) — built as each module actually adopted them, not speculatively.
 
 **Onboarding tour (hand-rolled, no tour library)**: a ~2.5KB spotlight-and-callout overlay covering the
-login page's demo accounts, the reconciliation health-check, and **every module's landing page** (13 steps
-total). A `MutationObserver` detects which target element is present on the current page, so the tour
-continues naturally across navigation (login → dashboard → each module); progress persists to localStorage
-and can be restarted anytime from the user menu.
+reconciliation health-check, the sidebar nav, and **every module's landing page** (12 steps for ADMIN,
+role-filtered automatically). "Next" **auto-navigates** to the page each step lives on; a `MutationObserver`
+re-locates the target once the lazy chunk mounts (so a Suspense gap never skips a step), and below-the-fold
+targets are scrolled into view first. Progress persists to localStorage and the tour can be restarted
+anytime from the user menu.
 
 **Observability**: Micrometer exposes metrics at `/actuator/prometheus` (reachable only on the internal
 network) — business counters derived from the same domain events (postings/logins/period changes) plus a

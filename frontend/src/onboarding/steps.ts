@@ -1,4 +1,5 @@
 import type { TranslationKey } from '../i18n';
+import type { Role } from '../auth/roles';
 
 export interface OnboardingStep {
   id: string;
@@ -8,12 +9,19 @@ export interface OnboardingStep {
   descriptionKey: TranslationKey;
   actionKey?: TranslationKey;
   position?: 'top' | 'bottom' | 'left' | 'right';
+  /** Route on which this step's target lives; the overlay navigates here before showing the step. Omit for
+   *  steps whose target exists on every authenticated page (e.g. the header) or that have no target at all. */
+  route?: string;
+  /** Only show this step to users holding this role; other users skip it and the total step count drops. */
+  requiredRole?: Role;
 }
 
 /**
- * Route-aware by construction: each step (after the centered welcome) targets an element that only
- * exists on one page. `OnboardingTourOverlay` silently fast-forwards past any step whose target isn't
- * in the current page's DOM, so the tour naturally continues as the user moves from login → dashboard.
+ * Route-aware by construction: each targeted step declares the `route` its target lives on.
+ * `OnboardingTourOverlay` navigates to that route before showing the step (so cross-module steps are reached
+ * instead of silently skipped) and only fast-forwards past a step when we're already on its route but the
+ * target is genuinely absent. `useOnboardingTour` filters out `requiredRole` steps the current user can't
+ * reach, so the total count and step numbering stay continuous per role.
  */
 export const ONBOARDING_STEPS: OnboardingStep[] = [
   {
@@ -22,18 +30,12 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     descriptionKey: 'onboarding.steps.loginWelcome.description',
   },
   {
-    id: 'login-demo-accounts',
-    targetSelector: '[data-onboarding="demo-accounts"]',
-    titleKey: 'onboarding.steps.demoAccounts.title',
-    descriptionKey: 'onboarding.steps.demoAccounts.description',
-    position: 'top',
-  },
-  {
     id: 'dashboard-reconciliation',
     targetSelector: '[data-onboarding="reconciliation-hero"]',
     titleKey: 'onboarding.steps.reconciliation.title',
     descriptionKey: 'onboarding.steps.reconciliation.description',
     position: 'bottom',
+    route: '/',
   },
   {
     id: 'nav-modules',
@@ -42,6 +44,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     descriptionKey: 'onboarding.steps.navModules.description',
     actionKey: 'onboarding.steps.navModules.tryIt',
     position: 'right',
+    route: '/',
   },
   // One step per module landing page (its `PageHeader`, or — for Audit, which has no PageHeader — its
   // title block). Title/description reuse each module's own nav label + subtitle strings verbatim, so
@@ -53,6 +56,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     titleKey: 'nav.purchasing',
     descriptionKey: 'purchasing.subtitle',
     position: 'right',
+    route: '/purchasing',
   },
   {
     id: 'module-inventory',
@@ -60,6 +64,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     titleKey: 'nav.inventory',
     descriptionKey: 'inventory.subtitle',
     position: 'right',
+    route: '/inventory',
   },
   {
     id: 'module-manufacturing',
@@ -67,6 +72,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     titleKey: 'nav.manufacturing',
     descriptionKey: 'manufacturing.page.subtitle',
     position: 'right',
+    route: '/manufacturing',
   },
   {
     id: 'module-sales',
@@ -74,6 +80,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     titleKey: 'nav.sales',
     descriptionKey: 'sales.subtitle',
     position: 'right',
+    route: '/sales',
   },
   {
     id: 'module-masterdata',
@@ -81,6 +88,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     titleKey: 'nav.masterData',
     descriptionKey: 'masterdata.subtitle',
     position: 'right',
+    route: '/masterdata',
   },
   {
     id: 'module-reporting',
@@ -88,6 +96,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     titleKey: 'nav.reporting',
     descriptionKey: 'reporting.subtitle',
     position: 'right',
+    route: '/reporting',
   },
   {
     id: 'module-ledger',
@@ -95,6 +104,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     titleKey: 'nav.ledger',
     descriptionKey: 'ledger.page.subtitle',
     position: 'right',
+    route: '/ledger',
   },
   {
     id: 'module-audit',
@@ -102,6 +112,8 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     titleKey: 'nav.audit',
     descriptionKey: 'audit.subtitle',
     position: 'right',
+    route: '/audit',
+    requiredRole: 'ADMIN',
   },
   {
     id: 'header-toggles',
