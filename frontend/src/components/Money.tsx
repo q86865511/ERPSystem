@@ -39,9 +39,16 @@ export function sumMoney(values: Array<string | undefined>): string {
   return `${negative ? '-' : ''}${intPart}.${fracPart}`;
 }
 
+/**
+ * Ink Ledger drops the monospace font for money (design.md §3): the body sans, Plus Jakarta Sans, ships
+ * an OpenType `tnum` (tabular figures) feature — verified via fontTools against the self-hosted woff2,
+ * every digit's `.tf` variant is a uniform 600 units wide vs. 371–732 for the proportional default — so
+ * `font-variant-numeric: tabular-nums` alone gives equal-width digits without switching type families.
+ * Monospace is reserved for unit/reference codes only (design.md §3), not amounts.
+ */
 export function MoneyText({ value }: { value: string | number | null | undefined }) {
   return (
-    <Text component="span" ff="monospace">
+    <Text component="span" style={{ fontVariantNumeric: 'tabular-nums' }}>
       {formatMoney(value)}
     </Text>
   );
