@@ -1,8 +1,29 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders, screen, userEvent } from '../test/test-utils';
 import { loadOnboardingState, saveOnboardingState } from './onboardingPreference';
 import { OnboardingTourProvider, useOnboardingTour } from './useOnboardingTour';
 import { ONBOARDING_STEPS } from './steps';
+
+// useOnboardingTour now RBAC-filters the step list via useAuth. Mock it so each test pins the roles it
+// needs; hasRole is re-created per render from the mocked roles. Default: ADMIN (sees every step).
+const authRoles = { current: ['ADMIN'] as string[] };
+vi.mock('../auth/useAuth', () => ({
+  useAuth: () => ({
+    user: { username: 'admin', roles: authRoles.current },
+    bootstrapping: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+    hasRole: (role: string) => authRoles.current.includes(role),
+    canDo: () => true,
+  }),
+}));
+
+// The overlay pulls in react-router navigation + DOM measurement that this provider-level test doesn't
+// exercise; stub it so we isolate the step-model / RBAC logic.
+vi.mock('./OnboardingTourOverlay', () => ({ OnboardingTourOverlay: () => null }));
+
+const ADMIN_STEP_COUNT = ONBOARDING_STEPS.length;
+const NON_ADMIN_STEP_COUNT = ONBOARDING_STEPS.filter((s) => !s.requiredRole).length;
 
 function Harness() {
   const tour = useOnboardingTour();
@@ -10,6 +31,7 @@ function Harness() {
     <div>
       <span data-testid="step">{tour.stepIndex}</span>
       <span data-testid="active">{String(tour.active)}</span>
+      <span data-testid="total">{tour.totalSteps}</span>
       <button onClick={tour.next}>next</button>
       <button onClick={tour.previous}>previous</button>
       <button onClick={tour.skip}>skip</button>
@@ -29,6 +51,7 @@ function renderHarness() {
 describe('OnboardingTourProvider', () => {
   beforeEach(() => {
     localStorage.clear();
+    authRoles.current = ['ADMIN'];
   });
 
   it('starts active at step 0 when nothing is persisted', () => {
@@ -60,7 +83,7 @@ describe('OnboardingTourProvider', () => {
   });
 
   it('next() past the last step marks the tour completed', async () => {
-    saveOnboardingState({ completed: false, currentStep: ONBOARDING_STEPS.length - 1 });
+    saveOnboardingState({ completed: false, currentStep: ADMIN_STEP_COUNT - 1 });
     renderHarness();
     expect(screen.getByTestId('active')).toHaveTextContent('true');
     await userEvent.click(screen.getByRole('button', { name: 'next' }));
@@ -85,5 +108,28 @@ describe('OnboardingTourProvider', () => {
     expect(screen.getByTestId('step')).toHaveTextContent('0');
     expect(screen.getByTestId('active')).toHaveTextContent('true');
     expect(loadOnboardingState()).toBeNull();
+  });
+
+  describe('RBAC filtering', () => {
+    it('an ADMIN sees every step', () => {
+      authRoles.current = ['ADMIN'];
+      renderHarness();
+      expect(screen.getByTestId('total')).toHaveTextContent(String(ADMIN_STEP_COUNT));
+    });
+
+    it('a non-ADMIN loses exactly the ADMIN-only step(s) from the total', () => {
+      authRoles.current = ['ACCOUNTANT'];
+      renderHarness();
+      expect(screen.getByTestId('total')).toHaveTextContent(String(NON_ADMIN_STEP_COUNT));
+      expect(NON_ADMIN_STEP_COUNT).toBe(ADMIN_STEP_COUNT - 1);
+    });
+
+    it('clamps a persisted index that now points past the shorter non-ADMIN list', () => {
+      // Persisted on the last ADMIN step; a non-ADMIN's list is one shorter, so the index must clamp.
+      saveOnboardingState({ completed: false, currentStep: ADMIN_STEP_COUNT - 1 });
+      authRoles.current = ['ACCOUNTANT'];
+      renderHarness();
+      expect(screen.getByTestId('step')).toHaveTextContent(String(NON_ADMIN_STEP_COUNT - 1));
+    });
   });
 });

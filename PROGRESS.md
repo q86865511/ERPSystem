@@ -1,7 +1,7 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
-**🖋️「墨青帳房(Ink Ledger)」前端全面改版完成,待 push/PR(2026-07-03,分支 `feat/ink-ledger-theme`,6 commits)** —— 以 `frontend/design.md` 為唯一美術依據,Blue Enterprise → 墨青帳房:ink/seal/paperGray 三 ramp、Noto Serif TC 自架 216 分片(零 CDN)、側欄固定深墨青、簽名元件 `SealBadge` 朱印章(含蓋章動效/reduced-motion/列表精簡章/非 CJK 矩形章)、圖表收斂八色文化 palette、`contrast.test.ts` 52 條 AA 對比斷言。/pipeline 流程:implementer+2×architect 分層派工、Opus+Codex 雙審 8 條發現(4 成立已修、2 誤報、2 依裁決不動)、design.md 三處自相矛盾以實測數據修訂並註記。build/types/**239 tests** 全綠;23 張截圖(8 主頁 light+dark、AI 側欄、zh 朱印)重製並目檢。
+**🖋️「墨青帳房(Ink Ledger)」前端全面改版已 merge(PR #112,2026-07-03);新手導覽修正在分支 `fix/onboarding-tour` 待 push/PR** —— 以 `frontend/design.md` 為唯一美術依據,Blue Enterprise → 墨青帳房:ink/seal/paperGray 三 ramp、Noto Serif TC 自架 216 分片(零 CDN)、側欄固定深墨青、簽名元件 `SealBadge` 朱印章(含蓋章動效/reduced-motion/列表精簡章/非 CJK 矩形章)、圖表收斂八色文化 palette、`contrast.test.ts` 52 條 AA 對比斷言。/pipeline 流程:implementer+2×architect 分層派工、Opus+Codex 雙審 8 條發現(4 成立已修、2 誤報、2 依裁決不動)、design.md 三處自相矛盾以實測數據修訂並註記。build/types/**239 tests** 全綠;23 張截圖(8 主頁 light+dark、AI 側欄、zh 朱印)重製並目檢。
 
 **🤖 ERP Copilot(AI/LLM 整合)全數交付且實機驗證通過(2026-07-03,PR #100–#110)** —— 平台定位轉「技術實驗場」後的第一個實驗:Claude 驅動的 AI 助手側欄(SSE 串流、12 工具、**寫入人工確認 HITL**、audit、限流)、「為什麼」歸因分析(對帳紅燈診斷/毛利環比,agent 自己鑽報表)、MCP server(Claude Desktop/Code 直連 ERP)。核心安全設計:工具以使用者自己的 JWT 回打自家 REST(RBAC/驗證/審計全重用),**AI 動了帳之後對帳 hero 仍全綠(IT + 實機皆驗)**。每個 PR 皆經 Opus+Codex 雙審全修。預設關閉(`APP_ASSISTANT_ENABLED` + `ANTHROPIC_API_KEY` 啟用);線上 demo 未開。整體計劃 `~/.claude/plans/ui-woolly-finch.md`。
 **✅ 實機驗證完成(本機 compose 帶 key)**:MCP 經 Claude Code 查詢 + 開單(SO-000025);側欄完整 HITL 開單(SO-000026 DRAFT)、audit 6 筆 `ASSISTANT_TOOL_EXECUTED`、對帳 hero 全程綠、preset 分析可用。實機另抓到 3 個「CI 綠但實際壞」的潛藏 bug 並修(#108 flag 條件自我否決 + 雙建構子、#109 確認卡死鎖、#110 日期注入/prompt/工具卡防重複),各補回歸測試;#107 還原平行 session 誤刪的 design.md。
@@ -19,6 +19,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-03] 🐛 **修正:新手導覽只顯示步驟 1、4、13(/pipeline)**。分支 `feat/ink-ledger-theme`。
+  - **根因(非墨青改版迴歸,main 上行為相同)**:(1) 步驟 2 的 target 只在登入頁,但 tour 依 ERP-017 只掛在登入後 shell → 死步驟;(2) 對帳 hero 在儀表板 fold 下,無 scrollIntoView,callout 定位在視窗外,且 `locate()` 快轉會持久化、跳過不可逆;(3) 步驟 5–12 的 target 分散八個模組頁,`locate()` 靜默跳過不在當前頁的步驟,而步驟 13 的 target 每頁都有 → 按「下一步」直接吞到 13。
+  - **修法(使用者裁決:下一步自動導航)**:steps 加 `route`/`requiredRole` 欄位、刪死步驟與 i18n 文案;Provider 以 `hasRole` 過濾可達步驟(非 ADMIN 自動少 audit 步、編號連續);overlay 改「route 不符 → navigate 過去等待;route 符合但 target 未 mount(lazy Suspense 空窗)→ 等 MutationObserver,**只有無 route 步驟可快轉**」;target 不在視窗先 `scrollIntoView` 再讀 rect;callout clamp 進視窗。
+  - **雙審(Opus reviewer + Codex MCP)7 條發現**:裁決 3 修(lazy 競態乒乓〔Codex 高,實讀碼確認成立〕、next/previous 未用 clamp 基準、LoginPage 孤兒屬性)+ 補 provider+overlay 整合測試(手控 `React.lazy` promise 模擬 Suspense 空窗);2 接受(估算高度 200px、scroll 重入抖動);1 記錄為已知限制(mobile 收合 navbar);另排除 3 條誤報(navigate 無限迴圈、RequireRole 重導、guest 路徑)。
+  - **驗證**:Vitest **246**(+7)全綠、`tsc -b`、`npm run build` 綠。
 - [2026-07-03] 🖋️ **「墨青帳房」前端視覺全面改版(/pipeline 多模型協作)**。分支 `feat/ink-ledger-theme`(自 main,6 commits)。
   - **Phase A tokens(implementer)**:`theme.ts` brand ramp 整組換墨青 ink 十階(名字保留 `brand`,零改名)+ 新增 `seal` + gray 換暖石灰;primaryShade `{light:8, dark:4}`;radius/shadows 調輕、headings serif(h1–h4,h5/h6 css 覆寫回無襯線);`index.css` 表面/語意/圖表變數 + table/sidebar per-scheme 變數;**Noto Serif TC 600/700 共 216 分片自架**(`fetch-noto-serif-tc.mjs`,比照 PJS 模式零 runtime CDN);`MoneyText` monospace→tabular-nums(先以 fontTools 驗證 PJS 有 `tnum` 才動手);新增 **`contrast.test.ts`** 把 WCAG AA 硬約束變單元測試。
   - **B1 側欄深墨青(architect)**:navbar 固定 `#123F3C`/dark `#0F332F` 不隨模式翻轉;NavLink 深底配色鎖在 `.navbar` scope(Mantine `--nl-*`),青瓷 active 左條、wash hover、深底捲軸。
@@ -503,6 +508,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 - ~~README CI badge 佔位~~(已解決:指向 `q86865511/ERPSystem`,main CI 綠)。
 - **沙箱限制**:本機沙箱/VM 擋 Tomcat loopback,無法在此跑真實 web server / Vite dev server;故 spec 以 MockMvc 匯出、前端以 `vite build` 驗證,實機驗證改在 **Oracle**(`ssh oracle`)上跑 Docker demo。
 - **前端小限制(可補可不補)**:庫存調整無歷史列表(後端無 adjustments list 端點);手動分錄科目選單取自試算表(空帳本無選項);期間關閉 `yearCode` 需手填;文件詳情點 `journalEntryId` 是導到該科目總帳鑽取的近似(無 by-entry 取整張分錄端點);主檔只有建立 + 列表,無編輯/刪除;列表端點無分頁(demo 規模夠用)。
+- **新手導覽 mobile 限制(2026-07-03 雙審發現,裁決記錄不修)**:手機寬度下 AppShell navbar 以 transform 收合但不 unmount,「瀏覽各模組」步驟的 target 找得到卻在畫面外,scrollIntoView 救不回,聚光燈會框到空處;桌機正常。若要修需把 navbar 開合狀態接進 tour 在該步自動展開。
 
 ## 重要決策紀錄
 - **建置策略=從零自建**:作品集價值在於展示自己的架構與 ERP 領域素養,而非 Odoo/Frappe 設定。

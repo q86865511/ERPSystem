@@ -85,7 +85,7 @@ export function LoginPage() {
             </Stack>
           </form>
 
-          <Stack gap="md" data-onboarding="demo-accounts">
+          <Stack gap="md">
             <Divider label={t('login.demoAccounts')} labelPosition="center" />
             <Button variant="light" disabled={loading} onClick={() => submit('guest', 'guest')}>
               {t('login.guestEntry')}
