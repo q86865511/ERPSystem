@@ -126,6 +126,14 @@ zero after a complete cycle. This one report is the project's hero artifact.
   multiple agents and delivered stage by stage.
 - **Interactive API docs**: Swagger UI (`/swagger-ui.html`) + OpenAPI 3.1 spec (`/v3/api-docs`),
   Authorize-and-try right inside the demo.
+- **ERP Copilot (AI assistant)**: a built-in Claude-powered sidebar — query inventory/AR/KPIs in natural
+  language, draft sales orders (**every write requires explicit human confirmation**), and run root-cause
+  analyses (reconciliation diagnosis, margin variance) where the agent drills into reports for evidence.
+  Tools call back into the app's own REST API **with the user's own JWT** (RBAC/validation/audit fully
+  reused); AI actions land in the append-only audit log, and the books still balance afterwards (provable
+  via the reconciliation hero). A standalone **MCP server** (`mcp-server/`) lets Claude Desktop / Claude
+  Code operate the ERP directly. Off by default — enable with `APP_ASSISTANT_ENABLED=true` +
+  `ANTHROPIC_API_KEY`.
 
 ## 🚀 Quick start
 
@@ -194,6 +202,7 @@ an nginx container that reverse-proxies to the backend on a single origin.
 | `reporting` | Read-side financial statements + reconciliation health-check + finance analytics (trends/cash-flow/budget) | — |
 | `hr` | Employees, departments, positions + attendance / leave / timesheets + payroll posting (HR) | `HrQuery` |
 | `iam` | Authentication & role-based authorization | — |
+| `assistant` | ERP Copilot: Claude agent loop, tool surface (from `assistant/tools.json`), HITL write confirmation, SSE chat | `AssistantToolExecutedEvent` (for audit) |
 
 | Layer | Choice |
 |---|---|
@@ -251,6 +260,22 @@ number → load detail → confirm.
 an append-only `audit_log` (domain events + an `AFTER_COMMIT` listener, so only committed actions are
 recorded; a DB trigger blocks update/delete). ADMIN users browse the "Audit Trail" page, filterable by event
 type and actor.
+
+**ERP Copilot (AI assistant, feature-flagged)**: the ✨ icon in the header opens the assistant sidebar (only
+rendered when enabled). Streaming SSE replies; 12 tools (inventory / partners / AR aging / KPIs /
+reconciliation health / income statement / GL drill-down / revenue trend / cash flow / budget variance +
+draft-SO creation) defined in a single manifest (`src/main/resources/assistant/tools.json`); **writes pause
+on a confirmation card and only run after the user approves** (stateless break/resume design); two one-click
+analysis presets (reconciliation diagnosis, margin variance). Security posture: tools call the app's own
+REST API with the caller's own JWT (privilege ceiling = the user themselves), guests get no write tools,
+per-user rate limiting (30/hour + one concurrent stream), AI actions are audit-logged, and the API key
+lives only in a backend environment variable. Enable by placing `APP_ASSISTANT_ENABLED=true` and
+`ANTHROPIC_API_KEY=sk-ant-...` in a `.env` next to the compose file.
+
+**MCP server (direct Claude Desktop / Claude Code access)**: `mcp-server/` is a standalone TypeScript stdio
+MCP server that reads the same tool manifest, logs into the ERP with env credentials, and exposes the 12
+tools to any MCP client (write confirmation is delegated to the client's native UX). Setup examples in
+[mcp-server/README.md](mcp-server/README.md).
 
 > 🔵 **"Blue Enterprise" redesign (Phase 1 shipped)**: the frontend has moved from Warm Terracotta to a
 > blue enterprise-SaaS look (primary `#2563EB` + a cool slate neutral scale) and is deployed — **the
@@ -388,4 +413,5 @@ The senior-signal decisions, each written up under [docs/adr/](docs/adr/):
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Deployment: local one-command demo + cloud subdomain (Cloudflare Tunnel + Caddy) |
 | [compose.demo.yaml](compose.demo.yaml) | One-command demo (postgres + backend + frontend) |
 | [frontend/](frontend/) | React frontend (standalone Vite project) |
+| [mcp-server/README.md](mcp-server/README.md) | MCP server (wiring Claude Desktop / Claude Code to the ERP) |
 | [README.md](README.md) | 繁體中文版 |

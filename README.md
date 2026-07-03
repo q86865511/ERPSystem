@@ -89,6 +89,7 @@
 - **一行容器化 demo**:獨立 nginx 容器以**單一 origin 反向代理** `/api` 到後端(免 CORS),`compose.demo.yaml` 一鍵起 postgres + 自動 seed 的後端 + 前端。
 - **以多代理工作流設計**:系統設計採「6 維度設計 → 整合 → 對抗式審查」的多代理流程定案;前端 8 階段亦以多代理設計後逐階交付。
 - **互動式 API 文件**:Swagger UI(`/swagger-ui.html`)+ OpenAPI 3.1 spec(`/v3/api-docs`),demo 內可直接 Authorize 試打。
+- **ERP Copilot(AI 助手)**:內建 Claude 驅動的助手側欄 —— 自然語言查庫存/AR/KPI、開銷售單草稿(**寫入一律人工確認**,human-in-the-loop)、對帳紅燈診斷與毛利環比歸因(agent 自己鑽取報表當證據);工具執行**以使用者自己的 JWT 回打自家 REST**(RBAC/驗證/審計全重用),AI 動作進 append-only audit_log,做完帳仍然是平的(對帳 hero 可驗證)。另附 **MCP server**(`mcp-server/`),讓 Claude Desktop / Claude Code 直接操作 ERP。預設關閉,設 `APP_ASSISTANT_ENABLED=true` + `ANTHROPIC_API_KEY` 啟用。
 
 ## 🚀 快速開始
 
@@ -141,6 +142,7 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 | `reporting` | read-side 財務報表 + 對帳健康檢查 + 財會分析(趨勢/現金流/預算) | — |
 | `hr` | 員工/部門/職位主檔 + 考勤/請假/工時 + 薪資過帳(HR) | `HrQuery` |
 | `iam` | 認證與角色授權 | — |
+| `assistant` | ERP Copilot:Claude agent loop、工具面(讀 `assistant/tools.json`)、HITL 寫入確認、SSE 聊天 | `AssistantToolExecutedEvent`(供 audit) |
 
 | 層面 | 選型 |
 |---|---|
@@ -180,6 +182,10 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 **分錄沖正(correcting entries)**:不可變帳本的更正以「沖正分錄」為之 —— 對手動分錄一鍵產生一張逐行借↔貸對調的鏡像分錄(原分錄永不編輯,雙方維持 POSTED、互相連結、淨額歸零)。只限手動分錄(子帳來源分錄須經其來源模組沖正,以維持子帳==GL)。Ledger 頁「沖正」分頁:輸入分錄號 → 載入明細 → 確認。
 
 **審計軌跡(ADMIN-only)**:過帳、期間關閉/重開、登入成功/失敗都會寫入 append-only 的 `audit_log`(domain event + `AFTER_COMMIT` 監聽,只記真正 committed 的動作;DB trigger 擋改/刪)。ADMIN 角色可在「審計軌跡」頁依事件類型 / 操作者篩選檢視。
+
+**ERP Copilot(AI 助手,feature flag)**:header 的 ✨ 圖示開啟助手側欄(啟用時才顯示)。SSE 串流回覆;12 個工具(庫存/夥伴/AR 帳齡/KPI/對帳健康/損益/總帳鑽取/營收趨勢/現金流/預算差異 + 開 SO 草稿)定義於 `src/main/resources/assistant/tools.json` 單一 manifest;**寫入動作以確認卡暫停,使用者按下確認才執行**(後端無狀態斷流/續跑設計);兩個 preset 分析(對帳紅燈診斷、毛利環比歸因)一鍵觸發。安全設計:工具以使用者自己的 JWT 回打自家 REST(權限上限=本人)、guest 無寫入工具、每人限流(30 次/小時 + 單一並發 stream)、AI 動作進 audit_log、API key 只存在後端環境變數。啟用方式:compose 同目錄放 `.env` 寫入 `APP_ASSISTANT_ENABLED=true` 與 `ANTHROPIC_API_KEY=sk-ant-...` 再 `up`。
+
+**MCP server(Claude Desktop / Claude Code 直連)**:`mcp-server/` 是獨立 TypeScript stdio MCP server,讀同一份工具 manifest,以 env 帳密登入 ERP 後把 12 個工具暴露給任何 MCP client(寫入確認交給 client 原生 UX)。設定範例見 [mcp-server/README.md](mcp-server/README.md)。
 
 > 🔵 **「Blue Enterprise」重設計(Phase 1 已上線)**:前端已由 Warm Terracotta 換為藍色企業 SaaS 風(主色 `#2563EB` + 冷 slate 中性色)並部署上線,**本頁截圖皆為藍色版**。四張 `@mantine/charts` 資料儀表板(ERP 總覽 / 財務中心 / 庫存 / 生產)已接真實端點;財會分析(營收趨勢 / 現金流 / 預算差異 / KPI 環比,C1)、逐品項熱度 treemap(C2)、供應商準時率(C3)、工單 Gantt(C4)、OEE / 設備(C5)**全部接真實後端 —— 已無 PLANNED 佔位**。
 
@@ -268,4 +274,5 @@ cd frontend && npm run build      # tsc -b && vite build
 | [docs/DEPLOY.md](docs/DEPLOY.md) | 部署:本機一鍵 demo + 雲端子網域(Cloudflare Tunnel + Caddy) |
 | [compose.demo.yaml](compose.demo.yaml) | 一鍵 demo(postgres + 後端 + 前端) |
 | [frontend/](frontend/) | React 前端(獨立 Vite 專案) |
+| [mcp-server/README.md](mcp-server/README.md) | MCP server(Claude Desktop / Claude Code 接 ERP 的設定) |
 | [README.en.md](README.en.md) | English version |
