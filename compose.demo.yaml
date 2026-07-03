@@ -38,6 +38,12 @@ services:
       # The app does not manage its own postgres here; we wire the datasource explicitly. Without this
       # spring-boot-docker-compose would try to start a compose file inside the container and fail.
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
+      # ERP Copilot (AI assistant) — off by default. To enable, put both lines in a .env file next to
+      # this compose file (compose auto-loads it; NEVER commit the key):
+      #   APP_ASSISTANT_ENABLED=true
+      #   ANTHROPIC_API_KEY=sk-ant-...
+      APP_ASSISTANT_ENABLED: ${APP_ASSISTANT_ENABLED:-false}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     depends_on:
       postgres:
         condition: service_healthy
