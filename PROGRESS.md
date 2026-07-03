@@ -14,6 +14,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-03] 🔌 **ERP Copilot PR5:MCP server(TypeScript stdio)**。分支 `feat/assistant-pr5-mcp-server`。新目錄 `mcp-server/`(獨立 npm 套件,不掛 frontend build)。
+  - **stdio MCP server**(官方 `@modelcontextprotocol/sdk`):工具讀單一事實來源 `src/main/resources/assistant/tools.json`(路徑:dist 相對回 repo 根;`ERP_TOOLS_MANIFEST` 可覆寫);ListTools 依 kind 衍生 annotations(read=readOnlyHint、write=+idempotentHint:false);CallTool 依後端同套映射規則組 HTTP(path var 拒 dot-segment、GET query scalar 守衛 + encodeURIComponent)。`erpClient`:env 帳密 login(`LoginRequest{username,password}`→`accessToken`)、single-flight、401 重登重試一次、problem+json 原樣帶回。write 確認交給 MCP client 原生 UX。stdout 全乾淨(JSON-RPC 通道)。
+  - **雙審修正(Opus+Codex,8 項全修)**:🔴 **Windows isMain bug**(手組 `file://` 少斜線 → `node dist/index.js` 起不來,正是 README 的 Claude Desktop 用法;POSIX 巧合讓 CI 測不到)→ `pathToFileURL`;parity 測試去硬編(7→`>=7`,**PR4 擴到 12 工具後仍綠 — 實測驗證**);single-flight login;path/scalar 防禦;annotations 補 idempotentHint;README 描述對齊實作;manifest 缺檔友善錯誤。
+  - **npm 踩坑紀錄**:初版 `@types/node@^24.15.0` 不存在(ETARGET),npm 無 `--legacy-peer-deps` 時**無聲卡死**數十分鐘(5 個並發 install 全掛),加該 flag 才吐出真錯誤 → 改 `^26.0.0` 後 3 秒裝完。
+  - **驗證**:`npm run build` tsc 乾淨;vitest **29 tests 全綠**(401 重登/併發 single-flight/query 編碼/path 防禦/manifest 三種壞檔 fixture/unknown tool);CI 加 `mcp-server` job(node 22,npm ci→build→test,與 frontend job 同慣例);`.gitignore` 排除 node_modules/dist。實機接 Claude Desktop 的驗證列入 PR6。
 - [2026-07-03] 📈 **ERP Copilot PR4:「為什麼」歸因分析(preset + 第二批 reporting 工具)**。分支 `feat/assistant-pr4-analysis`。
   - **5 個新 read 工具**(tools.json → 12 工具,逐一對照 controller 簽章):`get_income_statement`(asOf)、`get_general_ledger`(`{accountCode}` path var + asOf)、`get_revenue_trend`/`get_cash_flow`(months 1–36 + asOf)、`get_budget_variance`(year/month 1–12 + asOf);schema 帶 minimum/maximum/format:date/pattern(ToolRegistry 逐屬性透傳)。
   - **preset 分析模式**:`ChatRequest.preset`(@Pattern reconciliation|margin,null→GENERAL)→ `AssistantPrompts` 常數類(共用 base 安全規則);reconciliation playbook(健康檢查→同回合平行鑽取問題科目 GL)、margin playbook(兩期損益+趨勢拆量價)。前端空對話 preset chips(Button,a11y)→ 同對話沿用 preset(reducer state,resume 也帶);chips 在 error+空對話仍可重試。

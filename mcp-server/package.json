@@ -1,0 +1,27 @@
+{
+  "name": "erp-mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Standalone MCP (Model Context Protocol) stdio server exposing ERP Copilot tools to MCP clients such as Claude Desktop and Claude Code.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "erp-mcp-server": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "start": "node dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.9"
+  }
+}

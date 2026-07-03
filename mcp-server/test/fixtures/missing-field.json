@@ -1,0 +1,11 @@
+{
+  "tools": [
+    {
+      "name": "no_description",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/a",
+      "input_schema": { "type": "object", "properties": {}, "required": [] }
+    }
+  ]
+}
