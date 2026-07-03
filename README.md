@@ -109,6 +109,15 @@ docker compose -f compose.demo.yaml up --build
 
 > 想要全新一份資料時:`docker compose -f compose.demo.yaml down -v` 清掉 volume 再 `up`。
 
+**啟用 ERP Copilot(AI 助手,可選)**:預設關閉。在 `compose.demo.yaml` 同目錄放一個 `.env`(不會進 git):
+
+```bash
+APP_ASSISTANT_ENABLED=true
+ANTHROPIC_API_KEY=sk-ant-...   # 你的 Anthropic API key,只存在後端
+```
+
+`up` 後以角色帳號(如 `sales`)登入,header 右上會多一個 ✨ 圖示開啟助手側欄。開單等寫入動作會先跳確認卡、按下才執行,且寫入後對帳 hero 仍全綠。MCP server(讓 Claude Desktop / Claude Code 直連 ERP)設定見 [mcp-server/README.md](mcp-server/README.md)。
+
 ### 本機開發
 
 ```bash
