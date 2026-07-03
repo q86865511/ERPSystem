@@ -332,7 +332,6 @@ export function AppLayout() {
                     label={t(item.labelKey)}
                     leftSection={<Icon size={18} />}
                     active={active}
-                    variant="subtle"
                     onClick={() => {
                       setOpenSections((s) => ({ ...s, [item.to]: true }));
                       close();

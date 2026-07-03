@@ -22,35 +22,49 @@
 
 /* Deep-ink sidebar surface (design.md §2.4/§5). This class scopes ALL the dark-surface nav coloring to the
    navbar so it can never leak onto a NavLink rendered elsewhere in the app — the global NavLink theme
-   override (theme.ts) keeps only the color-agnostic active left-bar. The `--nl-*` vars are Mantine's own
-   NavLink CSS variables (--nl-bg / --nl-color / --nl-hover), so every NavLink inside here — parents,
-   children, single items — is recolored from one place without per-instance props. All values key off the
-   scheme-independent --app-sidebar-* tokens in index.css (single source; contrast.test.ts asserts them). */
+   override (theme.ts) keeps only the color-agnostic active left-bar. All values key off the
+   scheme-independent --app-sidebar-* tokens in index.css (single source; contrast.test.ts asserts them).
+
+   Mechanism note (the axe CI gate caught the first attempt): Mantine's NavLink declares --nl-bg/--nl-color/
+   --nl-hover ON ITS OWN ROOT (an element's own custom-property declaration beats any inherited value, so
+   setting them on this ancestor never lands), and its core CSS only *reads* --nl-color/--nl-bg inside the
+   [data-active] rule anyway — inactive links just inherit text color (black in light mode → 1.8:1 on ink)
+   and get a hardcoded gray-0/dark-6 hover. So: inactive states are recolored with plain color/background
+   declarations below (higher specificity than Mantine's :where()-wrapped rules), and only the active state
+   drives the --nl-* vars — targeted at the root itself, where they do win. */
 .navbar {
-  /* Inactive nav item: dim ink-tinted label on the deep surface, transparent bg. */
-  --nl-color: var(--app-sidebar-fg-inactive);
-  --nl-bg: transparent;
-  /* Hover on the ink surface: the stock gray-0/dark-6 hovers are unusable on deep ink, so we use a weak
-     ink-3 wash (one step under the active wash). The label brightening to the full fg tone is handled per
-     hit-area below (Mantine has no --nl var for hover *color*, only hover bg). */
-  --nl-hover: var(--app-sidebar-hover-wash);
+  /* Fallback inheritance for any non-NavLink text on the ink surface. */
+  color: var(--app-sidebar-fg);
+}
+
+/* Inactive nav item: dim ink-tinted label on the deep surface (explicit color — inactive NavLinks never
+   read --nl-color, see the mechanism note above). */
+.navbar :global(.mantine-NavLink-root):not([data-active]) {
+  color: var(--app-sidebar-fg-inactive);
+}
+
+/* Hover on the ink surface: Mantine hardcodes gray-0 (light) / dark-6 (dark) hover backgrounds for
+   inactive links — both unusable on deep ink — so both the weak ink-3 wash and the label lift to the full
+   fg tone are plain declarations that out-specify those :where()-wrapped stock rules. */
+.navbar :global(.mantine-NavLink-root):not([data-active]):hover {
+  color: var(--app-sidebar-hover-fg);
+  background-color: var(--app-sidebar-hover-wash);
 }
 
 /* Active nav item: ink-3 wash + pure-white label (the 3px 青瓷 left bar is the global box-shadow in
-   theme.ts). data-active is Mantine's NavLink root modifier; we drive its own --nl-bg/--nl-color vars so the
-   whole link (root bg + inherited label color) recolors from one place. White-on-(wash-over-ink) measures
-   ~8.8–10.2:1 (contrast.test.ts). */
+   theme.ts). data-active is Mantine's NavLink root modifier; its core CSS applies --nl-bg/--nl-color only
+   here, and --nl-hover on active:hover — pin all three at the root (where an own-element declaration wins)
+   so the active row keeps the same wash + white label when hovered, instead of falling back to Mantine's
+   pale primary-light-hover. White-on-(wash-over-ink) measures ~8.8–10.2:1 (contrast.test.ts). */
 .navbar :global(.mantine-NavLink-root)[data-active] {
   --nl-bg: var(--app-sidebar-active-wash);
   --nl-color: var(--app-sidebar-active-fg);
-}
-
-/* Lift the dim inactive label to the full fg tone on hover (--nl-hover only covers the bg). Overriding
-   --nl-color (rather than raw `color`) is the documented NavLink mechanism, so the label — which inherits
-   the root's color from that var — brightens with it. Non-active rows only; active rows keep their white
-   label. */
-.navbar :global(.mantine-NavLink-root):not([data-active]):hover {
-  --nl-color: var(--app-sidebar-hover-fg);
+  --nl-hover: var(--app-sidebar-active-wash);
+  /* Plain `color` too: a non-default `variant` prop makes Mantine's varsResolver write --nl-* as INLINE
+     styles on the root (unbeatable by any stylesheet var override — this bit the subtle-variant parent
+     links). The parent links dropped their variant, but pinning the property directly keeps the white
+     label safe even if a variant ever comes back. */
+  color: var(--app-sidebar-active-fg);
 }
 
 /* Sidebar parent row: a navigating label (flex-filled link) + an independent expand/collapse chevron.
