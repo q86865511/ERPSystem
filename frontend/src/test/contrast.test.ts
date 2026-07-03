@@ -180,6 +180,32 @@ describe('sidebar colors (design.md §2.4/§5)', () => {
       expectAA(`sidebar active (#FFFFFF) vs ${bgName}`, '#FFFFFF', bg);
     });
   }
+
+  // Phase B1 (design.md §5): the deep-ink NavLink states are washes over the sidebar bg, not opaque
+  // colors, so the *rendered* text background is the wash composited over the bg — that's what must clear
+  // AA. The wash + fg tokens are parsed from index.css (single source; they live in the light block only,
+  // being scheme-independent), the two bg values come from theme.ts's sidebarColors, and the composite is
+  // the same flatten helper the semantic-color tests use.
+  const activeWash = parseRgba(cssVar(lightVars, '--app-sidebar-active-wash'));
+  const activeFg = cssVar(lightVars, '--app-sidebar-active-fg'); // #ffffff
+  const hoverWash = parseRgba(cssVar(lightVars, '--app-sidebar-hover-wash'));
+  const hoverFg = cssVar(lightVars, '--app-sidebar-hover-fg');
+  const activeBar = cssVar(lightVars, '--app-sidebar-active-bar');
+
+  for (const [bgName, bg] of backgrounds) {
+    it(`active label on active-wash over ${bgName} passes AA`, () => {
+      const surface = compositeOverBackground(activeWash.hex, activeWash.alpha, bg);
+      expectAA(`sidebar active fg on wash/${bgName}`, activeFg, surface);
+    });
+    it(`hover label on hover-wash over ${bgName} passes AA`, () => {
+      const surface = compositeOverBackground(hoverWash.hex, hoverWash.alpha, bg);
+      expectAA(`sidebar hover fg on wash/${bgName}`, hoverFg, surface);
+    });
+    // The 3px 青瓷 (ink-3) active left bar is a non-text UI affordance — 3:1 floor, not 4.5:1.
+    it(`active left bar vs ${bgName} passes the 3:1 non-text floor`, () => {
+      expectAA(`sidebar active bar vs ${bgName}`, activeBar, bg, AA_NON_TEXT);
+    });
+  }
 });
 
 // ---------------------------------------------------------------------------

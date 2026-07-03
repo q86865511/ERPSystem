@@ -159,12 +159,16 @@ export const theme = createTheme({
     Tabs: Tabs.extend({
       defaultProps: { color: 'brand' },
     }),
-    // TODO(B1): 深墨青側欄——navbar 固定 ink、NavLink 深底配色
-    // Active nav item: 3px ink left bar via inset box-shadow (no layout shift). The wash bg + label come
-    // for free from the primary color on the default (light) variant.
+    // Active nav item: a 3px left bar via inset box-shadow (no layout shift). This is the ONE piece kept in
+    // the *global* NavLink override, and it's kept global on purpose: it references `--app-sidebar-active-bar`
+    // (青瓷 ink-3, defined at :root in index.css), so the worst a hypothetical non-sidebar active NavLink
+    // could inherit is a benign brand-accent left bar — never a broken deep-ink background. The actual
+    // deep-ink coloring (background/wash/fg/hover) is deliberately NOT here — it's scoped to the navbar via
+    // the `--nl-*` CSS vars in AppLayout.module.css `.navbar`, so it can never leak onto a future
+    // non-sidebar NavLink (design.md §5; see the B1 report for the global-vs-scoped rationale).
     NavLink: NavLink.extend({
       styles: (_theme, props) => ({
-        root: props.active ? { boxShadow: 'inset 3px 0 0 var(--mantine-color-brand-6)' } : {},
+        root: props.active ? { boxShadow: 'inset 3px 0 0 var(--app-sidebar-active-bar)' } : {},
       }),
     }),
     // Centered dialog, radius lg, shadow md (the one elevated-surface exception in §4). Close button is
@@ -210,13 +214,15 @@ export const theme = createTheme({
     Tooltip: Tooltip.extend({
       defaultProps: { radius: 'sm', color: 'dark' },
     }),
-    // TODO(B1): 深墨青側欄——navbar 固定 ink、NavLink 深底配色
-    // Warm header surface + off-white navbar (both scheme-aware via the surface CSS vars). Navbar does
-    // NOT yet use the fixed sidebarColors ink — that structural change belongs to Phase B1.
+    // Warm header surface (still the scheme-aware card tone) + the fixed deep-ink navbar (design.md §5:
+    // "navbar 從淺色翻為深墨青,最大的結構性改變"). The navbar bg is `--app-sidebar-bg` (index.css: #123f3c
+    // light / #0f332f dark) — it does NOT flip to the page/card tone, so the brand ink is present in both
+    // schemes. Everything else that rides on this dark surface (NavLink fg/wash/hover, ScrollArea thumb) is
+    // scoped in AppLayout.module.css, keyed off the same `--app-sidebar-*` tokens.
     AppShell: AppShell.extend({
       styles: {
         header: { backgroundColor: 'var(--app-color-card)' },
-        navbar: { backgroundColor: 'var(--mantine-color-body)' },
+        navbar: { backgroundColor: 'var(--app-sidebar-bg)' },
       },
     }),
   },

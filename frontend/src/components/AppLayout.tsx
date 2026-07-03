@@ -295,8 +295,8 @@ export function AppLayout() {
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar p="xs">
-        <ScrollArea>
+      <AppShell.Navbar p="xs" className={classes.navbar}>
+        <ScrollArea classNames={{ scrollbar: classes.scrollbar, thumb: classes.thumb }}>
           {NAV.filter((item) => !item.requiredRole || hasRole(item.requiredRole)).map((item) => {
             const active =
               item.to === '/' ? location.pathname === '/' : location.pathname.startsWith(item.to);

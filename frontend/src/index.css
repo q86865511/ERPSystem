@@ -51,10 +51,30 @@
   --app-table-hover: #ebf2f0; /* ink-0 */
 
   /* Sidebar (design.md §2.4/§5): fixed ink, does not flip with the color scheme — see sidebarColors in
-     theme.ts (single source, imported by the AppShell override and by contrast.test.ts). */
+     theme.ts (single source, imported by the AppShell override and by contrast.test.ts). The base
+     bg/fg/fgInactive triple lives here AND in theme.ts's `sidebarColors` (same hex, two consumers); the
+     derived-on-ink tokens below (active bar/wash, hover) are authored here only and parsed by
+     contrast.test.ts, so no fourth hand-copy exists. All of these are scheme-independent: the navbar stays
+     deep ink in light AND dark mode, so they sit outside the light/dark split (see the light block; the
+     dark block deliberately does NOT re-declare them). */
   --app-sidebar-bg: #123f3c;
   --app-sidebar-fg: #dce7e2;
   --app-sidebar-fg-inactive: #a9c2ba;
+  /* Active nav item: 青瓷 ink-3 3px left bar + a ink-3 wash behind it + pure white label (design.md §5).
+     The wash is translucent so it reads correctly over either sidebar bg (light #123f3c / dark #0f332f). */
+  --app-sidebar-active-bar: #8ab3ac; /* ink-3 青瓷 */
+  --app-sidebar-active-wash: rgba(138, 179, 172, 0.16); /* ink-3 @16% */
+  --app-sidebar-active-fg: #ffffff;
+  /* Hover on the deep ink surface — the light-mode gray-0/dark-6 hovers are unusable here (they'd be a
+     near-black-on-ink no-op / a cool gray unrelated to the ink surface). Instead: a weaker ink-3 wash (one
+     step below the active wash) plus lifting the (dimmer, inactive) label up to the full fg tone. */
+  --app-sidebar-hover-wash: rgba(138, 179, 172, 0.1); /* ink-3 @10%, one step under the active wash */
+  --app-sidebar-hover-fg: #dce7e2; /* == --app-sidebar-fg: inactive rows brighten to the base fg on hover */
+  /* Scrollbar thumb on the deep ink surface. Mantine's ScrollArea thumb only lightens itself in its
+     "where-dark" branch; in light mode it defaults to rgba(0,0,0,.4), invisible on ink — so we pin a
+     translucent light thumb for both schemes (non-text UI affordance, no AA requirement). */
+  --app-sidebar-scrollbar-thumb: rgba(220, 231, 226, 0.28);
+  --app-sidebar-scrollbar-thumb-hover: rgba(220, 231, 226, 0.45);
 }
 
 /* `:root[data-mantine-color-scheme]` (Mantine's own variable-resolver selector) outranks a bare attribute
@@ -90,6 +110,13 @@
   --app-table-th-color: #b0ccc7; /* ink-2 */
   --app-table-striped: #222c28;
   --app-table-hover: #20302b;
+
+  /* Sidebar (design.md §2.4): the ONLY sidebar token that flips with the scheme — the navbar drops one
+     notch of lightness in dark mode (#123f3c → #0f332f) to sit better against the darker page. fg,
+     fgInactive and every derived-on-ink token above are scheme-independent and intentionally NOT
+     re-declared here (they're translucent or already tuned for both ink backgrounds; contrast.test.ts
+     asserts fg/fgInactive/active-white against BOTH bg values). */
+  --app-sidebar-bg: #0f332f;
 }
 
 body {

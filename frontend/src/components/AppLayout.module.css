@@ -1,5 +1,7 @@
 /* "Skip to main content" link: offscreen until keyboard-focused, then it drops into view above the
-   header so keyboard/screen-reader users can bypass the sidebar nav (a11y, §6.4 #13). */
+   header so keyboard/screen-reader users can bypass the sidebar nav (a11y, §6.4 #13). brand-6 is now the
+   ink ramp's #2F6559 (design.md §2.1); white-on-that is 6.72:1 — comfortably AA — so the color is
+   unchanged from Blue Enterprise, only the underlying ramp moved. */
 .skipLink {
   position: absolute;
   top: -60px;
@@ -18,6 +20,39 @@
   top: 8px;
 }
 
+/* Deep-ink sidebar surface (design.md §2.4/§5). This class scopes ALL the dark-surface nav coloring to the
+   navbar so it can never leak onto a NavLink rendered elsewhere in the app — the global NavLink theme
+   override (theme.ts) keeps only the color-agnostic active left-bar. The `--nl-*` vars are Mantine's own
+   NavLink CSS variables (--nl-bg / --nl-color / --nl-hover), so every NavLink inside here — parents,
+   children, single items — is recolored from one place without per-instance props. All values key off the
+   scheme-independent --app-sidebar-* tokens in index.css (single source; contrast.test.ts asserts them). */
+.navbar {
+  /* Inactive nav item: dim ink-tinted label on the deep surface, transparent bg. */
+  --nl-color: var(--app-sidebar-fg-inactive);
+  --nl-bg: transparent;
+  /* Hover on the ink surface: the stock gray-0/dark-6 hovers are unusable on deep ink, so we use a weak
+     ink-3 wash (one step under the active wash). The label brightening to the full fg tone is handled per
+     hit-area below (Mantine has no --nl var for hover *color*, only hover bg). */
+  --nl-hover: var(--app-sidebar-hover-wash);
+}
+
+/* Active nav item: ink-3 wash + pure-white label (the 3px 青瓷 left bar is the global box-shadow in
+   theme.ts). data-active is Mantine's NavLink root modifier; we drive its own --nl-bg/--nl-color vars so the
+   whole link (root bg + inherited label color) recolors from one place. White-on-(wash-over-ink) measures
+   ~8.8–10.2:1 (contrast.test.ts). */
+.navbar :global(.mantine-NavLink-root)[data-active] {
+  --nl-bg: var(--app-sidebar-active-wash);
+  --nl-color: var(--app-sidebar-active-fg);
+}
+
+/* Lift the dim inactive label to the full fg tone on hover (--nl-hover only covers the bg). Overriding
+   --nl-color (rather than raw `color`) is the documented NavLink mechanism, so the label — which inherits
+   the root's color from that var — brightens with it. Non-active rows only; active rows keep their white
+   label. */
+.navbar :global(.mantine-NavLink-root):not([data-active]):hover {
+  --nl-color: var(--app-sidebar-hover-fg);
+}
+
 /* Sidebar parent row: a navigating label (flex-filled link) + an independent expand/collapse chevron.
    Splitting the two hit-areas is the ERP-001 fix — Mantine's collapsible NavLink swallows the click. */
 .parentRow {
@@ -28,18 +63,17 @@
   border-radius: var(--mantine-radius-sm);
 }
 
+/* Row-level hover wash on the deep ink surface (was gray-0 light / dark-6 dark, both unusable on ink).
+   Matches the weak ink-3 hover wash used for the NavLink itself so the whole row lights up together. */
 .parentRow:hover {
-  background-color: var(--mantine-color-gray-0);
+  background-color: var(--app-sidebar-hover-wash);
 }
 
-[data-mantine-color-scheme='dark'] .parentRow:hover {
-  background-color: var(--mantine-color-dark-6);
-}
-
-/* Active module: light brand wash across the whole row. The 3px brand left rail comes from the
-   theme's global active-NavLink box-shadow (theme.ts), same as every other active nav item. */
+/* Active module: the ink-3 active wash across the whole row (matches the NavLink's own active wash so the
+   row + label read as one band). The 3px 青瓷 left rail comes from the theme's global active-NavLink
+   box-shadow (theme.ts). */
 .parentRow[data-active] {
-  background-color: var(--mantine-color-brand-light);
+  background-color: var(--app-sidebar-active-wash);
 }
 
 /* The label owns the row width so the click target spans everything but the chevron. */
@@ -49,10 +83,22 @@
   background-color: transparent;
 }
 
+/* Chevron ActionIcon (subtle variant) on the deep ink surface: subtle's default gray foreground is too dim
+   on ink, so pin the inactive fg tone and lift to the full fg on hover, matching the nav labels. Icon vs
+   ink is a non-text 3:1 target, but the inactive fg already clears 6.1:1 (contrast.test.ts). */
 .chevron {
   flex: none;
   margin-inline-end: 4px;
-  transition: transform 150ms ease;
+  color: var(--app-sidebar-fg-inactive);
+  transition:
+    transform 150ms ease,
+    color 150ms ease-out;
+}
+
+.chevron:hover {
+  color: var(--app-sidebar-fg);
+  /* Keep the subtle hover backdrop consistent with the ink surface rather than the stock gray. */
+  background-color: var(--app-sidebar-hover-wash);
 }
 
 .chevron[data-open] {
@@ -62,4 +108,19 @@
 /* Sub-items indent under the parent label text. */
 .children {
   padding-inline-start: var(--mantine-spacing-xl);
+}
+
+/* ScrollArea on the deep ink surface: Mantine's thumb only lightens in its own "where-dark" branch, but our
+   navbar is dark ink even in LIGHT mode — where the thumb would default to rgba(0,0,0,.4) and vanish. Pin a
+   translucent light thumb (and a brighter hover thumb) for both schemes. Non-text affordance, no AA gate. */
+.scrollbar {
+  transition: background-color 150ms ease-out;
+}
+
+.scrollbar .thumb {
+  background-color: var(--app-sidebar-scrollbar-thumb);
+}
+
+.scrollbar:hover .thumb {
+  background-color: var(--app-sidebar-scrollbar-thumb-hover);
 }
