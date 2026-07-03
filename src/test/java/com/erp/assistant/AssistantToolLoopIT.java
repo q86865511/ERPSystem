@@ -51,9 +51,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * End-to-end integration for the assistant's tool loop over the real security filter chain and a real DB
  * (Testcontainers), with the model replaced by a {@link ScriptedAnthropicPort} and tools driven through a
- * {@link MockMvcToolInvoker} (no socket — the sandbox blocks loopback). The assistant is enabled
- * ({@code app.assistant.enabled=true}) but the scripted port bean wins over the SDK adapter (which is
- * {@code @ConditionalOnMissingBean}), so no {@code ANTHROPIC_API_KEY} is needed.
+ * {@link MockMvcToolInvoker} (no socket — the sandbox blocks loopback). The flag stays OFF (default): the
+ * scripted port bean alone makes the loop available ({@code isAvailable()} is port-presence, not the flag),
+ * and the flag-gated SDK adapter is never built, so no {@code ANTHROPIC_API_KEY} is needed. The real
+ * flag-on wiring is covered by {@link AssistantEnabledIT}.
  *
  * <p>Covers: (a) a read tool call surfacing seed data; (b) the full human-in-the-loop write flow — a
  * confirmation pause with no DB change, then an approved decision that creates the DRAFT sales order, audits
@@ -62,7 +63,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @Import({TestcontainersConfiguration.class, AssistantToolLoopIT.ScriptedConfig.class})
 @SpringBootTest(properties = {
-        "app.assistant.enabled=true",
         // Small caps so the rate-limit scenario is cheap to trigger.
         "app.assistant.rate-limit.max-chats-per-hour=2",
         "app.assistant.rate-limit.max-concurrent-streams=1"
