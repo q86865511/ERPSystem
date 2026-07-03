@@ -8,6 +8,16 @@ export const assistantEn = {
   inputPlaceholder: 'Message the assistant…',
   send: 'Send',
   stop: 'Stop',
+  preset: {
+    reconciliation: {
+      label: 'Reconciliation health check',
+      prompt: 'Are the books reconciled? If not, diagnose why.',
+    },
+    margin: {
+      label: 'Gross margin analysis',
+      prompt: 'Why did gross margin change compared to last month?',
+    },
+  },
   tool: {
     running: 'Running',
     confirm: 'Confirm',
@@ -40,6 +50,16 @@ export const assistantZh: typeof assistantEn = {
   inputPlaceholder: '對助手輸入訊息…',
   send: '送出',
   stop: '停止',
+  preset: {
+    reconciliation: {
+      label: '對帳健康診斷',
+      prompt: '帳有對平嗎?如果沒有,請診斷原因。',
+    },
+    margin: {
+      label: '毛利環比分析',
+      prompt: '與上個月相比,毛利為什麼變動?',
+    },
+  },
   tool: {
     running: '執行中',
     confirm: '確認',

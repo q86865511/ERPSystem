@@ -57,7 +57,8 @@
         "properties": {
           "asOf": {
             "type": "string",
-            "description": "As-of date in ISO yyyy-MM-dd form. Omit for today."
+            "description": "As-of date in ISO yyyy-MM-dd form. Omit for today.",
+            "format": "date"
           }
         },
         "required": []
@@ -74,7 +75,8 @@
         "properties": {
           "asOf": {
             "type": "string",
-            "description": "Reference date in ISO yyyy-MM-dd form; the month it falls in is the current month. Omit for today."
+            "description": "Reference date in ISO yyyy-MM-dd form; the month it falls in is the current month. Omit for today.",
+            "format": "date"
           }
         },
         "required": []
@@ -91,7 +93,127 @@
         "properties": {
           "asOf": {
             "type": "string",
-            "description": "As-of date in ISO yyyy-MM-dd form. Omit for today."
+            "description": "As-of date in ISO yyyy-MM-dd form. Omit for today.",
+            "format": "date"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_income_statement",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/reporting/income-statement",
+      "description": "Get the income statement as of a date: revenue and expense lines, their totals, and net income (totalRevenue - totalExpenses). Call this twice with two different asOf dates (e.g. end of this month and end of last month) to compare periods, such as explaining a change in gross profit or net income.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "asOf": {
+            "type": "string",
+            "description": "As-of date in ISO yyyy-MM-dd form. Omit for today.",
+            "format": "date"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_general_ledger",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/reporting/general-ledger/{accountCode}",
+      "description": "Get the posted journal-line drill-down for one GL account (entry id/no, posting date, debit, credit, memo, source document) as of a date. Use this to drill into the detail behind a suspicious or unbalanced figure — e.g. a reconciliation subledger/clearing-account mismatch found by get_reconciliation_health, or a specific account named in get_income_statement/get_budget_variance. accountCode must be an exact GL account code (e.g. from get_reconciliation_health's subledgerChecks/clearingAccounts or get_budget_variance's lines).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "accountCode": {
+            "type": "string",
+            "description": "Exact GL account code to drill into, e.g. \"1200\" or \"2100-GRIR\".",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9-]{0,31}$"
+          },
+          "asOf": {
+            "type": "string",
+            "description": "As-of date in ISO yyyy-MM-dd form. Omit for today.",
+            "format": "date"
+          }
+        },
+        "required": ["accountCode"]
+      }
+    },
+    {
+      "name": "get_revenue_trend",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/reporting/revenue-trend",
+      "description": "Get the monthly revenue trend: for each of the last N months, revenue, cost of goods sold (cogs) and the resulting gross margin (revenue - cogs). Use this to explain how revenue or gross margin moved month over month, e.g. to attribute a margin change to a revenue change versus a COGS change.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "months": {
+            "type": "integer",
+            "description": "Number of trailing months to return, ending at asOf. Omit for the default (6).",
+            "minimum": 1,
+            "maximum": 36
+          },
+          "asOf": {
+            "type": "string",
+            "description": "Reference date in ISO yyyy-MM-dd form; the trend ends in the month it falls in. Omit for today.",
+            "format": "date"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_cash_flow",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/reporting/cash-flow",
+      "description": "Get the monthly cash-flow trend: for each of the last N months, cash inflow (cash-account debits), outflow (cash-account credits) and the net change. Use this to answer questions about cash movement and liquidity trends, distinct from accrual profit.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "months": {
+            "type": "integer",
+            "description": "Number of trailing months to return, ending at asOf. Omit for the default (6).",
+            "minimum": 1,
+            "maximum": 36
+          },
+          "asOf": {
+            "type": "string",
+            "description": "Reference date in ISO yyyy-MM-dd form; the trend ends in the month it falls in. Omit for today.",
+            "format": "date"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_budget_variance",
+      "kind": "read",
+      "method": "GET",
+      "pathTemplate": "/api/reporting/budget-variance",
+      "description": "Get budget-vs-actual for one month: for each budgeted GL account, the budgeted figure, the actual posted movement, and the variance (actual - budget). Use this to answer which accounts are over or under budget and by how much.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer",
+            "description": "Calendar year, e.g. 2026. Omit to use asOf's (or today's) year.",
+            "minimum": 2000,
+            "maximum": 2100
+          },
+          "month": {
+            "type": "integer",
+            "description": "Month number 1-12. Omit to use asOf's (or today's) month.",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "asOf": {
+            "type": "string",
+            "description": "Reference date in ISO yyyy-MM-dd form, used to default year/month when they are omitted. Omit for today.",
+            "format": "date"
           }
         },
         "required": []

@@ -1,5 +1,6 @@
 package com.erp.assistant;
 
+import com.erp.assistant.application.PathVariableFiller;
 import com.erp.assistant.application.ToolInvoker;
 import com.erp.assistant.application.ToolResult;
 import com.erp.assistant.application.ToolSpec;
@@ -11,7 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,9 +23,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /**
  * A {@link ToolInvoker} that drives the ERP's real controllers through {@link MockMvc} instead of a socket
  * (this box's sandbox blocks loopback HTTP). It applies the same input→HTTP mapping as the production
- * {@code RestToolInvoker} — path variables, GET query params, POST body root — and forwards the caller's
- * bearer token so the real security filter chain authorizes the call. HTTP error statuses become
- * {@code ok=false} results, exactly as in production.
+ * {@code RestToolInvoker} — path variables (via the shared {@link PathVariableFiller}), GET query params,
+ * POST body root — and forwards the caller's bearer token so the real security filter chain authorizes the
+ * call. HTTP error statuses become {@code ok=false} results, exactly as in production.
  */
 public class MockMvcToolInvoker implements ToolInvoker {
 
@@ -39,11 +42,20 @@ public class MockMvcToolInvoker implements ToolInvoker {
         ObjectNode remaining = input != null && input.isObject()
                 ? ((ObjectNode) input).deepCopy()
                 : mapper.createObjectNode();
-        String path = fillPathVariables(spec.pathTemplate(), remaining);
         try {
+            // Expand the {var} template through UriComponentsBuilder (single-pass encoding — see
+            // PathVariableFiller's class doc) rather than substituting a pre-encoded string into the path
+            // ourselves, which would double-encode it. Building a java.net.URI (not a String re-fed through
+            // MockMvcRequestBuilders' own template parsing) keeps this a single encoding pass end to end.
+            Map<String, String> pathVariables = PathVariableFiller.extract(spec.pathTemplate(), remaining);
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(spec.pathTemplate());
+            if ("GET".equals(spec.method()) && !remaining.isEmpty()) {
+                uriBuilder.query(queryString(remaining));
+            }
+            URI uri = uriBuilder.build(pathVariables);
             MockHttpServletRequestBuilder builder = "GET".equals(spec.method())
-                    ? get(path + queryString(remaining))
-                    : post(path).contentType(MediaType.APPLICATION_JSON).content(remaining.toString());
+                    ? get(uri)
+                    : post(uri).contentType(MediaType.APPLICATION_JSON).content(remaining.toString());
             if (bearerToken != null && !bearerToken.isBlank()) {
                 builder.header(HttpHeaders.AUTHORIZATION, "Bearer " + bearerToken);
             }
@@ -59,11 +71,9 @@ public class MockMvcToolInvoker implements ToolInvoker {
         }
     }
 
+    /** The raw {@code a=1&b=2} query content (no leading {@code ?}) for {@code fields}, or "" if none. */
     private String queryString(ObjectNode fields) {
-        if (fields.isEmpty()) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder("?");
+        StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Map.Entry<String, JsonNode> entry : fields.properties()) {
             if (!first) {
@@ -73,22 +83,6 @@ public class MockMvcToolInvoker implements ToolInvoker {
             first = false;
         }
         return sb.toString();
-    }
-
-    private String fillPathVariables(String template, ObjectNode fields) {
-        String path = template;
-        int i = 0;
-        while ((i = path.indexOf('{', i)) >= 0) {
-            int end = path.indexOf('}', i);
-            if (end < 0) {
-                break;
-            }
-            String name = path.substring(i + 1, end);
-            JsonNode value = fields.remove(name);
-            path = path.replace("{" + name + "}", value != null ? scalar(value) : "");
-            i = 0;
-        }
-        return path;
     }
 
     private static String scalar(JsonNode node) {

@@ -19,7 +19,9 @@ import java.util.List;
  * input onto an HTTP request with these rules:
  * <ul>
  *   <li><b>Path variables</b>: any {@code {var}} in {@code pathTemplate} is replaced by the input field
- *       {@code var} (URL-encoded). Those fields are consumed and do not appear again below.</li>
+ *       {@code var}, percent-encoded as a single path segment. A missing/blank value or a dot-segment
+ *       ({@code .}/{@code ..}) is rejected rather than filled in. Those fields are consumed and do not appear
+ *       again below.</li>
  *   <li><b>GET</b>: every remaining top-level input field becomes a query parameter
  *       ({@code ?field=value}); arrays/objects are not expected for GET tools.</li>
  *   <li><b>POST</b>: the remaining input object is sent as the JSON request body root (verbatim), so the

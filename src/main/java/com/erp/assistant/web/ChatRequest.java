@@ -26,14 +26,24 @@ import java.util.List;
  * To resume after a write-confirmation pause, the client re-sends the full history (whose last assistant
  * turn contains the write {@code tool_use}) plus a {@link Decision}.
  *
+ * <p>An optional {@code preset} selects a specialised analysis system prompt ({@code reconciliation} or
+ * {@code margin}; see {@code AgentLoopService}) instead of the general-purpose one. It is stateless like
+ * everything else here: the client must resend the same {@code preset} on every resume of a preset-started
+ * conversation (including after a write confirmation), or the turn falls back to the general prompt.
+ *
  * <p>Validation cascades through the whole structure ({@code @Valid} on {@code messages} and each turn's
  * {@code content}), so a malformed nested field fails with the same 400 problem+json as a top-level
  * violation — handled by the shared {@code GlobalExceptionHandler#onValidation}.
  *
  * @param messages the conversation, oldest first (at least one turn)
  * @param decision optional answer to a pending write-tool confirmation (null on a fresh turn)
+ * @param preset   optional analysis preset: {@code reconciliation} or {@code margin} (null for the general
+ *                 assistant prompt)
  */
-public record ChatRequest(@NotEmpty @Valid List<Message> messages, @Valid Decision decision) {
+public record ChatRequest(
+        @NotEmpty @Valid List<Message> messages,
+        @Valid Decision decision,
+        @Pattern(regexp = "reconciliation|margin", message = "must be 'reconciliation' or 'margin'") String preset) {
 
     /**
      * One conversation turn.

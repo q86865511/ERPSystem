@@ -14,6 +14,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-03] 📈 **ERP Copilot PR4:「為什麼」歸因分析(preset + 第二批 reporting 工具)**。分支 `feat/assistant-pr4-analysis`。
+  - **5 個新 read 工具**(tools.json → 12 工具,逐一對照 controller 簽章):`get_income_statement`(asOf)、`get_general_ledger`(`{accountCode}` path var + asOf)、`get_revenue_trend`/`get_cash_flow`(months 1–36 + asOf)、`get_budget_variance`(year/month 1–12 + asOf);schema 帶 minimum/maximum/format:date/pattern(ToolRegistry 逐屬性透傳)。
+  - **preset 分析模式**:`ChatRequest.preset`(@Pattern reconciliation|margin,null→GENERAL)→ `AssistantPrompts` 常數類(共用 base 安全規則);reconciliation playbook(健康檢查→同回合平行鑽取問題科目 GL)、margin playbook(兩期損益+趨勢拆量價)。前端空對話 preset chips(Button,a11y)→ 同對話沿用 preset(reducer state,resume 也帶);chips 在 error+空對話仍可重試。
+  - **雙審修正(Opus+Codex,9 項全修)**:🔧 **path variable 真編碼**(PR2 遺留:javadoc 宣稱 URL-encoded 實際未編碼,`get_general_ledger` 首次曝光)→ 新 `PathVariableFiller`(拒絕空值/dot-segment)+ `UriBuilder.build(Map)` 單次編碼(`/`→`%2F`;初版 encodePathSegment 手動編碼踩到雙重編碼 `%2520`,已修),MockMvcToolInvoker 鏡像同一 helper;schema 數值範圍;IT 斷言強化(sourceDocId=本測試建立的 bill 單號;a4 自建資料 — **DataSeeder 有 @Profile("seed"),IT 不啟用,不能假設種子資料存在**);prompt 批次鑽取(緩解 max-turns=8);前端 mock 隔離/chips error 重試/Chip→Button;javadoc 清理。
+  - **驗證**:`mvnw verify` 全綠(unit 131 / **IT 229**,RestToolInvokerTest 8);前端 Vitest **156** / Playwright **13** / types / build 綠;openapi 僅 +`preset` 欄位。
 - [2026-07-03] 💬 **ERP Copilot PR3:前端 AI 助手側欄**。分支 `feat/assistant-pr3-frontend`(純前端 + nginx)。
   - **`features/assistant/`**(lazy chunk,~10KB):`AssistantDrawer`(右側 420px,`keepMounted` 保留對話)、`ToolCard`(read:running→success/error;write:proposed 確認/拒絕→running→終態)、`assistantReducer`(純函式,雙表示:`conversation` wire blocks + `messages` UI,**commit 游標**冪等提交)、`sseParser`(零依賴 fetch-stream parser:跨 chunk/CRLF/多行 data/尾 frame flush/heartbeat)、`useAssistantChat`(SSE 串流 + HITL 續跑 + AbortController + unmount abort)、`api.ts`(status query + streamChat 原生 fetch,401 重用 `client.ts` 單飛 `refreshAccessToken` 重試)。header sparkles 入口(status.enabled 才渲染)。i18n `assistant.*`(en/zh 模組);純文字渲染無 markdown 套件(無 XSS 面)。
   - **nginx**:`/api/assistant/` location(`proxy_buffering off` + `proxy_read_timeout 300s`,置於 `/api/` 前;不用 add_header,安全 header 無掉落)。

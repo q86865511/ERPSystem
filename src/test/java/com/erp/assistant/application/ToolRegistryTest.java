@@ -22,11 +22,13 @@ class ToolRegistryTest {
     private final ToolRegistry registry = new ToolRegistry(MAPPER);
 
     @Test
-    void loadsAllSevenManifestToolsWithExpectedNamesAndKinds() {
+    void loadsAllTwelveManifestToolsWithExpectedNamesAndKinds() {
         List<ToolSpec> specs = registry.specs();
         assertThat(specs).extracting(ToolSpec::name).containsExactlyInAnyOrder(
                 "search_items", "search_partners", "get_inventory_status", "get_ar_aging",
-                "get_kpi_summary", "get_reconciliation_health", "create_sales_order");
+                "get_kpi_summary", "get_reconciliation_health",
+                "get_income_statement", "get_general_ledger", "get_revenue_trend", "get_cash_flow",
+                "get_budget_variance", "create_sales_order");
         // Exactly one write tool (create_sales_order); the rest are reads.
         assertThat(specs).filteredOn(ToolSpec::isWrite).extracting(ToolSpec::name)
                 .containsExactly("create_sales_order");

@@ -34,6 +34,13 @@ export interface AssistantState {
   pending: PendingConfirmation | null;
   /** Last stream error surfaced to the user (banner), cleared when a new turn starts. */
   error: { title: string; detail?: string; status?: number } | null;
+  /**
+   * The analysis preset ('reconciliation' | 'margin') selected when this conversation started via a
+   * preset chip, or null for a plain conversation. Set once by the first `user_send` and carried on every
+   * subsequent resume (including HITL write confirmations) so the backend keeps using the same specialised
+   * system prompt for the whole conversation; cleared by `reset`.
+   */
+  preset: string | null;
 }
 
 export const initialAssistantState: AssistantState = {
@@ -42,11 +49,13 @@ export const initialAssistantState: AssistantState = {
   streaming: false,
   pending: null,
   error: null,
+  preset: null,
 };
 
 export type AssistantAction =
-  /** User pressed send: append their text and open a streaming assistant turn. */
-  | { type: 'user_send'; id: string; text: string }
+  /** User pressed send: append their text and open a streaming assistant turn. `preset` is only honoured
+   *  on the first message of a conversation (an empty `conversation`) — see the reducer case for why. */
+  | { type: 'user_send'; id: string; text: string; preset?: string | null }
   /** User confirmed/rejected the pending write tool (drives the resume POST at the hook layer). */
   | { type: 'resolve_confirmation'; approved: boolean; resultText: string }
   /** A parsed SSE event from the open stream. */
@@ -177,11 +186,16 @@ export function assistantReducer(state: AssistantState, action: AssistantAction)
         role: 'user',
         content: [{ type: 'text', text: action.text }],
       };
+      // A preset can only be (re)selected on the very first message of a conversation — once the
+      // conversation has history, `state.preset` (set once below) is always carried forward instead, so a
+      // later plain `send()` mid-conversation can't accidentally switch or drop the active preset.
+      const preset = state.conversation.length === 0 ? (action.preset ?? null) : state.preset;
       return {
         ...state,
         error: null,
         streaming: true,
         pending: null,
+        preset,
         conversation: [...state.conversation, userBlock],
         messages: [
           ...state.messages,
