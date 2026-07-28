@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -126,7 +128,7 @@ public class WorkOrderService {
         workOrder.beginIssue(wipLocation.id());
 
         int lineNo = 0;
-        for (WorkOrderComponent component : workOrder.getComponents()) {
+        for (WorkOrderComponent component : byComponentItemId(workOrder.getComponents())) {
             lineNo++;
             StockMovementCommand command = new StockMovementCommand(
                     component.getComponentItemId(), stockLocationId, wipLocation.id(),
@@ -212,7 +214,7 @@ public class WorkOrderService {
                         "return target must be a STOCK location, was " + stockLocation.type());
             }
             int lineNo = 0;
-            for (WorkOrderComponent component : workOrder.getComponents()) {
+            for (WorkOrderComponent component : byComponentItemId(workOrder.getComponents())) {
                 lineNo++;
                 if (component.getConsumedQty().signum() <= 0) {
                     continue;
@@ -230,6 +232,17 @@ public class WorkOrderService {
 
         workOrder.markCancelled();
         return workOrderRepository.saveAndFlush(workOrder);
+    }
+
+    /**
+     * Components sorted by item id. Every stock movement locks its item's cost state, so walking the
+     * components in item-id order keeps ADR 0003's fixed lock order regardless of how the BOM lists them
+     * — two work orders sharing components in opposite BOM order cannot deadlock.
+     */
+    private static List<WorkOrderComponent> byComponentItemId(List<WorkOrderComponent> components) {
+        List<WorkOrderComponent> ordered = new ArrayList<>(components);
+        ordered.sort(Comparator.comparing(WorkOrderComponent::getComponentItemId));
+        return ordered;
     }
 
     @Transactional(readOnly = true)

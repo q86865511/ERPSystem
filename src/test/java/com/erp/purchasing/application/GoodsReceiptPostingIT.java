@@ -137,6 +137,33 @@ class GoodsReceiptPostingIT {
                 .isInstanceOf(PurchasingValidationException.class);
     }
 
+    @Test
+    void multiLineReceiptTakesCostLocksInItemIdOrder() {
+        // Two items, PO lines deliberately in descending item id — ADR 0003's lock order says the stock
+        // legs (each of which locks that item's cost state) must still come out ascending.
+        Long lowItem = newRawItem("10");
+        Long highItem = newRawItem("10");
+        assertThat(highItem).isGreaterThan(lowItem);
+        PurchaseOrder po = purchaseOrderService.createOrder(newVendor(), List.of(
+                new PoLineInput(highItem, new BigDecimal("10"), new BigDecimal("10")),
+                new PoLineInput(lowItem, new BigDecimal("10"), new BigDecimal("10"))), JUNE, "tester");
+        purchaseOrderService.confirm(po.getId(), "tester");
+
+        GoodsReceipt grn = goodsReceiptService.receive(po.getId(), stockLocationId(), List.of(
+                new ReceiptLineInput(po.getLines().get(0).getId(), new BigDecimal("10")),
+                new ReceiptLineInput(po.getLines().get(1).getId(), new BigDecimal("10"))),
+                JUNE, "tester");
+
+        // One STOCK leg per receipt line, read back in insertion order.
+        List<Long> lockedItems = jdbcTemplate.queryForList(
+                "SELECT sle.item_id FROM stock_ledger_entry sle "
+                        + "JOIN location l ON l.id = sle.location_id "
+                        + "WHERE l.location_type = 'STOCK' AND sle.source_doc_type = 'GOODS_RECEIPT' "
+                        + "AND sle.source_doc_id LIKE ? ORDER BY sle.id",
+                Long.class, grn.getGrnNumber() + "#%");
+        assertThat(lockedItems).containsExactly(lowItem, highItem);
+    }
+
     private BigDecimal debitFor(Long journalEntryId, String accountCode) {
         return jdbcTemplate.queryForObject(
                 "SELECT COALESCE(SUM(jl.debit), 0) FROM journal_line jl "

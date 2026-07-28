@@ -18,6 +18,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white)](frontend/package.json)
 [![Mantine](https://img.shields.io/badge/Mantine-9-339af0?logo=mantine&logoColor=white)](frontend/package.json)
 [![Docker](https://img.shields.io/badge/Docker-compose%20demo-2496ed?logo=docker&logoColor=white)](compose.demo.yaml)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 <p align="center"><img src="docs/architecture.svg" alt="Manufacturing ERP 架構" width="900"></p>
 
@@ -25,7 +26,7 @@
 > 一具帶硬性 `借=貸` 不變量的過帳引擎、一本對帳到 GL 控制科目的不可變庫存子帳,以及一條
 > 可逐行辯護的「文件 → 庫存 → 分錄」管線。擴充套裝 ERP 多半只能展示框架設定。
 
-**目前進度**:**Phase 0–7 全數完成 + 全端化**。後端模組化單體(複式總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / RBAC)`mvn verify` 全綠(單元 60 + 整合 97);React 前端覆蓋全部 9 個模組;一行 `docker compose -f compose.demo.yaml up --build` 即可把 **postgres + 自動 seed 的後端 + 前端**整套拉起。逐階段交付見 [PROGRESS.md](PROGRESS.md)。
+**目前進度**:**Phase 0–7 全數完成 + 全端化**。後端模組化單體(複式總帳 / 庫存 / 採購到付款 / 訂單到收款 / 製造 / 報表與期間結 / RBAC)`mvn verify` 全綠(單元 135 + 整合 239),前端 246 個測試全綠;React 前端覆蓋全部 9 個模組;一行 `docker compose -f compose.demo.yaml up --build` 即可把 **postgres + 自動 seed 的後端 + 前端**整套拉起。逐階段交付見 [PROGRESS.md](PROGRESS.md)。
 
 ## 目錄
 
@@ -50,7 +51,7 @@
 2. **做**一個成品 —— 單階 BOM → 工單(領料進 WIP、完工產出成品)
 3. **賣**出去 —— 銷售單 → 出貨(以成本出) → 開票(收入 + COGS) → 收款
 
-然後**證明它是對的**:*對帳健康檢查* 斷言帳是平的 —— 全域 `SUM(借) = SUM(貸)`、庫存子帳值 == GL 庫存控制科目餘額、AP/AR 子帳 == 各自控制科目,且每個過渡科目(GR-IR、Deferred-COGS、WIP)在完整循環後都歸零。這張報表是本專案的招牌。
+然後**證明它是對的**:*對帳健康檢查* 斷言帳是平的 —— 全域 `SUM(借) = SUM(貸)`、庫存子帳值 == GL 庫存控制科目餘額、AP/AR 子帳 == 各自控制科目,這三項決定健康燈號;每個過渡科目(GR-IR、Deferred-COGS、WIP)的餘額另行列出供檢視(完整循環後應歸零),但不納入燈號判定。整張報表跑在單一 `REPEATABLE READ` 唯讀交易裡,GL 與各子帳讀的是同一個快照,不會在別人過帳時撕裂讀成誤紅/誤綠。這張報表是本專案的招牌。
 
 > 啟動 demo 後,以任一帳號開 **儀表板** 即可看到對帳 hero 亮綠燈;`GET /api/reporting/reconciliation` 是它的資料來源。
 
@@ -200,15 +201,15 @@ npm run gen:api      # 讀 openapi/openapi.json;或 npm run spec:pull 先抓最�
 
 **MCP server(Claude Desktop / Claude Code 直連)**:`mcp-server/` 是獨立 TypeScript stdio MCP server,讀同一份工具 manifest,以 env 帳密登入 ERP 後把 12 個工具暴露給任何 MCP client(寫入確認交給 client 原生 UX)。設定範例見 [mcp-server/README.md](mcp-server/README.md)。
 
-> 🔵 **「Blue Enterprise」重設計(Phase 1 已上線)**:前端已由 Warm Terracotta 換為藍色企業 SaaS 風(主色 `#2563EB` + 冷 slate 中性色)並部署上線,**本頁截圖皆為藍色版**。四張 `@mantine/charts` 資料儀表板(ERP 總覽 / 財務中心 / 庫存 / 生產)已接真實端點;財會分析(營收趨勢 / 現金流 / 預算差異 / KPI 環比,C1)、逐品項熱度 treemap(C2)、供應商準時率(C3)、工單 Gantt(C4)、OEE / 設備(C5)**全部接真實後端 —— 已無 PLANNED 佔位**。
+> 🖋️ **「墨青帳房(Ink Ledger)」重設計已上線**:前端已由 Blue Enterprise 換為墨青帳房設計系統(主色 `#123F3C` + 朱印點睛色 + 宣紙暖石灰 + 襯線標題),**本頁截圖皆為墨青版**。四張 `@mantine/charts` 資料儀表板(ERP 總覽 / 財務中心 / 庫存 / 生產)已接真實端點;財會分析(營收趨勢 / 現金流 / 預算差異 / KPI 環比,C1)、逐品項熱度 treemap(C2)、供應商準時率(C3)、工單 Gantt(C4)、OEE / 設備(C5)**全部接真實後端 —— 已無 PLANNED 佔位**。
 
-**設計系統(Blue Enterprise)**:自建的 Mantine theme —— 藍色企業主色(`#2563EB`)+ 冷 slate 中性色階 + 自託管 Plus Jakarta Sans;深/淺色模式右上角即時切換(預設跟隨系統,偏好存 localStorage)。元件層採 `theme.components` 全域覆寫(表格、卡片、輸入框等)加上共用元件(`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`KpiTile`/`DonutCard`/`AmountAllocationTable`/`EmptyState`/強化版 `PageHeader`)—— 隨模組實際採用而建,不預先造死碼。
+**設計系統(Ink Ledger)**:自建的 Mantine theme —— 墨青主色(`#123F3C`)+ 朱印 `seal` 點睛色 + 宣紙暖石灰中性色階 + 自託管 Noto Serif TC 標題字;深/淺色模式右上角即時切換(預設跟隨系統,偏好存 localStorage)。元件層採 `theme.components` 全域覆寫(表格、卡片、輸入框等)加上共用元件(`DataTable`/`DetailDrawer`/`StateButton`/`StatTile`/`KpiTile`/`DonutCard`/`SealBadge`/`AmountAllocationTable`/`EmptyState`/強化版 `PageHeader`)—— 隨模組實際採用而建,不預先造死碼。唯一美術依據見 [frontend/design.md](frontend/design.md)。
 
 **新手導覽(手刻,無 tour 套件)**:~2.5KB 的 spotlight + callout 疊層,涵蓋對帳健康檢查、側欄導覽、以及**每一個模組首頁**(ADMIN 共 12 步,依角色自動過濾稽核步);按「下一步」會**自動導航**到該步驟所在頁面,target 在 lazy chunk 掛載後由 `MutationObserver` 重新定位(不會因 Suspense 空窗跳步),fold 下方的目標會先捲動入鏡;進度存 localStorage,可隨時從右上角使用者選單重新開始。
 
 **可觀測性**:Micrometer 在 `/actuator/prometheus`(僅內部網路可達)暴露指標 —— 複用同一套 domain event 發業務 counter(過帳/登入/期間)+ 對帳健康 gauge,外加免費的 HTTP/JVM/連線池指標;結構化(ECS)JSON 日誌 + 每筆請求的關聯 ID。可選 `docker compose -f compose.demo.yaml -f compose.observability.yaml up` 起 Prometheus + Grafana(預載儀表板)。詳見 [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md)。
 
-**測試**:後端 97 個 Testcontainers 整合測試 + ArchUnit 邊界 + 對帳/年結驗收(`mvn verify`);前端 Vitest + React Testing Library(金額 BigInt 數學、RBAC 矩陣、i18n、**單飛 401→refresh→replay** JWT 流程、`RequireRole` 守衛),CI 每次 build 後跑;Playwright chromium smoke 走非阻斷的 `e2e` workflow(對線上 demo)。
+**測試**:後端 239 個 Testcontainers 整合測試 + 135 個單元測試(含 ArchUnit 26 條邊界)+ 對帳/年結驗收(`mvn verify`);前端 246 個 Vitest + React Testing Library(金額 BigInt 數學、RBAC 矩陣、i18n、**單飛 401→refresh→replay** JWT 流程、`RequireRole` 守衛),CI 每次 build 後跑;Playwright chromium smoke 走非阻斷的 `e2e` workflow(對線上 demo)。
 
 ## 📊 資料模型
 
@@ -238,14 +239,16 @@ erDiagram
 ## 🧪 測試
 
 ```bash
-# 後端:單元測試(Surefire)+ Testcontainers 整合測試(Failsafe,起真 Postgres)
-./mvnw verify       # 單元 60 + 整合 97;CI 用 `./mvnw -B -ntp verify`
+# 後端:單元測試(Surefire,不需 Docker)+ Testcontainers 整合測試(Failsafe,起真 Postgres)
+./mvnw test         # 單元 135
+./mvnw verify       # 單元 135 + 整合 239;CI 用 `./mvnw -B -ntp verify`
 
-# 前端:型別檢查 + 打包
+# 前端:型別檢查 + 打包 / 測試
 cd frontend && npm run build      # tsc -b && vite build
+cd frontend && npm run test:run   # Vitest 246
 ```
 
-整合測試命名為 `*IT`(Failsafe 在 `verify` 跑),`mvn test` 只跑 `*Test`/`*Tests`。請用 `mvn verify` 跑完整測試;GitHub Actions CI 已用 `verify`。`OpenApiSpecIT` 額外守 OpenAPI spec 不變量(無命名衝突、金額型別為字串、無合併 `oneOf` operation)。
+整合測試命名為 `*IT`(Failsafe 在 `verify` 跑),`mvn test` 只跑 `*Test`/`*Tests`。**分層是硬的:`mvn test` 不需要 Docker**——凡是要真 Postgres 的測試(含 context 冒煙測試 `ErpApplicationIT`)一律落在 `*IT` 層;反過來,**`mvn verify` 需要執行中的 Docker daemon**(Testcontainers 會拉 `postgres:16`)。請用 `mvn verify` 跑完整測試;GitHub Actions CI 已用 `verify`。`OpenApiSpecIT` 額外守 OpenAPI spec 不變量(無命名衝突、金額型別為字串、無合併 `oneOf` operation)。
 
 ## 🗺️ 路線圖
 
@@ -291,3 +294,7 @@ cd frontend && npm run build      # tsc -b && vite build
 | [frontend/](frontend/) | React 前端(獨立 Vite 專案) |
 | [mcp-server/README.md](mcp-server/README.md) | MCP server(Claude Desktop / Claude Code 接 ERP 的設定) |
 | [README.en.md](README.en.md) | English version |
+
+## 授權
+
+[MIT](LICENSE) —— 歡迎閱讀、fork、借鑑其中的作法。

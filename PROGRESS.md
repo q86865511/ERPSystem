@@ -1,6 +1,8 @@
 # PROGRESS — 製造業 ERP(作品集專案)
 
 ## 目前狀態
+**🔧 外部審查回報的正確性/衛生缺口已修完(2026-07-28,尚未 commit)** —— 併發鎖序、零金額價差行、對帳報表交易邊界、DB 平衡不變量缺口、測試分層與 LICENSE/README 一致性,詳見〈已完成〉最新條目。`./mvnw test` 135 綠(不需 Docker)、`./mvnw verify` 135 + 239 綠、前端 246 綠。
+
 **🖋️「墨青帳房(Ink Ledger)」前端全面改版已 merge(PR #112,2026-07-03);新手導覽修正亦已 merge(PR #113,同日)** —— 以 `frontend/design.md` 為唯一美術依據,Blue Enterprise → 墨青帳房:ink/seal/paperGray 三 ramp、Noto Serif TC 自架 216 分片(零 CDN)、側欄固定深墨青、簽名元件 `SealBadge` 朱印章(含蓋章動效/reduced-motion/列表精簡章/非 CJK 矩形章)、圖表收斂八色文化 palette、`contrast.test.ts` 52 條 AA 對比斷言。/pipeline 流程:implementer+2×architect 分層派工、Opus+Codex 雙審 8 條發現(4 成立已修、2 誤報、2 依裁決不動)、design.md 三處自相矛盾以實測數據修訂並註記。build/types/**239 tests** 全綠;23 張截圖(8 主頁 light+dark、AI 側欄、zh 朱印)重製並目檢。
 
 **🤖 ERP Copilot(AI/LLM 整合)全數交付且實機驗證通過(2026-07-03,PR #100–#110)** —— 平台定位轉「技術實驗場」後的第一個實驗:Claude 驅動的 AI 助手側欄(SSE 串流、12 工具、**寫入人工確認 HITL**、audit、限流)、「為什麼」歸因分析(對帳紅燈診斷/毛利環比,agent 自己鑽報表)、MCP server(Claude Desktop/Code 直連 ERP)。核心安全設計:工具以使用者自己的 JWT 回打自家 REST(RBAC/驗證/審計全重用),**AI 動了帳之後對帳 hero 仍全綠(IT + 實機皆驗)**。每個 PR 皆經 Opus+Codex 雙審全修。預設關閉(`APP_ASSISTANT_ENABLED` + `ANTHROPIC_API_KEY` 啟用);線上 demo 未開。整體計劃 `~/.claude/plans/ui-woolly-finch.md`。
@@ -19,6 +21,15 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-28] 🔧 **外部審查回報的正確性/衛生缺口全數修正**(高＋中級全修,尚未 commit)。
+  - **鎖序(ADR 0003 與實作對齊)**:`VendorBillService` 的 `variancePerItem` LinkedHashMap→TreeMap、`GoodsReceiptService.receive()` 收貨行先依 itemId 排序、`WorkOrderService.issue()/cancel()` 元件走新的 `byComponentItemId()`。三處原本都照輸入序取 `item_cost_state` 鎖,兩張文件以相反順序涵蓋同兩品項時有實際死鎖路徑(40P01)。
+  - **零金額價差行**:同一存貨科目上正負相抵的價差(如 +100/−100)會產生兩側皆零的分錄行,被 `JournalEntry.addLine` 拒絕、整張帳單過不了。改為組完 `entryLines` 後統一 `removeIf(isZeroLine)`,順帶蓋掉 `totalGrIr`/`gross` 為零的極端情況。
+  - **對帳報表交易邊界**:`ReconciliationService.reconcile()` 加 `@Transactional(readOnly = true, isolation = REPEATABLE_READ)` —— 原本 GL 與四個子帳各跑一個獨立 read transaction,併發過帳時會撕裂讀成誤紅/誤綠;READ COMMITTED 下單純包一層交易不夠(每個 statement 仍各自取快照),故指定 REPEATABLE READ。
+  - **DB 平衡不變量補洞**:新增 `V24__journal_line_balance_guard.sql` —— V1 的平衡 trigger 只掛在 `journal_entry`,對已 POSTED 分錄直接 `INSERT journal_line` 不會重驗。新的 deferred constraint trigger 在 commit 時重算所屬 entry 的借貸,讓「不平的分錄無法 commit」在 DB 層成為絕對真句(不改 V1)。
+  - **測試分層**:`ErpApplicationTests` → `ErpApplicationIT`(需 Testcontainers 卻落在 surefire,使無 Docker 的機器跑 `./mvnw test` 直接 BUILD FAILURE)。現在 `./mvnw test` 不需 Docker。
+  - **新增回歸測試**:`VendorBillLockOrderIT`(鎖序斷言 + 反序併發兩交易涵蓋同兩品項 × 4 輪)、`GoodsReceiptPostingIT.multiLineReceiptTakesCostLocksInItemIdOrder`、`WorkOrderIssueIT.issueTakesCostLocksInItemIdOrderWhateverTheBomOrder`、`VendorBillPostingIT.offsettingVariancesOnTheSameInventoryAccountPostWithoutAZeroLine`、`LedgerPostingServiceIT` 兩條 V24 守門測試。**全部先以還原修法的方式取得紅燈證據再轉綠**。
+  - **衛生/文件**:補根目錄 `LICENSE`(MIT)+ 雙語 README badge 與授權段;中文 README 的測試數字(單元 60 + 整合 97 → 實測 135 + 239 + 前端 246)、截圖說明(藍色版 → 墨青版)、設計系統段落同步英文版;README 測試段明寫「`mvn test` 不需 Docker、`mvn verify` 需要執行中的 daemon」;對帳段落改為「過渡科目只呈現不判定」以符合 `ReconciliationService` 的 `healthy` 實作;`frontend/index.html` 的 `theme-color` 從殘留的 Blue Enterprise `#2563eb`/`#1b2436` 改為墨青 `#123f3c`/`#0f332f`(對齊 index.css 的 `--app-sidebar-bg`)。
+  - **驗證**:`./mvnw -B -ntp test` → Tests run: 135, Failures: 0, Errors: 0(Docker 未啟動);`./mvnw -B -ntp verify` → 135 + 239 全綠;前端 `npm run test:run` → 27 files / 246 tests 全綠。
 - [2026-07-03] 🐛 **修正:新手導覽只顯示步驟 1、4、13(/pipeline)**。分支 `feat/ink-ledger-theme`。
   - **根因(非墨青改版迴歸,main 上行為相同)**:(1) 步驟 2 的 target 只在登入頁,但 tour 依 ERP-017 只掛在登入後 shell → 死步驟;(2) 對帳 hero 在儀表板 fold 下,無 scrollIntoView,callout 定位在視窗外,且 `locate()` 快轉會持久化、跳過不可逆;(3) 步驟 5–12 的 target 分散八個模組頁,`locate()` 靜默跳過不在當前頁的步驟,而步驟 13 的 target 每頁都有 → 按「下一步」直接吞到 13。
   - **修法(使用者裁決:下一步自動導航)**:steps 加 `route`/`requiredRole` 欄位、刪死步驟與 i18n 文案;Provider 以 `hasRole` 過濾可達步驟(非 ADMIN 自動少 audit 步、編號連續);overlay 改「route 不符 → navigate 過去等待;route 符合但 target 未 mount(lazy Suspense 空窗)→ 等 MutationObserver,**只有無 route 步驟可快轉**」;target 不在視窗先 `scrollIntoView` 再讀 rect;callout clamp 進視窗。
@@ -504,7 +515,7 @@ Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only �
 ## 已知問題
 - 本機 `java`/`mvn` 不在沙箱 shell 的 PATH;建置需顯式設定 `JAVA_HOME=E:\JDK21` 並把 System32/PowerShell 路徑補進 PATH(否則 mvnw.cmd 找不到 powershell 無法 bootstrap)。
 - Testcontainers 需 Docker daemon;若 `docker info` 連不上需先啟動 Docker Desktop(`C:\Program Files\Docker\Docker\Docker Desktop.exe`)。
-- **教訓**:整合測試命名為 `*IT` 由 Failsafe 在 `verify` 跑,`mvn test` 不會跑到(Surefire 只跑 `*Test`/`*Tests`)。請用 `mvn verify` 跑完整測試;CI 已用 `verify`。
+- **教訓**:整合測試命名為 `*IT` 由 Failsafe 在 `verify` 跑,`mvn test` 不會跑到(Surefire 只跑 `*Test`/`*Tests`)。請用 `mvn verify` 跑完整測試;CI 已用 `verify`。**2026-07-28 起分層是硬的**:`mvn test` 完全不需 Docker(`ErpApplicationTests` 已改名 `ErpApplicationIT`),要真 Postgres 的一律落 `*IT`。
 - ~~README CI badge 佔位~~(已解決:指向 `q86865511/ERPSystem`,main CI 綠)。
 - **沙箱限制**:本機沙箱/VM 擋 Tomcat loopback,無法在此跑真實 web server / Vite dev server;故 spec 以 MockMvc 匯出、前端以 `vite build` 驗證,實機驗證改在 **Oracle**(`ssh oracle`)上跑 Docker demo。
 - **前端小限制(可補可不補)**:庫存調整無歷史列表(後端無 adjustments list 端點);手動分錄科目選單取自試算表(空帳本無選項);期間關閉 `yearCode` 需手填;文件詳情點 `journalEntryId` 是導到該科目總帳鑽取的近似(無 by-entry 取整張分錄端點);主檔只有建立 + 列表,無編輯/刪除;列表端點無分頁(demo 規模夠用)。

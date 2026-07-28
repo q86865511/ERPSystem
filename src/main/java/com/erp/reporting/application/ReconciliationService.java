@@ -9,6 +9,8 @@ import com.erp.reporting.application.ReconciliationReport.ClearingBalance;
 import com.erp.reporting.application.ReconciliationReport.SubledgerCheck;
 import com.erp.sales.api.ReceivablesQuery;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -44,6 +46,14 @@ public class ReconciliationService {
         this.receivablesQuery = receivablesQuery;
     }
 
+    /**
+     * One read transaction for the whole report: the GL balances and the subledger reads must come from a
+     * single snapshot, otherwise a posting that lands between them tears the comparison and the hero
+     * reports a false red (or a false green). REPEATABLE READ because under READ COMMITTED every
+     * statement would take its own snapshot even inside one transaction; a read-only snapshot never
+     * conflicts, so it costs nothing but the snapshot age.
+     */
+    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
     public ReconciliationReport reconcile(LocalDate asOf) {
         List<AccountBalance> balances = generalLedgerQuery.accountBalances(asOf);
         Map<String, AccountBalance> byCode = new LinkedHashMap<>();

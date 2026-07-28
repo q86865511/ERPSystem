@@ -22,6 +22,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white)](frontend/package.json)
 [![Mantine](https://img.shields.io/badge/Mantine-9-339af0?logo=mantine&logoColor=white)](frontend/package.json)
 [![Docker](https://img.shields.io/badge/Docker-compose%20demo-2496ed?logo=docker&logoColor=white)](compose.demo.yaml)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 <p align="center"><img src="docs/architecture.svg" alt="Manufacturing ERP architecture" width="900"></p>
 
@@ -33,7 +34,8 @@
 
 **Status**: **Phase 0–7 complete + full-stack**. The modular-monolith backend (double-entry GL,
 inventory, procure-to-pay, order-to-cash, manufacturing, reporting & period close, RBAC) is green on
-`mvn verify` (60 unit + 97 integration); the React frontend covers all 9 modules; and a single
+`mvn verify` (135 unit + 239 integration) with 246 frontend tests green; the React frontend covers
+all 9 modules; and a single
 `docker compose -f compose.demo.yaml up --build` brings up **postgres + an auto-seeded backend +
 the frontend**. Stage-by-stage delivery is tracked in [PROGRESS.md](PROGRESS.md).
 
@@ -63,8 +65,11 @@ manufacturing differentiator (single-level BOM + Work Order with correct WIP acc
 
 Then **prove it**: the *reconciliation health-check* asserts the books are correct — global
 `SUM(debit) = SUM(credit)`, inventory subledger value == GL Inventory control balance, AP/AR
-subledgers == their control accounts, and every clearing account (GR-IR, Deferred-COGS, WIP) nets to
-zero after a complete cycle. This one report is the project's hero artifact.
+subledgers == their control accounts. Those three drive the health light; each clearing account
+(GR-IR, Deferred-COGS, WIP) is reported alongside for visibility (it should be zero after a complete
+cycle) but is not part of the verdict. The whole report runs in one `REPEATABLE READ` read-only
+transaction, so the GL and the subledgers are read from the same snapshot and a concurrent posting
+cannot tear it into a false red (or a false green). This one report is the project's hero artifact.
 
 > After starting the demo, open the **Dashboard** (as any user) to see the reconciliation hero go
 > green; `GET /api/reporting/reconciliation` is its data source.
@@ -323,8 +328,8 @@ reconciliation-health gauge, alongside free HTTP/JVM/pool metrics; structured (E
 per-request correlation id. An optional `docker compose -f compose.demo.yaml -f compose.observability.yaml up`
 brings up Prometheus + Grafana with a preloaded dashboard. See [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md).
 
-**Testing**: 97 backend Testcontainers integration tests + ArchUnit boundaries + reconciliation/year-end
-acceptance (`mvn verify`); frontend Vitest + React Testing Library (BigInt money math, the RBAC matrix, i18n,
+**Testing**: 239 backend Testcontainers integration tests + 135 unit tests (including 26 ArchUnit boundary
+rules) + reconciliation/year-end acceptance (`mvn verify`); 246 frontend Vitest + React Testing Library tests (BigInt money math, the RBAC matrix, i18n,
 the **single-flight 401→refresh→replay** JWT flow, the `RequireRole` guard) run in CI after every build; a
 Playwright chromium smoke runs in a separate non-blocking `e2e` workflow against the live demo.
 
@@ -358,14 +363,19 @@ erDiagram
 ## 🧪 Testing
 
 ```bash
-# Backend: unit tests (Surefire) + Testcontainers integration tests (Failsafe, real Postgres)
-./mvnw verify       # 60 unit + 97 integration; CI runs `./mvnw -B -ntp verify`
+# Backend: unit tests (Surefire, no Docker needed) + Testcontainers integration tests (Failsafe, real Postgres)
+./mvnw test         # 135 unit
+./mvnw verify       # 135 unit + 239 integration; CI runs `./mvnw -B -ntp verify`
 
-# Frontend: type-check + bundle
+# Frontend: type-check + bundle / tests
 cd frontend && npm run build      # tsc -b && vite build
+cd frontend && npm run test:run   # Vitest 246
 ```
 
 Integration tests are named `*IT` (run by Failsafe in `verify`); `mvn test` only runs `*Test`/`*Tests`.
+**The split is real: `mvn test` needs no Docker** — anything that wants a real Postgres (including the
+context smoke test `ErpApplicationIT`) lives in the `*IT` layer; conversely **`mvn verify` needs a running
+Docker daemon** (Testcontainers pulls `postgres:16`).
 Use `mvn verify` for the full suite; GitHub Actions CI already does. `OpenApiSpecIT` additionally guards
 OpenAPI-spec invariants (no schema-name collisions, money typed as string, no merged `oneOf` operations).
 
@@ -445,3 +455,7 @@ The senior-signal decisions, each written up under [docs/adr/](docs/adr/):
 | [frontend/](frontend/) | React frontend (standalone Vite project) |
 | [mcp-server/README.md](mcp-server/README.md) | MCP server (wiring Claude Desktop / Claude Code to the ERP) |
 | [README.md](README.md) | 繁體中文版 |
+
+## License
+
+[MIT](LICENSE) — read it, fork it, borrow from it.

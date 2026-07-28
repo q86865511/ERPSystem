@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -76,8 +78,13 @@ public class GoodsReceiptService {
         String grnNumber = sequenceAllocator.next(SEQUENCE_SCOPE);
         GoodsReceipt receipt = new GoodsReceipt(grnNumber, poId, postingDate);
 
+        // Receive in item-id order: each line locks that item's cost state, and ADR 0003's fixed lock
+        // order is what keeps two receipts covering the same items (in either line order) deadlock-free.
+        List<ReceiptLineInput> orderedLines = new ArrayList<>(lines);
+        orderedLines.sort(Comparator.comparing(input -> order.lineById(input.poLineId()).getItemId()));
+
         int lineNo = 0;
-        for (ReceiptLineInput input : lines) {
+        for (ReceiptLineInput input : orderedLines) {
             lineNo++;
             PoLine poLine = order.lineById(input.poLineId());
             BigDecimal qty = input.qty();

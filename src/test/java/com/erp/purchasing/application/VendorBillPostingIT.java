@@ -145,6 +145,56 @@ class VendorBillPostingIT {
         assertThat(revalueLegs).isEqualByComparingTo("100");
     }
 
+    @Test
+    void offsettingVariancesOnTheSameInventoryAccountPostWithoutAZeroLine() {
+        // Two RAW items → the same inventory account 1310. Bill one 10% over and the other 10% under:
+        // the variances cancel on 1310, and a zero-amount leg would be rejected by the ledger.
+        int n = SEQ.incrementAndGet();
+        Long vendorId = masterDataService.createPartner("V-OFF-" + n, "Vendor off " + n, true, false,
+                null, 30, null, null).getId();
+        Long itemA = masterDataService.createItem("RM-OFF-A-" + n, "Raw A " + n, ItemType.RAW, "EA", true,
+                new BigDecimal("100"), null, null).getId();
+        Long itemB = masterDataService.createItem("RM-OFF-B-" + n, "Raw B " + n, ItemType.RAW, "EA", true,
+                new BigDecimal("100"), null, null).getId();
+        PurchaseOrder po = purchaseOrderService.createOrder(vendorId, List.of(
+                new PoLineInput(itemA, new BigDecimal("10"), new BigDecimal("100")),
+                new PoLineInput(itemB, new BigDecimal("10"), new BigDecimal("100"))), JUNE, "tester");
+        Long lineA = po.getLines().get(0).getId();
+        Long lineB = po.getLines().get(1).getId();
+        purchaseOrderService.confirm(po.getId(), "tester");
+        goodsReceiptService.receive(po.getId(), stockLocationId(), List.of(
+                new ReceiptLineInput(lineA, new BigDecimal("10")),
+                new ReceiptLineInput(lineB, new BigDecimal("10"))), JUNE, "tester");
+
+        VendorBill bill = vendorBillService.postBill(po.getId(), List.of(
+                new BillLineInput(lineA, new BigDecimal("10"), new BigDecimal("110")),
+                new BillLineInput(lineB, new BigDecimal("10"), new BigDecimal("90"))),
+                "STANDARD", JUNE, "tester");
+
+        Long jeId = bill.getJournalEntryId();
+        assertThat(debitFor(jeId, "2150")).isEqualByComparingTo("2000");  // GR-IR at receipt cost
+        assertThat(debitFor(jeId, "1450")).isEqualByComparingTo("100");   // VAT on 2000
+        assertThat(creditFor(jeId, "2100")).isEqualByComparingTo("2100"); // AP gross
+        // The netted variance carries no leg at all — neither a zero debit nor a zero credit.
+        assertThat(debitFor(jeId, "1310")).isEqualByComparingTo("0");
+        assertThat(creditFor(jeId, "1310")).isEqualByComparingTo("0");
+        assertThat(lineCount(jeId, "1310")).isZero();
+
+        // Each item is still revalued individually: A up 100, B down 100.
+        assertThat(itemCostStateRepository.findById(itemA).orElseThrow().getTotalValue())
+                .isEqualByComparingTo("1100");
+        assertThat(itemCostStateRepository.findById(itemB).orElseThrow().getTotalValue())
+                .isEqualByComparingTo("900");
+    }
+
+    private Integer lineCount(Long journalEntryId, String accountCode) {
+        return jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM journal_line jl "
+                        + "JOIN account a ON a.id = jl.account_id "
+                        + "WHERE jl.journal_entry_id = ? AND a.code = ?",
+                Integer.class, journalEntryId, accountCode);
+    }
+
     private BigDecimal debitFor(Long journalEntryId, String accountCode) {
         return jdbcTemplate.queryForObject(
                 "SELECT COALESCE(SUM(jl.debit), 0) FROM journal_line jl "

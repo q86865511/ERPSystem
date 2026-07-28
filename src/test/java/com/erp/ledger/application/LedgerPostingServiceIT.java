@@ -104,4 +104,40 @@ class LedgerPostingServiceIT {
                 "UPDATE journal_line SET debit = debit + 1 WHERE journal_entry_id = ?", entry.getId()))
                 .isInstanceOf(DataAccessException.class);
     }
+
+    @Test
+    void appendingALineToAPostedEntryIsRejectedByTheDbBalanceGuard() {
+        JournalEntry entry = postingService.post(cashSale("APPEND-1", "42.00", "42.00", JUNE), "tester");
+        Long accountId = jdbcTemplate.queryForObject(
+                "SELECT id FROM account WHERE code = '1010'", Long.class);
+
+        // journal_line INSERT stays open on a POSTED parent (the posting flow needs it), so the guard
+        // has to be the balance re-check at COMMIT — V24.
+        assertThatThrownBy(() -> jdbcTemplate.update(
+                "INSERT INTO journal_line (journal_entry_id, line_no, account_id, debit, credit) "
+                        + "VALUES (?, 99, ?, 100, 0)", entry.getId(), accountId))
+                .isInstanceOf(DataAccessException.class);
+
+        // The entry is untouched and still balanced.
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COALESCE(SUM(debit - credit), 0) FROM journal_line WHERE journal_entry_id = ?",
+                BigDecimal.class, entry.getId())).isEqualByComparingTo("0");
+    }
+
+    @Test
+    void aBalancedPairAppendedToAPostedEntryStillCommits() {
+        JournalEntry entry = postingService.post(cashSale("APPEND-2", "42.00", "42.00", JUNE), "tester");
+        Long accountId = jdbcTemplate.queryForObject(
+                "SELECT id FROM account WHERE code = '1010'", Long.class);
+
+        // The guard only asserts balance — it must not block the posting flow's own line inserts.
+        jdbcTemplate.update(
+                "INSERT INTO journal_line (journal_entry_id, line_no, account_id, debit, credit) "
+                        + "VALUES (?, 98, ?, 5, 0), (?, 99, ?, 0, 5)",
+                entry.getId(), accountId, entry.getId(), accountId);
+
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COALESCE(SUM(debit - credit), 0) FROM journal_line WHERE journal_entry_id = ?",
+                BigDecimal.class, entry.getId())).isEqualByComparingTo("0");
+    }
 }

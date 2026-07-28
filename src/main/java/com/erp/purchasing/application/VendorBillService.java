@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 /**
  * Posts vendor bills. A bill matches its lines (FIFO) to received-but-unbilled receipts, clears the
@@ -89,7 +90,9 @@ public class VendorBillService implements PayableDocuments {
         BigDecimal totalVat = zero();
         BigDecimal totalGoods = zero();
         Map<String, BigDecimal> variancePerAccount = new LinkedHashMap<>();
-        Map<Long, BigDecimal> variancePerItem = new LinkedHashMap<>();
+        // TreeMap: iterated in item-id order so the cost-state locks are taken in the order ADR 0003
+        // fixes, whatever order the bill lines arrive in.
+        Map<Long, BigDecimal> variancePerItem = new TreeMap<>();
 
         for (BillLineInput input : billLines) {
             PoLine poLine = order.lineById(input.poLineId());
@@ -141,6 +144,9 @@ public class VendorBillService implements PayableDocuments {
             entryLines.add(new Line(INPUT_VAT_ACCOUNT, totalVat, null, "input VAT", null));
         }
         entryLines.add(new Line(AP_ACCOUNT, null, gross, "accounts payable", order.getPartnerId()));
+        // Offsetting variances on the same inventory account (say +100 and −100 across two lines) net to
+        // zero; such a leg carries no information and would violate the ledger's one-side-non-zero rule.
+        entryLines.removeIf(VendorBillService::isZeroLine);
 
         JournalEntryRequest request = new JournalEntryRequest(null, postingDate,
                 "vendor bill " + billNumber, null, SOURCE_DOC_TYPE, billNumber, "BILL", entryLines);
@@ -205,6 +211,12 @@ public class VendorBillService implements PayableDocuments {
 
     private static BigDecimal zero() {
         return BigDecimal.ZERO.setScale(MONEY_SCALE);
+    }
+
+    /** True when both sides of a leg are absent or zero — nothing to post. */
+    private static boolean isZeroLine(Line line) {
+        return (line.debit() == null || line.debit().signum() == 0)
+                && (line.credit() == null || line.credit().signum() == 0);
     }
 
     private static PayableBillView toPayableView(VendorBill bill) {

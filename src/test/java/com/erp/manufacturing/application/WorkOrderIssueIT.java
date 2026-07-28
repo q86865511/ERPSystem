@@ -120,6 +120,32 @@ class WorkOrderIssueIT {
                 .isInstanceOf(RuntimeException.class);
     }
 
+    @Test
+    void issueTakesCostLocksInItemIdOrderWhateverTheBomOrder() {
+        // BOM lists its components in descending item id; ADR 0003's lock order says the issue must
+        // still walk them ascending, so two work orders sharing components cannot deadlock.
+        Long lowItem = rawWithStock("100", "10");
+        Long highItem = rawWithStock("100", "10");
+        assertThat(highItem).isGreaterThan(lowItem);
+        Long fgId = finishedItem();
+        BillOfMaterials bom = bomService.createBom(fgId, new BigDecimal("1"), List.of(
+                new ComponentInput(highItem, new BigDecimal("1"), null),
+                new ComponentInput(lowItem, new BigDecimal("1"), null)), "tester");
+
+        WorkOrder wo = workOrderService.create(fgId, bom.getId(), new BigDecimal("10"), "tester");
+        workOrderService.release(wo.getId(), "tester");
+        wo = workOrderService.issue(wo.getId(), stockLocationId(), JUNE, "tester");
+
+        // One STOCK leg per component, read back in insertion order.
+        List<Long> lockedItems = jdbcTemplate.queryForList(
+                "SELECT sle.item_id FROM stock_ledger_entry sle "
+                        + "JOIN location l ON l.id = sle.location_id "
+                        + "WHERE l.location_type = 'STOCK' AND sle.source_doc_type = 'WORK_ORDER' "
+                        + "AND sle.source_doc_id LIKE ? ORDER BY sle.id",
+                Long.class, wo.getWoNumber() + "#issue#%");
+        assertThat(lockedItems).containsExactly(lowItem, highItem);
+    }
+
     private BigDecimal debitFor(Long journalEntryId, String accountCode) {
         return jdbcTemplate.queryForObject(
                 "SELECT COALESCE(SUM(jl.debit), 0) FROM journal_line jl "
