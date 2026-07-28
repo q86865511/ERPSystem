@@ -21,6 +21,11 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-28] 🚫 **TypeScript 7 確認無法升,#55 以 dependabot ignore 關閉**:dependabot 在 6.0.3 上
+  main 後把 #55 改推 7.0.2;本地實測 TS7 的 npm 套件不暴露舊 compiler JS API(`ts.factory` undefined),
+  `openapi-typescript` 的 gen:api 直接崩潰(其 peer 亦僅宣告 ^5.x)。已還原 6.0.3(gen:api:check 回綠、
+  工作樹乾淨),#55 留言 `@dependabot ignore this major version` 關閉;待 openapi-typescript 支援 TS7
+  再 unignore。
 - [2026-07-28] ⬆️ **前端 TypeScript 5.9.3 → 6.0.3**(解 #55 的 CI 失敗):失敗根因是 `openapi-typescript@7.13.0`
   peer 只宣告 `typescript@^5.x` 造成 ERESOLVE(上游至今無支援 TS6 的版本)。以 npm `overrides` 把其 peer
   指向專案 TS 版本;TS6 新檢查 TS2882(CSS side-effect 匯入需模組宣告)於 `css-modules.d.ts` 補 `declare module '*.css'`。
