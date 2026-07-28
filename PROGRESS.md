@@ -21,6 +21,10 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
+- [2026-07-28] ⬆️ **前端 TypeScript 5.9.3 → 6.0.3**(解 #55 的 CI 失敗):失敗根因是 `openapi-typescript@7.13.0`
+  peer 只宣告 `typescript@^5.x` 造成 ERESOLVE(上游至今無支援 TS6 的版本)。以 npm `overrides` 把其 peer
+  指向專案 TS 版本;TS6 新檢查 TS2882(CSS side-effect 匯入需模組宣告)於 `css-modules.d.ts` 補 `declare module '*.css'`。
+  驗證(CI 全套本地重演):`gen:api:check` 產物零 diff、`build` 綠、246 Vitest 綠、`test:types` 綠、e2e 13/13 綠。
 - [2026-07-28] 📦 **Dependabot 積壓清理:12 個 PR 全部 squash 合併**(CI actions ×5、jacoco 0.8.15、
   archunit 1.4.2、anthropic-java 2.52.0、vitest 4.1.10、react-query 5.101.2 ×2、react group ×3)。
   驗證:合併後 main 最終 commit 的 CI 全綠(ubuntu,前後端);本地 `npm ci`+246 前端測試綠。
