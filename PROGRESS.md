@@ -21,7 +21,12 @@
 Phase 1(商品與庫存)已完成:`inventory` 移動加權平均、append-only 子帳、對帳達成「庫存帳值==GL」。Phase 2 計畫見 `~/.claude/plans/phase-1-iridescent-ember.md`,總路線圖見 `~/.claude/plans/pm-erp-enchanted-aurora.md`。
 
 ## 已完成
-- [2026-07-28] 🔧 **外部審查回報的正確性/衛生缺口全數修正**(高＋中級全修,尚未 commit)。
+- [2026-07-28] 📦 **Dependabot 積壓清理:12 個 PR 全部 squash 合併**(CI actions ×5、jacoco 0.8.15、
+  archunit 1.4.2、anthropic-java 2.52.0、vitest 4.1.10、react-query 5.101.2 ×2、react group ×3)。
+  驗證:合併後 main 最終 commit 的 CI 全綠(ubuntu,前後端);本地 `npm ci`+246 前端測試綠。
+  **#55(TypeScript 5.9→6.0.3 major)不合併**:其 PR CI 的 frontend job FAILURE,major 升級需另案處理。
+  (本地 mvnw 驗證遇本機 JDK AF_UNIX 系統級故障,與升版無關,已以 CI 為準。)
+- [2026-07-28] 🔧 **外部審查回報的正確性/衛生缺口全數修正**(高＋中級全修,已 commit 7bb5c7b 並 push)。
   - **鎖序(ADR 0003 與實作對齊)**:`VendorBillService` 的 `variancePerItem` LinkedHashMap→TreeMap、`GoodsReceiptService.receive()` 收貨行先依 itemId 排序、`WorkOrderService.issue()/cancel()` 元件走新的 `byComponentItemId()`。三處原本都照輸入序取 `item_cost_state` 鎖,兩張文件以相反順序涵蓋同兩品項時有實際死鎖路徑(40P01)。
   - **零金額價差行**:同一存貨科目上正負相抵的價差(如 +100/−100)會產生兩側皆零的分錄行,被 `JournalEntry.addLine` 拒絕、整張帳單過不了。改為組完 `entryLines` 後統一 `removeIf(isZeroLine)`,順帶蓋掉 `totalGrIr`/`gross` 為零的極端情況。
   - **對帳報表交易邊界**:`ReconciliationService.reconcile()` 加 `@Transactional(readOnly = true, isolation = REPEATABLE_READ)` —— 原本 GL 與四個子帳各跑一個獨立 read transaction,併發過帳時會撕裂讀成誤紅/誤綠;READ COMMITTED 下單純包一層交易不夠(每個 statement 仍各自取快照),故指定 REPEATABLE READ。
