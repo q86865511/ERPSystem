@@ -46,7 +46,7 @@ jobs:
       # Surefire/Failsafe/ArchUnit results (ArchUnit runs as JUnit, so its outcome is in surefire-reports).
       - name: Upload test & coverage reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backend-reports
           path: |
@@ -104,7 +104,7 @@ jobs:
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: frontend/playwright-report/
