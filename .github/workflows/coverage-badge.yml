@@ -28,7 +28,7 @@ jobs:
           ref: main
 
       - name: Download coverage report from the CI run
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: backend-reports
           path: ci-reports
