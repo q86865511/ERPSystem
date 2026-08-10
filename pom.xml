@@ -30,7 +30,7 @@
 		<java.version>21</java.version>
 		<!-- springdoc 3.0.x targets Spring Boot 4 / Spring Framework 7 (3.0.3 is built on Boot 4.0.5);
 		     2.8.x is the Boot 3.5 line and is NOT compatible here. -->
-		<springdoc.version>3.0.3</springdoc.version>
+		<springdoc.version>3.1.0</springdoc.version>
 	</properties>
 	<dependencies>
 		<dependency>
